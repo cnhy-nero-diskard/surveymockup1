@@ -1,0 +1,69 @@
+/* src/Page1.css */
+body {
+    background-color: #e0f7fa;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+.header {
+    background-color: #2196f3;
+    color: white;
+    padding: 20px;
+    border-radius: 10px 10px 0 0;
+    text-align: center;
+    position: relative;
+}
+.header img {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 50px;
+    height: 50px;
+}
+.header h1 {
+    margin: 0;
+    font-size: 18px;
+}
+.content {
+    padding: 20px;
+}
+.content p {
+    margin: 0 0 10px;
+    font-size: 14px;
+}
+.content table {
+    width: 100%;
+    border-collapse: collapse;
+}
+.content table th, .content table td {
+    text-align: center;
+    padding: 5px;
+}
+.content table th {
+    font-weight: normal;
+    font-size: 12px;
+}
+.content table td {
+    font-size: 14px;
+}
+.content table input[type="radio"] {
+    margin: 0;
+}
+.footer {
+    text-align: center;
+    padding: 10px;
+}
+.footer button {
+    background-color: #2196f3;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+}
+.footer button:hover {
+    background-color: #1976d2;
+}

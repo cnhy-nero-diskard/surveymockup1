@@ -1,0 +1,58 @@
+{
+  "en": {
+    "page1": {
+      "title": "What modes of transportation did/will you use in the city/municipality? (Check all that apply)",
+      "rateScale": "Rate each on a scale of 1-4, with 4 being the highest.",
+      "rental": "Rental MotorCycle / Car / Van",
+      "motorcycle": "Motorcycle (Habal-habal)",
+      "bike": "Bike / Pedicab",
+      "tricycle": "Tricycle",
+      "jeepney": "Jeepney",
+      "bus": "Bus",
+      "taxi": "Taxi / Grab",
+      "van": "Van / AUV (public utility)",
+      "boat": "Small Boat (Bangka)",
+      "ferry": "Ferry / Commercial Ship (big)",
+      "train": "Train (e.g. MRT, LRT, PNR)",
+      "privateVehicle": "Private Vehicle (No need to rate)"
+    },
+    "page2": {
+      "title": "Where do you live?",
+      "note": "(Note: Please specify where you are from.)",
+      "inCity": "In this City/Municipality",
+      "outsideCity": "Outside this City/Municipality (specify)",
+      "province": "Province:",
+      "cityMun": "City/Mun:",
+      "foreignCountry": "Are you from a foreign country?",
+      "specify": "Specify:"
+    }
+  },
+  "ja": {
+    "page1": {
+      "title": "市/町で使用した/使用予定の交通手段は何ですか？（該当するものすべてにチェックを入れてください）",
+      "rateScale": "それぞれを1から4のスケールで評価してください。4が最も高い評価です。",
+      "rental": "レンタルバイク/車/バン",
+      "motorcycle": "バイク（ハバルハバル）",
+      "bike": "自転車/ペディキャブ",
+      "tricycle": "トライシクル",
+      "jeepney": "ジープニー",
+      "bus": "バス",
+      "taxi": "タクシー/グラブ",
+      "van": "バン/AUV（公共交通機関）",
+      "boat": "小型ボート（バンカ）",
+      "ferry": "フェリー/大型商船",
+      "train": "電車（MRT、LRT、PNRなど）",
+      "privateVehicle": "自家用車（評価不要）"
+    },
+    "page2": {
+      "title": "あなたの住んでいる場所はどこですか？",
+      "note": "（注意：出身地を指定してください。）",
+      "inCity": "この市/町内",
+      "outsideCity": "この市/町外（指定してください）",
+      "province": "県:",
+      "cityMun": "市/町:",
+      "foreignCountry": "外国出身ですか？",
+      "specify": "指定:"
+    }
+  }
+}
