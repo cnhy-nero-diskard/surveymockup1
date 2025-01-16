@@ -1,6 +1,6 @@
 import React from 'react';
-import { BrowserRouter as Router, Route, Routes, useNavigate } from 'react-router-dom';
-
+import { BrowserRouter as Router, Route, Routes, useNavigate, Navigate } from 'react-router-dom';
+import { useAuth } from './context/AuthContext';
 // Import all the pages
 import LanguageSelector from './pages/languageselector/LanguageSelector';
 import Residence1 from './pages/residence1/Residence1';
@@ -53,13 +53,17 @@ import Transportation2 from './pages/transportation2/Transportation2';
 import PProfile2 from './pages/personalprofile2/PProfile2';
 import PProfile1 from './pages/personalprofile1/PProfile1';
 import ProponentLgu from './pages/proponentlgu/ProponentLgu';
-import { Title } from './components/shared/styles1';
 import { LanguageProvider } from './components/partials/LanguageContext';
+import TourismAttractionsTable from './components/admin/attractions/TourismAttractionsTable';
+import AdminSessionDashboard from './components/admin/adminsessiondashboard/AdminSessionDashboard';
+import MainDashboard from './components/admin/maindashboard/MainDashboard';
+import Login from './components/admin/login/Login';
 
+const ProtectedRoute = ({ children }) => {
+  const { user } = useAuth();
+  return user ? children : <Navigate to="/login" />;
+};
 
-
-
-// ButtonGrid Component
 const ButtonGrid = () => {
   const navigate = useNavigate();
 
@@ -86,7 +90,6 @@ const ButtonGrid = () => {
     { label: 'Primary Attraction', path: '/primaryatt' },
     { label: 'Rate Attraction', path: '/rateattraction' },
     { label: 'Events Open 1', path: '/eventsopen1' },
-    // { label: 'Events Open 2', path: '/eventsopen2' },
     { label: 'Attractions Feedback', path: '/attractionsfeedback' },
     { label: 'Package Tour Feedback', path: '/packagetourfeedback' },
     { label: 'Attraction Form', path: '/attractionform' },
@@ -116,18 +119,53 @@ const ButtonGrid = () => {
     { label: 'Personal Profile 2', path: '/pprofile2' },
     { label: 'Personal Profile 1', path: '/pprofile1' },
     { label: 'Proponent LGU', path: '/proponentlgu' },
+    { label: 'Tourism Attractions', path: '/tourismattractionstable' },
+    { label: 'Main Dashboard', path: '/maindashboard' },
+    { label: 'Login', path: '/login' },
+    { label: 'Admin Session Dashboard', path: '/AdminSessionDashboard' },
   ];
+
+  // Load state from localStorage on mount
+  const [checkedStates, setCheckedStates] = React.useState(() => {
+    const savedState = localStorage.getItem('checkedStates');
+    return savedState ? JSON.parse(savedState) : Array(buttonRoutes.length).fill(false);
+  });
+
+  // Save state to localStorage whenever it changes
+  React.useEffect(() => {
+    localStorage.setItem('checkedStates', JSON.stringify(checkedStates));
+  }, [checkedStates]);
+
+  const handleCheckboxChange = (index) => {
+    const newCheckedStates = [...checkedStates];
+    newCheckedStates[index] = !newCheckedStates[index];
+    setCheckedStates(newCheckedStates);
+  };
 
   return (
     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '10px' }}>
       {buttonRoutes.map((button, index) => (
-        <button
-          key={index}
-          onClick={() => navigate(button.path)}
-          style={{ padding: '10px', fontSize: '16px', cursor: 'pointer' }}
-        >
-          {button.label}
-        </button>
+        <div key={index} style={{ display: 'flex', alignItems: 'center' }}>
+          <input
+            type="checkbox"
+            checked={checkedStates[index]}
+            onChange={() => handleCheckboxChange(index)}
+            style={{ marginRight: '10px' }}
+          />
+          <button
+            onClick={() => navigate(button.path)}
+            disabled={checkedStates[index]}
+            style={{
+              padding: '10px',
+              fontSize: '16px',
+              cursor: 'pointer',
+              backgroundColor: checkedStates[index] ? 'grey' : '',
+              color: checkedStates[index] ? 'white' : '',
+            }}
+          >
+            {button.label}
+          </button>
+        </div>
       ))}
     </div>
   );
@@ -141,6 +179,7 @@ const AppRoutes = () => {
         {/* <Title>(DEBUG) ALL SURVEY WEBPAGES</Title> */}
         <Routes>
           <Route path="/" element={<ButtonGrid />} />
+          <Route path="/login" element={<Login />} />
           <Route path="/languageselector" element={<LanguageSelector />} />
           <Route path="/residence1" element={<Residence1 />} />
           <Route path="/mainpurpose" element={<MainPurpose />} />
@@ -192,6 +231,9 @@ const AppRoutes = () => {
           <Route path="/pprofile2" element={<PProfile2 />} />
           <Route path="/pprofile1" element={<PProfile1 />} />
           <Route path="/proponentlgu" element={<ProponentLgu />} />
+          <Route path="/tourismattractionstable" element={<TourismAttractionsTable />} />
+          <Route path="/maindashboard" element={<TourismAttractionsTable />} />
+          <Route path="/adminsessiondashboard" element={<AdminSessionDashboard />} />
         </Routes>
       </Router>
 

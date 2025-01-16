@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import './LanguageSelector.css';
-import nextbutton from '../../svg/flnext.svg';
 import "/node_modules/flag-icons/css/flag-icons.min.css";
 import BodyPartial from '../../components/partials/BodyPartial';
 import GradientBackground from '../../components/partials/GradientBackground';
@@ -9,6 +8,7 @@ import translate from "../../components/img/translate.png";
 import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '../../components/partials/LanguageContext';
 import axios from 'axios';
+
 const LanguageSelector = () => {
   const { setSelectedLanguage } = useLanguage(); // Access the context
   const navigate = useNavigate();
@@ -19,7 +19,6 @@ const LanguageSelector = () => {
       try {
         const response = await axios.get(`${process.env.REACT_APP_API_HOST}:${process.env.REACT_APP_API_PORT}/api/languageselect`);
         const data = response.data;
-        // Assuming the API response is an array of objects with 'code', 'name', and 'flag' properties
         setLanguages(data);
       } catch (error) {
         console.error('Error fetching languages:', error);
@@ -44,7 +43,7 @@ const LanguageSelector = () => {
       <GradientBackground overlayImage={translate}>
         <Container>
           <Title>Select Your Language</Title>
-          <div className="language-buttons">
+          <div className="language-buttons-grid">
             {languages.map((language) => (
               <button
                 key={language.code}

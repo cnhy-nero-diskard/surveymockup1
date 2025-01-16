@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import { useSpring, animated } from 'react-spring';
 import { ToastContainer, toast } from 'react-toastify';
@@ -14,13 +14,21 @@ const TableContainer = styled(animated.div)`
   width: 90%;
   max-width: 800px;
   margin: 50px auto;
-  padding: 20px;
+  padding-bottom: 20px;
+  padding-right: 1px;
+  padding-left: 1px;
+  // overflow-x: auto; /* Enable horizontal scrolling on small screens */
 `;
 
 const Table = styled.table`
   width: 100%;
   border-collapse: collapse;
   margin: 20px 0;
+  @media (max-width: 768px) {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
 `;
 
 const TableHeader = styled.th`
@@ -28,12 +36,20 @@ const TableHeader = styled.th`
   color: white;
   padding: 10px;
   border: 1px solid #ddd;
+  @media (max-width: 768px) {
+    padding: 8px;
+    font-size: 14px;
+  }
 `;
 
 const TableCell = styled.td`
   padding: 10px;
   border: 1px solid #ddd;
   text-align: center;
+  @media (max-width: 768px) {
+    padding: 8px;
+    font-size: 14px;
+  }
 `;
 
 const Input = styled.input`
@@ -41,19 +57,33 @@ const Input = styled.input`
   padding: 8px;
   border: 1px solid #ccc;
   border-radius: 5px;
+  @media (max-width: 768px) {
+    padding: 6px;
+    font-size: 14px;
+  }
 `;
 
 const RadioGroup = styled.div`
   display: flex;
   justify-content: space-between;
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: center;
+  }
 `;
 
 const RadioInput = styled.input`
   margin: 0 5px;
+  @media (max-width: 768px) {
+    margin: 5px 0;
+  }
 `;
 
 const Emoji = styled.span`
   font-size: 20px;
+  @media (max-width: 768px) {
+    font-size: 16px;
+  }
 `;
 
 const TrashButton = styled.button`
@@ -66,12 +96,18 @@ const TrashButton = styled.button`
   &:hover {
     color: darkred;
   }
+  @media (max-width: 768px) {
+    font-size: 16px;
+  }
 `;
 
 const Title = styled.h1`
   text-align: center;
   color: #007bff;
   margin-bottom: 20px;
+  @media (max-width: 768px) {
+    font-size: 24px;
+  }
 `;
 
 const AttractionForm = () => {

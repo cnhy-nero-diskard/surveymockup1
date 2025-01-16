@@ -78,26 +78,60 @@ const WhereStayArrival = () => {
     const [language, setLanguage] = useState(localStorage.getItem('selectedLanguage'));
     const translations = useTranslations('WhereStayArrival', language);
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        console.log('Selected Option:', selectedOption);
-        console.log('Duration:', duration);
-        console.log('Duration Unit:', durationUnit);
-    };
-
     const navigate = useNavigate();
-    const handleNext = () => {
-        navigate('/'); // Navigate to the home page
-    }
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        // Prepare the survey response data
+const surveyResponse = {
+    user_id: 123,
+    component_name: 'WhereStayArrival',
+    question_key: 'whereStayArrivalSelectLabel',
+    response_value: JSON.stringify({
+        selectedOption: selectedOption,
+        duration: duration,
+        durationUnit: durationUnit
+    }),
+    language_code: language,
+    is_open_ended: false,
+    category: 'Accommodation',
+};
+        try {
+            // Submit the survey response to the backend
+            const response = await fetch(`${process.env.REACT_APP_API_HOST}:${process.env.REACT_APP_API_PORT}/api/survey/submit`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(surveyResponse),
+            });
+            console.log("SUCCESS response",response);
+
+            if (!response.ok) {
+                throw new Error('Failed to submit survey response');
+            }
+
+            const result = await response.json();
+            console.log('Survey response submitted:', result);
+
+            // Navigate to the next page after successful submission
+            navigate('/');
+        } catch (err) {
+            console.error('Error submitting survey response:', err);
+            alert('Failed to submit survey response. Please try again.',err);
+        }
+    };
 
     useEffect(() => {
         setLanguage(localStorage.getItem('selectedLanguage'));
     }, []);
 
     return (
-        <><BodyPartial />
-      <GradientBackground overlayImage={imgoverlay} opacity={0.1} blendMode="multiply">
-      <Container
+        <>
+            <BodyPartial />
+            <GradientBackground overlayImage={imgoverlay} opacity={0.1} blendMode="multiply">
+                <Container
                     initial={{ opacity: 0, y: -20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5 }}
@@ -138,7 +172,6 @@ const WhereStayArrival = () => {
 
                         <NextButton
                             type="submit"
-                            onClick={handleNext}
                             whileHover={{ scale: 1.1 }}
                             whileTap={{ scale: 0.9 }}
                         >
@@ -147,8 +180,8 @@ const WhereStayArrival = () => {
                     </Form>
                 </Container>
             </GradientBackground>
-
-        </>);
+        </>
+    );
 };
 
 export default WhereStayArrival;

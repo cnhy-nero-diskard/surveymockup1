@@ -8,12 +8,19 @@ import { useNavigate } from 'react-router-dom';
 import useTranslations from '../../components/shared/useTranslations';
 
 const TravelWith = () => {
-    const [selectedOption, setSelectedOption] = useState(null);
+    const [selectedOptions, setSelectedOptions] = useState([]); // State to store multiple selected options
     const [language, setLanguage] = useState(localStorage.getItem('selectedLanguage'));
     const translations = useTranslations('TravelWith', language);
 
     const handleOptionClick = (option) => {
-        setSelectedOption(option);
+        // Check if the option is already selected
+        if (selectedOptions.includes(option)) {
+            // If selected, remove it from the array
+            setSelectedOptions(selectedOptions.filter(item => item !== option));
+        } else {
+            // If not selected, add it to the array
+            setSelectedOptions([...selectedOptions, option]);
+        }
     };
 
     const options = [
@@ -42,7 +49,7 @@ const TravelWith = () => {
                                 initial={{ scale: 1 }}
                                 whileHover={{ scale: 1.1 }}
                                 whileTap={{ scale: 0.9 }}
-                                animate={{ backgroundColor: selectedOption === option ? '#4CAF50' : '#E0E0E0' }}
+                                animate={{ backgroundColor: selectedOptions.includes(option) ? '#4CAF50' : '#E0E0E0' }}
                             >
                                 {option}
                             </Option>
@@ -52,6 +59,7 @@ const TravelWith = () => {
                         whileHover={{ scale: 1.1 }}
                         whileTap={{ scale: 0.9 }}
                         onClick={handleNextClick}
+                        disabled={selectedOptions.length === 0} // Disable button if no options are selected
                     >
                         {translations.travelWithNextButton}
                     </NextButton>
@@ -100,10 +108,10 @@ const NextButton = styled(motion.button)`
   padding: 15px 30px;
   border: none;
   border-radius: 15px;
-  background-color: #007bff;
+  background-color: ${props => props.disabled ? '#B0B0B0' : '#007bff'};
   color: white;
   font-size: 1rem;
-  cursor: pointer;
+  cursor: ${props => props.disabled ? 'not-allowed' : 'pointer'};
   transition: background-color 0.3s ease;
 `;
 

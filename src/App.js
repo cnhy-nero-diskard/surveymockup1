@@ -1,6 +1,8 @@
 // src/App.js
-import React from 'react';
+import React, { useState } from 'react';
 import AppRoutes from './AppRoutes';
+import { AuthProvider } from './context/AuthContext'; // Import the AuthProvider
+import { log } from 'loglevel';
 
 
 const globalFonts = [
@@ -15,14 +17,13 @@ const globalFonts = [
 ];
 
 function App() {
-
   return (
-    <div className="App">
-      <AppRoutes />
-      {/* <ItemList /> */}
-    </div>
+    <AuthProvider>
+      <div className="App">
+        <AppRoutes />
+      </div>
+    </AuthProvider>
   );
 }
-
 
 export default App;

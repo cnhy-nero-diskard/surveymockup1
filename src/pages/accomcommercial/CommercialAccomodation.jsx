@@ -78,14 +78,14 @@ const PrimaryAtt = () => {
                     >
                         <Title>{translations.primaryAttQuestion}</Title>
                         <Option
-                            onClick={() => handleOptionClick('YES')}
+                            onClick={() => handleOptionClick('1x')}
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
                         >
                             {translations.primaryAttYesOption}
                         </Option>
                         <Option
-                            onClick={() => handleOptionClick('NO')}
+                            onClick={() => handleOptionClick('2x')}
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
                         >

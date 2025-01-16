@@ -37,7 +37,7 @@ const OpenEnded1 = () => {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5 }}
                 >
-                    <Title>{translations.openEnded1Title}</Title>
+                    <Title>{translations.openEnded1TitleLifestyle}</Title>
 
                     {/* Emoji Buttons */}
                     <div>

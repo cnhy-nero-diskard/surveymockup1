@@ -24,19 +24,28 @@ const Title = styled.h2`
   color: #fff;
 `;
 
+const OptionsGrid = styled.div`
+  display: flex;
+  gap: 20px;
+  width: 100%;
+  justify-content: center;
+`;
+
 const Option = styled(motion.div)`
   display: flex;
   align-items: center;
+
   justify-content: center;
-  width: 100%;
-  padding: 10px;
-  margin: 5px 0;
+  width: 6em;
+  height: 100px;
   border: none;
   border-radius: 10px;
   cursor: pointer;
   background-color: #007bff;
-  transition: background-color 0.3s ease;
+  transition: background-color 0.3s ease, transform 0.3s ease;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  font-size: 2rem;
+  color: #fff;
 
   &:hover {
     background-color: rgb(18, 166, 224);
@@ -67,27 +76,29 @@ const Transportation1 = () => {
                     transition={{ duration: 0.5 }}
                 >
                     <Title>{translations.transportation1Title}</Title>
-                    <Option
-                        onClick={() => handleOptionClick('AIR')}
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                    >
-                        {translations.transportation1OptionAir}
-                    </Option>
-                    <Option
-                        onClick={() => handleOptionClick('SEA')}
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                    >
-                        {translations.transportation1OptionSea}
-                    </Option>
-                    <Option
-                        onClick={() => handleOptionClick('LAND')}
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                    >
-                        {translations.transportation1OptionLand}
-                    </Option>
+                    <OptionsGrid>
+                        <Option
+                            onClick={() => handleOptionClick('AIR')}
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                        >
+                            {translations.transportation1OptionAir}🛬
+                        </Option>
+                        <Option
+                            onClick={() => handleOptionClick('SEA')}
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                        >
+                            {translations.transportation1OptionSea}🚢
+                        </Option>
+                        <Option
+                            onClick={() => handleOptionClick('LAND')}
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                        >
+                            {translations.transportation1OptionLand}🚌
+                        </Option>
+                    </OptionsGrid>
                 </Container>
             </GradientBackground>
         </>

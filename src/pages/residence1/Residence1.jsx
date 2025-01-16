@@ -10,6 +10,9 @@ import { useNavigate } from 'react-router-dom';
 import useTranslations from '../../components/shared/useTranslations';
 import { RESIDENCE1 as COMPONENT } from '../../components/shared/componentConstants';
 
+// Import the countries-list module
+import { countries } from 'countries-list';
+
 const Residence1 = () => {
   const [language, setLanguage] = useState(localStorage.getItem('selectedLanguage'));
   const [location, setLocation] = useState({
@@ -35,9 +38,6 @@ const Residence1 = () => {
   const provinceRef = useRef(null);
   const cityMunRef = useRef(null);
   const specifyRef = useRef(null);
-
-
-
 
   useEffect(() => {
     const fetchMunicipalities = async () => {
@@ -67,9 +67,6 @@ const Residence1 = () => {
   }, []);
 
   const translations = useTranslations(COMPONENT, language);  
-
-
-
 
   const handleLanguageChange = (lang) => {
     setLanguage(lang);
@@ -114,8 +111,8 @@ const Residence1 = () => {
   const handleSpecifyInputChange = (e) => {
     const value = e.target.value;
     setSpecifyInput(value);
-    const filtered = specifySuggestionsList.filter((suggestion) =>
-      suggestion.toLowerCase().startsWith(value.toLowerCase())
+    const filtered = Object.keys(countries).filter((countryCode) =>
+      countries[countryCode].native.toLowerCase().startsWith(value.toLowerCase())
     );
     setSpecifySuggestions(filtered);
     setShowSpecifySuggestions(true);
@@ -127,8 +124,6 @@ const Residence1 = () => {
     setShowCityMunSuggestions(false);
     setShowSpecifySuggestions(false);
   };
-
-  const specifySuggestionsList = ['USA', 'Canada', 'Japan', 'Germany', 'France', 'Australia', 'United Kingdom', 'China', 'India', 'Brazil'];
 
   const navigate = useNavigate(); // Initialize useNavigate
   const handleNextClick = () => {
@@ -236,13 +231,13 @@ const Residence1 = () => {
                 />
                 {showSpecifySuggestions && specifySuggestions.length > 0 && (
                   <div className="suggestions">
-                    {specifySuggestions.map((suggestion, index) => (
+                    {specifySuggestions.map((countryCode, index) => (
                       <div
                         key={index}
-                        onClick={() => handleSuggestionClick(setSpecifyInput, suggestion)}
+                        onClick={() => handleSuggestionClick(setSpecifyInput, countries[countryCode].native)}
                         className="suggestion-item"
                       >
-                        {suggestion}
+                        {countries[countryCode].native}
                       </div>
                     ))}
                   </div>
@@ -254,10 +249,6 @@ const Residence1 = () => {
               {translations.next}
             </Button>
           </form>
-          <select onChange={(e) => handleLanguageChange(e.target.value)}>
-            <option value="en">English</option>
-            <option value="ja">日本語</option>
-          </select>
         </Container>
       </GradientBackground>
     </>
