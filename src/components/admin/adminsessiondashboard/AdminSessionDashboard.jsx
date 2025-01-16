@@ -9,13 +9,16 @@ const AdminSessionDashboard = () => {
             try {
                 const response = await axios.get(`${process.env.REACT_APP_API_HOST}:${process.env.REACT_APP_API_PORT}/api/admin/session-data`, {
                     withCredentials: true, // Include cookies in the request
+                    headers: {
+                        'X-Custom-Header': 'TestHeader',
+                      }
                 });
                 setSessionData(response.data);
             } catch (error) {
                 console.error('GYATT Error fetching session data:', error);
                 if (error.response && error.response.status === 401) {
                     // Redirect to login if unauthorized
-                    
+
                 }
             }
         };
