@@ -99,7 +99,7 @@ const surveyResponse = {
 };
         try {
             // Submit the survey response to the backend
-            const response = await fetch(`${process.env.REACT_APP_API_HOST}:${process.env.REACT_APP_API_PORT}/api/survey/submit`, {
+            const response = await fetch(`${process.env.REACT_APP_API_HOST}/api/survey/submit`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

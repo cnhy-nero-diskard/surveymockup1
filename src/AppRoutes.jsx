@@ -56,8 +56,14 @@ import ProponentLgu from './pages/proponentlgu/ProponentLgu';
 import { LanguageProvider } from './components/partials/LanguageContext';
 import TourismAttractionsTable from './components/admin/attractions/TourismAttractionsTable';
 import AdminSessionDashboard from './components/admin/adminsessiondashboard/AdminSessionDashboard';
-import MainDashboard from './components/admin/maindashboard/MainDashboard';
 import Login from './components/admin/login/Login';
+import Dashboard from './components/admin/maindashboard/Dashboard';
+import OverallMun from './components/admin/maindashboard/OverallMun';
+import OverallBarangay from './components/admin/maindashboard/OverallBarangay';
+import OverallSurveyTopic from './components/admin/maindashboard/OverallSurveyTopic';
+import OverallOneBarangay from './components/admin/maindashboard/OverallOneBarangay';
+import TMGraph from './components/admin/maindashboard/TMGraph';
+
 
 const ProtectedRoute = ({ children }) => {
   const { user } = useAuth();
@@ -120,9 +126,14 @@ const ButtonGrid = () => {
     { label: 'Personal Profile 1', path: '/pprofile1' },
     { label: 'Proponent LGU', path: '/proponentlgu' },
     { label: 'Tourism Attractions', path: '/tourismattractionstable' },
-    { label: 'Main Dashboard', path: '/maindashboard' },
+    { label: 'Main Dashboard', path: '/dashboard' },
     { label: 'Login', path: '/login' },
     { label: 'Admin Session Dashboard', path: '/AdminSessionDashboard' },
+    { label: 'Overall Sentiment', path: '/overallmun' },
+    { label: 'Overall Sentiment Barangay', path: '/overallbarangay' },
+    { label: 'Overall Sentiment Topic', path: '/overalltopic' },
+    { label: 'Overall One Barangay', path: '/overallone' },
+    { label: 'Topic Modelling', path: '/tmgraph' },
   ];
 
   // Load state from localStorage on mount
@@ -232,8 +243,14 @@ const AppRoutes = () => {
           <Route path="/pprofile1" element={<PProfile1 />} />
           <Route path="/proponentlgu" element={<ProponentLgu />} />
           <Route path="/tourismattractionstable" element={<TourismAttractionsTable />} />
-          <Route path="/maindashboard" element={<TourismAttractionsTable />} />
+          <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/adminsessiondashboard" element={<AdminSessionDashboard />} />
+          <Route path="/overallmun" element={<OverallMun />} />
+          <Route path="/overallbarangay" element={<OverallBarangay />} />
+          <Route path="/overalltopic" element={<OverallSurveyTopic />} />
+          <Route path="/overallone" element={<OverallOneBarangay />} />
+          <Route path="/tmgraph" element={<TMGraph />} />
+
         </Routes>
       </Router>
 

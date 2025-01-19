@@ -17,10 +17,10 @@ const Login = () => {
 
     try {
       console.log('Logging in with username:', username);
-      const response = await axios.post(`${process.env.REACT_APP_API_HOST}:${process.env.REACT_APP_API_PORT}/api/auth/login`, {
+      const response = await axios.post(`${process.env.REACT_APP_API_HOST}/api/auth/login`, {
         username,
         password,
-      });
+      },{withCredentials: true});
 
       // If using HttpOnly cookies, the token is automatically handled by the browser
       // No need to manually store it in localStorage or state

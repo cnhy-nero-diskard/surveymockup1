@@ -40,7 +40,7 @@ const SurveyConsent = () => {
   useEffect(() => {
     const fetchTranslations = async () => {
       try {
-        const response = await axios.get(`${process.env.REACT_APP_API_HOST}:${process.env.REACT_APP_API_PORT}/api/texts?language=${language}&component=SurveyConsent`);
+        const response = await axios.get(`${process.env.REACT_APP_API_HOST}/api/texts?language=${language}&component=SurveyConsent`);
         setTranslations(response.data);
       } catch (error) {
         console.error('Error fetching translations:', error);
