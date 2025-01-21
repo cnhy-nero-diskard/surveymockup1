@@ -1,3 +1,4 @@
+//UNUSED
 import React from 'react';
 import { Box, Drawer, AppBar, Toolbar, Typography, Button, IconButton, List, ListItem, ListItemText } from '@mui/material';
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
@@ -27,14 +28,7 @@ const Dashboard = () => {
   return (
     <Box sx={{ display: 'flex' }}>
       {/* Drawer */}
-      <Drawer
-        variant="permanent"
-        sx={{
-          width: drawerWidth,
-          flexShrink: 0,
-          [`& .MuiDrawer-paper`]: { width: drawerWidth, boxSizing: 'border-box' },
-        }}
-      >
+
         <Toolbar />
         <Box sx={{ overflow: 'auto' }}>
           <List>
@@ -45,7 +39,6 @@ const Dashboard = () => {
             ))}
           </List>
         </Box>
-      </Drawer>
 
       {/* Main Content */}
       <Box

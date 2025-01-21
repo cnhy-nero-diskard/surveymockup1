@@ -1,6 +1,6 @@
 import React from 'react';
 import { Drawer, List, ListItem, ListItemText, AppBar, Toolbar, Typography, IconButton, Grid, Card, CardContent } from '@mui/material';
-import { Bar } from 'react-chartjs-2';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import SearchIcon from '@mui/icons-material/Search';
@@ -8,32 +8,12 @@ import SearchIcon from '@mui/icons-material/Search';
 const OverallSurveyTopic = () => {
   const drawerWidth = 240;
 
-  const data = {
-    labels: ['Accommodation', 'Activities', 'Services', 'Transportation'],
-    datasets: [
-      {
-        label: 'Positive',
-        data: [60, 70, 80, 90],
-        backgroundColor: '#7FC8FF',
-      },
-      {
-        label: 'Negative',
-        data: [40, 30, 20, 10],
-        backgroundColor: '#FF99C8',
-      },
-    ],
-  };
-
-  const options = {
-    responsive: true,
-    maintainAspectRatio: false,
-    scales: {
-      y: {
-        beginAtZero: true,
-        max: 100,
-      },
-    },
-  };
+  const data = [
+    { name: 'Accommodation', Positive: 60, Negative: 40 },
+    { name: 'Activities', Positive: 70, Negative: 30 },
+    { name: 'Services', Positive: 80, Negative: 20 },
+    { name: 'Transportation', Positive: 90, Negative: 10 },
+  ];
 
   return (
     <div style={{ display: 'flex' }}>
@@ -119,7 +99,25 @@ const OverallSurveyTopic = () => {
                   BARANGAY OVERALL SURVEY RESULT PER SURVEY TOPIC
                 </Typography>
                 <div style={{ height: '300px' }}>
-                  <Bar data={data} options={options} />
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart
+                      data={data}
+                      margin={{
+                        top: 20,
+                        right: 30,
+                        left: 20,
+                        bottom: 5,
+                      }}
+                    >
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="name" />
+                      <YAxis domain={[0, 100]} />
+                      <Tooltip />
+                      <Legend />
+                      <Bar dataKey="Positive" fill="#7FC8FF" />
+                      <Bar dataKey="Negative" fill="#FF99C8" />
+                    </BarChart>
+                  </ResponsiveContainer>
                 </div>
               </CardContent>
             </Card>

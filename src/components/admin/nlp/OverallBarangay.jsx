@@ -4,7 +4,6 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'rec
 import FilterListIcon from '@mui/icons-material/FilterList';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import styled from 'styled-components';
-import DashboardDrawer from './DashboardDrawer';
 
 const data = [
   {
@@ -44,7 +43,6 @@ export default function OverallBarangay() {
   return (
     <Box sx={{ display: 'flex' }}>
       {/* Drawer */}
-      <DashboardDrawer drawerWidth={240} />
 
       {/* Main Content */}
       <MainContent>

@@ -1,29 +1,28 @@
-// src/App.js
-import React, { useState } from 'react';
-import AppRoutes from './AppRoutes';
-import { AuthProvider } from './context/AuthContext'; // Import the AuthProvider
-import { log } from 'loglevel';
+import React from 'react';
+import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
+import RouteSelector from './routes/RouteSelector';
+import AdminRoutes from './AdminRoutes';
+import WebpageRoutesDev from './WebpageRoutesDev';
+import NotFound from './components/admin/fallback/NotFound';
 
-
-const globalFonts = [
-  {
-    family: "'Roboto', sans-serif",
-    url: "https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap",
-  },
-  {
-    family: "'Montserrat', sans-serif",
-    url: "https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap",
-  },
-];
-
-function App() {
+const App = () => {
   return (
-    <AuthProvider>
-      <div className="App">
-        <AppRoutes />
-      </div>
-    </AuthProvider>
+    <Router>
+      <Routes>
+        {/* Default route to show the RouteSelector */}
+        <Route path="/" element={<RouteSelector />} />
+
+        {/* Admin Routes */}
+        <Route path="/admin/*" element={<AdminRoutes />} />
+
+        {/* App Routes */}
+        <Route path="/devpath1/*" element={<WebpageRoutesDev />} />
+
+        {/* Fallback route */}
+        <Route path="*" element={<NotFound/>} />
+      </Routes>
+    </Router>
   );
-}
+};
 
 export default App;
