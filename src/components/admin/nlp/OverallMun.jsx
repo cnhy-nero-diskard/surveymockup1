@@ -1,13 +1,16 @@
 import React from "react";
-import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from "recharts"; // Import Recharts components
+import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from "recharts";
 import { Box, Typography, Toolbar } from "@mui/material";
 import styled from "styled-components";
+import { fontFamily, fontSize, fontWeight } from '../../../config/fontConfig';
+import { sentimentColors } from '../../../config/sentimentConfig';
 
 const MainContent = styled(Box)`
   flex-grow: 1;
   padding: 24px;
-  background-color: clear;
-  min-height: 100vh;
+  font-family: ${fontFamily};
+  font-size: ${fontSize};
+  font-weight: ${fontWeight};
 `;
 
 const PieChartContainer = styled(Box)`
@@ -16,14 +19,14 @@ const PieChartContainer = styled(Box)`
   align-items: center;
   flex-direction: column;
   margin-top: 40px;
+  padding: 16px;
+  border-radius: 15px;
 `;
 
 const ChartWrapper = styled(Box)`
-  width: 300px;
+  width: 100%;
   height: 300px;
-  background-color: #ffffff;
   border-radius: 16px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   padding: 16px;
 `;
 
@@ -55,15 +58,15 @@ const Footer = styled(Box)`
 
 const OverallMun = () => {
   const pieData = [
-    { name: "Positive (beach, nice)", value: 65, color: "#53C2F0" },
-    { name: "Negative (beach, crowded)", value: 35, color: "#FFA5A5" },
+    { name: "Positive (beach, nice)", value: 65, color: sentimentColors.positive },
+    { name: "Negative (beach, crowded)", value: 35, color: sentimentColors.negative },
   ];
 
   return (
     <MainContent>
-      <Toolbar /> {/* Add this to account for the AppBar */}
+      <Toolbar />
       <PieChartContainer>
-        <Typography variant="h6">PANGLAO OVERALL TOURIST SENTIMENT RESULTS</Typography>
+        <Typography variant="h6">OVERALL SENTIMENT (PANGLAO)</Typography>
         <ChartWrapper>
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
@@ -96,12 +99,6 @@ const OverallMun = () => {
           ))}
         </LegendContainer>
       </PieChartContainer>
-      <Footer>
-        <Typography variant="subtitle1" sx={{ mr: 2 }}>
-          DECEMBER 8, 2025
-        </Typography>
-        <Typography variant="subtitle1">10:07 PM</Typography>
-      </Footer>
     </MainContent>
   );
 };

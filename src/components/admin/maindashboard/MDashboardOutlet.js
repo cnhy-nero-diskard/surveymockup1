@@ -16,13 +16,12 @@ const MainContent = styled(Box)`
 `;
 
 const DashboardOutlet = () => {
-  const drawerWidth = 240;
+  const drawerWidth = 250;
 
   return (
     <Container>
       <Sidebar drawerWidth={drawerWidth} />
       <MainContent>
-        <Toolbar /> {/* Empty Toolbar to push content below AppBar */}
         <Outlet /> {/* This will render the nested routes */}
       </MainContent>
     </Container>

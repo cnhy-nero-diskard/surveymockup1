@@ -1,30 +1,20 @@
 import React from 'react';
-import {
-  Box,
-  Drawer,
-  List,
-  ListItem,
-  ListItemIcon,
-  ListItemText,
-  AppBar,
-  Toolbar,
-  Typography,
-  IconButton,
-  InputBase,
-  Paper,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow
-} from '@mui/material';
+import { Box, Drawer, List, ListItem, ListItemIcon, ListItemText, AppBar, Toolbar, Typography, IconButton, InputBase, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import BarChartIcon from '@mui/icons-material/BarChart';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import { ScatterChart, Scatter, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
-
+import { fontFamily, fontSize, fontWeight } from '../../../config/fontConfig'; // Import font configuration
+import styled from 'styled-components';
 const drawerWidth = 240;
+
+const MainContent = styled(Box)`
+  flex-grow: 1;
+  padding: 24px;
+  font-family: ${fontFamily};
+  font-size: ${fontSize};
+  font-weight: ${fontWeight};
+`;
 
 const data = [
   { x: 50, y: 70, category: 'Accommodation' },
@@ -35,60 +25,10 @@ const data = [
 
 const TMGraph = () => {
   return (
+      <MainContent>
     <Box sx={{ display: 'flex' }}>
       {/* Drawer */}
-      <Drawer
-        variant="permanent"
-        sx={{
-          width: drawerWidth,
-          flexShrink: 0,
-          [`& .MuiDrawer-paper`]: { width: drawerWidth, boxSizing: 'border-box' },
-        }}
-      >
-        <Toolbar />
-        <Box sx={{ overflow: 'auto' }}>
-          <List>
-            <ListItem>
-              <ListItemText primary="TPMS ADMIN DASHBOARD" secondary="Department of Tourism" />
-            </ListItem>
-            <ListItem>
-              <Paper
-                component="form"
-                sx={{ p: '2px 4px', display: 'flex', alignItems: 'center', width: 200 }}
-              >
-                <InputBase sx={{ ml: 1, flex: 1 }} placeholder="Search" />
-                <IconButton type="button" sx={{ p: '10px' }}>
-                  <SearchIcon />
-                </IconButton>
-              </Paper>
-            </ListItem>
-            <ListItem button>
-              <ListItemIcon>
-                <BarChartIcon />
-              </ListItemIcon>
-              <ListItemText primary="Graphs" />
-            </ListItem>
-            <ListItem button>
-              <ListItemText primary="Panglao Overall Sentiments" />
-            </ListItem>
-            <ListItem button>
-              <ListItemText primary="Panglao Overall / Barangay" />
-            </ListItem>
-            <ListItem button>
-              <ListItemText primary="Barangay / Category" />
-            </ListItem>
-            <ListItem button>
-              <ListItemText primary="Barangay" />
-            </ListItem>
-            <ListItem button>
-              <ListItemIcon>
-                <ExitToAppIcon />
-              </ListItemIcon>
-              <ListItemText primary="Log Out" />
-            </ListItem>
-          </List>
-        </Box>
-      </Drawer>
+
 
       {/* Main Content */}
       <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
@@ -154,7 +94,7 @@ const TMGraph = () => {
           </Table>
         </TableContainer>
       </Box>
-    </Box>
+    </Box> </MainContent>
   );
 };
 

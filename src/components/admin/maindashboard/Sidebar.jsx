@@ -5,14 +5,32 @@ import {
   Toolbar,
   List,
   ListItem,
+  ListItemIcon,
   ListItemText,
   Button,
   TextField,
   Typography,
+  Divider,
 } from "@mui/material";
-import styled from "styled-components";
-import { Link } from "react-router-dom"; // Import Link for routing
+import styled from "@emotion/styled";
+import { Link } from "react-router-dom";
+import {
+  Dashboard as DashboardIcon,
+  LocationCity as MunicipalityIcon,
+  Map as BarangayIcon,
+  Topic as TopicIcon,
+  Business as EstablishmentIcon,
+  Timeline as GraphIcon,
+  ExitToApp as LogoutIcon,
+} from "@mui/icons-material";
 
+// Import Google Fonts (Poppins)
+import "@fontsource/poppins/300.css"; // Light
+import "@fontsource/poppins/400.css"; // Regular
+import "@fontsource/poppins/500.css"; // Medium
+import "@fontsource/poppins/700.css"; // Bold
+
+// Styled Components
 const SidebarDrawer = styled(Drawer)`
   width: ${({ drawerWidth }) => drawerWidth}px;
   flex-shrink: 0;
@@ -21,49 +39,94 @@ const SidebarDrawer = styled(Drawer)`
     width: ${({ drawerWidth }) => drawerWidth}px;
     box-sizing: border-box;
     background: linear-gradient(to bottom, #d9f1ff, #ade7ff);
+    border-right: none;
+    font-family: "Poppins", sans-serif;
   }
+`;
+
+const SidebarHeader = styled(Box)`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 16px;
+  background: linear-gradient(to bottom, #0077b6, #023e8a);
+  color: white;
+  font-family: "Poppins", sans-serif;
+`;
+
+const SearchField = styled(TextField)`
+  margin: 16px;
+  background-color: white;
+  border-radius: 4px;
+  width: calc(100% - 32px);
+
+  & .MuiInputBase-input {
+    font-family: "Poppins", sans-serif;
+  }
+`;
+
+const CustomTypography = styled(Typography)`
+  font-family: "Poppins", sans-serif;
 `;
 
 const Sidebar = ({ drawerWidth }) => {
   return (
     <SidebarDrawer variant="permanent" drawerWidth={drawerWidth}>
       <Toolbar />
+      <SidebarHeader>
+        <CustomTypography variant="h6" align="center" fontWeight="bold">
+          MULTILINGUAL SURVEY SYSTEM ADMIN DASHBOARD        </CustomTypography>
+        <CustomTypography variant="subtitle2" align="center">
+          PANGLAO TOURISM OFFICE        </CustomTypography>
+      </SidebarHeader>
+      <SearchField placeholder="Search" fullWidth variant="outlined" />
+      <Divider />
       <Box sx={{ overflow: "auto" }}>
         <List>
-          <ListItem>
-            <Typography variant="h6">TPMS ADMIN DASHBOARD</Typography>
-          </ListItem>
-          <ListItem>
-            <Typography variant="subtitle2">Department of Tourism</Typography>
-          </ListItem>
-          <ListItem>
-            <TextField placeholder="Search" fullWidth />
-          </ListItem>
-          {/* Add Link components for navigation */}
-          <ListItem button component={Link} to="dashboard">
-            <ListItemText primary="Main Dashboard" />
-          </ListItem>
-          <ListItem button component={Link} to="overallmun">
-            <ListItemText primary="Overall Sentiment" />
-          </ListItem>
-          <ListItem button component={Link} to="overallbarangay">
-            <ListItemText primary="Overall Sentiment Barangay" />
-          </ListItem>
-          <ListItem button component={Link} to="overalltopic">
-            <ListItemText primary="Overall Sentiment Topic" />
-          </ListItem>
-          <ListItem button component={Link} to="overallone">
-            <ListItemText primary="Overall One Barangay" />
-          </ListItem>
-          <ListItem button component={Link} to="tmgraph">
-            <ListItemText primary="Topic Modelling" />
-          </ListItem>
-          <ListItem>
-            <Button fullWidth variant="outlined">
-              Log Out
-            </Button>
-          </ListItem>
+          {[
+            { text: "Dashboard", icon: <DashboardIcon />, to: "dashboard" },
+            {
+              text: "Municipality Data",
+              icon: <MunicipalityIcon />,
+              to: "overallmun",
+            },
+            {
+              text: "Per Barangay Data",
+              icon: <BarangayIcon />,
+              to: "overallbarangay",
+            },
+            {
+              text: "Per Survey Topic Data",
+              icon: <TopicIcon />,
+              to: "overalltopic",
+            },
+            {
+              text: "Per Establishment Data",
+              icon: <EstablishmentIcon />,
+              to: "overallonebarangay",
+            },
+            { text: "Topic Modelling", icon: <GraphIcon />, to: "tmgraph" },
+          ].map((item, index) => (
+            <ListItem button component={Link} to={item.to} key={index}>
+              <ListItemIcon>{item.icon}</ListItemIcon>
+              <ListItemText
+                primary={item.text}
+                primaryTypographyProps={{ fontFamily: "Poppins, sans-serif" }}
+              />
+            </ListItem>
+          ))}
         </List>
+      </Box>
+      <Box sx={{ p: 2 }}>
+        <Button
+          fullWidth
+          variant="contained"
+          color="secondary"
+          startIcon={<LogoutIcon />}
+          sx={{ fontFamily: "Poppins, sans-serif" }}
+        >
+          Log Out
+        </Button>
       </Box>
     </SidebarDrawer>
   );
