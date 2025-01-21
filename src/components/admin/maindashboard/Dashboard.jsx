@@ -5,6 +5,7 @@ import OverallMun from '../nlp/OverallMun';
 import OverallBarangay from '../nlp/OverallBarangay';
 import OverallSurveyTopic from '../nlp/OverallSurveyTopic';
 import OverallEstablishment from '../nlp/OverallEstablishment'; // Assuming you have this component
+import { fontFamily, fontSize, fontWeight } from '../../../config/fontConfig';
 
 // Global styles to disable scrolling
 const GlobalStyle = createGlobalStyle`
@@ -22,6 +23,9 @@ const MainContent = styled(Box)`
   padding: 24px;
   background-color: transparent;
   min-height: 100vh;
+  font-family: ${fontFamily};
+  font-size: ${fontSize};
+  font-weight: ${fontWeight};
 `;
 
 const CardContainer = styled(Box)`
@@ -65,7 +69,15 @@ const Dashboard = () => {
           {/* First Row */}
           <Grid item xs={12} sm={6} md={6} lg={6} xl={6}>
             <CardContainer>
-              <Typography variant="h6" gutterBottom>
+              <Typography
+                variant="h6"
+                gutterBottom
+                sx={{
+                  fontFamily: fontFamily,
+                  fontSize: fontSize+5,
+                  fontWeight: fontWeight,
+                }}
+              >
                 Overall Municipality
               </Typography>
               <ContentBox>
@@ -75,8 +87,16 @@ const Dashboard = () => {
           </Grid>
           <Grid item xs={12} sm={6} md={6} lg={6} xl={6}>
             <CardContainer>
-              <Typography variant="h6" gutterBottom>
-                Overall One Barangay
+              <Typography
+                variant="h6"
+                gutterBottom
+                sx={{
+                  fontFamily: fontFamily,
+                  fontSize: fontSize+5,
+                  fontWeight: fontWeight,
+                }}
+              >
+                Barangay Data
               </Typography>
               <ContentBox>
                 <OverallBarangay /> {/* Insert the OverallBarangay component */}
@@ -87,7 +107,15 @@ const Dashboard = () => {
           {/* Second Row */}
           <Grid item xs={12} sm={6} md={6} lg={6} xl={6}>
             <CardContainer>
-              <Typography variant="h6" gutterBottom>
+              <Typography
+                variant="h6"
+                gutterBottom
+                sx={{
+                  fontFamily: fontFamily,
+                  fontSize: fontSize+5,
+                  fontWeight: fontWeight,
+                }}
+              >
                 Overall Topic
               </Typography>
               <ContentBox>
@@ -97,7 +125,15 @@ const Dashboard = () => {
           </Grid>
           <Grid item xs={12} sm={6} md={6} lg={6} xl={6}>
             <CardContainer>
-              <Typography variant="h6" gutterBottom>
+              <Typography
+                variant="h6"
+                gutterBottom
+                sx={{
+                  fontFamily: fontFamily,
+                  fontSize: fontSize+5,
+                  fontWeight: fontWeight,
+                }}
+              >
                 Overall Establishment
               </Typography>
               <ContentBox>

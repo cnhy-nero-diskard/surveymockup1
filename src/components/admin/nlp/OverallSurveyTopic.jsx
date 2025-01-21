@@ -57,8 +57,8 @@ const OverallSurveyTopic = () => {
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis
                     dataKey="name"
-                    tick={{ fontSize: 12, angle: -45 }}
-                    tickFormatter={(value) => truncateLabel(value, 5)}
+                    tick={{ fontSize: 12, angle: -0 }}
+                    tickFormatter={(value) => truncateLabel(value, 8)}
                     interval={0}
                   />
                   <YAxis domain={[0, 100]} />

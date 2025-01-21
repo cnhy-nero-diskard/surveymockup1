@@ -3,17 +3,19 @@ import { Box, Typography } from '@mui/material';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
 import styled from 'styled-components';
 import { sentimentColors } from '../../../config/sentimentConfig';
-
+import { fontFamily, fontSize, fontWeight } from '../../../config/fontConfig';
 const data = [
-  { name: 'Accommodation', Positive: 60, Negative: 40 },
-  { name: 'Activities', Positive: 70, Negative: 30 },
-  { name: 'Services', Positive: 80, Negative: 20 },
-  { name: 'Transportation', Positive: 90, Negative: 10 },
+  { name: 'Danao', Positive: 60, Negative: 40 },
+  { name: 'Tangnan', Positive: 70, Negative: 30 },
+  { name: 'Tawala', Positive: 80, Negative: 20 },
 ];
 
 const MainContent = styled(Box)`
   flex-grow: 1;
   padding: 24px;
+    font-family: ${fontFamily};
+    font-size: ${fontSize};
+    font-weight: ${fontWeight};
 `;
 
 const ChartContainer = styled(Box)`
@@ -30,7 +32,7 @@ const OverallSurveyTopic = () => {
     <Box sx={{ display: 'flex' }}>
       <MainContent>
         <Typography variant="h6" align="center" gutterBottom>
-          SURVEY AREA TOPICS DATA
+          TOP 3 RELEVANT BARANGAYS DATA
         </Typography>
         <Box sx={{ display: 'flex', gap: 4 }}>
           <ChartContainer>
@@ -48,8 +50,8 @@ const OverallSurveyTopic = () => {
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis
                 dataKey="name"
-                tick={{ fontSize: 12, angle: -45 }}
-                tickFormatter={(value) => truncateLabel(value, 5)}
+                tick={{ fontSize: 12, angle: -0 }}
+                tickFormatter={(value) => truncateLabel(value, 10)}
                 interval={0}
               />
               <YAxis domain={[0, 100]} />
