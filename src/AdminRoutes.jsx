@@ -12,6 +12,7 @@ import SentimentGraphs from './components/admin/nlp/SentimentGraphs';
 import HeatmapChart from './components/admin/nlp/sentimentgraphs/sentiment_heatmap';
 import SurveyMetrics from './components/admin/surveryperfmetrics/SurveyMetrics';
 import AIToolsDashboard from './components/admin/aitoolsdashboard/AiToolsDashboard';
+import Metrics from './components/temp/metricsprom';
 // const ProtectedRoute = ({ children }) => {
 //   const { user } = useAuth();
 //   return user ? children : <Navigate to="/admin/login" />;
@@ -37,6 +38,7 @@ const AdminRoutes = () => {
         <Route path="sentimentgraphs" element={<HeatmapChart />} />
         <Route path="surveymetrics" element={<SurveyMetrics />} />
         <Route path="aitoolsdashboard" element={<AIToolsDashboard />} />
+        <Route path="systemperf" element={<Metrics />} />
       </Route>
     </Routes>
   );

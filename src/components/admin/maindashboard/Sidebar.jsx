@@ -24,6 +24,8 @@ import {
   ExitToApp as LogoutIcon,
   InsightsRounded as InsightsIcon,
   PollRounded as SurveyIcon,
+  ApiRounded as AiToolsIcon,
+  ComputerOutlined as CompIcon
 } from "@mui/icons-material";
 
 // Import Google Fonts (Poppins)
@@ -114,8 +116,13 @@ const Sidebar = ({ drawerWidth }) => {
             },
             {
               text: "AI Tools Dashboard",
-              icon: <SurveyIcon />,
+              icon: <AiToolsIcon />,
               to: "aitoolsdashboard",
+            },
+            {
+              text: "AI Tools Dashboard",
+              icon: <CompIcon />,
+              to: "systemperf",
             },
             { text: "Topic Modelling", icon: <GraphIcon />, to: "tmgraph" },
             { text: "Sentiment Analysis", icon: <InsightsIcon />, to: "sentimentgraphs" },
