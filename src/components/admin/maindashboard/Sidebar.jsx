@@ -22,6 +22,8 @@ import {
   Business as EstablishmentIcon,
   Timeline as GraphIcon,
   ExitToApp as LogoutIcon,
+  InsightsRounded as InsightsIcon,
+  PollRounded as SurveyIcon,
 } from "@mui/icons-material";
 
 // Import Google Fonts (Poppins)
@@ -105,7 +107,18 @@ const Sidebar = ({ drawerWidth }) => {
               icon: <EstablishmentIcon />,
               to: "overallonebarangay",
             },
+            {
+              text: "Survey Performance Metrics",
+              icon: <SurveyIcon />,
+              to: "surveymetrics",
+            },
+            {
+              text: "AI Tools Dashboard",
+              icon: <SurveyIcon />,
+              to: "aitoolsdashboard",
+            },
             { text: "Topic Modelling", icon: <GraphIcon />, to: "tmgraph" },
+            { text: "Sentiment Analysis", icon: <InsightsIcon />, to: "sentimentgraphs" },
           ].map((item, index) => (
             <ListItem button component={Link} to={item.to} key={index}>
               <ListItemIcon>{item.icon}</ListItemIcon>

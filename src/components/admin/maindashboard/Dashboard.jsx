@@ -1,10 +1,10 @@
 import React, { useEffect } from 'react';
 import { Box, Grid, Typography } from '@mui/material';
 import styled, { createGlobalStyle } from 'styled-components';
-import OverallMun from '../nlp/OverallMun';
-import OverallBarangay from '../nlp/OverallBarangay';
-import OverallSurveyTopic from '../nlp/OverallSurveyTopic';
-import OverallEstablishment from '../nlp/OverallEstablishment'; // Assuming you have this component
+import OverallMun from './nestedcomponents/OverallMun';
+import OverallBarangay from './nestedcomponents/OverallBarangay';
+import OverallSurveyTopic from './nestedcomponents/OverallSurveyTopic';
+import OverallEstablishment from './nestedcomponents/OverallEstablishment'; // Assuming you have this component
 import { fontFamily, fontSize, fontWeight } from '../../../config/fontConfig';
 
 // Global styles to disable scrolling
@@ -50,6 +50,10 @@ const ContentBox = styled(Box)`
   justify-content: center;
   align-items: center;
 `;
+const CustomTypography = styled(Typography)`
+  font-family: ${fontFamily};
+  padding-top: 16px;
+`;
 
 const Dashboard = () => {
   useEffect(() => {
@@ -65,6 +69,8 @@ const Dashboard = () => {
     <>
       <GlobalStyle />
       <MainContent>
+        <CustomTypography variant="h4" gutterBottom>AS OF JANUARY 22, 2025</CustomTypography>
+
         <Grid container spacing={2}>
           {/* First Row */}
           <Grid item xs={12} sm={6} md={6} lg={6} xl={6}>
