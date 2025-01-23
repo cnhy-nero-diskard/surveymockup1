@@ -19,7 +19,7 @@ import {
   Dashboard as DashboardIcon,
   LocationCity as MunicipalityIcon,
   Map as BarangayIcon,
-  Topic as TopicIcon,
+  BeachAccessOutlined as AttIcon,
   Business as EstablishmentIcon,
   Timeline as GraphIcon,
   ExitToApp as LogoutIcon,
@@ -123,17 +123,17 @@ console.log(response.status); if (response.status === 200) {
             {
               text: "Per Barangay Data",
               icon: <BarangayIcon />,
-              to: "overallbarangay",
+              to: "barangaydashboard",
             },
             {
-              text: "Per Survey Topic Data",
-              icon: <TopicIcon />,
-              to: "overalltopic",
+              text: "Per Attraction Data",
+              icon: <AttIcon />,
+              to: "attractiondashboard",
             },
             {
               text: "Per Establishment Data",
               icon: <EstablishmentIcon />,
-              to: "overallonebarangay",
+              to: "establishmentdashboard",
             },
             {
               text: "Survey Metrics",
@@ -158,7 +158,7 @@ console.log(response.status); if (response.status === 200) {
             {
               text: "Survey Touchpoints",
               icon: <SurveyTouchpointsIcon />,
-              to: "usersdashboard",
+              to: "surveytouchpoints",
             },
             { text: "Topic Modelling", icon: <GraphIcon />, to: "tmgraph" },
             { text: "Sentiment Analysis", icon: <InsightsIcon />, to: "sentimentgraphs" },

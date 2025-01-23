@@ -18,6 +18,10 @@ import UsersDashboard from './components/admin/usersdashboard/UsersDashboard';
 import { useAuth } from './components/context/AuthContext';
 import WarningMessage from './components/partials/WarningMessage';
 import SurveyTouchpoints from './components/admin/surveytouchpoints/SurveyTouchPoints';
+import EstablishmentDataDashboard from './components/admin/perestablishment/EstablishmentDataDashboard';
+import BarangaysDashboard from './components/admin/perbarangaydashboard/BarangayDashboard';
+import MunicipalityDashboard from './components/admin/permunicipalitydashboard/MunicipalityDashboard';
+import AttractionDashboard from './components/admin/perattractiondashboard/AttractionDashboard';
 
 const AdminRoutes = () => {
   const { isAuthenticated, unauthorized, handleUnauthorized, login } = useAuth();
@@ -71,7 +75,7 @@ const AdminRoutes = () => {
         >
           <Route index element={<Dashboard />} />
           <Route path="dashboard" element={<Dashboard />} />
-          <Route path="overallmun" element={<OverallMun />} />
+          <Route path="overallmun" element={<MunicipalityDashboard />} />
           <Route path="overallbarangay" element={<OverallBarangay />} />
           <Route path="overalltopic" element={<OverallSurveyTopic />} />
           <Route path="overallonebarangay" element={<OverallOneBarangay />} />
@@ -81,6 +85,10 @@ const AdminRoutes = () => {
           <Route path="aitoolsdashboard" element={<AIToolsDashboard />} />
           <Route path="systemperf" element={<Metrics />} />
           <Route path="usersdashboard" element={<UsersDashboard />} />
+          <Route path="surveytouchpoints" element={<SurveyTouchpoints />} />
+          <Route path="establishmentdashboard" element={<EstablishmentDataDashboard />} />
+          <Route path="barangaydashboard" element={<BarangaysDashboard />} />
+          <Route path="attractiondashboard" element={<AttractionDashboard />} />
         </Route>
       </Routes>
     </>
