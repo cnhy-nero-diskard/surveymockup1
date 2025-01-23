@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { Route, Routes, Navigate } from 'react-router-dom';
+import axios from 'axios';
 import DashboardOutlet from './components/admin/maindashboard/MDashboardOutlet';
 import OverallMun from './components/admin/maindashboard/nestedcomponents/OverallMun';
 import OverallBarangay from './components/admin/maindashboard/nestedcomponents/OverallBarangay';
@@ -14,36 +15,75 @@ import SurveyMetrics from './components/admin/surveryperfmetrics/SurveyMetrics';
 import AIToolsDashboard from './components/admin/aitoolsdashboard/AiToolsDashboard';
 import Metrics from './components/temp/metricsprom';
 import UsersDashboard from './components/admin/usersdashboard/UsersDashboard';
-// const ProtectedRoute = ({ children }) => {
-//   const { user } = useAuth();
-//   return user ? children : <Navigate to="/admin/login" />;
-// };
+import { useAuth } from './components/context/AuthContext';
+import WarningMessage from './components/partials/WarningMessage';
+import SurveyTouchpoints from './components/admin/surveytouchpoints/SurveyTouchPoints';
 
 const AdminRoutes = () => {
-  return (
-    <Routes>
-      <Route path="/login" element={<Login />} />
-      <Route
-        path="/"
-        element={
-            <DashboardOutlet />
+  const { isAuthenticated, unauthorized, handleUnauthorized, login } = useAuth();
+  const [loading, setLoading] = useState(true);
+  const hasCheckedAuth = useRef(false); // Track if the auth check has been performed
+
+  useEffect(() => {
+    if (hasCheckedAuth.current) return; // Skip if already checked
+    hasCheckedAuth.current = true; // Mark as checked
+
+    const checkAuth = async () => {
+      try {
+        const response = await axios.get(`${process.env.REACT_APP_API_HOST}/api/auth/check`, {
+          withCredentials: true,
+        });
+        console.log('response.status', response.status);
+        if (response.status === 401) {
+          console.log('Unauthorized access uhh');
+          handleUnauthorized();
+        } else {
+          login();
         }
-      >
-        <Route index element={<Dashboard />} /> {/* Default route */}
-        <Route path = "dashboard" element={<Dashboard />} />
-        <Route path="overallmun" element={<OverallMun />} />
-        <Route path="overallbarangay" element={<OverallBarangay />} />
-        <Route path="overalltopic" element={<OverallSurveyTopic />} />
-        <Route path="overallonebarangay" element={<OverallOneBarangay />} />
-        <Route path="tmgraph" element={<TMGraph />} />
-        <Route path="sentimentgraphs" element={<HeatmapChart />} />
-        <Route path="surveymetrics" element={<SurveyMetrics />} />
-        <Route path="aitoolsdashboard" element={<AIToolsDashboard />} />
-        <Route path="systemperf" element={<Metrics />} />
-        <Route path="usersdashboard" element={<UsersDashboard />} />
-        <Route path="login" element={<Login />} />
-      </Route>
-    </Routes>
+      } catch (error) {
+        console.error('Error checking authentication:', error);
+        handleUnauthorized();
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    checkAuth();
+  }, [handleUnauthorized, login]);
+
+  console.log('authorized? --> ', isAuthenticated);
+
+  if (loading) {
+    return <div>Loading...</div>; // Show a loading indicator
+  }
+
+  return (
+    <>
+      {unauthorized && <WarningMessage message="Unauthorized Access! Please log in." />}
+
+      <Routes>
+        <Route path="/login" element={<Login />} />
+        <Route
+          path="/"
+          element={
+            isAuthenticated ? <DashboardOutlet /> : <Navigate to="/login" replace />
+          }
+        >
+          <Route index element={<Dashboard />} />
+          <Route path="dashboard" element={<Dashboard />} />
+          <Route path="overallmun" element={<OverallMun />} />
+          <Route path="overallbarangay" element={<OverallBarangay />} />
+          <Route path="overalltopic" element={<OverallSurveyTopic />} />
+          <Route path="overallonebarangay" element={<OverallOneBarangay />} />
+          <Route path="tmgraph" element={<TMGraph />} />
+          <Route path="sentimentgraphs" element={<HeatmapChart />} />
+          <Route path="surveymetrics" element={<SurveyMetrics />} />
+          <Route path="aitoolsdashboard" element={<AIToolsDashboard />} />
+          <Route path="systemperf" element={<Metrics />} />
+          <Route path="usersdashboard" element={<UsersDashboard />} />
+        </Route>
+      </Routes>
+    </>
   );
 };
 

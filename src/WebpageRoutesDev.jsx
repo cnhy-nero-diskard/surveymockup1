@@ -1,6 +1,6 @@
 import React from 'react';
 import { Route, Routes, useNavigate } from 'react-router-dom';
-import { useAuth } from './context/AuthContext';
+import { useAuth } from './components/context/AuthContext';
 import LanguageSelector from './pages/languageselector/LanguageSelector';
 import Residence1 from './pages/residence1/Residence1';
 import MainPurpose from './pages/mainpurpose/MainPurpose';

@@ -1,11 +1,12 @@
 import React, {useEffect} from 'react';
 import { useNavigate } from 'react-router-dom';
-
+import { useAuth } from '../components/context/AuthContext';
 const RouteSelector = () => {
 
 
   const navigate = useNavigate();
-
+  const { isAuthenticated, unauthorized, handleUnauthorized } = useAuth(); // Correct usage
+  console.log('isAuthenticated', isAuthenticated);
   return (
     <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', flexDirection: 'column' }}>
       <h1>Select Route</h1>

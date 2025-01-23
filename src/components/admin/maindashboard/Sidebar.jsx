@@ -1,4 +1,5 @@
 import React from "react";
+import axios from "axios"; // Import Axios
 import {
   Drawer,
   Box,
@@ -27,7 +28,7 @@ import {
   ApiRounded as AiToolsIcon,
   ComputerOutlined as CompIcon,
   VerifiedUserOutlined as UserIcon,
-  LoginRounded as LoginIcon,
+  QrCode2Outlined as SurveyTouchpointsIcon,  
 } from "@mui/icons-material";
 
 // Import Google Fonts (Poppins)
@@ -77,14 +78,36 @@ const CustomTypography = styled(Typography)`
 `;
 
 const Sidebar = ({ drawerWidth }) => {
+  const handleLogout = async () => {
+    try {
+      console.log('Logging out...');
+      const response = await fetch(`${process.env.REACT_APP_API_HOST}/api/auth/logout`, {
+        method: 'GET',
+        credentials: 'include', // Include cookies in the request
+        headers: {
+            'Content-type': 'application/json',
+        },
+    });
+console.log(response.status); if (response.status === 200) {
+        // Handle successful logout, e.g., redirect to login page
+        window.location.href = '/login'; // Redirect to login page
+      }
+    } catch (error) {
+      console.error('Logout failed:', error);
+      // Handle error, e.g., show an error message
+    }
+  };
+
   return (
     <SidebarDrawer variant="permanent" drawerWidth={drawerWidth}>
       <Toolbar />
       <SidebarHeader>
         <CustomTypography variant="h6" align="center" fontWeight="bold">
-          MULTILINGUAL SURVEY SYSTEM ADMIN DASHBOARD        </CustomTypography>
+          MULTILINGUAL SURVEY SYSTEM ADMIN DASHBOARD
+        </CustomTypography>
         <CustomTypography variant="subtitle2" align="center">
-          PANGLAO TOURISM OFFICE        </CustomTypography>
+          PANGLAO TOURISM OFFICE
+        </CustomTypography>
       </SidebarHeader>
       <SearchField placeholder="Search" fullWidth variant="outlined" />
       <Divider />
@@ -133,9 +156,9 @@ const Sidebar = ({ drawerWidth }) => {
               to: "usersdashboard",
             },
             {
-              text: "TEMP - LOGIN",
-              icon: <LoginIcon />,
-              to: "login",
+              text: "Survey Touchpoints",
+              icon: <SurveyTouchpointsIcon />,
+              to: "usersdashboard",
             },
             { text: "Topic Modelling", icon: <GraphIcon />, to: "tmgraph" },
             { text: "Sentiment Analysis", icon: <InsightsIcon />, to: "sentimentgraphs" },
@@ -157,6 +180,7 @@ const Sidebar = ({ drawerWidth }) => {
           color="secondary"
           startIcon={<LogoutIcon />}
           sx={{ fontFamily: "Poppins, sans-serif" }}
+          onClick={handleLogout} // Add onClick event handler
         >
           Log Out
         </Button>

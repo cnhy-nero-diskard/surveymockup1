@@ -112,7 +112,7 @@ const AdminSessionDashboard = () => {
         <Container>
             <Title>Admin Session Dashboard</Title>
             {isUnauthorized ? (
-                <WarningMessage message="YOU ARE NOT AUTHORIZED TO VIEW THIS PAGE" />
+                <WarningMessage message="YOU ARE NOT GYATT TO VIEW THIS PAGE" />
             ) : (
                 <Table>
                     <TableHeader>
