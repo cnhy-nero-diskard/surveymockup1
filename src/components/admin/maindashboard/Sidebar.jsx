@@ -25,7 +25,9 @@ import {
   InsightsRounded as InsightsIcon,
   PollRounded as SurveyIcon,
   ApiRounded as AiToolsIcon,
-  ComputerOutlined as CompIcon
+  ComputerOutlined as CompIcon,
+  VerifiedUserOutlined as UserIcon,
+  LoginRounded as LoginIcon,
 } from "@mui/icons-material";
 
 // Import Google Fonts (Poppins)
@@ -33,6 +35,7 @@ import "@fontsource/poppins/300.css"; // Light
 import "@fontsource/poppins/400.css"; // Regular
 import "@fontsource/poppins/500.css"; // Medium
 import "@fontsource/poppins/700.css"; // Bold
+import UsersDashboard from "../usersdashboard/UsersDashboard";
 
 // Styled Components
 const SidebarDrawer = styled(Drawer)`
@@ -110,19 +113,29 @@ const Sidebar = ({ drawerWidth }) => {
               to: "overallonebarangay",
             },
             {
-              text: "Survey Performance Metrics",
+              text: "Survey Metrics",
               icon: <SurveyIcon />,
               to: "surveymetrics",
             },
             {
-              text: "AI Tools Dashboard",
+              text: "AI Tools",
               icon: <AiToolsIcon />,
               to: "aitoolsdashboard",
             },
             {
-              text: "AI Tools Dashboard",
+              text: "System Performance",
               icon: <CompIcon />,
               to: "systemperf",
+            },
+            {
+              text: "Users Dashboard",
+              icon: <UserIcon />,
+              to: "usersdashboard",
+            },
+            {
+              text: "TEMP - LOGIN",
+              icon: <LoginIcon />,
+              to: "login",
             },
             { text: "Topic Modelling", icon: <GraphIcon />, to: "tmgraph" },
             { text: "Sentiment Analysis", icon: <InsightsIcon />, to: "sentimentgraphs" },

@@ -2,59 +2,60 @@ import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { fetchMetrics } from './metricsServices';
 import { parseMetrics } from './parseMetrics';
-import Plot from 'react-plotly.js';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { CustomTypography, DynamicGridContainer } from '../admin/shared/styledComponents';
 
 // Styled components
-const Container = styled.div`
-  font-family: Arial, sans-serif;
-  margin: 0;
-  padding: 20px;
-  background-color: rgba(29, 7, 7, 0.4);
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-  gap: 20px;
-`;
-
 const ChartContainer = styled.div`
-  background-color: white;
+  background-color: rgb(220, 232, 255);
   padding: 20px;
   border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-`;
-
-const Title = styled.h1`
-  color: #333;
-  grid-column: 1 / -1;
-  text-align: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+  min-width: 300px; /* Minimum width for each chart container */
 `;
 
 const Metrics = () => {
-  const [metrics, setMetrics] = useState([]);
-  const [chartData, setChartData] = useState({});
+  const [chartData, setChartData] = useState([]);
+
+  const importantMetrics = [
+    'process_cpu_user_seconds_total',
+    'process_cpu_system_seconds_total',
+    'process_resident_memory_bytes',
+    'nodejs_eventloop_lag_seconds',
+    'nodejs_active_handles',
+    'nodejs_active_requests_total',
+  ];
+
+  // Mapping of metric keys to human-readable labels
+  const metricLabels = {
+    process_cpu_user_seconds_total: 'CPU User Time (seconds)',
+    process_cpu_system_seconds_total: 'CPU System Time (seconds)',
+    process_resident_memory_bytes: 'Resident Memory (bytes)',
+    nodejs_eventloop_lag_seconds: 'Event Loop Lag (seconds)',
+    nodejs_active_handles: 'Active Handles',
+    nodejs_active_requests_total: 'Active Requests',
+  };
 
   useEffect(() => {
     const loadMetrics = async () => {
       const metricsText = await fetchMetrics();
       if (metricsText) {
         const parsedMetrics = parseMetrics(metricsText);
-        setMetrics(parsedMetrics);
-
-        // Update chart data
-        const newChartData = { ...chartData };
         const timestamp = new Date().toLocaleTimeString();
 
+        // Create new data point with only important metrics
+        const newDataPoint = { time: timestamp };
         parsedMetrics.forEach((metric) => {
-          if (!newChartData[metric.name]) {
-            newChartData[metric.name] = {
-              x: [],
-              y: [],
-            };
+          if (importantMetrics.includes(metric.name)) {
+            newDataPoint[metric.name] = metric.value;
           }
-          newChartData[metric.name].x.push(timestamp);
-          newChartData[metric.name].y.push(metric.value);
         });
 
-        setChartData(newChartData);
+        // Update chartData, limiting to the last 100 data points
+        setChartData((prevData) => {
+          const newData = [...prevData, newDataPoint];
+          return newData.slice(-100); // Keep only the last 100 data points
+        });
       }
     };
 
@@ -63,59 +64,49 @@ const Metrics = () => {
     return () => clearInterval(interval);
   }, []);
 
-  // Define the important metrics to display
-  const importantMetrics = [
-    'cpu_usage',
-    'memory_usage',
-    'request_latency',
-    'disk_usage',
-    'network_throughput',
-    'error_rate',
-  ];
-
-  // Filter and prepare data for Plotly charts
-  const plotlyTraces = importantMetrics
-    .filter((metricName) => chartData[metricName]) // Ensure the metric exists in chartData
-    .map((metricName) => ({
-      x: chartData[metricName].x, // Timestamps
-      y: chartData[metricName].y, // Values
-      type: 'scatter',
-      mode: 'lines+markers',
-      name: metricName,
-      line: { shape: 'spline' }, // Smooth lines
-    }));
+  // Generate random colors for each metric line
+  const getRandomColor = () => {
+    return `#${Math.floor(Math.random() * 16777215).toString(16)}`;
+  };
 
   return (
-    <Container>
-      <Title>Metrics Dashboard</Title>
-      {importantMetrics.map((metricName, index) => (
-        <ChartContainer key={index}>
-          <h3>{metricName}</h3>
-          <Plot
-            data={[
-              {
-                x: chartData[metricName]?.x || [], // Timestamps
-                y: chartData[metricName]?.y || [], // Values
-                type: 'scatter',
-                mode: 'lines+markers',
-                name: metricName,
-                line: { shape: 'spline' }, // Smooth lines
-              },
-            ]}
-            layout={{
-              title: metricName,
-              xaxis: { title: 'Time' },
-              yaxis: { title: 'Value' },
-              showlegend: true,
-              autosize: true,
-              margin: { l: 50, r: 50, b: 50, t: 50, pad: 4 },
-            }}
-            config={{ responsive: true }}
-            style={{ width: '100%', height: '300px' }}
-          />
+    <DynamicGridContainer>
+      <CustomTypography
+        style={{
+          fontSize: '1.5rem',
+          color: 'white',
+          gridColumn: '1 / -1',
+          textAlign: 'center',
+          alignContent: 'center',
+          fontFamily: "Poppins"
+        }}
+      >
+        System Performance
+      </CustomTypography>
+      {importantMetrics.map((metricKey) => (
+        <ChartContainer key={metricKey}>
+          <ResponsiveContainer width={300} height="100%">
+            <LineChart
+              data={chartData}
+              margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+            >
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="time" />
+              <YAxis />
+              <Tooltip />
+              <Legend />
+              <Line
+                type="monotone"
+                dataKey={metricKey}
+                stroke={getRandomColor()}
+                activeDot={{ r: 8 }}
+                name={metricLabels[metricKey]} // Use human-readable label here
+              />
+            </LineChart>
+          </ResponsiveContainer>
         </ChartContainer>
       ))}
-    </Container>
+    </DynamicGridContainer>
   );
 };
 

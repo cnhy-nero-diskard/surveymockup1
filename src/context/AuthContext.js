@@ -1,4 +1,4 @@
-// src/context/AuthContext.js
+// // src/context/AuthContext.js
 // import React, { createContext, useState, useContext } from 'react';
 
 // const AuthContext = createContext();
@@ -14,7 +14,7 @@
 //   const logout = () => {
 //     localStorage.removeItem('token');
 //     setUser(null);
-//   };a
+//   };
 
 //   return (
 //     <AuthContext.Provider value={{ user, login, logout }}>

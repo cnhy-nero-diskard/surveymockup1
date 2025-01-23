@@ -13,6 +13,7 @@ const MainContent = styled(Box)`
   padding: 24px;
   background-color: clear;
   min-height: 100vh;
+  margin-left: ${({ drawerWidth }) => `${drawerWidth}px`}; // Offset for the sidebar
 `;
 
 const DashboardOutlet = () => {
@@ -21,7 +22,7 @@ const DashboardOutlet = () => {
   return (
     <Container>
       <Sidebar drawerWidth={drawerWidth} />
-      <MainContent>
+      <MainContent >
         <Outlet /> {/* This will render the nested routes */}
       </MainContent>
     </Container>

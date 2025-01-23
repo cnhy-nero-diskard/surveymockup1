@@ -9,7 +9,7 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
-  const { login } = useAuth();
+  // const { login } = useAuth();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -26,7 +26,7 @@ const Login = () => {
       // No need to manually store it in localStorage or state
 
       // Call the login function from AuthContext (if needed for state management)
-      login(); // Optional, depending on your AuthContext implementation
+      // login(); // Optional, depending on your AuthContext implementation
 
       // Redirect to the main page
       navigate('/');

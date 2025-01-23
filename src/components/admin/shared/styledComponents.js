@@ -1,4 +1,5 @@
 // src/styles/styledComponents.js
+//ADMIN DOMAIN ONLY
 import styled from 'styled-components';
 import { fontFamily, fontSize, fontWeight } from '../../../config/fontConfig';
 import { Box, Typography } from '@mui/material';
@@ -26,4 +27,35 @@ export const ChartContainer = styled(Box)`
   font-weight: ${fontWeight};
   align-items: center;
 
+`;
+
+export const CustomTypography = styled(Typography)`
+  font-family: ${fontFamily};
+  font-size: ${fontSize};
+  font-weight: ${fontWeight};
+  padding-top: 16px;
+`;
+
+export const DynamicGridContainer = styled.div`
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 20px;
+  background-color: rgba(6, 80, 122, 0.4);
+  display: grid;
+  gap: 20px;
+  height: 100vh;
+  overflow-y: auto; // Allow scrolling if content overflows
+
+  /* Default: 3 columns */
+  grid-template-columns: repeat(3, 1fr);
+
+  /* Adjust columns for medium screens */
+  @media (max-width: 768px) {
+    grid-template-columns: repeat(2, 1fr); /* 2 columns for screens smaller than 768px */
+  }
+
+  /* Adjust columns for small screens */
+  @media (max-width: 480px) {
+    grid-template-columns: repeat(1, 1fr); /* 1 column for screens smaller than 480px */
+  }
 `;
