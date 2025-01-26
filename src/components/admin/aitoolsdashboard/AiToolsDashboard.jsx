@@ -1,3 +1,4 @@
+// AiToolsDashboard.jsx
 import React, { useState, useEffect } from 'react';
 import {
   Container,
@@ -7,125 +8,125 @@ import {
   Grid,
   Box,
   CircularProgress,
-  TextField,
   Select,
   MenuItem,
   Dialog,
   DialogTitle,
   DialogContent,
   DialogActions,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
   Fade,
-  Slide,
-  Grow,
+  Slide, // Added Slide import
 } from '@mui/material';
 import { Bar } from 'react-chartjs-2';
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend,
-} from 'chart.js';
+import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
+import axios from 'axios';
 
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend
-);
-
-// Dummy data (same as before)
-const dummyData = {
-  apiUsageMetrics: {
-    totalCalls: 150,
-    callDistribution: { sentiment: 100, topicModeling: 50 },
-    usageByLanguage: { en: 100, es: 50 },
-    rateLimits: { used: 150, limit: 1000 },
-    responseTimes: [200, 150, 300, 250], // in milliseconds
-  },
-  apiHistory: [
-    { id: 1, timestamp: "2023-10-01T12:00:00Z", callsProcessed: 10, metrics: { sentiment: 8, topicModeling: 2 } },
-    { id: 2, timestamp: "2023-10-01T13:00:00Z", callsProcessed: 15, metrics: { sentiment: 10, topicModeling: 5 } },
-  ],
-  models: {
-    sentiment: [
-      { name: "distilbert-base-multilingual-cased-sentiments-student", link: "https://huggingface.co/distilbert-base-multilingual-cased-sentiments-student" },
-      { name: "Sentiment Model 2", link: "https://huggingface.co/sentiment-model-2" },
-    ],
-    topicModeling: [
-      { name: "M3L-Contrast (Multilingual and Multimodal Topic Model)", link: "https://huggingface.co/m3l-contrast" },
-      { name: "Topic Model 2", link: "https://huggingface.co/topic-model-2" },
-    ],
-  },
-};
+ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
 const AIToolsDashboard = () => {
+  const isActive = true; // Replace with your actual logic to determine if active
+const createdAt = new Date(); // Replace with your actual "Created At" value
+const isRecentlyCreated = (new Date() - new Date(createdAt)) < 5 * 60 * 1000; // Less than 5 minutes ago
   const [isScanning, setIsScanning] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [scanResult, setScanResult] = useState(null);
   const [showAnalysisResults, setShowAnalysisResults] = useState(false);
-  const [apiToken, setApiToken] = useState("hf_xxxxxxxxxxxxxxxxxx");
-  const [isEditingToken, setIsEditingToken] = useState(false);
-  const [selectedSentimentModel, setSelectedSentimentModel] = useState(
-    dummyData.models.sentiment[0].link
-  );
-  const [selectedTopicModel, setSelectedTopicModel] = useState(
-    dummyData.models.topicModeling[0].link
-  );
+  const [selectedSentimentModel, setSelectedSentimentModel] = useState("");
+  const [selectedTopicModel, setSelectedTopicModel] = useState("");
   const [openMetricsDialog, setOpenMetricsDialog] = useState(false);
   const [selectedMetrics, setSelectedMetrics] = useState(null);
-  const [isLoaded, setIsLoaded] = useState(false);
+  const [isLoaded, setIsLoaded] = useState(true);
+  const [hfTokens, setHfTokens] = useState([]);
+  const [selectedHFToken, setSelectedHFToken] = useState("");
+  const [openPreviewDialog, setOpenPreviewDialog] = useState(false);
+  const [topicModelingResult, setTopicModelingResult] = useState(null);
+  const [apiToken, setApiToken] = useState(""); // Added apiToken state
+  const [analysisResults, setAnalysisResults] = useState(null);
 
   useEffect(() => {
-    // Simulate component loading delay
-    setTimeout(() => {
-      setIsLoaded(true);
-    }, 500); // Adjust the delay as needed
+    const fetchHFTokens = async () => {
+      try {
+        const response = await axios.get(`${process.env.REACT_APP_API_HOST}/api/hf-tokens`, { withCredentials: true });
+        setHfTokens(response.data);
+      } catch (error) {
+        console.error('Error fetching HF tokens:', error);
+      }
+    };
+    fetchHFTokens();
   }, []);
 
   const handleScan = () => {
     setIsScanning(true);
-    // Simulate an API call with a delay
     setTimeout(() => {
-      const detectedEntries = Math.floor(Math.random() * 100) + 1; // Random number of entries
+      const detectedEntries = Math.floor(Math.random() * 100) + 1;
       setScanResult(detectedEntries);
       setIsScanning(false);
-    }, 2000); // 2-second delay to simulate scanning
+    }, 2000);
   };
 
-  const handleStartAnalysis = () => {
+  const handleStartAnalysis = async () => {
     setIsAnalyzing(true);
-    // Simulate an API call with a delay
-    setTimeout(() => {
-      setShowAnalysisResults(true);
+    console.log('Starting analysis...');
+    try {
+      const selectedToken = hfTokens.find((token) => token.id === selectedHFToken);
+      if (!selectedToken) {
+        throw new Error('No token selected');
+      }
+
+      const response = await axios.post(
+        `${process.env.REACT_APP_API_HOST}/api/analyzesentiment`,
+        {
+          text: 'I did love you, but no more', // Replace with actual text to analyze
+          tokenLabel: selectedToken.label,
+        }, { withCredentials: true }
+      );
+
+      // Handle the response from Hugging Face
+      if (response.data && Array.isArray(response.data)) {
+        const sentimentResults = response.data[0]; // Extract the sentiment results
+        console.log('Sentiment Analysis Results:', sentimentResults);
+        setShowAnalysisResults(true);
+        setAnalysisResults(sentimentResults); // Store the results in state
+      } else {
+        console.error('Unexpected response format:', response.data);
+      }
+
       setIsAnalyzing(false);
-    }, 3000); // 3-second delay to simulate analysis
+    } catch (error) {
+      console.error('Error during analysis:', error);
+      setIsAnalyzing(false);
+    }
   };
 
-  const handleEditToken = () => {
-    setIsEditingToken(true);
+  const handleStartTopicModeling = async () => {
+    setIsAnalyzing(true);
+    console.log('Starting topic modeling...');
+    try {
+      const selectedToken = hfTokens.find((token) => token.id === selectedHFToken);
+      if (!selectedToken) {
+        throw new Error('No token selected');
+      }
+
+      const response = await axios.post(
+        `${process.env.REACT_APP_API_HOST}/api/analyzetopics`,
+        {
+          text: 'Sample text for topic modeling',
+          tokenLabel: selectedToken.label,
+        },
+      );
+
+      setTopicModelingResult(response.data);
+      setIsAnalyzing(false);
+      console.log('Topic modeling result:', response.data);
+    } catch (error) {
+      console.error('Error during topic modeling:', error);
+      setIsAnalyzing(false);
+    }
   };
 
-  const handleSaveToken = () => {
-    setIsEditingToken(false);
-    // Simulate saving the token to the database
-    console.log("Token saved:", apiToken);
-  };
 
   const handleReloadToken = () => {
-    // Simulate retrieving the token from the database
-    setApiToken("hf_xxxxxxxxxxxxxxxxxx");
-    console.log("Token reloaded");
+    setApiToken("hf_xxxxxxxxxxxxxxxxxx"); // Example implementation
   };
 
   const handleOpenMetricsDialog = (metrics) => {
@@ -137,12 +138,20 @@ const AIToolsDashboard = () => {
     setOpenMetricsDialog(false);
   };
 
+  const handlePreview = () => {
+    setOpenPreviewDialog(true);
+  };
+
+  const handleClosePreviewDialog = () => {
+    setOpenPreviewDialog(false);
+  };
+
   const apiUsageData = {
     labels: ['Sentiment Analysis', 'Topic Modeling'],
     datasets: [
       {
         label: 'API Calls',
-        data: [dummyData.apiUsageMetrics.callDistribution.sentiment, dummyData.apiUsageMetrics.callDistribution.topicModeling],
+        data: [100, 50],
         backgroundColor: ['rgba(75, 192, 192, 0.2)', 'rgba(153, 102, 255, 0.2)'],
         borderColor: ['rgba(75, 192, 192, 1)', 'rgba(153, 102, 255, 1)'],
         borderWidth: 1,
@@ -171,56 +180,19 @@ const AIToolsDashboard = () => {
                   API Token Manager
                 </Typography>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                  <TextField
+                  <Select
                     fullWidth
-                    label="API Token"
-                    value={apiToken}
-                    onChange={(e) => setApiToken(e.target.value)}
-                    disabled={!isEditingToken}
+                    value={selectedHFToken}
+                    onChange={(e) => setSelectedHFToken(e.target.value)}
                     sx={{ mb: 2 }}
-                  />
-                  {isEditingToken ? (
-                    <Button variant="contained" color="primary" onClick={handleSaveToken} sx={{ textTransform: 'none' }}>
-                      Save
-                    </Button>
-                  ) : (
-                    <Button variant="outlined" color="primary" onClick={handleEditToken} sx={{ textTransform: 'none' }}>
-                      Edit
-                    </Button>
-                  )}
-                  <Button variant="outlined" color="secondary" onClick={handleReloadToken} sx={{ textTransform: 'none' }}>
-                    Reload
-                  </Button>
+                  >
+                    {hfTokens.map((token) => (
+                      <MenuItem key={token.id} value={token.id}>
+                        {token.label}
+                      </MenuItem>
+                    ))}
+                  </Select>
                 </Box>
-              </Box>
-              <Box>
-                <Typography variant="subtitle1" sx={{ color: 'text.secondary', mb: 1 }}>
-                  Model Selection
-                </Typography>
-                <Select
-                  fullWidth
-                  value={selectedSentimentModel}
-                  onChange={(e) => setSelectedSentimentModel(e.target.value)}
-                  sx={{ mb: 2 }}
-                >
-                  {dummyData.models.sentiment.map((model, index) => (
-                    <MenuItem key={index} value={model.link}>
-                      {model.name}
-                    </MenuItem>
-                  ))}
-                </Select>
-                <Select
-                  fullWidth
-                  value={selectedTopicModel}
-                  onChange={(e) => setSelectedTopicModel(e.target.value)}
-                  sx={{ mb: 2 }}
-                >
-                  {dummyData.models.topicModeling.map((model, index) => (
-                    <MenuItem key={index} value={model.link}>
-                      {model.name}
-                    </MenuItem>
-                  ))}
-                </Select>
               </Box>
             </Paper>
           </Slide>
@@ -256,92 +228,131 @@ const AIToolsDashboard = () => {
                   <Button
                     variant="contained"
                     color="primary"
+                    onClick={handlePreview}
+                    sx={{ textTransform: 'none', mr: 2 }}
+                  >
+                    PREVIEW
+                  </Button>
+                  <Button
+                    variant="contained"
+                    color="primary"
                     onClick={handleStartAnalysis}
                     disabled={!scanResult || isAnalyzing}
                     sx={{ textTransform: 'none' }}
                   >
                     {isAnalyzing ? <CircularProgress size={24} /> : 'START AI ANALYSIS'}
                   </Button>
+
+                  {/* Example Output Display */}
+                  {analysisResults && (
+                    <Box sx={{ mt: 2 }}>
+                      <Typography variant="body1" sx={{ color: 'text.secondary' }}>
+                        Sentiment Analysis Results:
+                      </Typography>
+                      <Box sx={{ mt: 1 }}>
+                        {analysisResults.map((result, index) => (
+                          <Typography key={index} variant="body2" sx={{ color: 'text.secondary' }}>
+                            {result.label}: {result.score.toFixed(4)}
+                          </Typography>
+                        ))}
+                      </Box>
+                    </Box>
+                  )}
                 </Box>
               )}
             </Paper>
           </Slide>
         </Grid>
 
-        {/* Analysis Results Section */}
-        {showAnalysisResults && (
-          <Grid item xs={12}>
-            <Grow in={showAnalysisResults} timeout={1500}>
-              <Paper elevation={3} sx={{ p: 3, bgcolor: 'background.paper', borderRadius: 2 }}>
-                <Typography variant="h6" gutterBottom sx={{ fontWeight: 'medium', color: 'text.primary' }}>
-                  Analysis Results
-                </Typography>
-                {isAnalyzing ? (
-                  <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '200px' }}>
-                    <CircularProgress />
-                  </Box>
-                ) : (
-                  <Grid container spacing={3}>
-                    <Grid item xs={12} md={6}>
-                      <Typography variant="body1" sx={{ color: 'text.secondary' }}>
-                        API Call Volume: {dummyData.apiUsageMetrics.totalCalls}
-                      </Typography>
-                      <Typography variant="body1" sx={{ color: 'text.secondary' }}>
-                        API Rate Limits: {dummyData.apiUsageMetrics.rateLimits.used} / {dummyData.apiUsageMetrics.rateLimits.limit}
-                      </Typography>
-                      <Typography variant="body1" sx={{ color: 'text.secondary' }}>
-                        Average Response Time: {dummyData.apiUsageMetrics.responseTimes.reduce((a, b) => a + b, 0) / dummyData.apiUsageMetrics.responseTimes.length} ms
-                      </Typography>
-                    </Grid>
-                    <Grid item xs={12} md={6}>
-                      <Bar data={apiUsageData} />
-                    </Grid>
-                  </Grid>
-                )}
-              </Paper>
-            </Grow>
-          </Grid>
-        )}
-
-        {/* API History Section */}
-        <Grid item xs={12}>
+        {/* Topic Modeling Section */}
+        <Grid item xs={12} md={6}>
           <Slide in={isLoaded} direction="up" timeout={1400}>
             <Paper elevation={3} sx={{ p: 3, bgcolor: 'background.paper', borderRadius: 2 }}>
               <Typography variant="h6" gutterBottom sx={{ fontWeight: 'medium', color: 'text.primary' }}>
-                API History
+                Topic Modeling
               </Typography>
-              <TableContainer>
-                <Table>
-                  <TableHead>
-                    <TableRow>
-                      <TableCell>Timestamp</TableCell>
-                      <TableCell>Calls Processed</TableCell>
-                      <TableCell>Actions</TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {dummyData.apiHistory.map((history) => (
-                      <TableRow key={history.id}>
-                        <TableCell>{new Date(history.timestamp).toLocaleString()}</TableCell>
-                        <TableCell>{history.callsProcessed}</TableCell>
-                        <TableCell>
-                          <Button
-                            variant="outlined"
-                            color="primary"
-                            onClick={() => handleOpenMetricsDialog(history.metrics)}
-                          >
-                            View Metrics
-                          </Button>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </TableContainer>
+              <Box>
+                <Typography variant="body1" sx={{ color: 'text.secondary', mb: 2 }}>
+                  Analyze topics from the detected entries.
+                </Typography>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={handleStartTopicModeling}
+                  disabled={!scanResult || isAnalyzing}
+                  sx={{ textTransform: 'none' }}
+                >
+                  {isAnalyzing ? <CircularProgress size={24} /> : 'START TOPIC MODELING'}
+                </Button>
+              </Box>
+              {topicModelingResult && (
+                <Box sx={{ mt: 2 }}>
+                  <Typography variant="body1" sx={{ color: 'text.secondary' }}>
+                    Topic Modeling Results:
+                  </Typography>
+                  <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                    {JSON.stringify(topicModelingResult, null, 2)}
+                  </Typography>
+                </Box>
+              )}
             </Paper>
           </Slide>
         </Grid>
       </Grid>
+
+      {/* // Preview Dialog */}
+      <Dialog open={openPreviewDialog} onClose={handleClosePreviewDialog}>
+        <DialogTitle>Preview Data</DialogTitle>
+        <DialogContent>
+          <Typography variant="body1" sx={{ color: 'text.secondary' }}>
+            Here is a preview of the dummy data:
+          </Typography>
+          <Box sx={{ mt: 2 }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+              <thead>
+                <tr>
+                  <th style={{ textAlign: 'left', padding: '8px', borderBottom: '1px solid #ddd' }}>Detected Entries</th>
+                  <th style={{ textAlign: 'left', padding: '8px', borderBottom: '1px solid #ddd' }}>Selected Model</th>
+                  <th style={{ textAlign: 'left', padding: '8px', borderBottom: '1px solid #ddd' }}>API Token</th>
+                  <th style={{ textAlign: 'left', padding: '8px', borderBottom: '1px solid #ddd' }}>Status</th>
+                  <th style={{ textAlign: 'left', padding: '8px', borderBottom: '1px solid #ddd' }}>Created At</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style={{ padding: '8px', borderBottom: '1px solid #ddd' }}>{scanResult}</td>
+                  <td style={{ padding: '8px', borderBottom: '1px solid #ddd' }}>{selectedSentimentModel}</td>
+                  <td style={{ padding: '8px', borderBottom: '1px solid #ddd' }}>{selectedHFToken}</td>
+                  <td style={{ padding: '8px', borderBottom: '1px solid #ddd' }}>
+                    <div
+                      style={{
+                        width: '12px',
+                        height: '12px',
+                        borderRadius: '50%',
+                        backgroundColor: isActive ? 'green' : 'red',
+                      }}
+                    ></div>
+                  </td>
+                  <td
+                    style={{
+                      padding: '8px',
+                      borderBottom: '1px solid #ddd',
+                      backgroundColor: isRecentlyCreated ? 'rgba(82, 82, 214, 0.73)' : 'transparent',
+                    }}
+                  >
+                    {createdAt}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClosePreviewDialog} color="primary">
+            Close
+          </Button>
+        </DialogActions>
+      </Dialog>
 
       {/* Metrics Dialog */}
       <Dialog open={openMetricsDialog} onClose={handleCloseMetricsDialog}>
@@ -354,15 +365,6 @@ const AIToolsDashboard = () => {
               </Typography>
               <Typography variant="body1" sx={{ color: 'text.secondary' }}>
                 Topic Modeling: {selectedMetrics.topicModeling}
-              </Typography>
-              <Typography variant="body1" sx={{ color: 'text.secondary' }}>
-                API Call Volume: {dummyData.apiUsageMetrics.totalCalls}
-              </Typography>
-              <Typography variant="body1" sx={{ color: 'text.secondary' }}>
-                API Rate Limits: {dummyData.apiUsageMetrics.rateLimits.used} / {dummyData.apiUsageMetrics.rateLimits.limit}
-              </Typography>
-              <Typography variant="body1" sx={{ color: 'text.secondary' }}>
-                Average Response Time: {dummyData.apiUsageMetrics.responseTimes.reduce((a, b) => a + b, 0) / dummyData.apiUsageMetrics.responseTimes.length} ms
               </Typography>
             </Box>
           )}

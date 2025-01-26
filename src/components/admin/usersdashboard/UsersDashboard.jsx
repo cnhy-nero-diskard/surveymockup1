@@ -1,20 +1,44 @@
-import React, { useState } from "react";
-import { Box, Typography, Card, CardContent, Collapse, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Grid } from "@mui/material";
+import React, { useState, useEffect } from "react";
+import {
+  Box,
+  Typography,
+  Card,
+  CardContent,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  Grid,
+  Button,
+  Modal,
+} from "@mui/material";
 import { Pie, Bar } from "react-chartjs-2";
-import { Chart as ChartJS, ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement } from "chart.js";
+import {
+  Chart as ChartJS,
+  ArcElement,
+  Tooltip,
+  Legend,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+} from "chart.js";
 import AdminSessionDashboard from "../adminsessiondashboard/AdminLogins";
 
 // Register Chart.js components
-ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement);
+ChartJS.register(
+  ArcElement,
+  Tooltip,
+  Legend,
+  CategoryScale,
+  LinearScale,
+  BarElement
+);
 
-// Dummy data (replace with backend data later)
+// Dummy data for charts (replace with backend data later)
 const dummyData = {
-  activeUsers: 120,
-  totalUsers: [
-    { id: 1, name: "John Doe", email: "john@example.com", country: "USA", language: "English" },
-    { id: 2, name: "Jane Smith", email: "jane@example.com", country: "Canada", language: "French" },
-    { id: 3, name: "Alice Johnson", email: "alice@example.com", country: "UK", language: "English" },
-  ],
   geographicDistribution: {
     USA: 50,
     Canada: 30,
@@ -29,7 +53,40 @@ const dummyData = {
 };
 
 const UsersDashboard = () => {
-  const [showAdminsTable, setShowAdminsTable] = useState(false);
+  const [anonymousUsers, setAnonymousUsers] = useState([]);
+  const [openModal, setOpenModal] = useState(false);
+
+  // Fetch anonymous users data from the backend every 5 seconds
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch(
+          `${process.env.REACT_APP_API_HOST}/api/admin/anonymous-users`,
+          {
+            credentials: "include",
+            method: "GET",
+            headers: { "Content-Type": "application/json" },
+          }
+        );
+        const data = await response.json();
+        setAnonymousUsers(data);
+      } catch (error) {
+        console.error("Error fetching anonymous users:", error);
+      }
+    };
+
+    // Fetch data immediately when the component mounts
+    fetchData();
+
+    // Set up an interval to fetch data every 5 seconds
+    const intervalId = setInterval(fetchData, 5000);
+
+    // Clean up the interval when the component unmounts
+    return () => clearInterval(intervalId);
+  }, []);
+
+  // Calculate the number of active users
+  const activeUsers = anonymousUsers.filter((user) => user.is_active).length;
 
   // Data for charts
   const geographicData = {
@@ -62,14 +119,14 @@ const UsersDashboard = () => {
 
       {/* Grid Layout */}
       <Grid container spacing={3} sx={{ flexGrow: 1 }}>
-        {/* Active Admins Section - Replaced with AdminSessionDashboard */}
+        {/* Active Admins Section */}
         <Grid item xs={12} md={6}>
           <Card sx={{ height: "100%", display: "flex", flexDirection: "column" }}>
             <CardContent>
               <Typography variant="h6" gutterBottom>
                 Active Admins
               </Typography>
-              <AdminSessionDashboard /> {/* Integrated AdminSessionDashboard */}
+              <AdminSessionDashboard />
             </CardContent>
           </Card>
         </Grid>
@@ -78,42 +135,12 @@ const UsersDashboard = () => {
         <Grid item xs={12} md={6}>
           <Card sx={{ height: "100%" }}>
             <CardContent>
-              <Typography variant="h6">Active Users: {dummyData.activeUsers} users taking surveys</Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-
-        {/* Total Users Section */}
-        <Grid item xs={12}>
-          <Card sx={{ height: "100%" }}>
-            <CardContent>
               <Typography variant="h6" gutterBottom>
-                TOTAL USERS
+                Active Users: {activeUsers} users taking surveys
               </Typography>
-              <TableContainer component={Paper}>
-                <Table>
-                  <TableHead>
-                    <TableRow>
-                      <TableCell>ID</TableCell>
-                      <TableCell>Name</TableCell>
-                      <TableCell>Email</TableCell>
-                      <TableCell>Country</TableCell>
-                      <TableCell>Language</TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {dummyData.totalUsers.map((user) => (
-                      <TableRow key={user.id}>
-                        <TableCell>{user.id}</TableCell>
-                        <TableCell>{user.name}</TableCell>
-                        <TableCell>{user.email}</TableCell>
-                        <TableCell>{user.country}</TableCell>
-                        <TableCell>{user.language}</TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </TableContainer>
+              <Button variant="contained" onClick={() => setOpenModal(true)}>
+                View All Users
+              </Button>
             </CardContent>
           </Card>
         </Grid>
@@ -146,8 +173,50 @@ const UsersDashboard = () => {
           </Card>
         </Grid>
       </Grid>
+
+      {/* Modal for All Users */}
+      <Modal open={openModal} onClose={() => setOpenModal(false)}>
+        <Box
+          sx={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            width: 800,
+            bgcolor: "background.paper",
+            boxShadow: 24,
+            p: 4,
+          }}
+        >
+          <Typography variant="h6" gutterBottom>
+            All Users
+          </Typography>
+          <TableContainer component={Paper}>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell>ID</TableCell>
+                  <TableCell>Nickname</TableCell>
+                  <TableCell>Created At</TableCell>
+                  <TableCell>Status</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {anonymousUsers.map((user) => (
+                  <TableRow key={user.anonymous_user_id}>
+                    <TableCell>{user.anonymous_user_id}</TableCell>
+                    <TableCell>{user.nickname}</TableCell>
+                    <TableCell>{new Date(user.created_at).toLocaleString()}</TableCell>
+                    <TableCell>{user.is_active ? "Active" : "Inactive"}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </Box>
+      </Modal>
     </Box>
   );
 };
 
-export default UsersDashboard;
+export default UsersDashboard;  
