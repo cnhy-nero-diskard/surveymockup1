@@ -160,6 +160,11 @@ console.log(response.status); if (response.status === 200) {
               icon: <SurveyTouchpointsIcon />,
               to: "surveytouchpoints",
             },
+            {
+              text: "LOGSTREAM",
+              icon: <SurveyTouchpointsIcon />,
+              to: "logstream",
+            },
             { text: "Topic Modelling", icon: <GraphIcon />, to: "tmgraph" },
             { text: "Sentiment Analysis", icon: <InsightsIcon />, to: "sentimentgraphs" },
           ].map((item, index) => (

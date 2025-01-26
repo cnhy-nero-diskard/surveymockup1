@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
-import BodyPartial from '../../components/partials/BodyPartial';
-import GradientBackground from '../../components/partials/GradientBackground';
+import BodyPartial from '../../../components/partials/BodyPartial';
+import GradientBackground from '../../../components/partials/GradientBackground';
 import { useNavigate } from 'react-router-dom';
-import imgoverlay from '../../components/img/bed23.png';
-import useTranslations from '../../components/shared/useTranslations';
+import imgoverlay from '../../../components/img/bed23.png';
+import useTranslations from '../../../components/shared/useTranslations';
 
 const Container = styled(motion.div)`
   font-family: Arial, sans-serif;

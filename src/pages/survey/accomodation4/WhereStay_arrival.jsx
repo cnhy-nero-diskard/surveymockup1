@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
-import BodyPartial from '../../components/partials/BodyPartial';
-import GradientBackground from '../../components/partials/GradientBackground';
+import BodyPartial from '../../../components/partials/BodyPartial';
+import GradientBackground from '../../../components/partials/GradientBackground';
 import { useNavigate } from 'react-router-dom';
-import imgoverlay from '../../components/img/bed23.png';
-import useTranslations from '../../components/shared/useTranslations';
+import imgoverlay from '../../../components/img/bed23.png';
+import useTranslations from '../../../components/shared/useTranslations';
+import axios from 'axios';
 
 const Container = styled(motion.div)`
   font-family: Arial, sans-serif;
@@ -84,42 +85,31 @@ const WhereStayArrival = () => {
         e.preventDefault();
 
         // Prepare the survey response data
-const surveyResponse = {
-    user_id: 123,
-    component_name: 'WhereStayArrival',
-    question_key: 'whereStayArrivalSelectLabel',
-    response_value: JSON.stringify({
-        selectedOption: selectedOption,
-        duration: duration,
-        durationUnit: durationUnit
-    }),
-    language_code: language,
-    is_open_ended: false,
-    category: 'Accommodation',
-};
+        const surveyResponse = {
+            component_name: 'WHERESTAYARRIVAL',
+            question_key: 'whereStayArrivalSelectLabel',
+            response_value: JSON.stringify({
+                selectedOption: selectedOption,
+                duration: duration,
+                durationUnit: durationUnit
+            }),
+            language_code: language,
+            is_open_ended: false,
+            category: 'Accommodation',
+        };
         try {
             // Submit the survey response to the backend
-            const response = await fetch(`${process.env.REACT_APP_API_HOST}/api/survey/submit`, {
-                method: 'POST',
+            const response = await axios.post(`${process.env.REACT_APP_API_HOST}/api/survey/submit`, surveyResponse, {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(surveyResponse),
+                withCredentials: true,
             });
-            console.log("SUCCESS response",response);
 
-            if (!response.ok) {
-                throw new Error('Failed to submit survey response');
-            }
-
-            const result = await response.json();
-            console.log('Survey response submitted:', result);
-
-            // Navigate to the next page after successful submission
+            const result = response;
             navigate('/');
         } catch (err) {
-            console.error('Error submitting survey response:', err);
-            alert('Failed to submit survey response. Please try again.',err);
+            alert('Failed to submit survey response. Please try again.', err);
         }
     };
 

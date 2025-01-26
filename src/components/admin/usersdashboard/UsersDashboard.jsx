@@ -188,12 +188,20 @@ const UsersDashboard = () => {
             bgcolor: "background.paper",
             boxShadow: 24,
             p: 4,
+            maxHeight: "80vh", // Restrict the height of the modal to 80% of the viewport height
+            overflowY: "auto", // Enable vertical scrolling if content exceeds the height
           }}
         >
           <Typography variant="h6" gutterBottom>
             All Users
           </Typography>
-          <TableContainer component={Paper}>
+          <TableContainer
+            component={Paper}
+            sx={{
+              maxHeight: "60vh", // Restrict the height of the table container
+              overflowY: "auto", // Enable vertical scrolling for the table
+            }}
+          >
             <Table>
               <TableHead>
                 <TableRow>
@@ -215,7 +223,8 @@ const UsersDashboard = () => {
                       ) : (
                         <Circle sx={{ color: "red", fontSize: "small" }} />
                       )}
-                    </TableCell>                  </TableRow>
+                    </TableCell>
+                  </TableRow>
                 ))}
               </TableBody>
             </Table>

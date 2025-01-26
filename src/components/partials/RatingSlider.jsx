@@ -7,12 +7,15 @@ import { Container, Title } from '../../components/shared/styles1';
 import imgOverlay from "../../components/img/sentiment.png";
 import { useNavigate } from 'react-router-dom';
 
-const RatingSlider = ({ title, categories, onRatingComplete }) => {
+const RatingSlider = ({ title, categories, onRatingChange, onRatingComplete }) => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [sliderValue, setSliderValue] = useState(2); // Default to neutral
   const navigate = useNavigate();
 
   const handleRating = (value) => {
+    const currentCategory = categories[currentSlide];
+    onRatingChange(currentCategory, value); // Call the onRatingChange prop with the current category and value
+
     if (currentSlide < categories.length - 1) {
       setCurrentSlide(currentSlide + 1);
       setSliderValue(2); // Reset slider to neutral for the next category

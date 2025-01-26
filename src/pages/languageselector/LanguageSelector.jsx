@@ -17,7 +17,9 @@ const LanguageSelector = () => {
   useEffect(() => {
     const fetchLanguages = async () => {
       try {
-        const response = await axios.get(`${process.env.REACT_APP_API_HOST}/api/languageselect`);
+        const response = await axios.get(`${process.env.REACT_APP_API_HOST}/api/languageselect`,
+           { withCredentials: true }
+          );
         const data = response.data;
         setLanguages(data);
       } catch (error) {

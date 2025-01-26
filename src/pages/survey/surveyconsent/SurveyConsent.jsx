@@ -3,8 +3,8 @@ import { useSpring, animated } from 'react-spring';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import './SurveyConsent.css';
-import BodyPartial from '../../components/partials/BodyPartial';
-import GradientBackground from '../../components/partials/GradientBackground';
+import BodyPartial from '../../../components/partials/BodyPartial';
+import GradientBackground from '../../../components/partials/GradientBackground';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 

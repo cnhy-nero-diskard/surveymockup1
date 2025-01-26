@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import BodyPartial from '../../components/partials/BodyPartial';
-import GradientBackground from '../../components/partials/GradientBackground';
+import BodyPartial from '../../../components/partials/BodyPartial';
+import GradientBackground from '../../../components/partials/GradientBackground';
 import { motion } from 'framer-motion';
 import './SurveyEvaluation05.css'; // Ensure you have a CSS file for styling
-import imgoverlay from "../../components/img/shutter.png";
-import useTranslations from '../../components/shared/useTranslations';
+import imgoverlay from "../../../components/img/shutter.png";
+import useTranslations from '../../../components/shared/useTranslations';
 
 const SurveyEvaluation05 = () => {
   const [surveyRating, setSurveyRating] = useState(1);
