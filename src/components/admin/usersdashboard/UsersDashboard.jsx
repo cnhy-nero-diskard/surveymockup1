@@ -15,6 +15,8 @@ import {
   Button,
   Modal,
 } from "@mui/material";
+
+import { Circle } from "@mui/icons-material";
 import { Pie, Bar } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -207,8 +209,13 @@ const UsersDashboard = () => {
                     <TableCell>{user.anonymous_user_id}</TableCell>
                     <TableCell>{user.nickname}</TableCell>
                     <TableCell>{new Date(user.created_at).toLocaleString()}</TableCell>
-                    <TableCell>{user.is_active ? "Active" : "Inactive"}</TableCell>
-                  </TableRow>
+                    <TableCell>
+                      {user.is_active ? (
+                        <Circle sx={{ color: "green", fontSize: "small" }} />
+                      ) : (
+                        <Circle sx={{ color: "red", fontSize: "small" }} />
+                      )}
+                    </TableCell>                  </TableRow>
                 ))}
               </TableBody>
             </Table>
