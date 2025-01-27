@@ -8,7 +8,7 @@ const BackgroundWrapper = styled.div`
   font-size: 1rem;
   color: #fff;
   border: none;
-  // min-width: 80vw;
+  min-width: 30vw;
   max-width: 70vw;
   border-radius: 25px;
   background: linear-gradient(135deg, #95b1ed, #3abde9); /* Gradient background */

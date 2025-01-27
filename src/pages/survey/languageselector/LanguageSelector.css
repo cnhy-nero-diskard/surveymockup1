@@ -23,8 +23,8 @@ h1 {
 
 .language-buttons-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); /* Responsive grid */
-  gap: 15px;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); /* Responsive grid with minimum width of 150px */
+  gap: 20px; /* Increased gap for better spacing */
   justify-content: center;
   margin-bottom: 30px;
   width: 100%; /* Ensure the grid takes full width */
@@ -34,16 +34,16 @@ h1 {
   background-color: #0d79ec; /* Darker blue */
   border: none;
   border-radius: 20px;
-  padding: 15px 20px;
+  padding: 20px; /* Increased padding for better spacing */
   cursor: pointer;
   transition: background-color 0.3s ease;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-width: 120px;
+  min-width: 150px; /* Increased minimum width */
   width: 100%;
-  height: 100px;
+  height: 120px; /* Increased height for better proportion */
 }
 
 .language-button:hover {
@@ -51,10 +51,8 @@ h1 {
 }
 
 .flag-icon {
-  width: 32px; /* Adjust the width as needed */
-  height: 24px; /* Adjust the height as needed */
-  vertical-align: middle; /* Align the flag vertically with the text */
-  font-size: large;
+  width: 48px; /* Increased width for better visibility */
+  height: 36px; /* Increased height for better visibility */
   margin-bottom: 10px;
 }
 
@@ -66,6 +64,8 @@ h1 {
 
 .next-button {
   border-radius: 20px;
+  padding: 10px 20px; /* Added padding for better button size */
+  font-size: 1rem; /* Adjusted font size */
 }
 
 .next-button:hover {
@@ -73,17 +73,26 @@ h1 {
   border-radius: 30px;
 }
 
-.next-button img {
-  margin-right: 10px;
-}
-
 /* Mobile Responsive */
 @media (max-width: 600px) {
   .language-buttons-grid {
     grid-template-columns: repeat(2, 1fr); /* 2 columns on smaller screens */
+    gap: 15px; /* Adjusted gap for smaller screens */
+  }
+
+  .language-button {
+    min-width: 120px; /* Adjusted minimum width for smaller screens */
+    height: 100px; /* Adjusted height for smaller screens */
+    padding: 15px; /* Adjusted padding for smaller screens */
+  }
+
+  .flag-icon {
+    width: 32px; /* Adjusted width for smaller screens */
+    height: 24px; /* Adjusted height for smaller screens */
   }
 
   .next-button {
-    max-width: 300px; /* Adjust max-width for smaller screens */
+    max-width: 100%; /* Full width on smaller screens */
+    padding: 10px; /* Adjusted padding for smaller screens */
   }
 }

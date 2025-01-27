@@ -96,7 +96,8 @@ const TourismAttractionsTable = () => {
     useEffect(() => {
         const fetchAttractions = async () => {
             try {
-                const response = await axios.get(`${process.env.REACT_APP_API_HOST}/api/admin/fetch`, { withCredentials: true });
+                const response = await axios.get(`${process.env.REACT_APP_API_HOST}/api/admin/fetch`, 
+                    { withCredentials: true });
                 setAttractions(response.data);
                 setIsUnauthorized(false); // Reset unauthorized state if request succeeds
             } catch (error) {

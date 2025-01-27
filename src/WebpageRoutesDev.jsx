@@ -1,7 +1,7 @@
 import React from 'react';
 import { Route, Routes, useNavigate } from 'react-router-dom';
 import { useAuth } from './components/context/AuthContext';
-import LanguageSelector from './pages/languageselector/LanguageSelector';
+import LanguageSelector from './pages/survey/languageselector/LanguageSelector';
 import Residence1 from './pages/residence1/Residence1';
 import MainPurpose from './pages/mainpurpose/MainPurpose';
 import VisitFrequencyForm from './pages/visitfrequencyform/VisitFrequencyForm';

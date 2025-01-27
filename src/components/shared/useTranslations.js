@@ -20,7 +20,8 @@ const useTranslations = (component, language) => {
         const fetchTranslations = async () => {
             try {
                 const response = await axios.get(
-                    `${process.env.REACT_APP_API_HOST}/api/texts?language=${language}&component=${component}`, { withCredentials: true }
+                    `${process.env.REACT_APP_API_HOST}/api/texts?language=${language}&component=${component}`,
+                     { withCredentials: true }
                 );
                 setTranslations(response.data);
             } catch (error) {

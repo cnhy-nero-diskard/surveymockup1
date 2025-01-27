@@ -43,7 +43,8 @@ const Residence1 = () => {
     const fetchMunicipalities = async () => {
       try {
         console.log(`API HOST - ${process.env.REACT_APP_API_HOST}`);
-        const response = await axios.get(`${process.env.REACT_APP_API_HOST}/api/municipalities`);
+        const response = await axios.get(`${process.env.REACT_APP_API_HOST}/api/municipalities`, 
+          {withCredentials: true});
         const data = response.data;
 
         const formattedData = data.reduce((acc, row) => {
