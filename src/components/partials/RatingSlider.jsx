@@ -6,106 +6,8 @@ import BodyPartial from '../../components/partials/BodyPartial';
 import { Container, Title } from '../../components/shared/styles1';
 import imgOverlay from "../../components/img/sentiment.png";
 import { useNavigate } from 'react-router-dom';
-
-const RatingSlider = ({ title, categories, onRatingChange, onRatingComplete }) => {
-  const [currentSlide, setCurrentSlide] = useState(0);
-  const [sliderValue, setSliderValue] = useState(2); // Default to neutral
-  const navigate = useNavigate();
-
-  const handleRating = (value) => {
-    const currentCategory = categories[currentSlide];
-    onRatingChange(currentCategory, value); // Call the onRatingChange prop with the current category and value
-
-    if (currentSlide < categories.length - 1) {
-      setCurrentSlide(currentSlide + 1);
-      setSliderValue(2); // Reset slider to neutral for the next category
-    } else {
-      onRatingComplete(); // Call the callback when all ratings are done
-    }
-  };
-
-  const transitions = useTransition(currentSlide, {
-    from: { opacity: 0, transform: 'translate3d(100%,0,0)' },
-    enter: { opacity: 1, transform: 'translate3d(0%,0,0)' },
-    leave: { opacity: 0, transform: 'translate3d(-50%,0,0)' },
-  });
-
-  const [sliderSpring, sliderApi] = useSpring(() => ({
-    transform: 'scale(1)',
-    config: { tension: 200, friction: 20 },
-  }));
-
-  const [emojiSpring, emojiApi] = useSpring(() => ({
-    opacity: 1,
-    transform: 'scale(1)',
-    config: { tension: 200, friction: 20 },
-  }));
-
-  const handleSliderChange = (e) => {
-    const newValue = parseInt(e.target.value);
-    setSliderValue(newValue);
-
-    // Animate the slider thumb
-    sliderApi.start({
-      transform: 'scale(1.2)',
-      immediate: false,
-      onRest: () => sliderApi.start({ transform: 'scale(1)' }),
-    });
-
-    // Animate the emoji points
-    emojiApi.start({
-      opacity: 0.5,
-      transform: 'scale(0.8)',
-      immediate: false,
-      onRest: () => emojiApi.start({ opacity: 1, transform: 'scale(1)' }),
-    });
-  };
-
-  const handleNextClick = () => {
-    navigate('/'); // Navigate to the next question
-  };
-
-  return (
-    <>
-      <BodyPartial />
-      <GradientBackground overlayImage={imgOverlay} opacity={0.2} blendMode='screen'>
-        <Container>
-          <Title>{title}</Title>
-          <SlidesContainer>
-            {transitions((style, index) => (
-              <Slide style={style}>
-                <Label>{categories[index]}</Label>
-                <EmojiSlider>
-                  <EmojiPoint style={emojiSpring}>☹️</EmojiPoint>
-                  <EmojiPoint style={emojiSpring}>😐</EmojiPoint>
-                  <EmojiPoint style={emojiSpring}>🙂</EmojiPoint>
-                  <EmojiPoint style={emojiSpring}>😄</EmojiPoint>
-                  <Slider
-                    type="range"
-                    min="1"
-                    max="4"
-                    value={sliderValue}
-                    onChange={handleSliderChange}
-                    style={sliderSpring}
-                  />
-                </EmojiSlider>
-                <EmojiButtons>
-                  <EmojiButton onClick={() => handleRating(sliderValue)}>
-                    Submit
-                  </EmojiButton>
-                </EmojiButtons>
-              </Slide>
-            ))}
-          </SlidesContainer>
-          {currentSlide === categories.length - 1 && (
-            <NextButton onClick={handleNextClick}>NEXT</NextButton>
-          )}
-        </Container>
-      </GradientBackground>
-    </>
-  );
-};
-
+import { submitSurveyResponses } from '../shared/apiUtils';
+import { NextButtonU } from '../../components/shared/styles1';
 const SlidesContainer = styled.div`
   position: relative;
   width: 100%;
@@ -118,9 +20,9 @@ const Slide = styled(animated.div)`
   width: 100%;
   height: 100%;
   display: flex;
-  flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
+  padding: 0 20px;
 `;
 
 const Label = styled.div`
@@ -134,32 +36,23 @@ const Label = styled.div`
 `;
 
 const EmojiSlider = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 50%;
+`;
+
+const EmojiDisplay = styled(animated.div)`
+  font-size: 4rem;
+  margin-left: 20px;
+`;
+
+const SliderContainer = styled.div`
+  width: 100%;
   position: relative;
-  width: 80%;
-  margin: 20px 0;
 `;
 
-const EmojiPoint = styled(animated.span)`
-  position: absolute;
-  top: -30px;
-  font-size: 20px;
-  transform: translateX(-50%);
-
-  &:nth-child(1) {
-    left: 0%;
-  }
-  &:nth-child(2) {
-    left: 29.5%;
-  }
-  &:nth-child(3) {
-    left: 60.66%;
-  }
-  &:nth-child(4) {
-    left: 92%;
-  }
-`;
-
-const Slider = styled(animated.input)`
+const Slider = styled.input`
   -webkit-appearance: none;
   width: 100%;
   height: 15px;
@@ -188,14 +81,30 @@ const Slider = styled(animated.input)`
   }
 `;
 
+const SliderSteps = styled.div`
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  position: absolute;
+  top: 25px;
+`;
+
+const StepMarker = styled.div`
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: ${(props) => (props.active ? '#007bff' : '#aaa')};
+  transform: translateX(-50%);
+`;
+
 const EmojiButtons = styled.div`
   display: flex;
   justify-content: center;
   width: 100%;
+  margin-top: 20px;
 `;
 
 const EmojiButton = styled.button`
-  margin-top: 20px;
   padding: 10px 20px;
   border: none;
   border-radius: 5px;
@@ -226,4 +135,117 @@ const NextButton = styled.button`
   }
 `;
 
+const RatingSlider = ({ title, categories, onRatingComplete, surveyquestion_refs }) => {
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const [sliderValue, setSliderValue] = useState(2); // Default to neutral
+  const [responses, setResponses] = useState([]); // Array to store responses
+  const navigate = useNavigate();
+
+  const emojis = ['☹️', '😐', '🙂', '😄'];
+
+  const handleRating = (value) => {
+    const currentCategory = categories[currentSlide];
+    const response = {
+      surveyquestion_ref: surveyquestion_refs + currentCategory.substring(0, 5).toUpperCase(),
+      response_value: value.toString(),
+    };
+  
+    setResponses((prevResponses) => {
+      const updatedResponses = [...prevResponses, response];
+  
+      if (currentSlide < categories.length - 1) {
+        setCurrentSlide(currentSlide + 1);
+        setSliderValue(2);
+      } else {
+        submitSurveyResponses(updatedResponses) // Use updated array
+          .then(() => {
+            onRatingComplete();
+            navigate('/');
+          })
+          .catch((error) => {
+            console.error('Error submitting survey responses:', error);
+          });
+      }
+  
+      return updatedResponses;
+    });
+  };
+  
+
+  const transitions = useTransition(currentSlide, {
+    from: { opacity: 0, transform: 'translate3d(100%,0,0)' },
+    enter: { opacity: 1, transform: 'translate3d(0%,0,0)' },
+    leave: { opacity: 0, transform: 'translate3d(-50%,0,0)' },
+  });
+
+  const [emojiSpring, emojiApi] = useSpring(() => ({
+    opacity: 1,
+    transform: 'scale(1)',
+    config: { tension: 1000, friction: 10},
+  }));
+
+  const handleSliderChange = (e) => {
+    const newValue = parseInt(e.target.value);
+    setSliderValue(newValue);
+
+    // Animate the emoji transition
+    emojiApi.start({
+      opacity: 0.5,
+      transform: 'scale(0.8)',
+      immediate: false,
+      onRest: () => {
+        emojiApi.start({
+          opacity: 1,
+          transform: 'scale(1)',
+        });
+      },
+    });
+  };
+
+  return (
+    <>
+      <BodyPartial />
+      <GradientBackground overlayImage={imgOverlay} opacity={0.2} blendMode='screen'>
+        <Container>
+          <Title>{title}</Title>
+          <SlidesContainer>
+            {transitions((style, index) => (
+              <Slide style={style}>
+                <EmojiSlider>
+                  <Label>{categories[index]}</Label>
+                  <SliderContainer>
+                    <Slider
+                      type="range"
+                      min="1"
+                      max="4"
+                      step="1" // Snap to discrete steps
+                      value={sliderValue}
+                      onChange={handleSliderChange}
+                    />
+                    <SliderSteps>
+                      {[1, 2, 3, 4].map((step) => (
+                        <StepMarker key={step} active={step === sliderValue} />
+                      ))}
+                    </SliderSteps>
+                  </SliderContainer>
+                  <EmojiButtons>
+                    <NextButtonU onClick={() => handleRating(sliderValue)}>
+                      Submit
+                    </NextButtonU>
+                  </EmojiButtons>
+                </EmojiSlider>
+                <EmojiDisplay style={emojiSpring}>
+                  {emojis[sliderValue - 1]}
+                </EmojiDisplay>
+              </Slide>
+            ))}
+          </SlidesContainer>
+
+        </Container>
+      </GradientBackground>
+    </>
+  );
+};
+
 export default RatingSlider;
+

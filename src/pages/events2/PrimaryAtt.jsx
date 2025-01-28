@@ -6,6 +6,7 @@ import BodyPartial from '../../components/partials/BodyPartial';
 import imgoverlay from "../../components/img/beach.png";
 import { useNavigate } from 'react-router-dom';
 import useTranslations from '../../components/shared/useTranslations';
+import { submitSurveyResponses } from '../../components/shared/apiUtils';
 
 const Container = styled(motion.div)`
   display: flex;
@@ -47,12 +48,31 @@ const PrimaryAtt = () => {
     const [selected, setSelected] = useState(null);
     const [showNextPage, setShowNextPage] = useState(false);
     const [language, setLanguage] = useState(localStorage.getItem('selectedLanguage'));
+    const [responses, setResponses] = useState([]);
 
     const translations = useTranslations('PrimaryAtt', language);
 
     const handleOptionClick = (option) => {
         setSelected(option);
         setShowNextPage(true);
+
+        // Create a response object
+        const response = {
+            surveyquestion_ref: 'PRATT', // Example 5-character unique reference
+            response_value: option === 'YES' ? 'Yes' : 'No' // Language-agnostic value
+        };
+
+        // Add the response to the array
+        setResponses([response]);
+
+        // Submit the responses to the backend
+        submitSurveyResponses([response])
+            .then(() => {
+                console.log('Responses submitted successfully');
+            })
+            .catch((error) => {
+                console.error('Error submitting responses:', error);
+            });
     };
 
     const navigate = useNavigate();

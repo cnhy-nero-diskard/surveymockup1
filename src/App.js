@@ -7,6 +7,7 @@ import WebpageRoutesDev from './WebpageRoutesDev';
 import NotFound from './components/admin/fallback/NotFound';
 import { AuthProvider } from './components/context/AuthContext';
 import Login from './components/admin/login/Login';
+
 const App = () => {
   const initializeAnonymousUser = async () => {
     console.log('Initializing anonymous user...');
@@ -31,7 +32,21 @@ const App = () => {
 
   return (
     <Router>
-      <AuthProvider> {/* Wrap the entire app with AuthProvider */}
+      <AuthProvider>
+        <style>
+          {`
+            body {
+              background-color:#00a2ff ;
+              height: 100vh;
+              margin: 0;
+            }
+            .App {
+              height: 100vh;
+              display: flex;
+              flex-direction: column;
+            }
+          `}
+        </style>
         <Routes>
           {/* Default route to show the RouteSelector */}
           <Route path="/" element={<RouteSelector />} />
@@ -42,7 +57,6 @@ const App = () => {
 
           {/* App Routes */}
           <Route path="/devpath1/*" element={<WebpageRoutesDev />} />
-          
 
           {/* Fallback route */}
           <Route path="*" element={<NotFound />} />

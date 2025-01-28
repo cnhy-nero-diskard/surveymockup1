@@ -6,15 +6,40 @@ import { motion } from 'framer-motion';
 import imgoverlay from "../../components/img/shutter.png";
 import { Container } from '../../components/shared/styles1';
 import useTranslations from '../../components/shared/useTranslations';
-
+import { submitSurveyResponses } from '../../components/shared/apiUtils';
+import { useNavigate } from 'react-router-dom';
 const Willrecom = () => {
+  const navigate = useNavigate();
+
   const [language, setLanguage] = useState(localStorage.getItem('selectedLanguage') || 'en');
+  const [responses, setResponses] = useState([]);
   const translations = useTranslations('Willrecom', language);
 
   const handleOptionClick = (option) => {
-    // Logic to navigate to the next page
+    // Create a new response object
+    const newResponse = {
+      surveyquestion_ref: 'WLRCM', // Example 5-character reference, all caps
+      response_value: option
+    };
+
+    // Update the responses array
+    setResponses([...responses, newResponse]);
+
+    // Log the response for debugging
     console.log(`User selected: ${option}`);
-    // Replace the console.log with your navigation logic, e.g., using React Router's history.push
+
+    // Submit the responses to the backend
+    submitSurveyResponses([newResponse])
+      .then(() => {
+        console.log('Response submitted successfully');
+
+        // Optionally, navigate to the next page or show a success message
+      })
+      .catch((error) => {
+        console.error('Failed to submit response:', error);
+        // Optionally, show an error message to the user
+      });
+      navigate('/');
   };
 
   useEffect(() => {

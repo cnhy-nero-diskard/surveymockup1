@@ -27,6 +27,7 @@ const RateAttraction = () => {
           title={translations.rateAttractionTitle}
           categories={categories}
           onRatingComplete={handleRatingComplete}
+          surveyquestion_refs={'RATT'}
         />
   );
 };

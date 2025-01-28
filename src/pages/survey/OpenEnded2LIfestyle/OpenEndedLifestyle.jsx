@@ -1,43 +1,63 @@
-// OpenEnded1.jsx
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import BodyPartial from '../../components/partials/BodyPartial';
-import GradientBackground from '../../components/partials/GradientBackground';
-import { Container, Title, Paragraph, Button, EmojiButton, TextField } from '../../components/shared/styles1';
-import imgoverlay from "../../components/img/review.png";
+import BodyPartial from '../../../components/partials/BodyPartial';
+import GradientBackground from '../../../components/partials/GradientBackground';
+import { Container, Title, Paragraph, Button, EmojiButton, TextField } from '../../../components/shared/styles1';
+import imgoverlay from "../../../components/img/review.png";
 import { useNavigate } from 'react-router-dom';
-import useTranslations from '../../components/shared/useTranslations';
-
-const OpenEnded1 = () => {
-    const [selectedButton, setSelectedButton] = useState(null);
+import useTranslations from '../../../components/shared/useTranslations';
+import { submitSurveyResponses } from '../../../components/shared/apiUtils';
+const OpenEndedLifestyle = () => {
+    const [selectedSatisfaction, setSelectedSatisfaction] = useState(null);
+    const [textFeedback, setTextFeedback] = useState('');
     const [language, setLanguage] = useState(localStorage.getItem('selectedLanguage'));
     const translations = useTranslations('OpenEnded1', language);
-
-    const handleButtonClick = (button) => {
-        setSelectedButton(button);
-        console.log(`Selected: ${button}`);
-    };
-
-    const navigate = useNavigate(); // Initialize useNavigate
-    const handleNextClick = () => {
-        navigate('/'); // Navigate to the next question
-    };
+    const navigate = useNavigate();
 
     useEffect(() => {
-        // Update translations when language changes
         setLanguage(localStorage.getItem('selectedLanguage'));
     }, [localStorage.getItem('selectedLanguage')]);
+
+    const handleButtonClick = (level) => {
+        setSelectedSatisfaction(level);
+        console.log(`Selected: ${level}`);
+    };
+
+    const handleNextClick = async () => {
+        const surveyResponses = [];
+
+        if (selectedSatisfaction) {
+            surveyResponses.push({
+                surveyquestion_ref: 'SATLV', // Satisfaction Level
+                response_value: selectedSatisfaction
+            });
+        }
+
+        if (textFeedback.trim() !== '') {
+            surveyResponses.push({
+                surveyquestion_ref: 'FDBCK2', // Feedback Comment
+                response_value: textFeedback
+            });
+        }
+
+        try {
+            await submitSurveyResponses(surveyResponses);
+            navigate('/'); // Navigate to the next page after submission
+        } catch (error) {
+            console.error('Error submitting survey responses:', error);
+        }
+    };
 
     return (
         <>
             <BodyPartial />
-            <GradientBackground overlayImage={imgoverlay} opacity={0.2} >
+            <GradientBackground overlayImage={imgoverlay} opacity={0.2}>
                 <Container
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5 }}
                 >
-                    <Title>{translations.openEnded1Title}</Title>
+                    <Title>{translations.openEnded1TitleLifestyle}</Title>
 
                     {/* Emoji Buttons */}
                     <div>
@@ -45,7 +65,7 @@ const OpenEnded1 = () => {
                             whileHover={{ scale: 1.1 }}
                             whileTap={{ scale: 0.9 }}
                             onClick={() => handleButtonClick('DISSATISFIED')}
-                            selected={selectedButton === 'DISSATISFIED'}
+                            selected={selectedSatisfaction === 'DISSATISFIED'}
                             tabIndex={0}
                             aria-label="Dissatisfied"
                         >
@@ -55,7 +75,7 @@ const OpenEnded1 = () => {
                             whileHover={{ scale: 1.1 }}
                             whileTap={{ scale: 0.9 }}
                             onClick={() => handleButtonClick('NEUTRAL')}
-                            selected={selectedButton === 'NEUTRAL'}
+                            selected={selectedSatisfaction === 'NEUTRAL'}
                             tabIndex={0}
                             aria-label="Neutral"
                         >
@@ -65,7 +85,7 @@ const OpenEnded1 = () => {
                             whileHover={{ scale: 1.1 }}
                             whileTap={{ scale: 0.9 }}
                             onClick={() => handleButtonClick('SATISFIED')}
-                            selected={selectedButton === 'SATISFIED'}
+                            selected={selectedSatisfaction === 'SATISFIED'}
                             tabIndex={0}
                             aria-label="Satisfied"
                         >
@@ -75,7 +95,7 @@ const OpenEnded1 = () => {
                             whileHover={{ scale: 1.1 }}
                             whileTap={{ scale: 0.9 }}
                             onClick={() => handleButtonClick('VERY SATISFIED')}
-                            selected={selectedButton === 'VERY SATISFIED'}
+                            selected={selectedSatisfaction === 'VERY SATISFIED'}
                             tabIndex={0}
                             aria-label="Very Satisfied"
                         >
@@ -86,7 +106,11 @@ const OpenEnded1 = () => {
                     <Paragraph>{translations.openEnded1FeedbackRequest}</Paragraph>
 
                     {/* Large Text Field */}
-                    <TextField placeholder={translations.openEnded1TextFieldPlaceholder} />
+                    <TextField
+                        placeholder={translations.openEnded1TextFieldPlaceholder}
+                        value={textFeedback}
+                        onChange={(e) => setTextFeedback(e.target.value)}
+                    />
 
                     {/* Next Button */}
                     <Button
@@ -104,4 +128,4 @@ const OpenEnded1 = () => {
     );
 };
 
-export default OpenEnded1;
+export default OpenEndedLifestyle;

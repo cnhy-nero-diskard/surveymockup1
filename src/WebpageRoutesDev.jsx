@@ -16,8 +16,8 @@ import ThankYouMessage from './pages/survey/thanku/ThankYouMessage';
 import Willrecom from './pages/reccommevent/Willrecom';
 import WhereLearn from './pages/wherelearn/WhereLearn';
 import SurveyVenue from './pages/surveyvenue/SurveyVenue';
-import OpenEnded2 from './pages/OpenEnded2LIfestyle/OpenEnded2';
-import OpenEnded1 from './pages/OpenEnded1Hotel/OpenEnded1';
+import OpenEnded2 from './pages/survey/OpenEnded2LIfestyle/OpenEndedLifestyle';
+import OpenEndedHotel from './pages/survey/OpenEnded1Hotel/OpenEndedHotel';
 import HowManyVisits from './pages/events1/HowManyVisits';
 import PrimaryAtt from './pages/events2/PrimaryAtt';
 import RateAttraction from './pages/events3/RateAttraction';
@@ -104,7 +104,7 @@ const ButtonGrid = () => {
     { label: 'Survey Venue', path: 'surveyvenue' },
     { label: 'Open Ended 2', path: 'openended2' },
     { label: 'Open Ended 1', path: 'openended1' },
-    { label: 'How Many Visits', path: 'howmanyvisits' },
+    { label: '(DUPLICATE)How Many Visits', path: 'howmanyvisits' },
     { label: 'Primary Attraction', path: 'primaryatt' },
     { label: 'Rate Attraction', path: 'rateattraction' },
     { label: 'Events Open 1', path: 'eventsopen1' },
@@ -218,7 +218,7 @@ const WebpageRoutesDev = () => {
         <Route path="/wherelearn" element={<WhereLearn />} />
         <Route path="/surveyvenue" element={<SurveyVenue />} />
         <Route path="/openended2" element={<OpenEnded2 />} />
-        <Route path="/openended1" element={<OpenEnded1 />} />
+        <Route path="/openended1" element={<OpenEndedHotel />} />
         <Route path="/howmanyvisits" element={<HowManyVisits />} />
         <Route path="/primaryatt" element={<PrimaryAtt />} />
         <Route path="/rateattraction" element={<RateAttraction />} />

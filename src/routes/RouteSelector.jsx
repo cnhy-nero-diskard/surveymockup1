@@ -8,7 +8,7 @@ const RouteSelector = () => {
   const { isAuthenticated, unauthorized, handleUnauthorized } = useAuth(); // Correct usage
   console.log('isAuthenticated', isAuthenticated);
   return (
-    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', flexDirection: 'column' }}>
+    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', flexDirection: 'column',  }}>
       <h1>Select Route</h1>
       <div style={{ display: 'flex', gap: '20px' }}>
         <button

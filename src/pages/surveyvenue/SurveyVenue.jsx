@@ -1,4 +1,3 @@
-// SurveyVenue.jsx
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
@@ -7,7 +6,7 @@ import BodyPartial from '../../components/partials/BodyPartial';
 import GradientBackground from '../../components/partials/GradientBackground';
 import imgOverlay from "../../components/img/venue.png";
 import useTranslations from '../../components/shared/useTranslations';
-
+import { submitSurveyResponses } from '../../components/shared/apiUtils';
 const Container = styled(motion.div)`
   font-family: Arial, sans-serif;
   padding: 20px;
@@ -115,6 +114,7 @@ const SurveyVenue = () => {
     if (venue === translations.surveyVenueOthersSpecify) {
       setShowPopup(true);
     } else {
+      submitResponse(venue);
       navigate('/'); // Navigate to the next page
     }
   };
@@ -122,9 +122,25 @@ const SurveyVenue = () => {
   const handlePopupSubmit = () => {
     if (otherVenue) {
       setSelectedVenue(otherVenue);
+      submitResponse(otherVenue);
       setShowPopup(false);
       navigate('/next-page'); // Navigate to the next page after specifying the venue
     }
+  };
+
+  const submitResponse = (responseValue) => {
+    const surveyResponses = [{
+      surveyquestion_ref: 'VENUE', // 5 characters, all caps
+      response_value: responseValue,
+    }];
+
+    submitSurveyResponses(surveyResponses)
+      .then(() => {
+        console.log('Survey responses submitted successfully');
+      })
+      .catch((error) => {
+        console.error('Error submitting survey responses:', error);
+      });
   };
 
   return (
