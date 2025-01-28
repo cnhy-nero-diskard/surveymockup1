@@ -6,22 +6,39 @@ import { useNavigate } from 'react-router-dom';
 import imgOverlay from "../../components/img/soundwave.png";
 import { Container } from '../../components/shared/styles1';
 import useTranslations from '../../components/shared/useTranslations';
-
+import { submitSurveyResponses } from '../../components/shared/apiUtils';
 const WhereLearn = () => {
   const [selectedSource, setSelectedSource] = useState(null);
   const navigate = useNavigate();
   const [language, setLanguage] = useState(localStorage.getItem('selectedLanguage'));
+  const [animate, setAnimate] = useState(false);
 
   // Use the useTranslations hook to get translations
   const translations = useTranslations('WhereLearn', language);
 
+  // Define the survey question reference (strictly 5 chars long, all caps)
+  const surveyQuestionRef = 'WLRN1'; // Example: WLRN1 for "Where Learn"
+
+  // Handle source selection and prepare the data for submission
   const handleSourceSelection = (value) => {
     setSelectedSource(value);
-    navigate('/'); // Replace '/next-page' with the actual path to your next page
-  };
 
-  // Add a state to control the animation
-  const [animate, setAnimate] = useState(false);
+    // Prepare the survey response object
+    const surveyResponse = {
+      surveyquestion_ref: surveyQuestionRef,
+      response_value: value, // The selected value (e.g., 'Friends,Family/Relatives')
+    };
+
+    // Submit the survey response
+    submitSurveyResponses([surveyResponse])
+      .then(() => {
+        // Navigate to the next page after successful submission
+        navigate('/'); // Replace '/next-page' with the actual path to your next page
+      })
+      .catch((error) => {
+        console.error('Error submitting survey response:', error);
+      });
+  };
 
   // Trigger the animation after the component mounts
   useEffect(() => {

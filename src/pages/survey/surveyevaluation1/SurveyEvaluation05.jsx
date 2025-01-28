@@ -2,28 +2,56 @@ import React, { useState, useEffect } from 'react';
 import BodyPartial from '../../../components/partials/BodyPartial';
 import GradientBackground from '../../../components/partials/GradientBackground';
 import { motion } from 'framer-motion';
-import './SurveyEvaluation05.css'; // Ensure you have a CSS file for styling
+import './SurveyEvaluation05.css';
 import imgoverlay from "../../../components/img/shutter.png";
 import useTranslations from '../../../components/shared/useTranslations';
+import { NextButtonU } from '../../../components/shared/styles1';
+import { submitSurveyResponses } from '../../../components/shared/apiUtils';
 
 const SurveyEvaluation05 = () => {
-  const [surveyRating, setSurveyRating] = useState(1);
-  const [surveyPreference, setSurveyPreference] = useState('');
-  const [resultsPreference, setResultsPreference] = useState('');
+  const [responses, setResponses] = useState([]);
   const [language, setLanguage] = useState(localStorage.getItem('selectedLanguage'));
 
   const translations = useTranslations('SurveyEvaluation05', language);
 
   const handleRatingChange = (event) => {
-    setSurveyRating(parseInt(event.target.value));
+    const value = parseInt(event.target.value);
+    updateResponse('RAT01', value);
   };
 
   const handlePreferenceChange = (event) => {
-    setSurveyPreference(event.target.value);
+    const value = event.target.value;
+    updateResponse('PREF01', value);
   };
 
   const handleResultsPreferenceChange = (event) => {
-    setResultsPreference(event.target.value);
+    const value = event.target.value;
+    updateResponse('RES01', value);
+  };
+
+  const updateResponse = (questionRef, value) => {
+    setResponses((prevResponses) => {
+      const existingResponseIndex = prevResponses.findIndex(response => response.surveyquestion_ref === questionRef);
+      if (existingResponseIndex !== -1) {
+        const updatedResponses = [...prevResponses];
+        updatedResponses[existingResponseIndex].response_value = value;
+        return updatedResponses;
+      } else {
+        return [...prevResponses, { surveyquestion_ref: questionRef, response_value: value }];
+      }
+    });
+  };
+
+  const handleSubmit = () => {
+    submitSurveyResponses(responses)
+      .then(() => {
+        console.log('Responses submitted successfully');
+        // Optionally, you can redirect or show a success message here
+      })
+      .catch((error) => {
+        console.error('Failed to submit responses:', error);
+        // Optionally, you can show an error message here
+      });
   };
 
   return (
@@ -59,7 +87,6 @@ const SurveyEvaluation05 = () => {
                   type="radio" 
                   name="results" 
                   value="yes" 
-                  checked={resultsPreference === 'yes'}
                   onChange={handleResultsPreferenceChange}
                 /> {translations.surveyEvaluation05OptionYes}
               </label>
@@ -68,7 +95,6 @@ const SurveyEvaluation05 = () => {
                   type="radio" 
                   name="results" 
                   value="no" 
-                  checked={resultsPreference === 'no'}
                   onChange={handleResultsPreferenceChange}
                 /> {translations.surveyEvaluation05OptionNo}
               </label>
@@ -90,7 +116,6 @@ const SurveyEvaluation05 = () => {
                     type="radio"
                     name="rating"
                     value={value}
-                    checked={surveyRating === value}
                     onChange={handleRatingChange}
                   /> {value}
                 </label>
@@ -112,7 +137,6 @@ const SurveyEvaluation05 = () => {
                   type="radio"
                   name="preference"
                   value="like"
-                  checked={surveyPreference === 'like'}
                   onChange={handlePreferenceChange}
                 /> {translations.surveyEvaluation05OptionLike}
               </label>
@@ -121,7 +145,6 @@ const SurveyEvaluation05 = () => {
                   type="radio"
                   name="preference"
                   value="expect"
-                  checked={surveyPreference === 'expect'}
                   onChange={handlePreferenceChange}
                 /> {translations.surveyEvaluation05OptionExpect}
               </label>
@@ -130,7 +153,6 @@ const SurveyEvaluation05 = () => {
                   type="radio"
                   name="preference"
                   value="dontCare"
-                  checked={surveyPreference === 'dontCare'}
                   onChange={handlePreferenceChange}
                 /> {translations.surveyEvaluation05OptionDontCare}
               </label>
@@ -139,7 +161,6 @@ const SurveyEvaluation05 = () => {
                   type="radio"
                   name="preference"
                   value="dontLike"
-                  checked={surveyPreference === 'dontLike'}
                   onChange={handlePreferenceChange}
                 /> {translations.surveyEvaluation05OptionDontLike}
               </label>
@@ -147,14 +168,9 @@ const SurveyEvaluation05 = () => {
           </motion.div>
 
           {/* Submit Button */}
-          <motion.button 
-            className="submit-button"
-            whileHover={{ scale: 1.05, y: -5 }}
-            whileTap={{ scale: 0.95, y: 0 }}
-            transition={{ type: "spring", stiffness: 400, damping: 10 }}
-          >
+          <NextButtonU onClick={handleSubmit}>
             {translations.surveyEvaluation05ButtonNext}
-          </motion.button>
+          </NextButtonU>
         </motion.div>
       </GradientBackground>
     </>

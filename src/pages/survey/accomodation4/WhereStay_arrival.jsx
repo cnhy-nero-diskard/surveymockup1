@@ -8,7 +8,7 @@ import imgoverlay from '../../../components/img/bed23.png';
 import useTranslations from '../../../components/shared/useTranslations';
 import axios from 'axios';
 import { v4 as uuidv4 } from 'uuid'; // For generating UUIDs
-import { submitSurveyResponse } from '../../../components/shared/apiUtils';
+import { submitSurveyResponses } from '../../../components/shared/apiUtils';
 
 const Container = styled(motion.div)`
   font-family: Arial, sans-serif;
@@ -115,14 +115,12 @@ const WhereStayArrival = () => {
 
         try {
             // Submit each survey response using the utility function
-            for (const response of surveyResponses) {
-                await submitSurveyResponse(response);
-            }
+            await submitSurveyResponses(surveyResponses);
+
 
             navigate('/');
         } catch (err) {
             console.error('Failed to submit survey response:', err);
-            alert('Failed to submit survey response. Please try again.');
         }
     };
     useEffect(() => {

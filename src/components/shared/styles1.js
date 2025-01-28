@@ -1,6 +1,9 @@
 // components/shared/styles1.js
-import styled from 'styled-components';
+import styled, {keyframes} from 'styled-components';
 import { motion } from 'framer-motion';
+
+export const fontColorU = 'white';
+
 
 export const Container = styled(motion.div)`
   display: flex;
@@ -63,4 +66,38 @@ export const TextField = styled.textarea`
   border-radius: 5px;
   font-size: 1rem;
   resize: none;
+`;
+
+const pulse = keyframes`
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
+`;
+
+
+export const NextButtonU = styled.button`
+  background: linear-gradient(135deg,rgba(107, 17, 203, 0.38), #2575fc);
+  color: white;
+  border: none;
+  padding: 15px 30px;
+  font-size: 1.2rem;
+  border-radius: 25px;
+  cursor: pointer;
+  transition: background 0.3s ease-in-out, transform 0.2s ease-in-out;
+  animation: ${pulse} 2s infinite;
+
+  &:hover {
+    background: linear-gradient(135deg, #2575fc, #6a11cb);
+    transform: scale(1.05);
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
 `;

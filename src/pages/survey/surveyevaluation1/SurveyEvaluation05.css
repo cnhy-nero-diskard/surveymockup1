@@ -1,11 +1,17 @@
 /* SurveyEvaluation.css */
 
+:root {
+    --font-size-default: 16px;
+    --font-size-small: 1.25rem;
+}
+
 .survey-evaluation {
     max-width: 600px;
     margin: 0 auto;
     padding: 20px;
     /* border: 1px solid #ccc; */
     border-radius: 8px;
+    font-size: var(--font-size-default);
 }
 
 .survey-evaluation h2 {
@@ -23,6 +29,7 @@
     margin-bottom: 8px;
     font-weight: bold;
     color: #555;
+    font-size: var(--font-size-default);
 }
 
 .form-group input[type="checkbox"],
@@ -46,6 +53,7 @@
     cursor: pointer;
     border-radius: 20px;
     transition: background-color 0.3s ease, transform 0.3s ease;
+    font-size: var(--font-size-default);
 }
 
 .radio-button-group label:hover {
@@ -66,7 +74,7 @@ button[type="submit"] {
     color: #fff;
     border: none;
     border-radius: 4px;
-    font-size: 16px;
+    font-size: var(--font-size-default);
     cursor: pointer;
     transition: background-color 0.3s ease;
 }
@@ -78,7 +86,7 @@ button[type="submit"]:hover {
 /* Custom Radio Button Styling */
 .survey-options label {
     margin-bottom: 10px;
-    font-size: 1rem;
+    font-size: var(--font-size-default);
     color: #ffffff;
     display: flex;
     align-items: center;
@@ -132,15 +140,15 @@ button[type="submit"]:hover {
     }
 
     .form-group label {
-        font-size: 14px;
+        font-size: var(--font-size-small);
     }
 
     .radio-button-group label {
         padding: 8px;
-        font-size: 14px;
+        font-size: var(--font-size-small);
     }
 
     button[type="submit"] {
-        font-size: 14px;
+        font-size: var(--font-size-small);
     }
 }

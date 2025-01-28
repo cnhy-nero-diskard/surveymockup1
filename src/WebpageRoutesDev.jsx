@@ -4,15 +4,15 @@ import { useAuth } from './components/context/AuthContext';
 import LanguageSelector from './pages/survey/languageselector/LanguageSelector';
 import Residence1 from './pages/survey/residence1/Residence1';
 import MainPurpose from './pages/survey/mainpurpose/MainPurpose';
-import VisitFrequencyForm from './pages/visitfrequencyform/VisitFrequencyForm';
+import VisitFrequencyForm from './pages/survey/visitfrequencyform/VisitFrequencyForm';
 import SurveyConsent from './pages/survey/surveyconsent/SurveyConsent';
-import Form from './pages/form/Form';
+import Form from './pages/survey/form/Form';
 import Greetings from './pages/greetings/Greetings';
 import BranchingSelect from './pages/branchingselect/BranchingSelect';
 import Page1 from './pages/page1/Page1';
 import SurveyEvaluation05 from './pages/survey/surveyevaluation1/SurveyEvaluation05';
 import SurveyEvaluationb from './pages/surveyevaluation2/SurveyEvaluationb';
-import ThankYouMessage from './pages/thanku/ThankYouMessage';
+import ThankYouMessage from './pages/survey/thanku/ThankYouMessage';
 import Willrecom from './pages/reccommevent/Willrecom';
 import WhereLearn from './pages/wherelearn/WhereLearn';
 import SurveyVenue from './pages/surveyvenue/SurveyVenue';
@@ -22,7 +22,6 @@ import HowManyVisits from './pages/events1/HowManyVisits';
 import PrimaryAtt from './pages/events2/PrimaryAtt';
 import RateAttraction from './pages/events3/RateAttraction';
 import EventsOpen1 from './pages/eventsopenended/EventsOpen1';
-import EventsOpen2 from './pages/eventsopenended2/EventsOpen2';
 import AttractionsFeedback from './pages/eventsopenended2/AttractionsFeedback';
 import PackageTourFeedback from './pages/eventsopenended2/PackageTourFeedback';
 import AttractionForm from './pages/events4/AttractionForm';
@@ -97,8 +96,8 @@ const ButtonGrid = () => {
     { label: 'Greetings', path: 'greetings' },
     { label: 'Branching Select', path: 'branchingselect' },
     { label: 'Page 1', path: 'page1' },
-    { label: 'Survey Evaluation 05', path: 'surveyevaluation05' },
-    { label: 'Survey Evaluation B', path: 'surveyevaluationb' },
+    { label: 'Survey Evaluation VERSION1', path: 'surveyevaluation05' },
+    { label: 'Survey Evaluation VERSION2', path: 'surveyevaluationb' },
     { label: 'Thank You Message', path: 'thankyoumessage' },
     { label: 'Will Recommend', path: 'willrecom' },
     { label: 'Where Learn', path: 'wherelearn' },

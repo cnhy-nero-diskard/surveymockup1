@@ -1,15 +1,104 @@
-// src/page3.jsx
-
+import styled, { keyframes } from 'styled-components';
 import React, { useState } from 'react';
-import './MainPurpose.css'; // Import the CSS file for styling
 import BodyPartial from '../../../components/partials/BodyPartial';
 import GradientBackground from '../../../components/partials/GradientBackground';
 import imgoverlay from "../../../components/img/question.png";
 import { useNavigate } from 'react-router-dom';
-import { Button } from 'style-components';
 import { MAINPURPOSE as COMPONENT }  from '../../../components/shared/componentConstants';
 import useTranslations from '../../../components/shared/useTranslations';  
-import { submitSurveyResponse } from '../../../components/shared/apiUtils';
+import { submitSurveyResponses } from '../../../components/shared/apiUtils';
+
+// Keyframes for animations
+const fadeIn = keyframes`
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+`;
+
+const pulse = keyframes`
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
+`;
+
+// Styled components
+export const Container = styled.div`
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+  text-align: center;
+  animation: ${fadeIn} 0.5s ease-in-out;
+`;
+
+export const Header = styled.h1`
+  font-size: 2.5rem;
+  color: #333;
+  margin-bottom: 20px;
+`;
+
+export const OptionsGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+  margin-bottom: 30px;
+`;
+
+export const Option = styled.div`
+  display: flex;
+  align-items: center;
+  background:rgb(184, 201, 255);
+  padding: 15px;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 44, 241, 0.69);
+  transition: transform 0.2s ease-in-out;
+
+  &:hover {
+    transform: translateY(-5px);
+  }
+`;
+
+export const CustomCheckbox = styled.input.attrs({ type: 'checkbox' })`
+  margin-right: 10px;
+  cursor: pointer;
+`;
+
+export const Label = styled.label`
+  font-size: 1.2rem;
+  color: #555;
+  cursor: pointer;
+`;
+
+export const NextButton = styled.button`
+  background: linear-gradient(135deg, #6a11cb, #2575fc);
+  color: white;
+  border: none;
+  padding: 15px 30px;
+  font-size: 1.2rem;
+  border-radius: 25px;
+  cursor: pointer;
+  transition: background 0.3s ease-in-out, transform 0.2s ease-in-out;
+  animation: ${pulse} 2s infinite;
+
+  &:hover {
+    background: linear-gradient(135deg, #2575fc, #6a11cb);
+    transform: scale(1.05);
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+`;
 
 const MainPurpose = () => {
   const [selectedPurpose, setSelectedPurpose] = useState('');
@@ -39,106 +128,113 @@ const MainPurpose = () => {
     ];
 
     try {
-        // Send each purpose as a separate POST request using the utility function
-        for (const purpose of purposes) {
-            const checkbox = document.getElementById(purpose.id);
-            const surveyResponse = {
-                surveyquestion_ref: purpose.ref, // Unique reference for each purpose
-                response_value: checkbox.checked ? 'YES' : 'NO', // Send 'YES' or 'NO' based on checkbox state
-            };
-
-            await submitSurveyResponse(surveyResponse);
-        }
+      // Create an array to hold all survey responses
+      const surveyResponses = [];
+  
+      // Loop through each purpose and collect the responses
+      for (const purpose of purposes) {
+          const checkbox = document.getElementById(purpose.id);
+          const surveyResponse = {
+              surveyquestion_ref: purpose.ref, // Unique reference for each purpose
+              response_value: checkbox.checked ? 'YES' : 'NO', // Send 'YES' or 'NO' based on checkbox state
+          };
+  
+          // Add the response to the array
+          surveyResponses.push(surveyResponse);
+      }
+  
+      // Send the array of responses in a single request
+      await submitSurveyResponses(surveyResponses);
 
         navigate('/'); // Navigate to the next question
     } catch (error) {
         console.error('Error submitting survey responses:', error);
         alert('Failed to submit survey responses. Please try again.');
     }
-};
+  };
 
   return (
     <>
       <BodyPartial />
       <GradientBackground overlayImage={imgoverlay}>
-        <div className="containerr">
-          <h1>{translations.MainPurposeHeader}</h1>
+        <Container>
+          <Header>{translations.MainPurposeHeader}</Header>
           <form>
             {showOptions && ( // Conditionally render the options
-              <div className="options-grid">
-                <div className="option">
-                  <input
+              <OptionsGrid>
+                <Option>
+                  <CustomCheckbox
                     type="checkbox"
                     id="pleasureVacation"
                     value="Pleasure/Vacation"
                     onChange={handlePurposeChange}
                   />
-                  <label htmlFor="pleasureVacation" className="custom-checkbox">
+                  <Label htmlFor="pleasureVacation">
                     {translations.MainPurposePleasureVacation}
-                  </label>
-                </div>
-                <div className="option">
-                  <input
+                  </Label>
+                </Option>
+                <Option>
+                  <CustomCheckbox
                     type="checkbox"
                     id="businessProfessional"
                     value="Business/Professional Work"
                     onChange={handlePurposeChange}
                   />
-                  <label htmlFor="businessProfessional" className="custom-checkbox">
+                  <Label htmlFor="businessProfessional">
                     {translations.MainPurposeBusinessProfessional}
-                  </label>
-                </div>
-                <div className="option">
-                  <input
+                  </Label>
+                </Option>
+                <Option>
+                  <CustomCheckbox
                     type="checkbox"
                     id="educationalFieldtrip"
                     value="Educational/Fieldtrip"
                     onChange={handlePurposeChange}
                   />
-                  <label htmlFor="educationalFieldtrip" className="custom-checkbox">
+                  <Label htmlFor="educationalFieldtrip">
                     {translations.MainPurposeEducationalFieldtrip}
-                  </label>
-                </div>
-                <div className="option">
-                  <input
+                  </Label>
+                </Option>
+                <Option>
+                  <CustomCheckbox
                     type="checkbox"
                     id="healthWellnessRetirement"
                     value="Health/Wellness/Retirement"
                     onChange={handlePurposeChange}
                   />
-                  <label htmlFor="healthWellnessRetirement" className="custom-checkbox">
+                  <Label htmlFor="healthWellnessRetirement">
                     {translations.MainPurposeHealthWellnessRetirement}
-                  </label>
-                </div>
-                <div className="option">
-                  <input
+                  </Label>
+                </Option>
+                <Option>
+                  <CustomCheckbox
                     type="checkbox"
                     id="visitFriendsRelatives"
                     value="Visit Friends and Relatives"
                     onChange={handlePurposeChange}
                   />
-                  <label htmlFor="visitFriendsRelatives" className="custom-checkbox">
+                  <Label htmlFor="visitFriendsRelatives">
                     {translations.MainPurposeVisitFriendsRelatives}
-                  </label>
-                </div>
-                <div className="option">
-                  <input
+                  </Label>
+                </Option>
+                <Option>
+                  <CustomCheckbox
                     type="checkbox"
                     id="meetingIncentiveConventionExhibition"
                     value="Meeting, Incentive, Convention, Exhibition"
                     onChange={handlePurposeChange}
                   />
-                  <label htmlFor="meetingIncentiveConventionExhibition" className="custom-checkbox">
+                  <Label htmlFor="meetingIncentiveConventionExhibition">
                     {translations.MainPurposeMeetingIncentiveConventionExhibition}
-                  </label>
-                </div>
-              </div>
+                  </Label>
+                </Option>
+              </OptionsGrid>
             )}
           </form>
-          <Button onClick={handleNextClick} className="next-button">
+          <NextButton onClick={handleNextClick}>
             {translations.MainPurposeNextButton}
-          </Button>
-        </div>
+          </NextButton>
+        </Container>
       </GradientBackground>
     </>
   );

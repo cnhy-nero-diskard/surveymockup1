@@ -8,6 +8,7 @@ import { useLanguage } from '../../../components/partials/LanguageContext';
 import axios from 'axios';
 import './LanguageSelector.css'
 import BodyPartial from '../../../components/partials/BodyPartial';
+import { NextButtonU } from '../../../components/shared/styles1';
 
 const LanguageSelector = () => {
   const { setSelectedLanguage } = useLanguage(); // Access the context
@@ -79,9 +80,9 @@ const LanguageSelector = () => {
               </button>
             ))}
           </div>
-          <Button onClick={handleNextClick} className="next-button">
+          <NextButtonU onClick={handleNextClick} className="next-button">
             NEXT
-          </Button>
+          </NextButtonU>
         </Container>
       </GradientBackground>
     </>
