@@ -1,6 +1,4 @@
-/* src/page2.css */
 body {
-    /* background: linear-gradient(to bottom right, #0072ff, #00c6ff); */
     display: flex;
     justify-content: center;
     align-items: center;
@@ -25,7 +23,7 @@ p {
 
 .option {
     display: flex;
-    align-items: center;
+    align-items: start;
     margin-bottom: 10px;
     transition: margin 0.3s ease;
 }
@@ -44,32 +42,32 @@ p {
 
 .option .custom-checkbox::before {
     content: '';
+.option .custom-checkbox::before {
+    content: '';
     position: absolute;
     left: 0;
     top: 0;
-    width: 20px;
-    height: 20px;
+    width: 1.25rem;
+    height: 1.25rem;
     border: 2px solid #0072ff;
     border-radius: 4px;
     background: transparent;
     transition: background 0.3s ease, border 0.3s ease;
 }
-
+    content: '';
 .option .custom-checkbox::after {
     content: '';
     position: absolute;
-    left: 7px;
-    top: 3px;
-    width: 6px;
-    height: 12px;
+    left: 0.4375rem;
+    top: 0.1875rem;
+    width: 0.375rem;
+    height: 0.75rem;
     border: solid white;
     border-width: 0 2px 2px 0;
     transform: rotate(45deg);
     opacity: 0;
     transition: opacity 0.3s ease;
 }
-
-.option input[type="checkbox"]:checked + .custom-checkbox::before {
     background: #0072ff;
     border-color: #0072ff;
 }

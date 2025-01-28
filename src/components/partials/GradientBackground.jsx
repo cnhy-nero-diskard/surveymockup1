@@ -4,17 +4,17 @@ import styled from 'styled-components';
 // Styled-component for the background
 const BackgroundWrapper = styled.div`
   position: relative; /* Needed for overlay positioning */
-  padding: 1rem 2rem;
   font-size: 1rem;
   color: #fff;
   border: none;
   min-width: 30vw;
-  max-width: 70vw;
+  max-width: 100vw;
   border-radius: 25px;
   background: linear-gradient(135deg, #95b1ed, #3abde9); /* Gradient background */
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-
   overflow: hidden; /* Ensures no overflow issues */
+  padding: 1rem; 
+  
 `;
 
 // Styled-component for optional image overlay

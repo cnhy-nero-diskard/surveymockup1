@@ -7,6 +7,8 @@ import { useNavigate } from 'react-router-dom';
 import imgoverlay from '../../../components/img/bed23.png';
 import useTranslations from '../../../components/shared/useTranslations';
 import axios from 'axios';
+import { v4 as uuidv4 } from 'uuid'; // For generating UUIDs
+import { submitSurveyResponse } from '../../../components/shared/apiUtils';
 
 const Container = styled(motion.div)`
   font-family: Arial, sans-serif;
@@ -84,35 +86,45 @@ const WhereStayArrival = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        // Prepare the survey response data
-        const surveyResponse = {
-            component_name: 'WHERESTAYARRIVAL',
-            question_key: 'whereStayArrivalSelectLabel',
-            response_value: JSON.stringify({
-                selectedOption: selectedOption,
-                duration: duration,
-                durationUnit: durationUnit
-            }),
-            language_code: language,
-            is_open_ended: false,
-            category: 'Accommodation',
-        };
-        try {
-            // Submit the survey response to the backend
-            const response = await axios.post(`${process.env.REACT_APP_API_HOST}/api/survey/submit`, surveyResponse, {
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                withCredentials: true,
-            });
 
-            const result = response;
+        // Map the selected option to its English equivalent
+        const optionMapping = {
+            [translations.whereStayArrivalOptionHome]: 'Home of Friends or Relatives',
+            [translations.whereStayArrivalOptionCampsite]: 'Campsite',
+            [translations.whereStayArrivalOptionCruise]: 'Cruise Ship',
+            [translations.whereStayArrivalOptionOwnHome]: 'Own Home'
+        };
+
+        const englishSelectedOption = optionMapping[selectedOption] || selectedOption;
+
+        // Prepare the survey responses for each input field
+        const surveyResponses = [
+            {
+                surveyquestion_ref: 'WS001', // Reference for the stay option question
+                response_value: englishSelectedOption
+            },
+            {
+                surveyquestion_ref: 'WS002', // Reference for the duration question
+                response_value: duration
+            },
+            {
+                surveyquestion_ref: 'WS003', // Reference for the duration unit question
+                response_value: durationUnit
+            }
+        ];
+
+        try {
+            // Submit each survey response using the utility function
+            for (const response of surveyResponses) {
+                await submitSurveyResponse(response);
+            }
+
             navigate('/');
         } catch (err) {
-            alert('Failed to submit survey response. Please try again.', err);
+            console.error('Failed to submit survey response:', err);
+            alert('Failed to submit survey response. Please try again.');
         }
     };
-
     useEffect(() => {
         setLanguage(localStorage.getItem('selectedLanguage'));
     }, []);
@@ -135,10 +147,10 @@ const WhereStayArrival = () => {
                             onChange={(e) => setSelectedOption(e.target.value)}
                         >
                             <option value="">{translations.whereStayArrivalDefaultOption}</option>
-                            <option value="Home of Friends or Relatives">{translations.whereStayArrivalOptionHome}</option>
-                            <option value="Campsite">{translations.whereStayArrivalOptionCampsite}</option>
-                            <option value="Cruise Ship">{translations.whereStayArrivalOptionCruise}</option>
-                            <option value="Own Home">{translations.whereStayArrivalOptionOwnHome}</option>
+                            <option value={translations.whereStayArrivalOptionHome}>{translations.whereStayArrivalOptionHome}</option>
+                            <option value={translations.whereStayArrivalOptionCampsite}>{translations.whereStayArrivalOptionCampsite}</option>
+                            <option value={translations.whereStayArrivalOptionCruise}>{translations.whereStayArrivalOptionCruise}</option>
+                            <option value={translations.whereStayArrivalOptionOwnHome}>{translations.whereStayArrivalOptionOwnHome}</option>
                         </Select>
 
                         <Label htmlFor="duration">{translations.whereStayArrivalDurationLabel}</Label>
@@ -154,9 +166,9 @@ const WhereStayArrival = () => {
                                 value={durationUnit}
                                 onChange={(e) => setDurationUnit(e.target.value)}
                             >
-                                <option value="days">Days</option>
-                                <option value="months">Months</option>
-                                <option value="years">Years</option>
+                                <option value="days">{translations.days}</option>
+                                <option value="months">{translations.months}</option>
+                                <option value="years">{translations.years}</option>
                             </DurationSelect>
                         </DurationContainer>
 

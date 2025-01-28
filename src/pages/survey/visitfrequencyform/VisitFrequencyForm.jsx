@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { useSpring, animated } from 'react-spring';
 import './VisitFrequencyForm.css'; // Import the CSS file
-import BodyPartial from '../../components/partials/BodyPartial';
-import GradientBackground from '../../components/partials/GradientBackground';
-import { Container, Title, Paragraph, Button, EmojiButton, TextField } from '../../components/shared/styles1';
+import BodyPartial from '../../../components/partials/BodyPartial';
+import GradientBackground from '../../../components/partials/GradientBackground';
+import { Container, Title, Paragraph, Button, EmojiButton, TextField } from '../../../components/shared/styles1';
 import imgOverlay from "../../components/img/city.png";
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { VISITFREQUENCYFORM } from '../../components/shared/componentConstants';
-import useTranslations from '../../components/shared/useTranslations';
-import VisitCounterR from '../../components/partials/VisitCounterR';
+import { VISITFREQUENCYFORM } from '../../../components/shared/componentConstants';
+import useTranslations from '../../../components/shared/useTranslations';
+import VisitCounterR from '../../../components/partials/VisitCounterR';
 
 
 

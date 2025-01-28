@@ -2,15 +2,14 @@ import React, { useState, useRef, useEffect } from 'react';
 import axios from 'axios';
 import './Residence1.css'; // Import the CSS file
 import { CSSTransition } from 'react-transition-group';
-import BodyPartial from '../../components/partials/BodyPartial';
-import GradientBackground from '../../components/partials/GradientBackground';
-import { Container, Title, Paragraph, Button, EmojiButton, TextField } from '../../components/shared/styles1';
-import imgOverlay from "../../components/img/home.png";
+import BodyPartial from '../../../components/partials/BodyPartial';
+import GradientBackground from '../../../components/partials/GradientBackground';
+import { Container, Title, Paragraph, Button, EmojiButton, TextField } from '../../../components/shared/styles1';
+import imgOverlay from "../../../components/img/home.png";
 import { useNavigate } from 'react-router-dom';
-import useTranslations from '../../components/shared/useTranslations';
-import { RESIDENCE1 as COMPONENT } from '../../components/shared/componentConstants';
-
-// Import the countries-list module
+import useTranslations from '../../../components/shared/useTranslations';
+import { RESIDENCE1 as COMPONENT } from '../../../components/shared/componentConstants';
+import { submitSurveyResponse } from '../../../components/shared/apiUtils'; // Import the submitSurveyResponse function
 import { countries } from 'countries-list';
 
 const Residence1 = () => {
@@ -32,6 +31,8 @@ const Residence1 = () => {
   const [showProvinceSuggestions, setShowProvinceSuggestions] = useState(false);
   const [showCityMunSuggestions, setShowCityMunSuggestions] = useState(false);
   const [showSpecifySuggestions, setShowSpecifySuggestions] = useState(false);
+  const navigate = useNavigate(); // Initialize useNavigate
+
 
   const [provincesWithMunicipalities, setProvincesWithMunicipalities] = useState({});
 
@@ -58,9 +59,8 @@ const Residence1 = () => {
 
         setProvincesWithMunicipalities(formattedData);
       } catch (err) {
-        console.log(process.env.API_HOST);
-        console.error(err);
-        console.error("SOMETHING HAPPENED EME");
+        // console.error(err);
+        console.error("---------------SOMETHING HAPPENED EME");
       }
     };
 
@@ -126,9 +126,26 @@ const Residence1 = () => {
     setShowSpecifySuggestions(false);
   };
 
-  const navigate = useNavigate(); // Initialize useNavigate
-  const handleNextClick = () => {
-    navigate('/'); // Navigate to the next question
+
+  const handleNextClick = async () => {
+    // Prepare the data to be sent
+    const responses = [
+      { surveyquestion_ref: 'LOCIN', response_value: location.inCity ? 'Yes' : 'No' },
+      { surveyquestion_ref: 'LOCOUT', response_value: location.outsideCity ? 'Yes' : 'No' },
+      { surveyquestion_ref: 'LOCFRN', response_value: location.foreignCountry ? 'Yes' : 'No' },
+      { surveyquestion_ref: 'PROV', response_value: provinceInput || ' ' }, // Default to '' if provinceInput is empty
+      { surveyquestion_ref: 'CITY', response_value: cityMunInput || ' ' }, // Default to '' if cityMunInput is empty
+      { surveyquestion_ref: 'CNTRY', response_value: specifyInput || ' ' }, // Default to '' if specifyInput is empty
+    ];
+    // Send each response as a separate POST request
+    try {
+      for (const response of responses) {
+        await submitSurveyResponse(response);
+        navigate('/'); // Navigate to the next question after all responses are submitted
+      }
+    } catch (error) {
+      console.log('Error submitting survey responses:');
+    }
   };
 
   return (
@@ -138,7 +155,6 @@ const Residence1 = () => {
         <Container>
           <h1>{translations.title}</h1>
           <p>{translations.note}</p>
-          <form>
             <div className="option">
               <input type="checkbox" name="inCity" id="in-city" checked={location.inCity} onChange={handleLocationChange} />
               <label htmlFor="in-city" className="custom-checkbox">{translations.inCity}</label>
@@ -249,7 +265,6 @@ const Residence1 = () => {
             <Button onClick={handleNextClick}>
               {translations.next}
             </Button>
-          </form>
         </Container>
       </GradientBackground>
     </>
