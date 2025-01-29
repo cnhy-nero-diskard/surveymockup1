@@ -1,12 +1,14 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useSpring, animated } from 'react-spring';
 import styled from 'styled-components';
-import withBackground from '../../components/partials/withBackground';
-import GradientBackground from '../../components/partials/GradientBackground';
 import BodyPartial from '../../components/partials/BodyPartial';
+import GradientBackground from '../../components/partials/GradientBackground';
 import imgoverlay from "../../components/img/commentsbg.png";
+import { submitSurveyResponses } from '../../components/shared/apiUtils';
 import useTranslations from '../../components/shared/useTranslations';
 import { GREETINGS } from '../../components/shared/componentConstants';
+import { NextButton } from '../survey/mainpurpose/MainPurpose';
+import { NextButtonU } from '../../components/shared/styles1';
 
 const Container = styled.div`
   display: flex;
@@ -65,6 +67,25 @@ const Greetings = () => {
     config: { tension: 200, friction: 12 },
   });
 
+  const handleStartSurvey = () => {
+    // Prepare the survey response data
+    const surveyResponses = [
+      {
+        surveyquestion_ref: 'CONSENT', // Custom code for consent
+        response_value: 'true', // Consent given
+      },
+    ];
+
+    // Submit survey responses using the axios util function
+    submitSurveyResponses(surveyResponses)
+      .then(() => {
+        console.log('Survey responses submitted successfully');
+      })
+      .catch((error) => {
+        console.error('Error submitting survey responses:', error);
+      });
+  };
+
   return (
     <>
       <BodyPartial />
@@ -75,7 +96,9 @@ const Greetings = () => {
           <Subtitle>{translations.greetingsDOTSurvey}</Subtitle>
           <Paragraph>{translations.greetingsSurveyPurpose}</Paragraph>
           <Paragraph>{translations.greetingsDataPrivacy}</Paragraph>
-          <Button style={buttonProps}>{translations.greetingsStartSurvey}</Button>
+          <NextButtonU style={buttonProps} onClick={handleStartSurvey}>
+            {translations.greetingsStartSurvey}
+          </NextButtonU>
         </Container>
       </GradientBackground>
     </>

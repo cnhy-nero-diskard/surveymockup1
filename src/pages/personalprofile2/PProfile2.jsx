@@ -8,6 +8,8 @@ import GradientBackground from '../../components/partials/GradientBackground';
 import { useNavigate } from 'react-router-dom';
 import imgoverlay from '../../components/img/profile.png';
 import useTranslations from '../../components/shared/useTranslations';
+import { submitSurveyResponses } from '../../components/shared/apiUtils';
+import { NextButtonU } from '../../components/shared/styles1';
 
 const FormContainer = styled(animated.div)`
   display: flex;
@@ -38,13 +40,6 @@ const Label = styled.label`
   color: #555;
 `;
 
-const Input = styled.input`
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  font-size: 0.9rem;
-`;
-
 const NextButton = styled(animated.button)`
   padding: 10px 20px;
   border: none;
@@ -61,10 +56,14 @@ const NextButton = styled(animated.button)`
 `;
 
 const PProfile2 = () => {
-  const [startDate, setStartDate] = useState(null);
-  const [endDate, setEndDate] = useState(null);
-  const [accomplishedDate, setAccomplishedDate] = useState(null);
-  const [language, setLanguage] = useState(localStorage.getItem('selectedLanguage'));
+  const navigate = useNavigate();
+  const [responses, setResponses] = useState([
+    { ref: 'ARRDT', value: null, label: 'pprofile2ArrivalDateLabel' },
+    { ref: 'DEPDT', value: null, label: 'pprofile2DepartureDateLabel' },
+    { ref: 'ACCMP', value: new Date(), label: 'pprofile2AccomplishedDateLabel' },
+  ]);
+
+  const language = localStorage.getItem('selectedLanguage');
   const translations = useTranslations('PProfile2', language);
 
   const formAnimation = useSpring({
@@ -79,8 +78,17 @@ const PProfile2 = () => {
     config: { duration: 300, delay: 500 },
   });
 
-  const navigate = useNavigate();
-  const handleNextClick = () => {
+  const handleInputChange = (index, date) => {
+    setResponses((prev) => prev.map((item, i) => (i === index ? { ...item, value: date } : item)));
+  };
+
+  const handleNextClick = async () => {
+    const surveyResponses = responses.map(({ ref, value }) => ({
+      surveyquestion_ref: ref,
+      response_value: value ? value.toISOString().split('T')[0] : null,
+    }));
+
+    await submitSurveyResponses(surveyResponses);
     navigate('/');
   };
 
@@ -89,19 +97,18 @@ const PProfile2 = () => {
       <GradientBackground overlayImage={imgoverlay} opacity={0.2} blendMode="darken">
         <FormContainer style={formAnimation}>
           <FormTitle>{translations.pprofile2FormTitle}</FormTitle>
-          <FormField>
-            <Label>{translations.pprofile2ArrivalDateLabel}</Label>
-            <DatePicker selected={startDate} onChange={(date) => setStartDate(date)} dateFormat="MM/dd/yyyy" />
-          </FormField>
-          <FormField>
-            <Label>{translations.pprofile2DepartureDateLabel}</Label>
-            <DatePicker selected={endDate} onChange={(date) => setEndDate(date)} dateFormat="MM/dd/yyyy" />
-          </FormField>
-          <FormField>
-            <Label>{translations.pprofile2AccomplishedDateLabel}</Label>
-            <DatePicker selected={accomplishedDate} onChange={(date) => setAccomplishedDate(date)} dateFormat="MM/dd/yyyy" />
-          </FormField>
-          <NextButton style={buttonAnimation} onClick={handleNextClick}>{translations.pprofile2NextButton}</NextButton>
+          {responses.map((item, index) => (
+            <FormField key={item.ref}>
+              <Label>{translations[item.label]}</Label>
+              <DatePicker
+                selected={item.value}
+                onChange={(date) => handleInputChange(index, date)}
+                dateFormat="MM/dd/yyyy"
+                disabled={item.ref === 'ACCMP'}
+              />
+            </FormField>
+          ))}
+          <NextButtonU style={buttonAnimation} onClick={handleNextClick}>{translations.pprofile2NextButton}</NextButtonU>
         </FormContainer>
       </GradientBackground>
     </>);

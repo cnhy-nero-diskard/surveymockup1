@@ -18,6 +18,7 @@ const AccomodationOpen1 = () => {
     <FeedbackForm
       title={translations.accomodationOpen1Title} // Use the translation variable
       onNext={handleNext}
+      squestion_identifier={"ACC1"}
     />
   );
 };

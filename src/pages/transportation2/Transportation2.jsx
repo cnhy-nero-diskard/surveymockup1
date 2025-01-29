@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
-import { useNavigate } from 'react-router-dom'; // Import useNavigate
+import { useNavigate } from 'react-router-dom';
 import GradientBackground from '../../components/partials/GradientBackground';
 import BodyPartial from '../../components/partials/BodyPartial';
 import imgoverlay from '../../components/img/suitcase.png';
 import useTranslations from '../../components/shared/useTranslations';
+import { submitSurveyResponses } from '../../components/shared/apiUtils';
 
 const Container = styled(motion.div)`
   display: flex;
@@ -16,15 +17,35 @@ const Container = styled(motion.div)`
   border-radius: 10px;
   max-width: 50vw;
   margin: 0 auto;
+
+  @media (max-width: 768px) {
+    max-width: 90%;
+    padding: 15px;
+  }
+
+  @media (max-width: 480px) {
+    padding: 10px;
+  }
 `;
 
 const Title = styled.h2`
   font-size: 1.5rem;
   margin-bottom: 20px;
   color: #fff;
+
+  @media (max-width: 768px) {
+    font-size: 1.2rem;
+    margin-bottom: 15px;
+  }
+
+  @media (max-width: 480px) {
+    font-size: 1rem;
+    margin-bottom: 10px;
+  }
 `;
 
 const Option = styled(motion.div)`
+  color: #fff;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -34,17 +55,27 @@ const Option = styled(motion.div)`
   border: none;
   border-radius: 10px;
   cursor: pointer;
-  background-color: #007bff;
+  background-color: rgba(0, 123, 255, 0.78);
   transition: background-color 0.3s ease;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 
   &:hover {
     background-color: rgb(18, 166, 224);
   }
+
+  @media (max-width: 768px) {
+    padding: 8px;
+    margin: 3px 0;
+  }
+
+  @media (max-width: 480px) {
+    font-size: 0.9rem;
+    padding: 6px;
+  }
 `;
 
 const Transportation2 = () => {
-    const navigate = useNavigate(); // Initialize useNavigate
+    const navigate = useNavigate();
     const [language, setLanguage] = useState(localStorage.getItem('selectedLanguage'));
     const translations = useTranslations('Transportation2', language);
 
@@ -52,20 +83,26 @@ const Transportation2 = () => {
         setLanguage(localStorage.getItem('selectedLanguage'));
     }, []);
 
-    const handleNextClick = () => {
-        navigate('/'); // Navigate to the next question
-    };
+    const handleOptionClick = async (option) => {
+        const surveyResponses = [
+            {
+                surveyquestion_ref: 'TRN02', // 5-character reference
+                response_value: option, // Storing the selected value
+            }
+        ];
 
-    const handleOptionClick = (option) => {
-        console.log('Option selected:', option);
-        navigate('/'); // Navigate to the placeholder route
-        handleNextClick();
+        try {
+            await submitSurveyResponses(surveyResponses);
+            navigate('/'); // Navigate to the next step
+        } catch (error) {
+            console.error('Error submitting survey responses:', error);
+        }
     };
 
     return (
         <>
             <BodyPartial />
-            <GradientBackground overlayImage={imgoverlay} opacity={0.4} blendMode="darken">
+            <GradientBackground overlayImage={imgoverlay} opacity={0.3} blendMode="darken">
                 <Container
                     initial={{ opacity: 0, y: -20 }}
                     animate={{ opacity: 1, y: 0 }}

@@ -6,6 +6,7 @@ import useTranslations from '../../components/shared/useTranslations';
 const Transportation3 = () => {
   const [language, setLanguage] = useState(localStorage.getItem('selectedLanguage'));
   const translations = useTranslations('Transportation3', language);
+  const entranslations = useTranslations('Transportation3', language);
 
   const categories = [
     translations.transportation3RentalMotorcycleCarVan,
@@ -21,6 +22,21 @@ const Transportation3 = () => {
     translations.transportation3TrainMRTLRT,
     translations.transportation3PrivateVehicleNoNeedToRate,
   ];
+  const encategories = [
+    entranslations.transportation3RentalMotorcycleCarVan,
+    entranslations.transportation3MotorcycleHabalHabal,
+    entranslations.transportation3BikePedicab,
+    entranslations.transportation3Tricycle,
+    entranslations.transportation3Jeepney,
+    entranslations.transportation3Bus,
+    entranslations.transportation3TaxiGrab,
+    entranslations.transportation3VanAUVPublicUtility,
+    entranslations.transportation3SmallBoatBangka,
+    entranslations.transportation3FerryCommercialShipBig,
+    entranslations.transportation3TrainMRTLRT,
+    entranslations.transportation3PrivateVehicleNoNeedToRate,
+  ];
+
 
   const navigate = useNavigate();
 
@@ -33,6 +49,8 @@ const Transportation3 = () => {
       title={translations.transportation3PleaseRateThisTouristAttractionEvent}
       categories={categories}
       onRatingComplete={handleRatingComplete}
+      surveyquestion_refs={"RTRA"}
+      entranslations={encategories}
     />
   );
 };

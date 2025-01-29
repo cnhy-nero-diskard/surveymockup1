@@ -10,7 +10,6 @@ const AccomodationOpen2 = () => {
 
   const handleNext = (selectedOptionValue, feedback) => {
     // Handle the next action based on the selected option and feedback
-    console.log('Selected Option:', selectedOptionValue, 'Feedback:', feedback);
     navigate('/'); // Navigate to the next question
   };
 
@@ -18,6 +17,7 @@ const AccomodationOpen2 = () => {
     <FeedbackForm
       title={translations.accomodationOpen2Title} // Use translation variable
       onNext={handleNext}
+      squestion_identifier={"ACC2"}
     />
   );
 };

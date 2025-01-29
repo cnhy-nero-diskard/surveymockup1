@@ -2,10 +2,11 @@ import React, { useState, useEffect } from 'react';
 import styled, { keyframes } from 'styled-components';
 import BodyPartial from '../../components/partials/BodyPartial';
 import GradientBackground from '../../components/partials/GradientBackground';
-import { Container } from '../../components/shared/styles1';
+import { Container, NextButtonU } from '../../components/shared/styles1';
 import { useNavigate } from 'react-router-dom';
 import imgOverlay from "../../components/img/bed.png";
 import useTranslations from '../../components/shared/useTranslations';
+import { submitSurveyResponses } from '../../components/shared/apiUtils';
 
 const fadeIn = keyframes`
   from {
@@ -98,24 +99,54 @@ const NextButton = styled.button`
 const HowManyNights = () => {
   const [stayOvernight, setStayOvernight] = useState(null);
   const [nights, setNights] = useState('');
+  const [responses, setResponses] = useState([]);
   const [language, setLanguage] = useState(localStorage.getItem('selectedLanguage'));
   const translations = useTranslations('HowManyNights', language);
 
   const handleRadioChange = (e) => {
-    setStayOvernight(e.target.value);
+    const value = e.target.value;
+    setStayOvernight(value);
+    
+    // Update responses with radio button selection
+    setResponses(prev => {
+      const existing = prev.find(item => item.surveyquestion_ref === 'STAY');
+      if (existing) {
+        existing.response_value = value.toUpperCase();
+        return [...prev];
+      }
+      return [...prev, { 
+        surveyquestion_ref: 'STAY',
+        response_value: value.toUpperCase()
+      }];
+    });
   };
 
   const handleNightsChange = (e) => {
-    setNights(e.target.value);
+    const value = e.target.value;
+    setNights(value);
+    
+    // Update responses with nights input
+    setResponses(prev => {
+      const existing = prev.find(item => item.surveyquestion_ref === 'NIGHTS');
+      if (existing) {
+        existing.response_value = value;
+        return [...prev];
+      }
+      return [...prev, { 
+        surveyquestion_ref: 'NIGHTS',
+        response_value: value
+      }];
+    });
   };
 
   const navigate = useNavigate();
-  const handleNextClick = () => {
+  const handleNextClick = async () => {
+    // Submit responses to backend
+    await submitSurveyResponses(responses);
     navigate("/");
   };
 
   useEffect(() => {
-    // Update the language state when the localStorage value changes
     setLanguage(localStorage.getItem('selectedLanguage'));
   }, []);
 
@@ -159,9 +190,12 @@ const HowManyNights = () => {
               </InputGroup>
             )}
             {stayOvernight && (
-              <NextButton onClick={handleNextClick} disabled={stayOvernight === "yes" && !nights}>
+              <NextButtonU
+                onClick={handleNextClick} 
+                disabled={stayOvernight === "yes" && !nights}
+              >
                 {translations.howManyNightsNextButton}
-              </NextButton>
+              </NextButtonU>
             )}
           </FormContainer>
         </Container>

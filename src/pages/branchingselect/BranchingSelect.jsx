@@ -8,6 +8,7 @@ import GradientBackground from '../../components/partials/GradientBackground';
 import imgoverlay from "../../components/img/emailbg.png";
 import { Container } from '../../components/shared/styles1';
 import useTranslations from '../../components/shared/useTranslations';
+import { submitSurveyResponses } from '../../components/shared/apiUtils'; // Import the API utility function
 
 const Option = styled(animated.div)`
   padding: 15px;
@@ -16,16 +17,16 @@ const Option = styled(animated.div)`
   border-radius: 20px;
   cursor: pointer;
   transition: background-color 0.3s ease;
-  background-color:rgb(47, 134, 206);
+  background-color: rgb(47, 134, 206);
 
   &:hover {
-    background-color:rgb(4, 110, 197);
+    background-color: rgb(4, 110, 197);
   }
 
   ${({ selected }) =>
     selected &&
     `
-    background-color:rgb(18, 177, 31);
+    background-color: rgb(18, 177, 31);
     color: white;
   `}
 `;
@@ -65,9 +66,31 @@ const BranchingSelect = () => {
     });
   };
 
-  const handleNextClick = () => {
-    // Add your logic for what happens when the "Next" button is clicked
-    console.log('Next button clicked with selected options:', selectedOptions);
+  const handleNextClick = async () => {
+    // Map selected options to key-value objects
+    const surveyResponses = selectedOptions.map((option) => ({
+      surveyquestion_ref: getSurveyQuestionRef(option), // Generate a unique 5-character reference
+      response_value: option, // Use the selected option as the response value
+    }));
+
+    try {
+      // Submit the survey responses to the backend
+      await submitSurveyResponses(surveyResponses);
+      console.log('Survey responses submitted successfully:', surveyResponses);
+    } catch (error) {
+      console.error('Failed to submit survey responses:', error);
+    }
+  };
+
+  // Helper function to generate a unique 5-character surveyquestion_ref
+  const getSurveyQuestionRef = (option) => {
+    const refMap = {
+      ACCOMODATION: 'BRACC',
+      TRANSPORTATION: 'BRTRA',
+      'EVENT/ACTIVITIES': 'BREV', 
+      SERVICES: 'BRSER',
+    };
+    return refMap[option] || 'UNKWN'; // Default to 'UNKWN' if option is not found
   };
 
   return (

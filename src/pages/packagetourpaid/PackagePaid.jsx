@@ -7,6 +7,7 @@ import imgoverlay from "../../components/img/money.png";
 import { useNavigate } from 'react-router-dom';
 import useTranslations from '../../components/shared/useTranslations';
 import { submitSurveyResponses } from '../../components/shared/apiUtils';
+import { NextButtonU } from '../../components/shared/styles1';
 
 const Container = styled.div`
   display: flex;
@@ -77,73 +78,73 @@ const ConversionResult = styled.div`
 `;
 
 const PackagePaid = () => {
-    const [responses, setResponses] = useState({ price: '', currency: 'USD' });
-    const [language, setLanguage] = useState(localStorage.getItem('selectedLanguage'));
-    const translations = useTranslations('PackagePaid', language);
-    const navigate = useNavigate();
+  const [responses, setResponses] = useState({ price: '', currency: 'USD' });
+  const [language, setLanguage] = useState(localStorage.getItem('selectedLanguage'));
+  const translations = useTranslations('PackagePaid', language);
+  const navigate = useNavigate();
 
-    const buttonAnimation = useSpring({
-        transform: 'scale(1)',
-        from: { transform: 'scale(0.9)' },
-        config: { tension: 200, friction: 10 },
-    });
+  const buttonAnimation = useSpring({
+    transform: 'scale(1)',
+    from: { transform: 'scale(0.9)' },
+    config: { tension: 200, friction: 10 },
+  });
 
-    const handleInputChange = (e) => {
-        setResponses(prev => ({ ...prev, [e.target.name]: e.target.value }));
-    };
+  const handleInputChange = (e) => {
+    setResponses(prev => ({ ...prev, [e.target.name]: e.target.value }));
+  };
 
-    const conversionRates = {
-        USD: 56, EUR: 60, JPY: 0.4, PHP: 1, CNY: 8,
-        INR: 0.7, RUB: 0.75, KRW: 0.04, FRF: 60, ESP: 60
-    };
+  const conversionRates = {
+    USD: 56, EUR: 60, JPY: 0.4, PHP: 1, CNY: 8,
+    INR: 0.7, RUB: 0.75, KRW: 0.04, FRF: 60, ESP: 60
+  };
 
-    const convertedPrice = (parseFloat(responses.price) * conversionRates[responses.currency]).toFixed(2);
+  const convertedPrice = (parseFloat(responses.price) * conversionRates[responses.currency]).toFixed(2);
 
-    const handleNextClick = async () => {
-        const surveyResponses = [
-            { surveyquestion_ref: 'PRCAM', response_value: responses.price },
-            { surveyquestion_ref: 'CURNC', response_value: responses.currency },
-            { surveyquestion_ref: 'CONVR', response_value: convertedPrice }
-        ];
-        await submitSurveyResponses(surveyResponses);
-        navigate('/');
-    };
+  const handleNextClick = async () => {
+    const surveyResponses = [
+      { surveyquestion_ref: 'PRCAM', response_value: responses.price },
+      { surveyquestion_ref: 'CURNC', response_value: responses.currency },
+      { surveyquestion_ref: 'CONVR', response_value: convertedPrice }
+    ];
+    await submitSurveyResponses(surveyResponses);
+    navigate('/');
+  };
 
-    return (
-        <>
-            <BodyPartial />
-            <GradientBackground overlayImage={imgoverlay} opacity={0.3} blendMode="screen">
-                <Container>
-                    <Question>{translations.packagePaidQuestion}</Question>
-                    <InputContainer>
-                        <InputLabel>{translations.packagePaidInputLabel}</InputLabel>
-                        <CurrencyInput
-                            type="number"
-                            name="price"
-                            placeholder={translations.packagePaidInputPlaceholder}
-                            value={responses.price}
-                            onChange={handleInputChange}
-                        />
-                        <CurrencySelect name="currency" value={responses.currency} onChange={handleInputChange}>
-                            {Object.keys(conversionRates).map(code => (
-                                <option key={code} value={code}>{translations[`packagePaidCurrency${code}`]}</option>
-                            ))}
-                        </CurrencySelect>
-                    </InputContainer>
-                    <ConversionResult>
-                        {responses.price && responses.currency && (
-                            <span>
-                                {translations.packagePaidConversionResult} {responses.price} {responses.currency} {translations.packagePaidConversionResultApprox} {convertedPrice} PHP.
-                            </span>
-                        )}
-                    </ConversionResult>
-                    <NextButton style={buttonAnimation} onClick={handleNextClick}>
-                        {translations.packagePaidNextButton}
-                    </NextButton>
-                </Container>
-            </GradientBackground>
-        </>
-    );
+  return (
+    <>
+      <BodyPartial />
+      <GradientBackground overlayImage={imgoverlay} opacity={0.3} blendMode="screen">
+        <Container>
+          <Question>{translations.packagePaidQuestion}</Question>
+          <InputContainer>
+            <InputLabel>{translations.packagePaidInputLabel}</InputLabel>
+            <CurrencyInput
+              type="number"
+              name="price"
+              placeholder={translations.packagePaidInputPlaceholder}
+              value={responses.price}
+              onChange={handleInputChange}
+            />
+            <CurrencySelect name="currency" value={responses.currency} onChange={handleInputChange}>
+              {Object.keys(conversionRates).map(code => (
+                <option key={code} value={code}>{translations[`packagePaidCurrency${code}`]}</option>
+              ))}
+            </CurrencySelect>
+          </InputContainer>
+          <ConversionResult>
+            {responses.price && responses.currency && (
+              <span>
+                {translations.packagePaidConversionResult} {responses.price} {responses.currency} {translations.packagePaidConversionResultApprox} {convertedPrice} PHP.
+              </span>
+            )}
+          </ConversionResult>
+          <NextButtonU style={buttonAnimation} onClick={handleNextClick}>
+            {translations.packagePaidNextButton}
+          </NextButtonU>
+        </Container>
+      </GradientBackground>
+    </>
+  );
 };
 
 export default PackagePaid;

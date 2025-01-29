@@ -128,7 +128,7 @@ const ButtonGrid = () => {
     { label: 'Accommodation Form', path: 'accommodationform' },
     { label: 'Booking Form', path: 'bookingform' },
     { label: 'Where Stay Arrival', path: 'wherestayarrival' },
-    { label: 'Where Stay Departure', path: 'wherestaydepart' },
+    { label: '(IGNORE)Where Stay Departure', path: 'wherestaydepart' },
     { label: 'Accommodation Open 1', path: 'accomodationopen1' },
     { label: 'Accommodation Open 2', path: 'accomodationopen2' },
     { label: 'Transportation 3', path: 'transportation3' },

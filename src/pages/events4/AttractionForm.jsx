@@ -9,27 +9,38 @@ import imgOverlay from "../../components/img/umb.png";
 import { Button, Container } from '../../components/shared/styles1';
 import { useNavigate } from 'react-router-dom';
 import useTranslations from '../../components/shared/useTranslations';
+import { submitSurveyResponses } from '../../components/shared/apiUtils';
 
 const TableContainer = styled(animated.div)`
-  width: 90%;
+  width: 105%;
   max-width: 800px;
   margin: 50px auto;
   padding-bottom: 20px;
   padding-right: 1px;
   padding-left: 1px;
-  // overflow-x: auto; /* Enable horizontal scrolling on small screens */
+  max-height: 80vh;
+  overflow-y: auto;
+  overflow-x: hidden;
 `;
 
 const Table = styled.table`
-  width: 100%;
+  width: 10px;
   border-collapse: collapse;
   margin: 20px 0;
+  table-layout: fixed;
   @media (max-width: 768px) {
     display: block;
-    overflow-x: auto;
-    white-space: nowrap;
+    padding: 10px;
+    width: 100%;
   }
 `;
+
+const ScrollableTableContainer = styled.div`
+  max-height: 80vh;
+  overflow-y: auto;
+  padding-bottom: 20px;
+`;
+
 
 const TableHeader = styled.th`
   background-color: #007bff;
@@ -48,12 +59,30 @@ const TableCell = styled.td`
   text-align: center;
   @media (max-width: 768px) {
     padding: 8px;
-    font-size: 14px;
+    font-size: 10px;
+  }
+`;
+const MobileRow = styled.div`
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 20px;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  @media (max-width: 768px) {
+    width: 100%;
   }
 `;
 
+const MobileRowHeader = styled.div`
+  font-weight: bold;
+  color: #007bff;
+  margin-bottom: 5px;
+`;
+
+
 const Input = styled.input`
-  width: 95%;
+  width: 100%;
   padding: 8px;
   border: 1px solid #ccc;
   border-radius: 5px;
@@ -69,6 +98,17 @@ const RadioGroup = styled.div`
   @media (max-width: 768px) {
     flex-direction: column;
     align-items: center;
+  }
+`;
+const HRadioGroup = styled.div`
+  display: flex;
+  gap: 10px; /* Adds space between the radio buttons */
+  justify-content: center;
+  align-items: center;
+
+  @media (max-width: 768px) {
+    flex-direction: row; /* Keep row direction on mobile */
+    gap: 5px; /* Smaller gap on mobile */
   }
 `;
 
@@ -144,7 +184,15 @@ const AttractionForm = () => {
       return;
     }
 
-    setRows([...rows, { ...currentInput, id: Date.now() }]);
+    const newRow = {
+      ...currentInput,
+      id: Date.now(),
+      attraction_ref: 'ATTRA1', // Fixed surveyquestion_ref for attraction
+      location_ref: 'LOCAT1',   // Fixed surveyquestion_ref for location
+      rating_ref: 'RATNG1'      // Fixed surveyquestion_ref for rating
+    };
+
+    setRows([...rows, newRow]);
     setCurrentInput({ attraction: '', location: '', rating: '' });
     toast.success(translations.attractionFormRowAdded, {
       position: 'top-right',
@@ -168,9 +216,29 @@ const AttractionForm = () => {
     });
   };
 
-  const navigate = useNavigate(); // Initialize useNavigate
-  const handleNextClick = () => {
-    navigate('/'); // Navigate to the next question
+  const navigate = useNavigate();
+  const handleNextClick = async () => {
+    // Prepare survey responses as an array of key-value pairs
+    const surveyResponses = rows.map((row) => [
+      { surveyquestion_ref: row.attraction_ref, response_value: row.attraction },
+      { surveyquestion_ref: row.location_ref, response_value: row.location },
+      { surveyquestion_ref: row.rating_ref, response_value: row.rating },
+    ]).flat();
+
+    try {
+      // Call the function to submit the responses
+      await submitSurveyResponses(surveyResponses);
+      navigate('/'); // Navigate to the next question
+    } catch (error) {
+      toast.error(translations.attractionFormErrorSubmission, {
+        position: 'top-right',
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
+    }
   };
 
   return (
@@ -180,92 +248,94 @@ const AttractionForm = () => {
         <Container>
           <TableContainer style={formAnimation}>
             <Title>{translations.attractionFormTitle}</Title>
-            <Table>
-              <thead>
-                <tr>
-                  <TableHeader>{translations.attractionFormHeaderAttraction}</TableHeader>
-                  <TableHeader>{translations.attractionFormHeaderLocation}</TableHeader>
-                  <TableHeader>{translations.attractionFormHeaderRating}</TableHeader>
-                  <TableHeader>{translations.attractionFormHeaderDelete}</TableHeader>
-                </tr>
-              </thead>
-              <tbody>
-                {rows.map((row) => (
-                  <tr key={row.id}>
-                    <TableCell>{row.attraction}</TableCell>
-                    <TableCell>{row.location}</TableCell>
-                    <TableCell>
-                      <RadioGroup>
-                        {[
-                          { value: '1', emoji: '☹️' },
-                          { value: '2', emoji: '😐' },
-                          { value: '3', emoji: '🙂' },
-                          { value: '4', emoji: '😄' },
-                        ].map((option) => (
-                          <label key={option.value}>
-                            <RadioInput
-                              type="radio"
-                              value={option.value}
-                              checked={row.rating === option.value}
-                              readOnly
-                            />
-                            <Emoji>{option.emoji}</Emoji>
-                          </label>
-                        ))}
-                      </RadioGroup>
-                    </TableCell>
-                    <TableCell>
-                      <TrashButton onClick={() => handleDeleteRow(row.id)}>🗑️</TrashButton>
-                    </TableCell>
+            <ScrollableTableContainer>
+
+              <Table>
+                <thead>
+                  <tr>
+                    <TableHeader>{translations.attractionFormHeaderAttraction}</TableHeader>
+                    <TableHeader>{translations.attractionFormHeaderLocation}</TableHeader>
+                    <TableHeader>{translations.attractionFormHeaderRating}</TableHeader>
+                    <TableHeader>{translations.attractionFormHeaderDelete}</TableHeader>
                   </tr>
-                ))}
-                <tr>
-                  <TableCell>
-                    <Input
-                      type="text"
-                      name="attraction"
-                      value={currentInput.attraction}
-                      onChange={handleChange}
-                      placeholder={translations.attractionFormPlaceholderAttraction}
-                    />
-                  </TableCell>
-                  <TableCell>
-                    <Input
-                      type="text"
-                      name="location"
-                      value={currentInput.location}
-                      onChange={handleChange}
-                      placeholder={translations.attractionFormPlaceholderLocation}
-                    />
-                  </TableCell>
-                  <TableCell>
-                    <RadioGroup>
-                      {[
-                        { value: '1', emoji: '☹️' },
-                        { value: '2', emoji: '😐' },
-                        { value: '3', emoji: '🙂' },
-                        { value: '4', emoji: '😄' },
-                      ].map((option) => (
-                        <label key={option.value}>
-                          <RadioInput
-                            type="radio"
-                            name="rating"
-                            value={option.value}
-                            checked={currentInput.rating === option.value}
-                            onChange={handleChange}
-                          />
-                          <Emoji>{option.emoji}</Emoji>
-                        </label>
-                      ))}
-                    </RadioGroup>
-                  </TableCell>
-                  <TableCell>-</TableCell>
-                </tr>
-              </tbody>
-            </Table>
-            <Button onClick={handleAddRow}>{translations.attractionFormButtonAddRow}</Button>
-            <Button onClick={handleNextClick}>{translations.attractionFormButtonNext}</Button>
+                </thead>
+                <tbody>
+                  {rows.map((row) => (
+                    <tr key={row.id}>
+                      <TableCell>{row.attraction}</TableCell>
+                      <TableCell>{row.location}</TableCell>
+                      <TableCell>
+                        <RadioGroup>
+                          {[
+                            { value: '1', emoji: '☹️' },
+                            { value: '2', emoji: '😐' },
+                            { value: '3', emoji: '🙂' },
+                            { value: '4', emoji: '😄' },
+                          ].map((option) => (
+                            <label key={option.value}>
+                              <RadioInput
+                                type="radio"
+                                value={option.value}
+                                checked={row.rating === option.value}
+                                readOnly
+                              />
+                              <Emoji>{option.emoji}</Emoji>
+                            </label>
+                          ))}
+                        </RadioGroup>
+                      </TableCell>
+                      <TableCell>
+                        <TrashButton onClick={() => handleDeleteRow(row.id)}>🗑️</TrashButton>
+                      </TableCell>
+                    </tr>
+                  ))}
+                </tbody>
+              </Table>
+
+              {/* Mobile View for First Row */}
+              <div>
+                <MobileRow>
+                  <MobileRowHeader>{translations.attractionFormHeaderAttraction}</MobileRowHeader>
+                  <Input
+                    name="attraction"
+                    value={currentInput.attraction}
+                    onChange={handleChange}
+                    placeholder={translations.attractionFormPlaceholderAttraction}
+                  />
+                  <MobileRowHeader>{translations.attractionFormHeaderLocation}</MobileRowHeader>
+                  <Input
+                    name="location"
+                    value={currentInput.location}
+                    onChange={handleChange}
+                    placeholder={translations.attractionFormPlaceholderLocation}
+                  />
+                  <MobileRowHeader>{translations.attractionFormHeaderRating}</MobileRowHeader>
+                  <HRadioGroup>
+                    {[
+                      { value: '1', emoji: '☹️' },
+                      { value: '2', emoji: '😐' },
+                      { value: '3', emoji: '🙂' },
+                      { value: '4', emoji: '😄' },
+                    ].map((option) => (
+                      <label key={option.value}>
+                        <input
+                          type="radio"
+                          name="rating"
+                          value={option.value}
+                          checked={currentInput.rating === option.value}
+                          onChange={(e) => handleChange(e)}
+                        />
+                        <Emoji>{option.emoji}</Emoji>
+                      </label>
+                    ))}
+                  </HRadioGroup>
+                </MobileRow>
+              </div>
+
+            </ScrollableTableContainer>
           </TableContainer>
+          <Button onClick={handleAddRow}>{translations.attractionFormButtonAddRow}</Button>
+          <Button onClick={handleNextClick}>{translations.attractionFormButtonNext}</Button>
         </Container>
       </GradientBackground>
       <ToastContainer />

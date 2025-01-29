@@ -144,10 +144,7 @@ const AccommodationForm = () => {
   ];
   const navigate = useNavigate();
 
-  // Fetch the selected language from localStorage
   const [language, setLanguage] = useState(localStorage.getItem('selectedLanguage'));
-
-  // Fetch translations using the useTranslations hook
   const translations = useTranslations('AccommodationForm', language);
 
   const handleRatingChange = (type, emoji) => {
@@ -159,7 +156,6 @@ const AccommodationForm = () => {
   const handleDurationChange = (type, duration) => {
     setDurations((prevState) => ({ ...prevState, [type]: duration }));
 
-    // Clear the rating if the duration is 0 or empty
     if (duration === '' || duration === '0') {
       setRatings((prevState) => ({ ...prevState, [type]: '' }));
       updateSurveyResponses(type, 'RATING', '');
@@ -190,21 +186,43 @@ const AccommodationForm = () => {
     });
   };
 
+  const handleCommercialResponse = (responseValue) => {
+    setSurveyResponses((prevResponses) => {
+      const commercialResponseIndex = prevResponses.findIndex(
+        (response) => response.surveyquestion_ref === 'commercial'
+      );
+
+      if (commercialResponseIndex !== -1) {
+        const updatedResponses = [...prevResponses];
+        updatedResponses[commercialResponseIndex].response_value = responseValue;
+        return updatedResponses;
+      } else {
+        return [
+          ...prevResponses,
+          {
+            surveyquestion_ref: 'COMMACC',
+            response_value: responseValue,
+          },
+        ];
+      }
+    });
+  };
+
   const handleSubmit = async () => {
     try {
       await submitSurveyResponses(surveyResponses);
-      navigate('/'); // Navigate to the home page after submission
+      navigate('/');
     } catch (error) {
       console.error('Error submitting survey responses:', error);
     }
   };
 
   const handleNoButtonClick = () => {
+    handleCommercialResponse('NO');
     setIsCommercial(false);
-    navigate('/');
+    handleSubmit();
   };
 
-  // Convert existing responses to emojis if needed
   useEffect(() => {
     if (surveyResponses.length > 0) {
       const updatedRatings = { ...ratings };
@@ -233,7 +251,10 @@ const AccommodationForm = () => {
             <Button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              onClick={() => setIsCommercial(true)}
+              onClick={() => {
+                handleCommercialResponse('YES');
+                setIsCommercial(true);
+              }}
             >
               {translations.accommodationFormYesButton}
             </Button>
@@ -298,5 +319,6 @@ const AccommodationForm = () => {
     </>
   );
 };
+
 
 export default AccommodationForm;
