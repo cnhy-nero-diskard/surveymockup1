@@ -1,4 +1,3 @@
-// FeedbackForm.jsx
 import React, { useState, useEffect } from 'react';
 import { useSpring, animated } from 'react-spring';
 import styled from 'styled-components';
@@ -7,6 +6,7 @@ import BodyPartial from './BodyPartial';
 import GradientBackground from './GradientBackground';
 import imgOverlay from "../../components/img/ball.png";
 import useTranslations from '../../components/shared/useTranslations';
+import { submitSurveyResponses } from '../../components/shared/apiUtils';
 
 const FeedbackFormContainer = styled(animated.div)`
   max-width: 600px;
@@ -74,7 +74,13 @@ const NextButton = styled.button`
   }
 `;
 
-const FeedbackForm = ({ title, onNext, satisfactionOptions = {
+const WarningMessage = styled.div`
+  color: red;
+  margin-bottom: 10px;
+  text-align: center;
+`;
+
+const FeedbackForm = ({ title, onNext, squestion_identifier, satisfactionOptions = {
     Dissatisfied: 1,
     Neutral: 2,
     Satisfied: 3,
@@ -84,6 +90,8 @@ const FeedbackForm = ({ title, onNext, satisfactionOptions = {
     const [selectedOption, setSelectedOption] = useState(null);
     const [placeholderText, setPlaceholderText] = useState('');
     const [language, setLanguage] = useState(localStorage.getItem('selectedLanguage'));
+    const [isFormValid, setIsFormValid] = useState(false);
+    const [showWarning, setShowWarning] = useState(false);
 
     // Fetch translations based on the selected language
     const translations = useTranslations('FeedbackForm', language);
@@ -91,6 +99,11 @@ const FeedbackForm = ({ title, onNext, satisfactionOptions = {
     useEffect(() => {
         setPlaceholderText(translations.feedbackFormPlaceholderDefault);
     }, [language, translations]);
+
+    useEffect(() => {
+        // Check if all required fields are filled
+        setIsFormValid(selectedOption !== null && feedback.trim() !== '');
+    }, [selectedOption, feedback]);
 
     const handleOptionClick = (option) => {
         setSelectedOption(option);
@@ -121,11 +134,39 @@ const FeedbackForm = ({ title, onNext, satisfactionOptions = {
     });
 
     const navigate = useNavigate(); // Initialize useNavigate
-    const handleNextClick = () => {
-        // Pass the selected option and feedback to the parent component
-        const selectedOptionValue = satisfactionOptions[selectedOption];
-        onNext(selectedOptionValue, feedback);
-        navigate('/'); // Navigate to the next question
+
+    const handleNextClick = async () => {
+        if (!isFormValid) {
+            setShowWarning(true);
+            return;
+        }
+
+        // Prepare the survey responses array
+        const surveyResponses = [];
+
+        // Add the selected satisfaction option to the responses
+        if (selectedOption) {
+            surveyResponses.push({
+                surveyquestion_ref: 'SATLV' + squestion_identifier, // 5 chars, all caps
+                response_value: selectedOption, // English value
+            });
+        }
+
+        // Add the feedback text to the responses
+        if (feedback) {
+            surveyResponses.push({
+                surveyquestion_ref: 'FDBK' + squestion_identifier, // 5 chars, all caps
+                response_value: feedback, // English value
+            });
+        }
+
+        // Submit the survey responses to the backend
+        try {
+            await submitSurveyResponses(surveyResponses);
+            onNext(selectedOption, feedback); // Pass the selected option and feedback to the parent component
+        } catch (error) {
+            console.error('Error submitting survey responses:', error);
+        }
     };
 
     return (
@@ -149,6 +190,9 @@ const FeedbackForm = ({ title, onNext, satisfactionOptions = {
                         value={feedback}
                         onChange={(e) => setFeedback(e.target.value)}
                     />
+                    {showWarning && !isFormValid && (
+                        <WarningMessage>{translations.feedbackFormWarningMessage}</WarningMessage>
+                    )}
                     <NextButton onClick={handleNextClick}>{translations.feedbackFormNextButton}</NextButton>
                 </FeedbackFormContainer>
             </GradientBackground>

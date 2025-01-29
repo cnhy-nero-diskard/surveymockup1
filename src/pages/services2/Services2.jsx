@@ -4,10 +4,12 @@ import GradientBackground from '../../components/partials/GradientBackground';
 import BodyPartial from '../../components/partials/BodyPartial';
 import imgOverlay from "../../components/img/sentiment.png";
 import useTranslations from '../../components/shared/useTranslations';
+import { useNavigate } from 'react-router-dom';
 
 const Services2 = () => {
   const [language, setLanguage] = useState(localStorage.getItem('selectedLanguage'));
   const translations = useTranslations('Services2', language);
+  const entranslations = useTranslations('Services2', 'en');
 
   const categories = [
     translations.services2AccomodationPersonnel,
@@ -26,10 +28,27 @@ const Services2 = () => {
     translations.services2Seaport,
     translations.services2MobileSignalWifi
   ];
-
+  const encategories = [
+    entranslations.services2AccomodationPersonnel,
+    entranslations.services2RestaurantFoodBeveragesPersonnel,
+    entranslations.services2TransportPersonnel,
+    entranslations.services2TravelTourOperators,
+    entranslations.services2TourGuides,
+    entranslations.services2AttractionPersonnel,
+    entranslations.services2GovernmentPersonnel,
+    entranslations.services2FinancialServicesPersonnel,
+    entranslations.services2Facilities,
+    entranslations.services2Restaurant,
+    entranslations.services2LeisureEntertainmentFacilities,
+    entranslations.services2ShopsMalls,
+    entranslations.services2PanglaoInternationalAirport,
+    entranslations.services2Seaport,
+    entranslations.services2MobileSignalWifi
+  ];
+  const navigate = useNavigate();
   const handleRatingComplete = () => {
     console.log(translations.services2AllRatingsCompleted);
-    // Handle any additional logic here (e.g., saving ratings, navigating, etc.)
+    navigate('/');
   };
 
   return (
@@ -37,6 +56,8 @@ const Services2 = () => {
       title={translations.services2RateServicesFacilitiesTitle}
       categories={categories}
       onRatingComplete={handleRatingComplete}
+      surveyquestion_refs={'SVC2'}
+      entranslations={encategories}
     />
   );
 };

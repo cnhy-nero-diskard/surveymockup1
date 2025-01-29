@@ -13,6 +13,7 @@ import axios from 'axios';
 const Services1 = () => {
   const [language, setLanguage] = useState(localStorage.getItem('selectedLanguage'));
   const translations = useTranslations('Services2', language);
+  const entranslations = useTranslations('Services2', 'en');
   const [ratings, setRatings] = useState({});
   const navigate = useNavigate();
 
@@ -23,6 +24,14 @@ const Services1 = () => {
     translations.services1CategoryLocalTransportation,
     translations.services1CategoryTourismActivities,
     translations.services1CategoryEntertainment,
+  ];
+  const encategories = [
+    entranslations.services1CategoryAccomodation,
+    entranslations.services1CategoryRestaurant,
+    entranslations.services1CategoryShopping,
+    entranslations.services1CategoryLocalTransportation,
+    entranslations.services1CategoryTourismActivities,
+    entranslations.services1CategoryEntertainment,
   ];
 
   const handleRatingChange = (category, rating) => {
@@ -38,35 +47,9 @@ const Services1 = () => {
 
   const handleRatingComplete = () => {
     console.log(translations.services2AllRatingsCompleted);
-    handleSubmit();
+    navigate('/');
   };
 
-  const handleSubmit = async () => {
-    // Prepare the survey response data
-    const surveyResponse = {
-      component_name: 'SERVICES1',
-      question_key: '------',
-      response_value: JSON.stringify(ratings),
-      language_code: language,
-      is_open_ended: false,
-      category: 'Services',
-    };
-
-    try {
-      // Submit the survey response to the backend
-      const response = await axios.post(`${process.env.REACT_APP_API_HOST}/api/survey/submit`, surveyResponse, {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        withCredentials: true,
-      });
-
-      const result = response;
-      navigate('/');
-    } catch (err) {
-      alert('Failed to submit survey response. Please try again.', err);
-    }
-  };
 
   return (
     <RatingSlider
@@ -74,6 +57,8 @@ const Services1 = () => {
       categories={categories}
       onRatingChange={handleRatingChange}
       onRatingComplete={handleRatingComplete}
+      surveyquestion_refs={'SVC1'}
+      entranslations={encategories}
     />
   );
 };

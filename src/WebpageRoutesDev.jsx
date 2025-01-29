@@ -102,7 +102,7 @@ const ButtonGrid = () => {
     { label: 'Will Recommend', path: 'willrecom' },
     { label: 'Where Learn', path: 'wherelearn' },
     { label: 'Survey Venue', path: 'surveyvenue' },
-    { label: 'Open Ended 2', path: 'openended2' },
+    { label: 'Open Ended Lifestyle', path: 'openended2' },
     { label: 'Open Ended 1', path: 'openended1' },
     { label: '(DUPLICATE)How Many Visits', path: 'howmanyvisits' },
     { label: 'Primary Attraction', path: 'primaryatt' },

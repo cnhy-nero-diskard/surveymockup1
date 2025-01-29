@@ -7,6 +7,8 @@ import GradientBackground from '../../components/partials/GradientBackground';
 import imgoverlay from "../../components/img/persons.png";
 import { useNavigate } from 'react-router-dom';
 import useTranslations from '../../components/shared/useTranslations';
+import { NextButtonU } from '../../components/shared/styles1';
+import { submitSurveyResponses } from '../../components/shared/apiUtils'; // Import the function
 
 const Container = styled.div`
   display: flex;
@@ -58,7 +60,6 @@ const NextButton = styled(animated.button)`
 
 const TravelQuestion = () => {
   const [value, setValue] = useState('');
-  const [showNextPage, setShowNextPage] = useState(false); // State to control navigation
   const [language, setLanguage] = useState(localStorage.getItem('selectedLanguage'));
   const translations = useTranslations('TravelQuestion', language);
 
@@ -68,10 +69,22 @@ const TravelQuestion = () => {
     config: { tension: 200, friction: 12 },
   });
 
-  const handleNext = () => {
-    // Navigate to the next page by updating the state
-    setShowNextPage(true);
+  const handleNext = async () => {
+    // Create the survey response object
+    const surveyResponse = {
+      surveyquestion_ref: 'TRVQ1', // Example 5-character reference
+      response_value: value, // The value from the input field
+    };
+
+    // Send the response to the backend
+    try {
+      await submitSurveyResponses([surveyResponse]);
+      navigate('/');
+    } catch (error) {
+      console.error('Error submitting survey response:', error);
+    }
   };
+
   const navigate = useNavigate(); // Initialize useNavigate
   const handleNextClick = () => {
     navigate('/'); // Navigate to the next question
@@ -86,10 +99,7 @@ const TravelQuestion = () => {
       <BodyPartial />
       <GradientBackground overlayImage={imgoverlay} opacity={0.1} blendMode="multiply">
         <QuestionContainer>
-          {showNextPage ? (
-            <p>{translations.travelQuestionNextStepPlaceholder}</p>
-            // Render the next page placeholder
-          ) : (
+
             <QuestionContainer>
               <QuestionText>
                 {translations.travelQuestionPersonCountText}
@@ -101,12 +111,12 @@ const TravelQuestion = () => {
                   onChange={(e) => setValue(e.target.value)}
                   placeholder={translations.travelQuestionInputPlaceholder}
                 />
-                <NextButton style={buttonAnimation} onClick={handleNextClick}>
+                <NextButtonU style={buttonAnimation} onClick={handleNext}>
                   {translations.travelQuestionNextButtonText}
-                </NextButton>
+                </NextButtonU>
               </InputContainer>
             </QuestionContainer>
-          )}
+
         </QuestionContainer>
       </GradientBackground>
     </>

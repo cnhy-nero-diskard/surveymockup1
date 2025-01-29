@@ -31,6 +31,7 @@ const VisitCounterAtt = () => {
       selectedOption={selectedOption} 
       setSelectedOption={setSelectedOption} 
       handleNextClick={handleNextClick} 
+      surveyquestion_ref={'VSCATT'}
     />
   );
 };

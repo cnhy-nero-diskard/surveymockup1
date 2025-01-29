@@ -6,6 +6,8 @@ import GradientBackground from '../../components/partials/GradientBackground';
 import imgOverlay from "../../components/img/peopless.png";
 import { useNavigate } from 'react-router-dom';
 import useTranslations from '../../components/shared/useTranslations';
+import { NextButtonU } from '../../components/shared/styles1';
+import { submitSurveyResponses } from '../../components/shared/apiUtils'; // Import the API utility function
 
 const Container = styled.div`
   display: flex;
@@ -53,6 +55,21 @@ const TravelOptions = () => {
         console.log(`Option selected: ${option}`); // Debugging line
         setSelectedOption(option);
         setNextStep(true);
+
+        // Prepare the survey response object
+        const surveyResponse = {
+            surveyquestion_ref: 'TROPT', // Unique 5-character uppercase string
+            response_value: option, // Selected option in English
+        };
+
+        // Submit the response to the backend
+        submitSurveyResponses([surveyResponse])
+            .then((response) => {
+                console.log('Response submitted successfully:', response);
+            })
+            .catch((error) => {
+                console.error('Error submitting response:', error);
+            });
     };
 
     const navigate = useNavigate(); // Initialize useNavigate
@@ -71,18 +88,18 @@ const TravelOptions = () => {
                 <Container>
                     <Question>{translations.travelOptionsQuestion}</Question>
                     <OptionsContainer>
-                        <Option
+                        <NextButtonU
                             onClick={() => handleOptionClick('Package Tour')}
                             selected={selectedOption === 'Package Tour'}
                         >
                             {translations.travelOptionsPackageTour}
-                        </Option>
-                        <Option
+                        </NextButtonU>
+                        <NextButtonU
                             onClick={() => handleOptionClick('Independent Traveler/s')}
                             selected={selectedOption === 'Independent Traveler/s'}
                         >
                             {translations.travelOptionsIndependentTraveler}
-                        </Option>
+                        </NextButtonU>
                     </OptionsContainer>
                     {nextStep && handleNextClick() }
                 </Container>

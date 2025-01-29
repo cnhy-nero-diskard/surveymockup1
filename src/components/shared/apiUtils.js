@@ -3,7 +3,7 @@ import axios from 'axios';
 
 export const submitSurveyResponses = async (surveyResponses) => {
     try {
-        console.log(`ATTEMPTING TO SEND ${surveyResponses.length} RESPONSES`);
+        console.log(`ATTEMPTING TO SEND ${JSON.stringify(surveyResponses)} `);
         const requests = surveyResponses.map(response =>
             axios.post(`${process.env.REACT_APP_API_HOST}/api/survey/submit`, response, {
                 withCredentials: true,

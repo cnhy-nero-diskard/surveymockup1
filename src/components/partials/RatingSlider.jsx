@@ -8,6 +8,8 @@ import imgOverlay from "../../components/img/sentiment.png";
 import { useNavigate } from 'react-router-dom';
 import { submitSurveyResponses } from '../shared/apiUtils';
 import { NextButtonU } from '../../components/shared/styles1';
+import useTranslations from '../shared/useTranslations';
+import { useEffect } from 'react';
 const SlidesContainer = styled.div`
   position: relative;
   width: 100%;
@@ -26,7 +28,7 @@ const Slide = styled(animated.div)`
 `;
 
 const Label = styled.div`
-  font-size: 1.5rem;
+  font-size: calc(1rem + 0.5vw);
   color: #fff;
   margin-bottom: 20px;
   background-color: #007bff;
@@ -135,7 +137,7 @@ const NextButton = styled.button`
   }
 `;
 
-const RatingSlider = ({ title, categories, onRatingComplete, surveyquestion_refs }) => {
+const RatingSlider = ({ title, categories, onRatingComplete, surveyquestion_refs, entranslations }) => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [sliderValue, setSliderValue] = useState(2); // Default to neutral
   const [responses, setResponses] = useState([]); // Array to store responses
@@ -143,34 +145,38 @@ const RatingSlider = ({ title, categories, onRatingComplete, surveyquestion_refs
 
   const emojis = ['☹️', '😐', '🙂', '😄'];
 
+  // Use useEffect to log responses after they are updated
+  useEffect(() => {
+    if (responses.length === categories.length) {
+      console.log(`RESPONSES: >>>> ${JSON.stringify(responses)}`);
+      submitSurveyResponses(responses)
+        .then(() => {
+          onRatingComplete();
+        })
+        .catch((error) => {
+          console.error('Error submitting survey responses:', error);
+        });
+    }
+  }, [responses, categories.length, onRatingComplete]);
+
   const handleRating = (value) => {
-    const currentCategory = categories[currentSlide];
+    const currentCategory = entranslations[currentSlide];
     const response = {
       surveyquestion_ref: surveyquestion_refs + currentCategory.substring(0, 5).toUpperCase(),
       response_value: value.toString(),
     };
-  
+
     setResponses((prevResponses) => {
       const updatedResponses = [...prevResponses, response];
-  
+
       if (currentSlide < categories.length - 1) {
         setCurrentSlide(currentSlide + 1);
         setSliderValue(2);
-      } else {
-        submitSurveyResponses(updatedResponses) // Use updated array
-          .then(() => {
-            onRatingComplete();
-            navigate('/');
-          })
-          .catch((error) => {
-            console.error('Error submitting survey responses:', error);
-          });
       }
-  
+
       return updatedResponses;
     });
   };
-  
 
   const transitions = useTransition(currentSlide, {
     from: { opacity: 0, transform: 'translate3d(100%,0,0)' },
