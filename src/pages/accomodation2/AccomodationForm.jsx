@@ -6,6 +6,7 @@ import GradientBackground from '../../components/partials/GradientBackground';
 import { useNavigate } from 'react-router-dom';
 import imgoverlay from '../../components/img/bed.png';
 import useTranslations from '../../components/shared/useTranslations';
+import { submitSurveyResponses } from '../../components/shared/apiUtils';
 
 const FormContainer = styled(motion.div)`
   font-family: Arial, sans-serif;
@@ -109,31 +110,36 @@ const NextButton = styled(motion.button)`
   margin-top: 20px;
 `;
 
+const emojiToRating = { '☹️': 1, '😐': 2, '🙂': 3, '😄': 4 };
+const ratingToEmoji = { 1: '☹️', 2: '😐', 3: '🙂', 4: '😄' };
+
 const AccommodationForm = () => {
   const [isCommercial, setIsCommercial] = useState(null);
   const [ratings, setRatings] = useState({
     Hotel: '',
     Resort: '',
     'Serviced Residences': '',
-    'Pension/Lodging house': '',
-    'Tourist Inn/Motel/Drive-In': '',
+    'PensionLodging house': '',
+    'Tourist InnMotelDriveIn': '',
     Homestay: '',
   });
   const [durations, setDurations] = useState({
     Hotel: '',
     Resort: '',
     'Serviced Residences': '',
-    'Pension/Lodging house': '',
-    'Tourist Inn/Motel/Drive-In': '',
+    'PensionLodging house': '',
+    'Tourist InnMotelDriveIn': '',
     Homestay: '',
   });
+  const [surveyResponses, setSurveyResponses] = useState([]);
+
   const emoj = ['☹️', '😐', '🙂', '😄'];
-  const accomodationTypes = [
+  const accommodationTypes = [
     'Hotel',
     'Resort',
     'Serviced Residences',
     'PensionLodging house',
-    'TouristInnMotelDriveIn',
+    'Tourist InnMotelDriveIn',
     'Homestay',
   ];
   const navigate = useNavigate();
@@ -144,8 +150,10 @@ const AccommodationForm = () => {
   // Fetch translations using the useTranslations hook
   const translations = useTranslations('AccommodationForm', language);
 
-  const handleRatingChange = (type, rating) => {
-    setRatings((prevState) => ({ ...prevState, [type]: rating }));
+  const handleRatingChange = (type, emoji) => {
+    const rating = emojiToRating[emoji];
+    setRatings((prevState) => ({ ...prevState, [type]: emoji }));
+    updateSurveyResponses(type, 'RATING', rating);
   };
 
   const handleDurationChange = (type, duration) => {
@@ -154,17 +162,62 @@ const AccommodationForm = () => {
     // Clear the rating if the duration is 0 or empty
     if (duration === '' || duration === '0') {
       setRatings((prevState) => ({ ...prevState, [type]: '' }));
+      updateSurveyResponses(type, 'RATING', '');
     }
+
+    updateSurveyResponses(type, 'DURATION', duration);
   };
 
-  const handleNext = () => {
-    navigate('/'); // Navigate to the home page
+  const updateSurveyResponses = (type, field, value) => {
+    setSurveyResponses((prevResponses) => {
+      const existingResponseIndex = prevResponses.findIndex(
+        (response) => response.surveyquestion_ref === `${type}_${field}`
+      );
+
+      if (existingResponseIndex !== -1) {
+        const updatedResponses = [...prevResponses];
+        updatedResponses[existingResponseIndex].response_value = value;
+        return updatedResponses;
+      } else {
+        return [
+          ...prevResponses,
+          {
+            surveyquestion_ref: `${type}_${field}`,
+            response_value: value,
+          },
+        ];
+      }
+    });
+  };
+
+  const handleSubmit = async () => {
+    try {
+      await submitSurveyResponses(surveyResponses);
+      navigate('/'); // Navigate to the home page after submission
+    } catch (error) {
+      console.error('Error submitting survey responses:', error);
+    }
   };
 
   const handleNoButtonClick = () => {
     setIsCommercial(false);
     navigate('/');
   };
+
+  // Convert existing responses to emojis if needed
+  useEffect(() => {
+    if (surveyResponses.length > 0) {
+      const updatedRatings = { ...ratings };
+      surveyResponses.forEach(response => {
+        if (response.surveyquestion_ref.endsWith('_RATING')) {
+          const type = response.surveyquestion_ref.split('_')[0];
+          const ratingValue = parseInt(response.response_value);
+          updatedRatings[type] = ratingToEmoji[ratingValue] || '';
+        }
+      });
+      setRatings(updatedRatings);
+    }
+  }, [surveyResponses]);
 
   return (
     <>
@@ -204,7 +257,7 @@ const AccommodationForm = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {accomodationTypes.map((type) => (
+                  {accommodationTypes.map((type) => (
                     <TableRow key={type}>
                       <TableCell>{translations[`accommodationFormType${type.replace(/ /g, '')}`]}</TableCell>
                       <RatingCell>
@@ -234,7 +287,7 @@ const AccommodationForm = () => {
               <NextButton
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                onClick={handleNext}
+                onClick={handleSubmit}
               >
                 {translations.accommodationFormNextButton}
               </NextButton>

@@ -6,6 +6,7 @@ import GradientBackground from '../../components/partials/GradientBackground';
 import imgoverlay from "../../components/img/items.png";
 import { useNavigate } from 'react-router-dom';
 import useTranslations from '../../components/shared/useTranslations';
+import { submitSurveyResponses } from '../../components/shared/apiUtils';
 
 const ChecklistContainer = styled(motion.div)`
   display: flex;
@@ -114,26 +115,46 @@ const PackageTourItems = () => {
     const [language, setLanguage] = useState(localStorage.getItem('selectedLanguage'));
     const translations = useTranslations('PackageTourItems', language);
 
+    // Mapping of translations to English values
+    const englishValues = {
+        [translations.packageTourItemsAccommodation]: 'Accommodation',
+        [translations.packageTourItemsEstablishment]: 'Establishment',
+        [translations.packageTourItemsFoodBeverages]: 'Food & Beverages',
+        [translations.packageTourItemsShopping]: 'Shopping',
+        [translations.packageTourItemsLocalTransport]: 'Local Transport',
+        [translations.packageTourItemsTourismActivities]: 'Tourism Activities',
+        [translations.packageTourItemsEntertainment]: 'Entertainment',
+        [translations.packageTourItemsMiscellaneous]: 'Miscellaneous',
+    };
+
     const handleCheckboxChange = (item) => {
-        if (selectedItems.includes(item)) {
-            setSelectedItems(selectedItems.filter((i) => i !== item));
+        const englishValue = englishValues[item];
+        const surveyResponse = {
+            surveyquestion_ref: 'PKGITEMS', // Example 5-char ref, can be dynamic if needed
+            response_value: englishValue,
+        };
+
+        if (selectedItems.some((i) => i.response_value === englishValue)) {
+            setSelectedItems(selectedItems.filter((i) => i.response_value !== englishValue));
         } else {
-            setSelectedItems([...selectedItems, item]);
+            setSelectedItems([...selectedItems, surveyResponse]);
         }
     };
-    const navigate = useNavigate(); // Initialize useNavigate
 
-    const handleNextClick = () => {
+    const navigate = useNavigate();
+
+    const handleNextClick = async () => {
         setIsLoading(true);
         console.log('Selected Items:', selectedItems);
-        // Simulate a delay for loading state
-        setTimeout(() => {
+
+        try {
+            await submitSurveyResponses(selectedItems);
             setIsLoading(false);
-            // Add your next action 
             navigate('/'); // Navigate to the next question
-
-        }, 2000); // 2 seconds delay
-
+        } catch (error) {
+            console.error('Error submitting survey responses:', error);
+            setIsLoading(false);
+        }
     };
 
     const checklistItems = [
@@ -160,7 +181,7 @@ const PackageTourItems = () => {
                     {checklistItems.map((item) => (
                         <ChecklistItem key={item}>
                             <Checkbox
-                                checked={selectedItems.includes(item)}
+                                checked={selectedItems.some((i) => i.response_value === englishValues[item])}
                                 onChange={() => handleCheckboxChange(item)}
                             />
                             {item}

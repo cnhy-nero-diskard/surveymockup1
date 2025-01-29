@@ -122,7 +122,7 @@ const ButtonGrid = () => {
     { label: 'Package Paid', path: 'packagepaid' },
     { label: 'Expense Tracker', path: 'expensetracker' },
     { label: 'Percentage Share List', path: 'percentagesharelist' },
-    { label: 'Expense Companions', path: 'expensecompanions' },
+    { label: '(DUPLICATE)Expense Companions', path: 'expensecompanions' },
     { label: 'Pack Transpo', path: 'packtranspo' },
     { label: 'How Many Nights', path: 'howmanynights' },
     { label: 'Accommodation Form', path: 'accommodationform' },

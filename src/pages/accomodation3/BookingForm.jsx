@@ -6,6 +6,8 @@ import GradientBackground from '../../components/partials/GradientBackground';
 import { useNavigate } from 'react-router-dom';
 import imgoverlay from '../../components/img/bed.png';
 import useTranslations from '../../components/shared/useTranslations';
+import { submitSurveyResponses } from '../../components/shared/apiUtils';
+import { NextButtonU } from '../../components/shared/styles1';
 
 const Container = styled.div`
   font-family: Arial, sans-serif;
@@ -59,6 +61,7 @@ const BookingForm = () => {
     const [bookingPlatform, setBookingPlatform] = useState('');
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [language, setLanguage] = useState(localStorage.getItem('selectedLanguage'));
+    const [responses, setResponses] = useState([]);
 
     const translations = useTranslations('BookingForm', language);
 
@@ -77,28 +80,59 @@ const BookingForm = () => {
     };
 
     const handleBookingMethodChange = (e) => {
-        setBookingMethod(e.target.value);
+        const method = e.target.value;
+        setBookingMethod(method);
         setBookingPlatform('');
-        setIsDropdownOpen(e.target.value !== 'Others (specify)');
+        setIsDropdownOpen(method !== 'Others (specify)');
+
+        // Update responses array
+        setResponses((prevResponses) => [
+            ...prevResponses.filter((response) => response.surveyquestion_ref !== 'METHOD'),
+            { surveyquestion_ref: 'BMETHOD', response_value: method },
+        ]);
     };
 
     const handleBookingPlatformChange = (e) => {
-        setBookingPlatform(e.target.value);
+        const platform = e.target.value;
+        setBookingPlatform(platform);
+
+        // Update responses array
+        setResponses((prevResponses) => [
+            ...prevResponses.filter((response) => response.surveyquestion_ref !== 'PLATF'),
+            { surveyquestion_ref: 'PLATF', response_value: platform },
+        ]);
     };
+
+    const handleOthersSpecifyChange = (e) => {
+        const value = e.target.value;
+        setBookingPlatform(value);
+
+        // Update responses array
+        setResponses((prevResponses) => [
+            ...prevResponses.filter((response) => response.surveyquestion_ref !== 'OTHER'),
+            { surveyquestion_ref: 'OTHER', response_value: value },
+        ]);
+    };
+
     const navigate = useNavigate();
-    const handleNext = () => {
-        navigate('/');
-    }
 
-    useEffect(() => {
-        // Update translations when language changes
-        setLanguage(localStorage.getItem('selectedLanguage'));
-    }, [localStorage.getItem('selectedLanguage')]);
-
+    const handleNext = async () => {
+        try {
+            await submitSurveyResponses(responses);
+            navigate('/');
+        } catch (error) {
+            console.error('Failed to submit survey responses:', error);
+        }
+    };
+    
+    const isNextDisabled =
+        !bookingMethod || (bookingMethod !== 'Others (specify)' && !bookingPlatform) || (bookingMethod === 'Others (specify)' && !bookingPlatform.trim());
+    
     return (
-        <><BodyPartial />
-      <GradientBackground overlayImage={imgoverlay} opacity={0.2} blendMode="multiply">
-      <Container>
+        <>
+            <BodyPartial />
+            <GradientBackground overlayImage={imgoverlay} opacity={0.2} blendMode="multiply">
+                <Container>
                     <FormGroup>
                         <Label>{translations.bookingFormBookingMethodLabel}</Label>
                         <Dropdown value={bookingMethod} onChange={handleBookingMethodChange}>
@@ -110,7 +144,7 @@ const BookingForm = () => {
                             ))}
                         </Dropdown>
                     </FormGroup>
-
+    
                     {bookingMethod && bookingMethod !== 'Others (specify)' && (
                         <FormGroup>
                             <Label>{translations.bookingFormBookingPlatformLabel}</Label>
@@ -126,23 +160,22 @@ const BookingForm = () => {
                             </animated.div>
                         </FormGroup>
                     )}
-
+    
                     {bookingMethod === 'Others (specify)' && (
                         <FormGroup>
                             <Label>{translations.bookingFormOthersSpecifyLabel}</Label>
-                            <Input
-                                type="text"
-                                value={bookingPlatform}
-                                onChange={(e) => setBookingPlatform(e.target.value)}
-                            />
+                            <Input type="text" value={bookingPlatform} onChange={handleOthersSpecifyChange} />
                         </FormGroup>
                     )}
-
-                    <Button onClick={handleNext}>{translations.bookingFormNextButton}</Button>
+    
+                    <NextButtonU onClick={handleNext} disabled={isNextDisabled}>
+                        {translations.bookingFormNextButton}
+                    </NextButtonU>
                 </Container>
-
-            </GradientBackground></>
+            </GradientBackground>
+        </>
     );
+    
 };
 
 export default BookingForm;

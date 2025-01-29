@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import { useSpring, animated } from 'react-spring';
 import BodyPartial from '../../components/partials/BodyPartial';
@@ -6,6 +6,7 @@ import GradientBackground from '../../components/partials/GradientBackground';
 import imgoverlay from "../../components/img/money.png";
 import { useNavigate } from 'react-router-dom';
 import useTranslations from '../../components/shared/useTranslations';
+import { submitSurveyResponses } from '../../components/shared/apiUtils';
 
 const Container = styled.div`
   display: flex;
@@ -76,10 +77,10 @@ const ConversionResult = styled.div`
 `;
 
 const PackagePaid = () => {
-    const [price, setPrice] = useState('');
-    const [currency, setCurrency] = useState('USD');
+    const [responses, setResponses] = useState({ price: '', currency: 'USD' });
     const [language, setLanguage] = useState(localStorage.getItem('selectedLanguage'));
     const translations = useTranslations('PackagePaid', language);
+    const navigate = useNavigate();
 
     const buttonAnimation = useSpring({
         transform: 'scale(1)',
@@ -88,49 +89,25 @@ const PackagePaid = () => {
     });
 
     const handleInputChange = (e) => {
-        setPrice(e.target.value);
+        setResponses(prev => ({ ...prev, [e.target.name]: e.target.value }));
     };
 
-    const handleCurrencyChange = (e) => {
-        setCurrency(e.target.value);
-    };
-    const navigate = useNavigate(); // Initialize useNavigate
-
-    const handleNextClick = () => {
-        const conversionRates = {
-            USD: 56, // Example rate to PHP
-            EUR: 60, // Example rate to PHP
-            JPY: 0.4, // Example rate to PHP
-            PHP: 1, // PHP itself
-            CNY: 8, // Chinese Yuan to PHP
-            INR: 0.7, // Indian Rupee to PHP
-            RUB: 0.75, // Russian Ruble to PHP
-            KRW: 0.04, // Korean Won to PHP
-            FRF: 60, // French Franc (assuming Euro rate)
-            ESP: 60, // Spanish Peseta (assuming Euro rate)
-        };
-
-        const convertedPrice = (parseFloat(price) * conversionRates[currency]).toFixed(2);
-        // alert(`You paid ${price} ${currency}, which is approximately ${convertedPrice} PHP.`);
-        navigate('/'); // Navigate to the next question
-
-    };
-
-    // Dynamic conversion logic
     const conversionRates = {
-        USD: 56, // Example rate to PHP
-        EUR: 60, // Example rate to PHP
-        JPY: 0.4, // Example rate to PHP
-        PHP: 1, // PHP itself
-        CNY: 8, // Chinese Yuan to PHP
-        INR: 0.7, // Indian Rupee to PHP
-        RUB: 0.75, // Russian Ruble to PHP
-        KRW: 0.04, // Korean Won to PHP
-        FRF: 60, // French Franc (assuming Euro rate)
-        ESP: 60, // Spanish Peseta (assuming Euro rate)
+        USD: 56, EUR: 60, JPY: 0.4, PHP: 1, CNY: 8,
+        INR: 0.7, RUB: 0.75, KRW: 0.04, FRF: 60, ESP: 60
     };
 
-    const convertedPrice = (parseFloat(price) * conversionRates[currency]).toFixed(2);
+    const convertedPrice = (parseFloat(responses.price) * conversionRates[responses.currency]).toFixed(2);
+
+    const handleNextClick = async () => {
+        const surveyResponses = [
+            { surveyquestion_ref: 'PRCAM', response_value: responses.price },
+            { surveyquestion_ref: 'CURNC', response_value: responses.currency },
+            { surveyquestion_ref: 'CONVR', response_value: convertedPrice }
+        ];
+        await submitSurveyResponses(surveyResponses);
+        navigate('/');
+    };
 
     return (
         <>
@@ -142,30 +119,22 @@ const PackagePaid = () => {
                         <InputLabel>{translations.packagePaidInputLabel}</InputLabel>
                         <CurrencyInput
                             type="number"
+                            name="price"
                             placeholder={translations.packagePaidInputPlaceholder}
-                            value={price}
+                            value={responses.price}
                             onChange={handleInputChange}
                         />
-                        <CurrencySelect value={currency} onChange={handleCurrencyChange}>
-                            <option value="USD">{translations.packagePaidCurrencyUSD}</option>
-                            <option value="EUR">{translations.packagePaidCurrencyEUR}</option>
-                            <option value="JPY">{translations.packagePaidCurrencyJPY}</option>
-                            <option value="PHP">{translations.packagePaidCurrencyPHP}</option>
-                            <option value="CNY">{translations.packagePaidCurrencyCNY}</option>
-                            <option value="INR">{translations.packagePaidCurrencyINR}</option>
-                            <option value="RUB">{translations.packagePaidCurrencyRUB}</option>
-                            <option value="KRW">{translations.packagePaidCurrencyKRW}</option>
-                            <option value="FRF">{translations.packagePaidCurrencyFRF}</option>
-                            <option value="ESP">{translations.packagePaidCurrencyESP}</option>
+                        <CurrencySelect name="currency" value={responses.currency} onChange={handleInputChange}>
+                            {Object.keys(conversionRates).map(code => (
+                                <option key={code} value={code}>{translations[`packagePaidCurrency${code}`]}</option>
+                            ))}
                         </CurrencySelect>
                     </InputContainer>
                     <ConversionResult>
-                        {price && currency ? (
+                        {responses.price && responses.currency && (
                             <span>
-                                {translations.packagePaidConversionResult} {price} {currency} {translations.packagePaidConversionResultApprox} {convertedPrice} PHP.
+                                {translations.packagePaidConversionResult} {responses.price} {responses.currency} {translations.packagePaidConversionResultApprox} {convertedPrice} PHP.
                             </span>
-                        ) : (
-                            <span></span>
                         )}
                     </ConversionResult>
                     <NextButton style={buttonAnimation} onClick={handleNextClick}>

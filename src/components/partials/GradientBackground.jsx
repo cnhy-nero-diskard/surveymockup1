@@ -5,7 +5,7 @@ import styled from 'styled-components';
 const BackgroundWrapper = styled.div`
   position: relative; /* Needed for overlay positioning */
   font-size: 1rem;
-  color: #fff;
+  font-color:white;
   border: none;
   min-width: 30vw;
   max-width: 100vw;
