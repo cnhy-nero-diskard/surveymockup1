@@ -5,9 +5,9 @@ import BodyPartial from '../../../components/partials/BodyPartial';
 import GradientBackground from '../../../components/partials/GradientBackground';
 import imgoverlay from "../../../components/img/money.png";
 import { useNavigate } from 'react-router-dom';
-import useTranslations from '../../../components/shared/useTranslations';
-import { submitSurveyResponses } from '../../../components/shared/sendDataBindInput';
-import { NextButtonU } from '../../../components/shared/styles1';
+import useTranslations from '../../../components/utils/useTranslations';
+import { submitSurveyResponses } from '../../../components/utils/sendInputUtils';
+import { NextButtonU } from '../../../components/utils/styles1';
 
 const Container = styled.div`
   display: flex;

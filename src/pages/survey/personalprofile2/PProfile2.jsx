@@ -7,9 +7,9 @@ import BodyPartial from '../../../components/partials/BodyPartial';
 import GradientBackground from '../../../components/partials/GradientBackground';
 import { useNavigate } from 'react-router-dom';
 import imgoverlay from '../../../components/img/profile.png';
-import useTranslations from '../../../components/shared/useTranslations';
-import { submitSurveyResponses } from '../../../components/shared/sendDataBindInput';
-import { NextButtonU } from '../../../components/shared/styles1';
+import useTranslations from '../../../components/utils/useTranslations';
+import { submitSurveyResponses } from '../../../components/utils/sendInputUtils';
+import { NextButtonU } from '../../../components/utils/styles1';
 
 const FormContainer = styled(animated.div)`
   display: flex;

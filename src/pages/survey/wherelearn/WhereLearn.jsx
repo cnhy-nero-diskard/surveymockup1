@@ -4,9 +4,9 @@ import GradientBackground from '../../../components/partials/GradientBackground'
 import BodyPartial from '../../../components/partials/BodyPartial';
 import { useNavigate } from 'react-router-dom';
 import imgOverlay from "../../../components/img/soundwave.png";
-import { Container } from '../../../components/shared/styles1';
-import useTranslations from '../../../components/shared/useTranslations';
-import { submitSurveyResponses } from '../../../components/shared/sendDataBindInput';
+import { Container } from '../../../components/utils/styles1';
+import useTranslations from '../../../components/utils/useTranslations';
+import { submitSurveyResponses } from '../../../components/utils/sendInputUtils';
 const WhereLearn = () => {
   const [selectedSource, setSelectedSource] = useState(null);
   const navigate = useNavigate();

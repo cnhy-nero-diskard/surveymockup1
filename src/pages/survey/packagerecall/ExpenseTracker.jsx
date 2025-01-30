@@ -4,8 +4,8 @@ import { useSpring, animated } from 'react-spring';
 import { useNavigate } from 'react-router-dom';
 import BodyPartial from '../../../components/partials/BodyPartial';
 import GradientBackground from '../../../components/partials/GradientBackground';
-import useTranslations from '../../../components/shared/useTranslations';
-import { submitSurveyResponses } from '../../../components/shared/sendDataBindInput'; // Importing the function
+import useTranslations from '../../../components/utils/useTranslations';
+import { submitSurveyResponses } from '../../../components/utils/sendInputUtils'; // Importing the function
 
 const Container = styled.div`
   font-family: Arial, sans-serif;

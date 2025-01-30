@@ -5,8 +5,8 @@ import BodyPartial from '../../../components/partials/BodyPartial';
 import GradientBackground from '../../../components/partials/GradientBackground';
 import imageoverlay from '../../../components/img/pricetag.png';
 import { useNavigate } from 'react-router-dom';
-import useTranslations from '../../../components/shared/useTranslations';
-import { submitSurveyResponses } from '../../../components/shared/sendDataBindInput';
+import useTranslations from '../../../components/utils/useTranslations';
+import { submitSurveyResponses } from '../../../components/utils/sendInputUtils';
 
 const Container = styled.div`
   font-family: Arial, sans-serif;

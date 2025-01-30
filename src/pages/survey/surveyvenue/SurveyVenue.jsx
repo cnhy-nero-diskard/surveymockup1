@@ -5,8 +5,8 @@ import { useNavigate } from 'react-router-dom';
 import BodyPartial from '../../../components/partials/BodyPartial';
 import GradientBackground from '../../../components/partials/GradientBackground';
 import imgOverlay from "../../../components/img/venue.png";
-import useTranslations from '../../../components/shared/useTranslations';
-import { submitSurveyResponses } from '../../../components/shared/sendDataBindInput';
+import useTranslations from '../../../components/utils/useTranslations';
+import { submitSurveyResponses } from '../../../components/utils/sendInputUtils';
 const Container = styled(motion.div)`
   font-family: Arial, sans-serif;
   padding: 20px;

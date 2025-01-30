@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import VisitCounterR from '../../../components/partials/VisitCounterR';
-import useTranslations from '../../../components/shared/useTranslations';
+import useTranslations from '../../../components/utils/useTranslations';
 
 const VisitCounterAtt = () => {
   const [selectedOption, setSelectedOption] = useState(null);

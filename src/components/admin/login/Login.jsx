@@ -5,6 +5,8 @@ import { useAuth } from '../../context/AuthContext';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import styled from 'styled-components';
+import bgimage from './Designer.png';
+import globe from './global.png';
 import {
   Typography,
   TextField,
@@ -57,7 +59,7 @@ const StyledButton = styled(Button)`
 const ImageContainer = styled.div`
   width: 100%;
   height: 100%;
-  background-image: url(https://placehold.co/600x400/000000/FFF);
+  background-image: url(${bgimage});
   background-size: cover;
   background-position: center;
   border-radius: 8px;

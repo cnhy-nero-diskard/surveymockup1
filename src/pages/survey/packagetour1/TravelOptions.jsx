@@ -5,9 +5,9 @@ import BodyPartial from '../../../components/partials/BodyPartial';
 import GradientBackground from '../../../components/partials/GradientBackground';
 import imgOverlay from "../../../components/img/peopless.png";
 import { useNavigate } from 'react-router-dom';
-import useTranslations from '../../../components/shared/useTranslations';
-import { NextButtonU } from '../../../components/shared/styles1';
-import { submitSurveyResponses } from '../../../components/shared/sendDataBindInput'; // Import the API utility function
+import useTranslations from '../../../components/utils/useTranslations';
+import { NextButtonU } from '../../../components/utils/styles1';
+import { submitSurveyResponses } from '../../../components/utils/sendInputUtils'; // Import the API utility function
 
 const Container = styled.div`
   display: flex;

@@ -3,13 +3,13 @@ import { useSpring, animated } from 'react-spring';
 import styled from 'styled-components';
 import BodyPartial from '../../components/partials/BodyPartial';
 import GradientBackground from '../../components/partials/GradientBackground';
-import { Container } from '../../components/shared/styles1';
+import { Container } from '../utils/styles1';
 import imgOverlay from "../../components/img/city.png";
 import { useNavigate } from 'react-router-dom';
-import useTranslations from '../../components/shared/useTranslations';
-import { VISITFREQUENCYFORM } from '../../components/shared/componentConstants';
-import { submitSurveyResponses } from '../shared/sendDataBindInput';
-import { NextButtonU,fontColorU } from '../../components/shared/styles1';
+import useTranslations from '../utils/useTranslations';
+import { VISITFREQUENCYFORM } from '../utils/componentConstants';
+import { submitSurveyResponses } from '../utils/sendInputUtils';
+import { NextButtonU,fontColorU } from '../utils/styles1';
 
 // Styled Components
 const AnimatedContainer = styled(animated.div)`

@@ -5,8 +5,8 @@ import GradientBackground from '../../../components/partials/GradientBackground'
 import BodyPartial from '../../../components/partials/BodyPartial';
 import imgoverlay from "../../../components/img/beach.png";
 import { useNavigate } from 'react-router-dom';
-import useTranslations from '../../../components/shared/useTranslations';
-import { submitSurveyResponses } from '../../../components/shared/sendDataBindInput';
+import useTranslations from '../../../components/utils/useTranslations';
+import { submitSurveyResponses } from '../../../components/utils/sendInputUtils';
 
 const Container = styled(motion.div)`
   display: flex;

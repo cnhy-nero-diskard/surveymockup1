@@ -3,8 +3,8 @@ import './SurveyEvaluationb.css';
 import GradientBackground from '../../../components/partials/GradientBackground';
 import BodyPartial from '../../../components/partials/BodyPartial';
 import imgoverlay from "../../../components/img/commentsbg.png";
-import { Container, EmojiButton, TextField } from '../../../components/shared/styles1';
-import useTranslations from '../../../components/shared/useTranslations';
+import { Container, EmojiButton, TextField } from '../../../components/utils/styles1';
+import useTranslations from '../../../components/utils/useTranslations';
 
 const SurveyEvaluationb = () => {
   const [rating, setRating] = useState(null);

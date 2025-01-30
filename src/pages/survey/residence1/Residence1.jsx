@@ -6,11 +6,11 @@ import axios from 'axios';
 import BodyPartial from '../../../components/partials/BodyPartial';
 import GradientBackground from '../../../components/partials/GradientBackground';
 import { useNavigate } from 'react-router-dom';
-import useTranslations from '../../../components/shared/useTranslations';
-import { RESIDENCE1 as COMPONENT } from '../../../components/shared/componentConstants';
-import { submitSurveyResponses } from '../../../components/shared/sendDataBindInput';
+import useTranslations from '../../../components/utils/useTranslations';
+import { RESIDENCE1 as COMPONENT } from '../../../components/utils/componentConstants';
+import { submitSurveyResponses } from '../../../components/utils/sendInputUtils';
 import { countries } from 'countries-list';
-import { NextButtonU,fontColorU } from '../../../components/shared/styles1';
+import { NextButtonU,fontColorU } from '../../../components/utils/styles1';
 
 // Animations
 const fadeIn = keyframes`

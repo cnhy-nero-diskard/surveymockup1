@@ -6,7 +6,7 @@ import styled from 'styled-components';
 import BodyPartial from '../../../components/partials/BodyPartial';
 import GradientBackground from '../../../components/partials/GradientBackground';
 import { useNavigate } from 'react-router-dom';
-import { submitSurveyResponses } from '../../../components/shared/sendDataBindInput'; // Import the submit function
+import { submitSurveyResponses } from '../../../components/utils/sendInputUtils'; // Import the submit function
 import axios from 'axios';
 const Container = styled.div`
   display: flex;

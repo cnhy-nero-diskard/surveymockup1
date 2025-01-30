@@ -2,7 +2,7 @@
 import { useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
-import { sroutes } from "./SurveyRoutes";
+import { sroutes as surveyRoutes } from "./SurveyRoutes";
 
 const SurveyStepGuard = ({ route, index, totalSteps }) => {
   const navigate = useNavigate();
@@ -12,13 +12,13 @@ const SurveyStepGuard = ({ route, index, totalSteps }) => {
     const validateStepAccess = async () => {
       try {
         // Fetch the user's current progress from the backend
-        const response = await axios.get(`${process.env.REACT_APP_API_HOST}/api/survey/progress`);
+        const response = await axios.get(`${process.env.REACT_APP_API_HOST}/api/survey/progress`,{withCredentials:true});
         const currentStep = response.data.currentStep;
-
+        console.log(currentStep);
         // Check if the user is allowed to access this step
         if (index !== currentStep) {
           // Redirect to the correct step
-          navigate(sroutes[currentStep].path);
+          navigate(surveyRoutes[currentStep].path);
         }
       } catch (err) {
         console.error("Error validating step access:", err);

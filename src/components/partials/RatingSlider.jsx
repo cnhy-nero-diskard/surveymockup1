@@ -3,12 +3,12 @@ import styled from 'styled-components';
 import { useTransition, animated, useSpring } from 'react-spring';
 import GradientBackground from '../../components/partials/GradientBackground';
 import BodyPartial from '../../components/partials/BodyPartial';
-import { Container, Title } from '../../components/shared/styles1';
+import { Container, Title } from '../utils/styles1';
 import imgOverlay from "../../components/img/sentiment.png";
 import { useNavigate } from 'react-router-dom';
-import { submitSurveyResponses } from '../shared/sendDataBindInput';
-import { NextButtonU } from '../../components/shared/styles1';
-import useTranslations from '../shared/useTranslations';
+import { submitSurveyResponses } from '../utils/sendInputUtils';
+import { NextButtonU } from '../utils/styles1';
+import useTranslations from '../utils/useTranslations';
 import { useEffect } from 'react';
 const SlidesContainer = styled.div`
   position: relative;

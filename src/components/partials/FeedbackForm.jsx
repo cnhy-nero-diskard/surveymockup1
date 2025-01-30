@@ -5,8 +5,8 @@ import { useNavigate } from 'react-router-dom';
 import BodyPartial from './BodyPartial';
 import GradientBackground from './GradientBackground';
 import imgOverlay from "../../components/img/ball.png";
-import useTranslations from '../../components/shared/useTranslations';
-import { submitSurveyResponses } from '../shared/sendDataBindInput';
+import useTranslations from '../utils/useTranslations';
+import { submitSurveyResponses } from '../utils/sendInputUtils';
 
 const FeedbackFormContainer = styled(animated.div)`
   max-width: 600px;

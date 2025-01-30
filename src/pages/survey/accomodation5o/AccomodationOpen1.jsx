@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import FeedbackForm from '../../../components/partials/FeedbackForm';
 import { useNavigate } from 'react-router-dom';
-import useTranslations from '../../../components/shared/useTranslations';
+import useTranslations from '../../../components/utils/useTranslations';
 
 const AccomodationOpen1 = () => {
   const navigate = useNavigate();

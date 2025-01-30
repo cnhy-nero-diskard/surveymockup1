@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import RatingSlider from '../../../components/partials/RatingSlider';
-import useTranslations from '../../../components/shared/useTranslations';
+import useTranslations from '../../../components/utils/useTranslations';
 import { useNavigate } from 'react-router-dom';
 
 const Services2 = () => {

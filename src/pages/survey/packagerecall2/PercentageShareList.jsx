@@ -4,11 +4,11 @@ import { motion } from 'framer-motion';
 import BodyPartial from '../../../components/partials/BodyPartial';
 import GradientBackground from '../../../components/partials/GradientBackground';
 import { useNavigate } from 'react-router-dom';
-import useTranslations from '../../../components/shared/useTranslations'; // Import the translation hook
+import useTranslations from '../../../components/utils/useTranslations'; // Import the translation hook
 import Slider from 'rc-slider'; // Import the slider component
 import 'rc-slider/assets/index.css'; // Import the default styles
-import { submitSurveyResponses } from '../../../components/shared/sendDataBindInput'; // Import the submission function
-import { NextButtonU } from '../../../components/shared/styles1';
+import { submitSurveyResponses } from '../../../components/utils/sendInputUtils'; // Import the submission function
+import { NextButtonU } from '../../../components/utils/styles1';
 
 const Container = styled.div`
   font-family: Arial, sans-serif;

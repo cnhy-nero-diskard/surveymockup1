@@ -3,10 +3,10 @@ import { useSpring, animated } from 'react-spring';
 import styled, { ThemeProvider } from 'styled-components';
 import BodyPartial from '../../../components/partials/BodyPartial';
 import { useNavigate } from 'react-router-dom';
-import { FORM } from '../../../components/shared/componentConstants';
-import useTranslations from '../../../components/shared/useTranslations';
-import { NextButtonU } from '../../../components/shared/styles1';
-import { submitSurveyResponses } from '../../../components/shared/sendDataBindInput';
+import { FORM } from '../../../components/utils/componentConstants';
+import useTranslations from '../../../components/utils/useTranslations';
+import { NextButtonU } from '../../../components/utils/styles1';
+import { submitSurveyResponses } from '../../../components/utils/sendInputUtils';
 import GradientBackground from '../../../components/partials/GradientBackground';
 
 export const theme = {

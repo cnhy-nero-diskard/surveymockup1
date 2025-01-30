@@ -6,9 +6,9 @@ import GradientBackground from '../../../components/partials/GradientBackground'
 import Select from 'react-select';
 import { useNavigate } from 'react-router-dom';
 import imgoverlay from '../../../components/img/profile.png';
-import useTranslations from '../../../components/shared/useTranslations';
-import { submitSurveyResponses } from '../../../components/shared/sendDataBindInput'; // Import axios submission function
-import { NextButtonU } from '../../../components/shared/styles1';
+import useTranslations from '../../../components/utils/useTranslations';
+import { submitSurveyResponses } from '../../../components/utils/sendInputUtils'; // Import axios submission function
+import { NextButtonU } from '../../../components/utils/styles1';
 
 const Container = styled(motion.div)`
   display: flex;

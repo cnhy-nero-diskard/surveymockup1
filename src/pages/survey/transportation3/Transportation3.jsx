@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import RatingSlider from '../../../components/partials/RatingSlider';
 import { useNavigate } from 'react-router-dom';
-import useTranslations from '../../../components/shared/useTranslations';
+import useTranslations from '../../../components/utils/useTranslations';
 
 const Transportation3 = () => {
   const [language, setLanguage] = useState(localStorage.getItem('selectedLanguage'));

@@ -4,10 +4,12 @@ import bg from './page1bg.jpg';
 import logo from './logo.svg';
 import BodyPartial from '../../../components/partials/BodyPartial';
 import { useNavigate } from 'react-router-dom';
-import { NextButtonU } from '../../../components/shared/styles1';
-import useTranslations from '../../../components/shared/useTranslations';
+import { NextButtonU } from '../../../components/utils/styles1';
+import useTranslations from '../../../components/utils/useTranslations';
 import axios from 'axios';
 import { useEffect } from 'react';
+import { goToNextStep } from '../../../components/utils/navigationUtils';
+import { useCurrentStepIndex } from '../../../components/utils/useCurrentIndex';
 // Define keyframes for animations
 const fadeIn = keyframes`
   from {
@@ -87,6 +89,8 @@ const Page1 = () => {
   const [language, setLanguage] = useState(localStorage.getItem('selectedLanguage'));
   const translations = useTranslations('residence1', language);
   const navigate = useNavigate();
+  const currentStepIndex = useCurrentStepIndex();
+
   useEffect(() => {
     const fetchProgress = async () => {
       try {
@@ -102,7 +106,7 @@ const Page1 = () => {
 
 
   const handleNextClick = () => {
-    navigate('/');
+    goToNextStep(currentStepIndex, navigate);
   };
 
   return (

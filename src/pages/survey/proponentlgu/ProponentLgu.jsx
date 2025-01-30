@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import BodyPartial from '../../../components/partials/BodyPartial';
 import GradientBackground from '../../../components/partials/GradientBackground';
 import { useNavigate } from 'react-router-dom';
-import { submitSurveyResponses } from '../../../components/shared/sendDataBindInput'; // import the submission function
+import { submitSurveyResponses } from '../../../components/utils/sendInputUtils'; // import the submission function
 import imgoverlay from '../../../components/img/profile.png';
 
 const Container = styled(motion.div)`

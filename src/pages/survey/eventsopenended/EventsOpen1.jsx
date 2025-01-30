@@ -1,7 +1,7 @@
 // EventsOpen1.jsx
 import React, { useEffect, useState } from 'react';
 import FeedbackForm from '../../../components/partials/FeedbackForm';
-import useTranslations from '../../../components/shared/useTranslations';
+import useTranslations from '../../../components/utils/useTranslations';
 import { useNavigate } from 'react-router-dom';
 
 const EventsOpen1 = () => {

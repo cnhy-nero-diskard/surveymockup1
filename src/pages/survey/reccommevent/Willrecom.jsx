@@ -4,9 +4,9 @@ import GradientBackground from '../../../components/partials/GradientBackground'
 import BodyPartial from '../../../components/partials/BodyPartial';
 import { motion } from 'framer-motion';
 import imgoverlay from "../../../components/img/shutter.png";
-import { Container } from '../../../components/shared/styles1';
-import useTranslations from '../../../components/shared/useTranslations';
-import { submitSurveyResponses } from '../../../components/shared/sendDataBindInput';
+import { Container } from '../../../components/utils/styles1';
+import useTranslations from '../../../components/utils/useTranslations';
+import { submitSurveyResponses } from '../../../components/utils/sendInputUtils';
 import { useNavigate } from 'react-router-dom';
 const Willrecom = () => {
   const navigate = useNavigate();

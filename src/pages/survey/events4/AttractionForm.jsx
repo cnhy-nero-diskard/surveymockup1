@@ -6,10 +6,10 @@ import 'react-toastify/dist/ReactToastify.css';
 import BodyPartial from '../../../components/partials/BodyPartial';
 import GradientBackground from '../../../components/partials/GradientBackground';
 import imgOverlay from "../../../components/img/umb.png";
-import { Button, Container } from '../../../components/shared/styles1';
+import { Button, Container } from '../../../components/utils/styles1';
 import { useNavigate } from 'react-router-dom';
-import useTranslations from '../../../components/shared/useTranslations';
-import { submitSurveyResponses } from '../../../components/shared/sendDataBindInput';
+import useTranslations from '../../../components/utils/useTranslations';
+import { submitSurveyResponses } from '../../../components/utils/sendInputUtils';
 
 const TableContainer = styled(animated.div)`
   width: 105%;

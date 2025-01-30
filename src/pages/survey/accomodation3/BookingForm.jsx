@@ -3,11 +3,11 @@ import styled from 'styled-components';
 import { useSpring, animated } from 'react-spring';
 import BodyPartial from '../../../components/partials/BodyPartial';
 import GradientBackground from '../../../components/partials/GradientBackground';
-import { NextButtonU } from '../../../components/shared/styles1';
+import { NextButtonU } from '../../../components/utils/styles1';
 import { useNavigate } from 'react-router-dom';
 import imgoverlay from '../../../components/img/bed.png';
-import useTranslations from '../../../components/shared/useTranslations';
-import { submitSurveyResponses } from '../../../components/shared/sendDataBindInput';
+import useTranslations from '../../../components/utils/useTranslations';
+import { submitSurveyResponses } from '../../../components/utils/sendInputUtils';
 
 const Container = styled.div`
   font-family: Arial, sans-serif;

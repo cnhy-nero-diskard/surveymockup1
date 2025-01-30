@@ -5,7 +5,7 @@ import BodyPartial from '../../../components/partials/BodyPartial';
 import GradientBackground from '../../../components/partials/GradientBackground';
 import { useNavigate } from "react-router-dom";
 import imgOverlay from "../../../components/img/money.png";
-import useTranslations from '../../../components/shared/useTranslations';
+import useTranslations from '../../../components/utils/useTranslations';
 
 const Container = styled.div`
   display: flex;

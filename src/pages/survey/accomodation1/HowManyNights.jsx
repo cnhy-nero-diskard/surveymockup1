@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import styled, { keyframes } from 'styled-components';
-import { Container, NextButtonU } from '../../../components/shared/styles1';
+import { Container, NextButtonU } from '../../../components/utils/styles1';
 import { useNavigate } from 'react-router-dom';
 import imgOverlay from "../../../components/img/bed.png";
 
-import useTranslations from '../../../components/shared/useTranslations';
-import { submitSurveyResponses } from '../../../components/shared/sendDataBindInput';
+import useTranslations from '../../../components/utils/useTranslations';
+import { submitSurveyResponses } from '../../../components/utils/sendInputUtils';
 import BodyPartial from '../../../components/partials/BodyPartial';
 import GradientBackground from '../../../components/partials/GradientBackground';
 

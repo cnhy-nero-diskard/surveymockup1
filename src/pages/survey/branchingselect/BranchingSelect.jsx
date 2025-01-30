@@ -6,9 +6,9 @@ import './BranchingSelect.css';
 import BodyPartial from '../../../components/partials/BodyPartial';
 import GradientBackground from '../../../components/partials/GradientBackground';
 import imgoverlay from "../../../components/img/emailbg.png";
-import { Container } from '../../../components/shared/styles1';
-import useTranslations from '../../../components/shared/useTranslations';
-import { submitSurveyResponses } from '../../../components/shared/sendDataBindInput'; // Import the API utility function
+import { Container } from '../../../components/utils/styles1';
+import useTranslations from '../../../components/utils/useTranslations';
+import { submitSurveyResponses } from '../../../components/utils/sendInputUtils'; // Import the API utility function
 
 const Option = styled(animated.div)`
   padding: 15px;

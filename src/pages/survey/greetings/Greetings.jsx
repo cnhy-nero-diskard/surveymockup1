@@ -4,10 +4,10 @@ import styled from 'styled-components';
 import BodyPartial from '../../../components/partials/BodyPartial';
 import GradientBackground from '../../../components/partials/GradientBackground';
 import imgoverlay from "../../../components/img/commentsbg.png";
-import { submitSurveyResponses } from '../../../components/shared/sendDataBindInput';
-import useTranslations from '../../../components/shared/useTranslations';
-import { GREETINGS } from '../../../components/shared/componentConstants';
-import { NextButtonU } from '../../../components/shared/styles1';
+import { submitSurveyResponses } from '../../../components/utils/sendInputUtils';
+import useTranslations from '../../../components/utils/useTranslations';
+import { GREETINGS } from '../../../components/utils/componentConstants';
+import { NextButtonU } from '../../../components/utils/styles1';
 
 const Container = styled.div`
   display: flex;

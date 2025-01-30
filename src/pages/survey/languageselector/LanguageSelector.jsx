@@ -1,20 +1,23 @@
 import React, { useEffect, useState } from 'react';
 import "/node_modules/flag-icons/css/flag-icons.min.css";
 import GradientBackground from '../../../components/partials/GradientBackground';
-import { Container, Title, Button } from '../../../components/shared/styles1';
+import { Container, Title, Button } from '../../../components/utils/styles1';
 import translate from "../../../components/img/translate.png";
 import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '../../../components/partials/LanguageContext';
 import axios from 'axios';
 import './LanguageSelector.css'
 import BodyPartial from '../../../components/partials/BodyPartial';
-import { NextButtonU } from '../../../components/shared/styles1';
+import { NextButtonU } from '../../../components/utils/styles1';
+import { useCurrentStepIndex } from '../../../components/utils/useCurrentIndex';
+import { goToNextStep } from '../../../components/utils/navigationUtils';
 
 const LanguageSelector = () => {
   const { setSelectedLanguage } = useLanguage(); // Access the context
   const navigate = useNavigate();
   const [languages, setLanguages] = useState([]); // State to hold the languages
   const [selectedLanguageCode, setSelectedLanguageCode] = useState(null); // State to hold the selected language code
+  const currentStepIndex = useCurrentStepIndex();
 
   useEffect(() => {
     const fetchLanguages = async () => {
@@ -56,7 +59,7 @@ const LanguageSelector = () => {
         console.error('Error saving response:', error);
       }
 
-      navigate('/'); // Navigate to the next page
+      goToNextStep(currentStepIndex, navigate);
     } else {
       alert('Please select a language before proceeding.');
     }

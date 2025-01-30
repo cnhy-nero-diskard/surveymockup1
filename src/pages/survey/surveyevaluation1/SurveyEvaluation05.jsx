@@ -4,9 +4,9 @@ import GradientBackground from '../../../components/partials/GradientBackground'
 import { motion } from 'framer-motion';
 import './SurveyEvaluation05.css';
 import imgoverlay from "../../../components/img/shutter.png";
-import useTranslations from '../../../components/shared/useTranslations';
-import { NextButtonU } from '../../../components/shared/styles1';
-import { submitSurveyResponses } from '../../../components/shared/sendDataBindInput';
+import useTranslations from '../../../components/utils/useTranslations';
+import { NextButtonU } from '../../../components/utils/styles1';
+import { submitSurveyResponses } from '../../../components/utils/sendInputUtils';
 
 const SurveyEvaluation05 = () => {
   const [responses, setResponses] = useState([]);

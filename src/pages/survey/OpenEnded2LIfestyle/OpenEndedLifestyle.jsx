@@ -2,11 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import BodyPartial from '../../../components/partials/BodyPartial';
 import GradientBackground from '../../../components/partials/GradientBackground';
-import { Container, Title, Paragraph, Button, EmojiButton, TextField } from '../../../components/shared/styles1';
+import { Container, Title, Paragraph, Button, EmojiButton, TextField } from '../../../components/utils/styles1';
 import imgoverlay from "../../../components/img/review.png";
 import { useNavigate } from 'react-router-dom';
-import useTranslations from '../../../components/shared/useTranslations';
-import { submitSurveyResponses } from '../../../components/shared/sendDataBindInput';
+import useTranslations from '../../../components/utils/useTranslations';
+import { submitSurveyResponses } from '../../../components/utils/sendInputUtils';
 const OpenEndedLifestyle = () => {
     const [selectedSatisfaction, setSelectedSatisfaction] = useState(null);
     const [textFeedback, setTextFeedback] = useState('');

@@ -4,9 +4,9 @@ import BodyPartial from '../../../components/partials/BodyPartial';
 import GradientBackground from '../../../components/partials/GradientBackground';
 import imgoverlay from "../../../components/img/question.png";
 import { useNavigate } from 'react-router-dom';
-import { MAINPURPOSE as COMPONENT }  from '../../../components/shared/componentConstants';
-import useTranslations from '../../../components/shared/useTranslations';  
-import { submitSurveyResponses } from '../../../components/shared/sendDataBindInput';
+import { MAINPURPOSE as COMPONENT }  from '../../../components/utils/componentConstants';
+import useTranslations from '../../../components/utils/useTranslations';  
+import { submitSurveyResponses } from '../../../components/utils/sendInputUtils';
 
 // Keyframes for animations
 const fadeIn = keyframes`

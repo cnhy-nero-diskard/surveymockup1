@@ -5,10 +5,10 @@ import BodyPartial from '../../../components/partials/BodyPartial';
 import GradientBackground from '../../../components/partials/GradientBackground';
 import { useNavigate } from 'react-router-dom';
 import imgoverlay from '../../../components/img/bed23.png';
-import useTranslations from '../../../components/shared/useTranslations';
+import useTranslations from '../../../components/utils/useTranslations';
 import axios from 'axios';
 import { v4 as uuidv4 } from 'uuid'; // For generating UUIDs
-import { submitSurveyResponses } from '../../../components/shared/sendDataBindInput';
+import { submitSurveyResponses } from '../../../components/utils/sendInputUtils';
 
 const Container = styled(motion.div)`
   font-family: Arial, sans-serif;
