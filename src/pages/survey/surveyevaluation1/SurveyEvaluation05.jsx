@@ -6,7 +6,7 @@ import './SurveyEvaluation05.css';
 import imgoverlay from "../../../components/img/shutter.png";
 import useTranslations from '../../../components/shared/useTranslations';
 import { NextButtonU } from '../../../components/shared/styles1';
-import { submitSurveyResponses } from '../../../components/shared/apiUtils';
+import { submitSurveyResponses } from '../../../components/shared/sendDataBindInput';
 
 const SurveyEvaluation05 = () => {
   const [responses, setResponses] = useState([]);

@@ -23,6 +23,12 @@ const RouteSelector = () => {
         >
           App Routes
         </button>
+        <button
+          onClick={() => navigate('/survey')}
+          style={{ padding: '10px 20px', fontSize: '16px', cursor: 'pointer' }}
+        >
+          TPMS SURVEY
+        </button>
       </div>
     </div>
   );

@@ -6,7 +6,7 @@ import imgoverlay from "../../../components/img/question.png";
 import { useNavigate } from 'react-router-dom';
 import { MAINPURPOSE as COMPONENT }  from '../../../components/shared/componentConstants';
 import useTranslations from '../../../components/shared/useTranslations';  
-import { submitSurveyResponses } from '../../../components/shared/apiUtils';
+import { submitSurveyResponses } from '../../../components/shared/sendDataBindInput';
 
 // Keyframes for animations
 const fadeIn = keyframes`

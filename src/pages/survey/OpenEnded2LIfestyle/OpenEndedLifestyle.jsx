@@ -6,7 +6,7 @@ import { Container, Title, Paragraph, Button, EmojiButton, TextField } from '../
 import imgoverlay from "../../../components/img/review.png";
 import { useNavigate } from 'react-router-dom';
 import useTranslations from '../../../components/shared/useTranslations';
-import { submitSurveyResponses } from '../../../components/shared/apiUtils';
+import { submitSurveyResponses } from '../../../components/shared/sendDataBindInput';
 const OpenEndedLifestyle = () => {
     const [selectedSatisfaction, setSelectedSatisfaction] = useState(null);
     const [textFeedback, setTextFeedback] = useState('');

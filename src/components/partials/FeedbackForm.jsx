@@ -6,7 +6,7 @@ import BodyPartial from './BodyPartial';
 import GradientBackground from './GradientBackground';
 import imgOverlay from "../../components/img/ball.png";
 import useTranslations from '../../components/shared/useTranslations';
-import { submitSurveyResponses } from '../../components/shared/apiUtils';
+import { submitSurveyResponses } from '../shared/sendDataBindInput';
 
 const FeedbackFormContainer = styled(animated.div)`
   max-width: 600px;

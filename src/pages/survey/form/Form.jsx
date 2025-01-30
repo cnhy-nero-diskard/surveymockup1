@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { FORM } from '../../../components/shared/componentConstants';
 import useTranslations from '../../../components/shared/useTranslations';
 import { NextButtonU } from '../../../components/shared/styles1';
-import { submitSurveyResponses } from '../../../components/shared/apiUtils';
+import { submitSurveyResponses } from '../../../components/shared/sendDataBindInput';
 import GradientBackground from '../../../components/partials/GradientBackground';
 
 export const theme = {

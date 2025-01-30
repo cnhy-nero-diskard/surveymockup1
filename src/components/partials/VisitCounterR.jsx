@@ -8,7 +8,7 @@ import imgOverlay from "../../components/img/city.png";
 import { useNavigate } from 'react-router-dom';
 import useTranslations from '../../components/shared/useTranslations';
 import { VISITFREQUENCYFORM } from '../../components/shared/componentConstants';
-import { submitSurveyResponses } from '../shared/apiUtils';
+import { submitSurveyResponses } from '../shared/sendDataBindInput';
 import { NextButtonU,fontColorU } from '../../components/shared/styles1';
 
 // Styled Components

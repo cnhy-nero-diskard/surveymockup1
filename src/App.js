@@ -7,6 +7,7 @@ import WebpageRoutesDev from './WebpageRoutesDev';
 import NotFound from './components/admin/fallback/NotFound';
 import { AuthProvider } from './components/context/AuthContext';
 import Login from './components/admin/login/Login';
+import SurveyRoutes from './routes/SurveyRoutes';
 
 const App = () => {
   const initializeAnonymousUser = async () => {
@@ -57,6 +58,7 @@ const App = () => {
 
           {/* App Routes */}
           <Route path="/devpath1/*" element={<WebpageRoutesDev />} />
+          <Route path="/survey/*" element={<SurveyRoutes />} />
 
           {/* Fallback route */}
           <Route path="*" element={<NotFound />} />

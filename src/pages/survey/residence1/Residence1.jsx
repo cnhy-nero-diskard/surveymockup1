@@ -8,7 +8,7 @@ import GradientBackground from '../../../components/partials/GradientBackground'
 import { useNavigate } from 'react-router-dom';
 import useTranslations from '../../../components/shared/useTranslations';
 import { RESIDENCE1 as COMPONENT } from '../../../components/shared/componentConstants';
-import { submitSurveyResponses } from '../../../components/shared/apiUtils';
+import { submitSurveyResponses } from '../../../components/shared/sendDataBindInput';
 import { countries } from 'countries-list';
 import { NextButtonU,fontColorU } from '../../../components/shared/styles1';
 

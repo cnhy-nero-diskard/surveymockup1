@@ -5,7 +5,7 @@ import GradientBackground from '../../../components/partials/GradientBackground'
 import BodyPartial from '../../../components/partials/BodyPartial';
 import imgoverlay from "../../../components/img/thank.png";
 import useTranslations from '../../../components/shared/useTranslations';
-import { submitSurveyResponses } from '../../../components/shared/apiUtils';
+import { submitSurveyResponses } from '../../../components/shared/sendDataBindInput';
 import { useNavigate } from 'react-router-dom';
 // Keyframes for animations
 const fadeIn = keyframes`
