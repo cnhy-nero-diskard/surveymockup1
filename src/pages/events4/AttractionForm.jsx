@@ -24,7 +24,7 @@ const TableContainer = styled(animated.div)`
 `;
 
 const Table = styled.table`
-  width: 10px;
+  width: 100%;
   border-collapse: collapse;
   margin: 20px 0;
   table-layout: fixed;
@@ -100,15 +100,27 @@ const RadioGroup = styled.div`
     align-items: center;
   }
 `;
-const HRadioGroup = styled.div`
+const BottomEmojiRadioGroup = styled.div`
   display: flex;
-  gap: 10px; /* Adds space between the radio buttons */
+  gap: 15px; /* Adds more space between the radio buttons */
   justify-content: center;
   align-items: center;
 
   @media (max-width: 768px) {
     flex-direction: row; /* Keep row direction on mobile */
-    gap: 5px; /* Smaller gap on mobile */
+    gap: 10px; /* Smaller gap on mobile */
+  }
+
+  label {
+    font-size: 24px; /* Increase the size of the labels */
+  }
+
+  input {
+    transform: scale(1.5); /* Scale up the radio buttons */
+  }
+
+  span {
+    font-size: 24px; /* Increase the size of the emoji */
   }
 `;
 
@@ -149,7 +161,6 @@ const Title = styled.h1`
     font-size: 24px;
   }
 `;
-
 const AttractionForm = () => {
   const [rows, setRows] = useState([]);
   const [currentInput, setCurrentInput] = useState({
@@ -158,7 +169,7 @@ const AttractionForm = () => {
     rating: '',
   });
 
-  const [language, setLanguage] = useState(localStorage.getItem('selectedLanguage'));
+  const language = localStorage.getItem('selectedLanguage');
   const translations = useTranslations('AttractionForm', language);
 
   const formAnimation = useSpring({
@@ -172,6 +183,20 @@ const AttractionForm = () => {
   };
 
   const handleAddRow = () => {
+    // Check if the maximum number of rows (5) has been reached
+    if (rows.length >= 5) {
+      toast.error(translations.attractionFormErrorMaxRows, {
+        position: 'top-right',
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
+      return;
+    }
+
+    // Check if all fields are filled
     if (!currentInput.attraction || !currentInput.location || !currentInput.rating) {
       toast.error(translations.attractionFormErrorAllFields, {
         position: 'top-right',
@@ -184,12 +209,14 @@ const AttractionForm = () => {
       return;
     }
 
+    // Generate unique references for the new row
+    const rowNumber = rows.length + 1;
     const newRow = {
       ...currentInput,
       id: Date.now(),
-      attraction_ref: 'ATTRA1', // Fixed surveyquestion_ref for attraction
-      location_ref: 'LOCAT1',   // Fixed surveyquestion_ref for location
-      rating_ref: 'RATNG1'      // Fixed surveyquestion_ref for rating
+      attraction_ref: `ATTRA${rowNumber}`, // Unique attraction_ref
+      location_ref: `LOCAT${rowNumber}`,   // Unique location_ref
+      rating_ref: `RATNG${rowNumber}`      // Unique rating_ref
     };
 
     setRows([...rows, newRow]);
@@ -249,7 +276,6 @@ const AttractionForm = () => {
           <TableContainer style={formAnimation}>
             <Title>{translations.attractionFormTitle}</Title>
             <ScrollableTableContainer>
-
               <Table>
                 <thead>
                   <tr>
@@ -310,7 +336,7 @@ const AttractionForm = () => {
                     placeholder={translations.attractionFormPlaceholderLocation}
                   />
                   <MobileRowHeader>{translations.attractionFormHeaderRating}</MobileRowHeader>
-                  <HRadioGroup>
+                  <BottomEmojiRadioGroup>
                     {[
                       { value: '1', emoji: '☹️' },
                       { value: '2', emoji: '😐' },
@@ -328,10 +354,9 @@ const AttractionForm = () => {
                         <Emoji>{option.emoji}</Emoji>
                       </label>
                     ))}
-                  </HRadioGroup>
+                  </BottomEmojiRadioGroup>
                 </MobileRow>
               </div>
-
             </ScrollableTableContainer>
           </TableContainer>
           <Button onClick={handleAddRow}>{translations.attractionFormButtonAddRow}</Button>
@@ -342,5 +367,6 @@ const AttractionForm = () => {
     </>
   );
 };
+
 
 export default AttractionForm;

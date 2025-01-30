@@ -1,11 +1,12 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import styled, { keyframes } from 'styled-components';
 import { FaCheckCircle } from 'react-icons/fa'; // Importing a checkmark icon
 import GradientBackground from '../../../components/partials/GradientBackground';
 import BodyPartial from '../../../components/partials/BodyPartial';
 import imgoverlay from "../../../components/img/thank.png";
 import useTranslations from '../../../components/shared/useTranslations';
-
+import { submitSurveyResponses } from '../../../components/shared/apiUtils';
+import { useNavigate } from 'react-router-dom';
 // Keyframes for animations
 const fadeIn = keyframes`
   from {
@@ -72,12 +73,33 @@ const FinishButton = styled.button`
 `;
 
 const ThankYouMessage = () => {
+  const navigate = useNavigate();
   const language = localStorage.getItem('selectedLanguage');
   const translations = useTranslations('ThankYouMessage', language);
+  const [surveyResponses, setSurveyResponses] = useState([]);
 
-  const handleFinish = () => {
-    // Handle the finish action, e.g., redirect or close modal
-    console.log('Finish button clicked');
+  useEffect(() => {
+    // Simulate fetching or constructing survey responses
+    const responses = [
+    ];
+    setSurveyResponses(responses);
+  }, []);
+
+  const handleFinish = async () => {
+    try {
+      // Submit the survey responses to the backend
+      await submitSurveyResponses(surveyResponses);
+      console.log('Survey responses submitted successfully');
+      
+      // Indicate that the tourist has finished the survey
+      const finishResponse = { surveyquestion_ref: 'FINISH', response_value: 'Survey Completed' };
+      await submitSurveyResponses([finishResponse]);
+      
+      console.log('Survey completion indicated');
+      navigate('/');
+    } catch (error) {
+      console.error('Error submitting survey responses:', error);
+    }
   };
 
   return (

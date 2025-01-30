@@ -6,6 +6,7 @@ import GradientBackground from '../../components/partials/GradientBackground';
 import imageoverlay from '../../components/img/pricetag.png';
 import { useNavigate } from 'react-router-dom';
 import useTranslations from '../../components/shared/useTranslations';
+import { submitSurveyResponses } from '../../components/shared/apiUtils';
 
 const Container = styled.div`
   font-family: Arial, sans-serif;
@@ -36,16 +37,6 @@ const Item = styled(animated.li)`
 
 const ItemName = styled.span`
   flex: 1;
-`;
-
-const Rating = styled.span`
-  font-size: 20px;
-`;
-
-const Input = styled.input`
-  padding: 8px;
-  margin-right: 10px;
-  font-size: 16px;
 `;
 
 const Select = styled.select`
@@ -81,32 +72,25 @@ const emojiMap = {
   4: '😄',
 };
 
+const surveyQuestionRefs = ["LOCARTS", "APPAR", "FOODDE", "ACCESS", "COSM", "PERSO"];
+
 const DestinationShoppingList = () => {
-  const [items, setItems] = useState([]); // Initialize as empty array
-  const [newItem, setNewItem] = useState('');
-  const [newRating, setNewRating] = useState(1);
-  const [language, setLanguage] = useState(localStorage.getItem('selectedLanguage') || 'en'); // Default to 'en' if no language is selected
+  const [items, setItems] = useState([]);
+  const [surveyResponses, setSurveyResponses] = useState([]);
+  const [language, setLanguage] = useState(localStorage.getItem('selectedLanguage') || 'en');
 
   const translations = useTranslations('DestinationShoppingList', language);
 
-  // Fetch the initial items from translations
   useEffect(() => {
     if (translations.destinationShoppingListItems) {
- 
-      setItems(JSON.parse(translations.destinationShoppingListItems).map(item => ({
+      const parsedItems = JSON.parse(translations.destinationShoppingListItems).map((item, index) => ({
         name: item.name,
-        rating: item.rating || 1 // Default rating to 1 if not provided
-      })));
+        rating: item.rating || 1,
+        surveyquestion_ref: surveyQuestionRefs[index % surveyQuestionRefs.length]
+      }));
+      setItems(parsedItems);
     }
   }, [translations]);
-
-  const handleAddItem = () => {
-    if (newItem.trim()) {
-      setItems([...items, { name: newItem, rating: newRating }]);
-      setNewItem('');
-      setNewRating(1);
-    }
-  };
 
   const handleUpdateRating = (index, newRating) => {
     const updatedItems = [...items];
@@ -114,12 +98,17 @@ const DestinationShoppingList = () => {
     setItems(updatedItems);
   };
 
+  const handleNextClick = async () => {
+    const formattedResponses = items.map(item => ({
+      surveyquestion_ref: item.surveyquestion_ref,
+      response_value: item.rating.toString()
+    }));
+    await submitSurveyResponses(formattedResponses);
+    navigate('/');
+  };
+
   const animations = useSpring({ opacity: 1, from: { opacity: 0 } });
   const navigate = useNavigate();
-
-  const handleNextClick = () => {
-    navigate('/'); // Navigate to the next question
-  };
 
   return (
     <>
@@ -144,25 +133,6 @@ const DestinationShoppingList = () => {
               </Item>
             ))}
           </ItemList>
-          <div>
-            <Input
-              type="text"
-              placeholder={translations.destinationShoppingListAddItemPlaceholder}
-              value={newItem}
-              onChange={(e) => setNewItem(e.target.value)}
-            />
-            <Select
-              value={newRating}
-              onChange={(e) => setNewRating(parseInt(e.target.value))}
-            >
-              {Object.entries(emojiMap).map(([key, emoji]) => (
-                <option key={key} value={key}>
-                  {emoji}
-                </option>
-              ))}
-            </Select>
-            <Button onClick={handleAddItem}>{translations.destinationShoppingListAddItemButton}</Button>
-          </div>
           <NextButton onClick={handleNextClick}>{translations.destinationShoppingListNextButton}</NextButton>
         </Container>
       </GradientBackground>
