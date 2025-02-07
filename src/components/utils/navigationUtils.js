@@ -1,6 +1,5 @@
 // navigationUtils.js
 import axios from "axios";
-import { sroutes as surveyRoutes } from "../../routes/SurveyRoutes";
 
 
 /**
@@ -17,7 +16,7 @@ import { sroutes as surveyRoutes } from "../../routes/SurveyRoutes";
  *
  * @throws Will throw an error if the backend update or navigation fails.
  */
-export const goToNextStep = async (currentStepIndex, navigate) => {
+export const goToNextStep = async (currentStepIndex, navigate, surveyRoutes) => {
   console.log(`CURRENT STEP = ${currentStepIndex}`);
   try {
     // Update progress on the backend

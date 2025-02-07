@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import "/node_modules/flag-icons/css/flag-icons.min.css";
 import GradientBackground from '../../../components/partials/GradientBackground';
-import { Container, Title, Button } from '../../../components/utils/styles1';
+import { Container, Title } from '../../../components/utils/styles1';
 import translate from "../../../components/img/translate.png";
 import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '../../../components/partials/LanguageContext';
