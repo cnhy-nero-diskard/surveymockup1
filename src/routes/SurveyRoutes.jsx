@@ -57,10 +57,10 @@ import NotFound from '../components/admin/fallback/NotFound';
 // Define the button-to-route mapping
 export const buttonRoutes = [
     { label: 'Language Selector', path: 'languageselector' },
+    { label: 'Survey Consent', path: 'surveyconsent' },
     { label: 'Residence 1', path: 'residence1' },
     { label: 'Main Purpose', path: 'mainpurpose' },
     { label: 'Visit Frequency Form', path: 'visitfrequencyform' },
-    { label: 'Survey Consent', path: 'surveyconsent' },
     { label: 'Form', path: 'form' },
     { label: 'Greetings', path: 'greetings' },
     { label: 'Branching Select', path: 'branchingselect' },
@@ -162,12 +162,11 @@ const ButtonGrid = () => {
 
 
 export const sroutes = [
-    // { label: 'Language Selector', path: 'languageselector' },
     { label: 'Page 1', path: 'page1' },
+    { label: 'Survey Consent', path: 'surveyconsent' },
     { label: 'Residence 1', path: 'residence1' },
     { label: 'Main Purpose', path: 'mainpurpose' },
     { label: 'Visit Frequency Form', path: 'visitfrequencyform' },
-    { label: 'Survey Consent', path: 'surveyconsent' },
     { label: 'Form', path: 'form' },
     { label: 'Greetings', path: 'greetings' },
     { label: 'Branching Select', path: 'branchingselect' },
@@ -223,6 +222,7 @@ const SurveyRoutes = () => {
                 <Route path="/" element={<LanguageSelector />} />
                 <Route path="/page1" element={<Page1 />} />
                 <Route path="/residence1" element={<Residence1 />} />
+                <Route path="/surveyconsent" element={<SurveyConsent />} />
                 {/* <Route path="/greetings" element={<Greetings />} /> */}
                 {/* Dynamically generate survey routes */}
                 {sroutes.map((route, index) => (

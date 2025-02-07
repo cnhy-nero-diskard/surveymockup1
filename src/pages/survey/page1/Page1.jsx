@@ -85,12 +85,23 @@ const NextButton = styled.input`
 `;
 
 const Page1 = () => {
-  const [currentStep, setCurrentStep] = useState(0);
+  const [currentStep, setCurrentStep] = useState();
   const [language, setLanguage] = useState(localStorage.getItem('selectedLanguage'));
   const translations = useTranslations('residence1', language);
   const navigate = useNavigate();
   const currentStepIndex = useCurrentStepIndex();
 
+  /**
+   * Fetches the current survey progress from the API and updates the current step state.
+   * 
+   * Makes a GET request to the survey progress endpoint using Axios. If the request is successful,
+   * it updates the current step state with the data received from the response. If an error occurs,
+   * it logs the error to the console.
+   * 
+   * @async
+   * @function fetchProgress
+   * @returns {Promise<void>} A promise that resolves when the fetch operation is complete.
+   */
   useEffect(() => {
     const fetchProgress = async () => {
       try {

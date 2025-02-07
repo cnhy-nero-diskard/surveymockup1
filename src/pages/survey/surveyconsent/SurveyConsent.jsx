@@ -8,6 +8,8 @@ import GradientBackground from '../../../components/partials/GradientBackground'
 import { useNavigate } from 'react-router-dom';
 import { submitSurveyResponses } from '../../../components/utils/sendInputUtils'; // Import the submit function
 import axios from 'axios';
+import { useCurrentStepIndex } from '../../../components/utils/useCurrentIndex';
+import { goToNextStep } from '../../../components/utils/navigationUtils';
 const Container = styled.div`
   display: flex;
   flex-direction: column;
@@ -93,9 +95,11 @@ const Button = styled(animated.button)`
 `;
 
 const SurveyConsent = () => {
+  const [currentStep, setCurrentStep] = useState();
   const [translations, setTranslations] = useState({});
   const [language, setLanguage] = useState(localStorage.getItem('selectedLanguage') || 'en');
   const [surveyResponses, setSurveyResponses] = useState([]);
+  const currentStepIndex = useCurrentStepIndex();
 
   const titleProps = useSpring({
     from: { opacity: 0, transform: 'translateY(-20px)' },
@@ -118,18 +122,29 @@ const SurveyConsent = () => {
   const notify = () => toast(translations.SurveyConsentAgreeToast || 'Thank you for agreeing to participate!');
 
   const navigate = useNavigate();
+  useEffect(() => {
+    const fetchProgress = async () => {
+      try {
+        console.log("GET SURVEYPROGRESS")
+        const response = await axios.get(`${process.env.REACT_APP_API_HOST}/api/survey/progress`, {withCredentials: true});
+        setCurrentStep(response.data.currentStep);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    fetchProgress();
+  }, [navigate]);
 
   const handleNextClick = async () => {
-    // Prepare the survey responses array
     const responses = [
-      { surveyquestion_ref: 'CONS1', response_value: 'Agreed' }, // Example response
-      // Add more responses as needed
+      { surveyquestion_ref: 'CONS1', response_value: 'Agreed' }, 
     ];
+    
 
     try {
       await submitSurveyResponses(responses); // Submit the responses
       notify();
-      navigate('/'); // Navigate to the next question
+      goToNextStep(currentStepIndex, navigate);
     } catch (error) {
       console.error('Error submitting survey responses:', error);
     }
