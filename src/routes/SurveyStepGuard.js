@@ -11,19 +11,19 @@ const SurveyStepGuard = ({ route, index, totalSteps }) => {
   useEffect(() => {
     const validateStepAccess = async () => {
       try {
-        console.log("SURVEY STEP GUARD VERIFYING")
-        // Fetch the user's current progress from the backend
-        const response = await axios.get(`${process.env.REACT_APP_API_HOST}/api/survey/progress`,{withCredentials:true});
+        console.log("SURVEY STEP GUARD VERIFYING");
+        const response = await axios.get(`${process.env.REACT_APP_API_HOST}/api/survey/progress`, { withCredentials: true });
         const currentStep = response.data.currentStep;
-        console.log(currentStep);
-        // Check if the user is allowed to access this step
+        console.log("Backend Current Step:", currentStep);
+        console.log("Component Index:", index);
+    
         if (index !== currentStep) {
-          // Redirect to the correct step
-          navigate(surveyRoutes[currentStep].path);
+          console.log("Redirecting to:", surveyRoutes[currentStep].path);
+          navigate(`/survey/${surveyRoutes[currentStep].path}`);
         }
       } catch (err) {
         console.error("Error validating step access:", err);
-        navigate("/gyatt"); // Redirect to the default route on error
+        navigate("/gyatt");
       }
     };
 

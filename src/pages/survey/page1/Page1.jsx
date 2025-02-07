@@ -117,7 +117,7 @@ const Page1 = () => {
 
 
   const handleNextClick = () => {
-    
+    console.log("Current Step Index:", currentStepIndex);
     goToNextStep(currentStepIndex, navigate);
   };
 
