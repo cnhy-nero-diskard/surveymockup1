@@ -16,7 +16,8 @@ import { sroutes as surveyRoutes } from "../../routes/SurveyRoutes";
  */
 export const useCurrentStepIndex = () => {
   const location = useLocation();
-  const currentPath = location.pathname;
+  const currentPath = location.pathname.split('/').pop();
+  console.log(`useCurrentindex.js - we are in current path ${currentPath}`);
 
   // Find the index of the current route in the surveyRoutes array
   const currentStepIndex = surveyRoutes.findIndex(

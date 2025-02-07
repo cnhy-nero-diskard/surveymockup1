@@ -162,7 +162,8 @@ const ButtonGrid = () => {
 
 
 export const sroutes = [
-    { label: 'Language Selector', path: 'languageselector' },
+    // { label: 'Language Selector', path: 'languageselector' },
+    { label: 'Page 1', path: 'page1' },
     { label: 'Residence 1', path: 'residence1' },
     { label: 'Main Purpose', path: 'mainpurpose' },
     { label: 'Visit Frequency Form', path: 'visitfrequencyform' },
@@ -170,7 +171,6 @@ export const sroutes = [
     { label: 'Form', path: 'form' },
     { label: 'Greetings', path: 'greetings' },
     { label: 'Branching Select', path: 'branchingselect' },
-    { label: 'Page 1', path: 'page1' },
     { label: 'Survey Evaluation VERSION1', path: 'surveyevaluation05' },
     { label: 'Survey Evaluation VERSION2', path: 'surveyevaluationb' },
     { label: 'Thank You Message', path: 'thankyoumessage' },
@@ -220,9 +220,10 @@ const SurveyRoutes = () => {
         <LanguageProvider>
             <Routes>
                 {/* Default route */}
-                <Route path="/" element={<Page1 />} />
-                <Route path="/languageselector" element={<LanguageSelector />} />
-
+                <Route path="/" element={<LanguageSelector />} />
+                <Route path="/page1" element={<Page1 />} />
+                <Route path="/residence1" element={<Residence1 />} />
+                {/* <Route path="/greetings" element={<Greetings />} /> */}
                 {/* Dynamically generate survey routes */}
                 {sroutes.map((route, index) => (
                     <Route

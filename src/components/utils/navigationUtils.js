@@ -18,6 +18,7 @@ import { sroutes as surveyRoutes } from "../../routes/SurveyRoutes";
  * @throws Will throw an error if the backend update or navigation fails.
  */
 export const goToNextStep = async (currentStepIndex, navigate) => {
+  console.log(`CURRENT STEP = ${currentStepIndex}`);
   try {
     // Update progress on the backend
     await axios.post(`${process.env.REACT_APP_API_HOST}/api/survey/progress`, {
@@ -27,10 +28,12 @@ export const goToNextStep = async (currentStepIndex, navigate) => {
 
     // Get the next step from the surveyRoutes array
     const nextStep = surveyRoutes[currentStepIndex + 1];
+    
 
     if (nextStep) {
+      console.log(`TO NEXT ROUTE ${nextStep.path}`);
       // Navigate to the next step
-      navigate(nextStep.path);
+      navigate(`/survey/${nextStep.path}`);
     } else {
       // If there is no next step, navigate to a completion page or home
       navigate("/survey-complete");
