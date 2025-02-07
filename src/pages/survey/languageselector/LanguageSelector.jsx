@@ -10,13 +10,14 @@ import BodyPartial from '../../../components/partials/BodyPartial';
 import { NextButtonU } from '../../../components/utils/styles1';
 import { useCurrentStepIndex } from '../../../components/utils/useCurrentIndex';
 import { goToNextStep } from '../../../components/utils/navigationUtils';
+import { sroutes } from '../../../routes/surveyRoutesConfig';
 
 const LanguageSelector = () => {
   const { setSelectedLanguage } = useLanguage(); // Access the context
   const navigate = useNavigate();
   const [languages, setLanguages] = useState([]); // State to hold the languages
   const [selectedLanguageCode, setSelectedLanguageCode] = useState(null); // State to hold the selected language code
-  const currentStepIndex = useCurrentStepIndex();
+  const currentStepIndex = useCurrentStepIndex(sroutes);
 
   useEffect(() => {
     const fetchLanguages = async () => {
@@ -58,7 +59,7 @@ const LanguageSelector = () => {
         console.error('Error saving response:', error);
       }
 
-      goToNextStep(currentStepIndex, navigate);
+      goToNextStep(currentStepIndex, navigate,sroutes);
     } else {
       alert('Please select a language before proceeding.');
     }

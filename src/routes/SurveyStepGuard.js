@@ -2,8 +2,7 @@
 import { useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
-import { sroutes as surveyRoutes } from "./SurveyRoutes";
-
+import { sroutes as surveyRoutes } from "./surveyRoutesConfig";
 const SurveyStepGuard = ({ route, index, totalSteps }) => {
   const navigate = useNavigate();
   const location = useLocation();

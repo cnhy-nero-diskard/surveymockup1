@@ -1,6 +1,5 @@
 // useCurrentStepIndex.js
 import { useLocation } from "react-router-dom";
-import { sroutes as surveyRoutes } from "../../routes/SurveyRoutes";
 /**
  * Custom hook to get the index of the current step in the survey based on the current URL path.
  *
@@ -14,7 +13,7 @@ import { sroutes as surveyRoutes } from "../../routes/SurveyRoutes";
  * @requires useLocation from 'react-router-dom'
  * @requires surveyRoutes - An array of route objects with a 'path' property
  */
-export const useCurrentStepIndex = () => {
+export const useCurrentStepIndex = (surveyRoutes) => {
   const location = useLocation();
   const currentPath = location.pathname;
   console.log(`useCurrentindex.js - we are in current path ${currentPath}`);
