@@ -1,9 +1,8 @@
 import React, {useEffect} from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../components/context/AuthContext';
+
 const RouteSelector = () => {
-
-
   const navigate = useNavigate();
   const { isAuthenticated, unauthorized, handleUnauthorized } = useAuth(); // Correct usage
   console.log('isAuthenticated', isAuthenticated);

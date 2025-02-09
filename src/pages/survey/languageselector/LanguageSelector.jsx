@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import GradientBackground from '../../../components/partials/GradientBackground';
 import { Container, Title } from '../../../components/utils/styles1';
 import translate from "../../../components/img/translate.png";
@@ -10,14 +10,33 @@ import BodyPartial from '../../../components/partials/BodyPartial';
 import { NextButtonU } from '../../../components/utils/styles1';
 import { useCurrentStepIndex } from '../../../components/utils/useCurrentIndex';
 import { goToNextStep } from '../../../components/utils/navigationUtils';
-import { sroutes } from '../../../routes/surveyRoutesConfig';
+import SurveyRoutesContext from '../../../routes/SurveyRoutesContext';
 
 const LanguageSelector = () => {
   const { setSelectedLanguage } = useLanguage(); // Access the context
+  // const { setSelectedLanguage } = useState(); // Access the context
   const navigate = useNavigate();
   const [languages, setLanguages] = useState([]); // State to hold the languages
   const [selectedLanguageCode, setSelectedLanguageCode] = useState(null); // State to hold the selected language code
+  const sroutes = useContext(SurveyRoutesContext);
+  
+  const [currentStep, setCurrentStep] = useState();
   const currentStepIndex = useCurrentStepIndex(sroutes);
+
+
+  useEffect(() => {
+    const fetchProgress = async () => {
+      try {
+        console.log("GET SURVEYPROGRESS")
+        const response = await axios.get(`${process.env.REACT_APP_API_HOST}/api/survey/progress`, {withCredentials: true});
+        setCurrentStep(response.data.currentStep);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    fetchProgress();
+  }, [navigate]);
+
 
   useEffect(() => {
     const fetchLanguages = async () => {
@@ -38,6 +57,7 @@ const LanguageSelector = () => {
   const handleLanguageSelect = (code) => {
     setSelectedLanguageCode(code); // Update the selected language code in state
     console.log(`Selected language: ${code}`);
+    
   };
 
   const handleNextClick = async () => {

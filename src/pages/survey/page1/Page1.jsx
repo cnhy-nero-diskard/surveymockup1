@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import styled, { keyframes } from 'styled-components';
 import bg from './page1bg.jpg';
 import logo from './logo.svg';
@@ -7,9 +7,10 @@ import { useNavigate } from 'react-router-dom';
 import { NextButtonU } from '../../../components/utils/styles1';
 import useTranslations from '../../../components/utils/useTranslations';
 import axios from 'axios';
-import { useEffect } from 'react';
-import { goToNextStep } from '../../../components/utils/navigationUtils';
+
 import { useCurrentStepIndex } from '../../../components/utils/useCurrentIndex';
+import { goToNextStep } from '../../../components/utils/navigationUtils';
+import SurveyRoutesContext from '../../../routes/SurveyRoutesContext';
 // Define keyframes for animations
 const fadeIn = keyframes`
   from {
@@ -85,12 +86,13 @@ const NextButton = styled.input`
 `;
 
 const Page1 = () => {
-  const [currentStep, setCurrentStep] = useState();
   const [language, setLanguage] = useState(localStorage.getItem('selectedLanguage'));
   const translations = useTranslations('residence1', language);
   const navigate = useNavigate();
-  const currentStepIndex = useCurrentStepIndex();
-
+  const sroutes = useContext(SurveyRoutesContext);
+  
+  const [currentStep, setCurrentStep] = useState();
+  const currentStepIndex = useCurrentStepIndex(sroutes);
   /**
    * Fetches the current survey progress from the API and updates the current step state.
    * 
@@ -106,8 +108,9 @@ const Page1 = () => {
     const fetchProgress = async () => {
       try {
         console.log("GET SURVEYPROGRESS")
-        const response = await axios.get(`${process.env.REACT_APP_API_HOST}/api/survey/progress`, {withCredentials: true});
+        const response = await axios.get(`${process.env.REACT_APP_API_HOST}/api/survey/progress`, { withCredentials: true });
         setCurrentStep(response.data.currentStep);
+
       } catch (err) {
         console.error(err);
       }
@@ -118,7 +121,7 @@ const Page1 = () => {
 
   const handleNextClick = () => {
     console.log("Current Step Index:", currentStepIndex);
-    goToNextStep(currentStepIndex, navigate);
+    goToNextStep(currentStepIndex, navigate, sroutes);
   };
 
   return (

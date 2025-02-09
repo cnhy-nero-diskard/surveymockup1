@@ -17,11 +17,12 @@ import axios from "axios";
  * @throws Will throw an error if the backend update or navigation fails.
  */
 export const goToNextStep = async (currentStepIndex, navigate, surveyRoutes) => {
-  console.log(`CURRENT STEP = ${currentStepIndex}`);
+  console.log(`NAVUTILS - CURRENT STEP = ${currentStepIndex}`);
   try {
     // Update progress on the backend
+    const plusone = currentStepIndex + 1;
     await axios.post(`${process.env.REACT_APP_API_HOST}/api/survey/progress`, {
-      currentStep: currentStepIndex + 1,
+      currentStep: plusone,
       
     },{withCredentials:true});
 
@@ -30,7 +31,8 @@ export const goToNextStep = async (currentStepIndex, navigate, surveyRoutes) => 
     
 
     if (nextStep) {
-      console.log(`TO NEXT ROUTE ${nextStep.path}`);
+
+      console.log(`NAVUTILS - TO NEXT ROUTE ${nextStep.path}`);
       // Navigate to the next step
       navigate(`/survey/${nextStep.path}`);
     } else {

@@ -8,7 +8,6 @@ import NotFound from './components/admin/fallback/NotFound';
 import { AuthProvider } from './components/context/AuthContext';
 import Login from './components/admin/login/Login';
 import SurveyRoutes from './routes/SurveyRoutes';
-
 const App = () => {
   const initializeAnonymousUser = async () => {
     console.log('Initializing anonymous user...');

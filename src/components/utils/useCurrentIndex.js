@@ -19,9 +19,11 @@ export const useCurrentStepIndex = (surveyRoutes) => {
   console.log(`useCurrentindex.js - we are in current path ${currentPath}`);
 
   // Find the index of the current route in the surveyRoutes array
-  const currentStepIndex = surveyRoutes.findIndex(
-    (route) => route.path === currentPath
-  );
+  const currentStepIndex = surveyRoutes.findIndex((route) => {
+    const routeBasePath = route.path.split('/').pop(); // Extract the last part of the route path
+    const currentBasePath = currentPath.split('/').pop(); // Extract the last part of the current path
+    return routeBasePath === currentBasePath; // Compare the base paths to find the matching route
+  });
 
   return currentStepIndex;
 };

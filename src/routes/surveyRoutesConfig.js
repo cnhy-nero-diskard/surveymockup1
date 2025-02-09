@@ -1,4 +1,57 @@
+import LanguageSelector from '../pages/survey/languageselector/LanguageSelector';
+import Residence1 from '../pages/survey/residence1/Residence1';
+import MainPurpose from '../pages/survey/mainpurpose/MainPurpose';
+import VisitFrequencyForm from '../pages/survey/visitfrequencyform/VisitFrequencyForm';
+import SurveyConsent from '../pages/survey/surveyconsent/SurveyConsent';
+import Form from '../pages/survey/form/Form';
+import Greetings from '../pages/survey/greetings/Greetings';
+import BranchingSelect from '../pages/survey/branchingselect/BranchingSelect';
+import Page1 from '../pages/survey/page1/Page1';
+import SurveyEvaluation05 from '../pages/survey/surveyevaluation1/SurveyEvaluation05';
+import SurveyEvaluationb from '../pages/survey/surveyevaluation2/SurveyEvaluationb';
+import ThankYouMessage from '../pages/survey/thanku/ThankYouMessage';
+import Willrecom from '../pages/survey/reccommevent/Willrecom';
+import WhereLearn from '../pages/survey/wherelearn/WhereLearn';
+import SurveyVenue from '../pages/survey/surveyvenue/SurveyVenue';
+import OpenEnded2 from '../pages/survey/OpenEnded2LIfestyle/OpenEndedLifestyle';
+import OpenEndedHotel from '../pages/survey/OpenEnded1Hotel/OpenEndedHotel';
+import HowManyVisits from '../pages/survey/events1/HowManyVisits';
+import PrimaryAtt from '../pages/survey/events2/PrimaryAtt';
+import RateAttraction from '../pages/survey/events3/RateAttraction';
+import EventsOpen1 from '../pages/survey/eventsopenended/EventsOpen1';
+import AttractionsFeedback from '../pages/survey/eventsopenended2/AttractionsFeedback';
+import PackageTourFeedback from '../pages/survey/eventsopenended2/PackageTourFeedback';
+import AttractionForm from '../pages/survey/events4/AttractionForm';
+import Services2 from '../pages/survey/services2/Services2';
+import Services1 from '../pages/survey/services1/Services1';
+import DestinationShoppingList from '../pages/survey/services3/DestinationShoppingList';
+import VisitCounterAtt from '../pages/survey/hmvisits/VisitCounterAtt';
+import TravelQuestion from '../pages/survey/travelquestion/TravelQuestion';
+import TravelWith from '../pages/survey/travelwith/TravelWith';
+import TravelOptions from '../pages/survey/packagetour1/TravelOptions';
+import PackageTourItems from '../pages/survey/packageitems/PackageTourItems';
+import PackagePaid from '../pages/survey/packagetourpaid/PackagePaid';
+import ExpenseTracker from '../pages/survey/packagerecall/ExpenseTracker';
+import PercentageShareList from '../pages/survey/packagerecall2/PercentageShareList';
+import ExpenseCompanions from '../pages/survey/expensecompanion/ExpenseCompanions';
+import PackTranspo from '../pages/survey/packTranspo/PackTranspo';
+import HowManyNights from '../pages/survey/accomodation1/HowManyNights';
+import AccommodationForm from '../pages/survey/accomodation2/AccomodationForm';
+import BookingForm from '../pages/survey/accomodation3/BookingForm';
+import WhereStayArrival from '../pages/survey/accomodation4/WhereStay_arrival';
+import WhereStayDeparture from '../pages/survey/accomodation4/WhereStay_depart';
+import AccomodationOpen1 from '../pages/survey/accomodation5o/AccomodationOpen1';
+import AccomodationOpen2 from '../pages/survey/accomodation6o/AccomodationOpen2';
+import Transportation3 from '../pages/survey/transportation3/Transportation3';
+import Transportation1 from '../pages/survey/transportation1/Transportation1';
+import Transportation2 from '../pages/survey/transportation2/Transportation2';
+import PProfile2 from '../pages/survey/personalprofile2/PProfile2';
+import PProfile1 from '../pages/survey/personalprofile1/PProfile1';
+import ProponentLgu from '../pages/survey/proponentlgu/ProponentLgu';
+
+
 export const sroutes = [
+
     { label: 'Page 1', path: 'page1', component: Page1},
     { label: 'Language', path: 'languageselector', component: LanguageSelector},
     { label: 'Survey Consent', path: 'surveyconsent', component: SurveyConsent},

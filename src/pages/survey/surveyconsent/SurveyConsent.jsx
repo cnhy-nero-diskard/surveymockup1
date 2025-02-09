@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { useSpring, animated } from 'react-spring';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -10,6 +10,7 @@ import { submitSurveyResponses } from '../../../components/utils/sendInputUtils'
 import axios from 'axios';
 import { useCurrentStepIndex } from '../../../components/utils/useCurrentIndex';
 import { goToNextStep } from '../../../components/utils/navigationUtils';
+import SurveyRoutesContext from '../../../routes/SurveyRoutesContext';
 const Container = styled.div`
   display: flex;
   flex-direction: column;
@@ -99,7 +100,8 @@ const SurveyConsent = () => {
   const [translations, setTranslations] = useState({});
   const [language, setLanguage] = useState(localStorage.getItem('selectedLanguage') || 'en');
   const [surveyResponses, setSurveyResponses] = useState([]);
-  const currentStepIndex = useCurrentStepIndex();
+  const sroutes = useContext(SurveyRoutesContext);
+  const currentStepIndex = useCurrentStepIndex(sroutes);
 
   const titleProps = useSpring({
     from: { opacity: 0, transform: 'translateY(-20px)' },
