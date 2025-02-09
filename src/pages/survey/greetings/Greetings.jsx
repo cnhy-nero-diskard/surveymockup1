@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { useSpring, animated } from 'react-spring';
 import styled from 'styled-components';
 import BodyPartial from '../../../components/partials/BodyPartial';
@@ -8,6 +8,10 @@ import { submitSurveyResponses } from '../../../components/utils/sendInputUtils'
 import useTranslations from '../../../components/utils/useTranslations';
 import { GREETINGS } from '../../../components/utils/componentConstants';
 import { NextButtonU } from '../../../components/utils/styles1';
+import SurveyRoutesContext from '../../../routes/SurveyRoutesContext';
+import { useNavigate } from 'react-router-dom';
+import { useCurrentStepIndex } from '../../../components/utils/useCurrentIndex';
+import { goToNextStep } from '../../../components/utils/navigationUtils';
 
 const Container = styled.div`
   display: flex;
@@ -59,6 +63,9 @@ const Button = styled(animated.button)`
 const Greetings = () => {
   const [language, setLanguage] = useState(localStorage.getItem('selectedLanguage'));
   const translations = useTranslations(GREETINGS, language);
+  const navigate = useNavigate();
+  const currentStepIndex = useCurrentStepIndex();
+  const sroutes = useContext(SurveyRoutesContext);
 
   const buttonProps = useSpring({
     from: { opacity: 0, transform: 'scale(0.9)' },
@@ -83,6 +90,7 @@ const Greetings = () => {
       .catch((error) => {
         console.error('Error submitting survey responses:', error);
       });
+    goToNextStep(currentStepIndex, navigate, sroutes )
   };
 
   return (

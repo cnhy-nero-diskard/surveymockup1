@@ -128,7 +128,7 @@ const SurveyConsent = () => {
     const fetchProgress = async () => {
       try {
         console.log("GET SURVEYPROGRESS")
-        const response = await axios.get(`${process.env.REACT_APP_API_HOST}/api/survey/progress`, {withCredentials: true});
+        const response = await axios.get(`${process.env.REACT_APP_API_HOST}/api/survey/progress`, { withCredentials: true });
         setCurrentStep(response.data.currentStep);
       } catch (err) {
         console.error(err);
@@ -139,9 +139,9 @@ const SurveyConsent = () => {
 
   const handleNextClick = async () => {
     const responses = [
-      { surveyquestion_ref: 'CONS1', response_value: 'Agreed' }, 
+      { surveyquestion_ref: 'CONS1', response_value: 'Agreed' },
     ];
-    
+
 
     try {
       await submitSurveyResponses(responses); // Submit the responses
@@ -150,6 +150,7 @@ const SurveyConsent = () => {
     } catch (error) {
       console.error('Error submitting survey responses:', error);
     }
+    goToNextStep(currentStepIndex, navigate, sroutes);
   };
 
   useEffect(() => {

@@ -9,10 +9,10 @@ import SurveyRoutesContext from './SurveyRoutesContext';
 const SurveyRoutes = () => {
     return (
         <LanguageProvider>
-<SurveyRoutesContext.Provider value={sroutes}>
+            <SurveyRoutesContext.Provider value={sroutes}>
                 <SurveyRoutesContent />
-    
-</SurveyRoutesContext.Provider>        </LanguageProvider>
+            </SurveyRoutesContext.Provider>
+        </LanguageProvider>
     );
 };
 
@@ -20,10 +20,6 @@ const SurveyRoutesContent = () => {
     const navigate = useNavigate();
     const sroute = useContext(SurveyRoutesContext);
 
-    useEffect(() => {
-        // Navigate to the first route in sroutes when the app loads
-        navigate(`/survey/page1`);
-    }, [navigate]);
 
     console.log("SURVEY ROUTES NAV");
 

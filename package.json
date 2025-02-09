@@ -21,7 +21,7 @@
     "currency-converter-lt": "^2.0.1",
     "emoji-mart": "^5.6.0",
     "fetch": "^1.1.0",
-    "flag-icons": "^7.2.3",
+    "flag-icons": "^7.3.2",
     "formik": "^2.4.6",
     "framer-motion": "^11.15.0",
     "groq-sdk": "^0.9.1",

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { useSpring, animated } from 'react-spring';
 import styled, { ThemeProvider } from 'styled-components';
 import BodyPartial from '../../../components/partials/BodyPartial';
@@ -8,7 +8,10 @@ import useTranslations from '../../../components/utils/useTranslations';
 import { NextButtonU } from '../../../components/utils/styles1';
 import { submitSurveyResponses } from '../../../components/utils/sendInputUtils';
 import GradientBackground from '../../../components/partials/GradientBackground';
-
+import { useCurrentStepIndex } from '../../../components/utils/useCurrentIndex';
+import SurveyRoutesContext from '../../../routes/SurveyRoutesContext';
+import axios from 'axios';
+import { goToNextStep } from '../../../components/utils/navigationUtils';
 export const theme = {
     colors: {
         primary: '#007bff',
@@ -61,13 +64,34 @@ const InputField = styled.input`
 `;
 
 const Form = () => {
+    const navigate = useNavigate();
+    const sroutes = useContext(SurveyRoutesContext);
+    const [currentStep, setCurrentStep] = useState();
+    const currentStepIndex = useCurrentStepIndex();
     const [formData, setFormData] = useState({
         fullName: '',
         email: '',
     });
-
     const [language] = useState(localStorage.getItem('selectedLanguage') || 'en');
     const translations = useTranslations(FORM, language);
+
+
+    useEffect(() => {
+        const fetchProgress = async () => {
+          try {
+            console.log("GET SURVEYPROGRESS")
+            const response = await axios.get(`${process.env.REACT_APP_API_HOST}/api/survey/progress`, { withCredentials: true });
+            setCurrentStep(response.data.currentStep);
+    
+          } catch (err) {
+            console.error(err);
+          }
+        };
+        fetchProgress();
+      }, [navigate]);
+    
+
+
 
     const formAnimation = useSpring({
         from: { opacity: 0, transform: 'translateY(-50px)' },
@@ -75,7 +99,6 @@ const Form = () => {
         config: { duration: 500 },
     });
 
-    const navigate = useNavigate();
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -108,6 +131,8 @@ const Form = () => {
         } catch (error) {
             console.error('Failed to submit survey responses:', error);
         }
+
+        goToNextStep(currentStepIndex, navigate, sroutes);
     };
 
     return (

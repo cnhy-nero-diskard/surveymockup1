@@ -1,3 +1,20 @@
+
+/**
+ * Initializes the anonymous user by making an API call to the backend.
+ * Logs the success or failure of the initialization process.
+ * 
+ * @async
+ * @function initializeAnonymousUser
+ * @returns {Promise<void>}
+ */
+
+/**
+ * The main App component that sets up the routing for the application.
+ * It initializes the anonymous user on mount and provides the AuthProvider context.
+ * 
+ * @component
+ * @returns {JSX.Element} The rendered component.
+ */
 import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import axios from 'axios';

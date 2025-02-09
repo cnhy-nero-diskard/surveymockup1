@@ -16,13 +16,13 @@ import axios from "axios";
  *
  * @throws Will throw an error if the backend update or navigation fails.
  */
-export const goToNextStep = async (currentStepIndex, navigate, surveyRoutes) => {
+export const goToNextStep = async (currentStepIndex, navigate, surveyRoutes, increment = 1) => {
   console.log(`NAVUTILS - CURRENT STEP = ${currentStepIndex}`);
   try {
     // Update progress on the backend
-    const plusone = currentStepIndex + 1;
+    const pluswhat = currentStepIndex + increment;
     await axios.post(`${process.env.REACT_APP_API_HOST}/api/survey/progress`, {
-      currentStep: plusone,
+      currentStep: pluswhat,
       
     },{withCredentials:true});
 

@@ -52,14 +52,16 @@ import ProponentLgu from '../pages/survey/proponentlgu/ProponentLgu';
 
 export const sroutes = [
 
+    { label: 'Language', path: '', component: LanguageSelector},
     { label: 'Page 1', path: 'page1', component: Page1},
-    { label: 'Language', path: 'languageselector', component: LanguageSelector},
     { label: 'Survey Consent', path: 'surveyconsent', component: SurveyConsent},
+    { label: 'Gmail Form', path: 'form', component: Form},
     { label: 'Greetings', path: 'greetings', component: Greetings},
     { label: 'Residence 1', path: 'residence1', component: Residence1},
+    { label: 'Transportation 1', path: 'transportation1', component: Transportation1},
+    { label: 'Transportation 2', path: 'transportation2', component: Transportation2},
     { label: 'Main Purpose', path: 'mainpurpose', component: MainPurpose},
     { label: 'Visit Frequency Form', path: 'visitfrequencyform', component: VisitFrequencyForm},
-    { label: 'Form', path: 'form', component: Form},
     { label: 'Branching Select', path: 'branchingselect', component: BranchingSelect},
     { label: 'Survey Evaluation VERSION1', path: 'surveyevaluation05', component: SurveyEvaluation05},
     // { label: 'Survey Evaluation VERSION2', path: 'surveyevaluationb', component: },
@@ -97,8 +99,6 @@ export const sroutes = [
     { label: 'Accommodation Open 1', path: 'accomodationopen1', component: AccomodationOpen1},
     { label: 'Accommodation Open 2', path: 'accomodationopen2', component: AccomodationOpen2},
     { label: 'Transportation 3', path: 'transportation3', component: Transportation3},
-    { label: 'Transportation 1', path: 'transportation1', component: Transportation1},
-    { label: 'Transportation 2', path: 'transportation2', component: Transportation2},
     { label: 'Personal Profile 2', path: 'pprofile2', component: PProfile2},
     { label: 'Personal Profile 1', path: 'pprofile1', component: PProfile1},
     { label: 'Proponent LGU', path: 'proponentlgu', component: ProponentLgu},

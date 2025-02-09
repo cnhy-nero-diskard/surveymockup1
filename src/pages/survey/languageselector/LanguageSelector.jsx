@@ -11,7 +11,7 @@ import { NextButtonU } from '../../../components/utils/styles1';
 import { useCurrentStepIndex } from '../../../components/utils/useCurrentIndex';
 import { goToNextStep } from '../../../components/utils/navigationUtils';
 import SurveyRoutesContext from '../../../routes/SurveyRoutesContext';
-
+import 'flag-icons/css/flag-icons.min.css';
 const LanguageSelector = () => {
   const { setSelectedLanguage } = useLanguage(); // Access the context
   // const { setSelectedLanguage } = useState(); // Access the context
@@ -84,6 +84,7 @@ const LanguageSelector = () => {
       alert('Please select a language before proceeding.');
     }
   };
+  console.log(`LANGSEL - languages are ${JSON.stringify(languages)}`);
 
   return (
     <>
