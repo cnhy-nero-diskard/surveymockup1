@@ -2,11 +2,19 @@ import React, { useEffect, useState } from 'react';
 import RatingSlider from '../../../components/partials/RatingSlider';
 import { useNavigate } from 'react-router-dom';
 import useTranslations from '../../../components/utils/useTranslations';
+import { UnifiedContext } from '../../../routes/UnifiedContext';
+import { useCurrentStepIndex } from '../../../components/utils/useCurrentIndex';
+import { goToNextStep } from '../../../components/utils/navigationUtils';
+import { useContext } from 'react';
 
 const Transportation3 = () => {
   const [language, setLanguage] = useState(localStorage.getItem('selectedLanguage'));
   const translations = useTranslations('Transportation3', language);
   const entranslations = useTranslations('Transportation3', language);
+
+  const { routes } = useContext(UnifiedContext);
+  const currentStepIndex = useCurrentStepIndex(routes);
+  const { activeBlocks, } = useContext(UnifiedContext);
 
   const categories = [
     translations.transportation3RentalMotorcycleCarVan,
@@ -41,7 +49,7 @@ const Transportation3 = () => {
   const navigate = useNavigate();
 
   const handleRatingComplete = () => {
-    navigate('/'); // Navigate to the next page after rating is complete
+      goToNextStep(currentStepIndex, navigate,routes,activeBlocks);
   };
 
   return (

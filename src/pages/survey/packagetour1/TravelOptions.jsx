@@ -8,7 +8,10 @@ import { useNavigate } from 'react-router-dom';
 import useTranslations from '../../../components/utils/useTranslations';
 import { NextButtonU } from '../../../components/utils/styles1';
 import { submitSurveyResponses } from '../../../components/utils/sendInputUtils'; // Import the API utility function
-
+import { UnifiedContext } from '../../../routes/UnifiedContext';
+import { useContext } from 'react';
+import { goToNextStep } from '../../../components/utils/navigationUtils';
+import { useCurrentStepIndex } from '../../../components/utils/useCurrentIndex';
 const Container = styled.div`
   display: flex;
   flex-direction: column;
@@ -50,12 +53,21 @@ const TravelOptions = () => {
     const [nextStep, setNextStep] = useState(false);
     const [language, setLanguage] = useState(localStorage.getItem('selectedLanguage'));
     const translations = useTranslations('TravelOptions', language);
+    const { routes } = useContext(UnifiedContext);
+    const { activeBlocks, appendActiveBlocks, removeActiveBlocks } = useContext(UnifiedContext);
+    const currentStepIndex = useCurrentStepIndex(routes);
+
 
     const handleOptionClick = (option) => {
         console.log(`Option selected: ${option}`); // Debugging line
         setSelectedOption(option);
         setNextStep(true);
+        removeActiveBlocks('pkgtour');
 
+        removeActiveBlocks('pkgtour');
+        if (option !== 'Independent Traveler/s') {
+            appendActiveBlocks('pkgtour');
+        }
         // Prepare the survey response object
         const surveyResponse = {
             surveyquestion_ref: 'TROPT', // Unique 5-character uppercase string
@@ -74,7 +86,8 @@ const TravelOptions = () => {
 
     const navigate = useNavigate(); // Initialize useNavigate
     const handleNextClick = () => {
-        navigate('/'); // Navigate to the next question
+        goToNextStep(currentStepIndex, navigate, routes, activeBlocks);
+
     };
 
     useEffect(() => {
@@ -84,7 +97,7 @@ const TravelOptions = () => {
     return (
         <>
             <BodyPartial />
-            <GradientBackground overlayImage={imgOverlay} opacity={0.5} blendMode="screen">  
+            <GradientBackground overlayImage={imgOverlay} opacity={0.5} blendMode="screen">
                 <Container>
                     <Question>{translations.travelOptionsQuestion}</Question>
                     <OptionsContainer>
@@ -101,7 +114,7 @@ const TravelOptions = () => {
                             {translations.travelOptionsIndependentTraveler}
                         </NextButtonU>
                     </OptionsContainer>
-                    {nextStep && handleNextClick() }
+                    {nextStep && handleNextClick()}
                 </Container>
             </GradientBackground>
         </>

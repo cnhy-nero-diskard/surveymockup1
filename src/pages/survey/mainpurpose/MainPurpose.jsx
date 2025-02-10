@@ -1,13 +1,15 @@
 import styled, { keyframes } from 'styled-components';
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import BodyPartial from '../../../components/partials/BodyPartial';
 import GradientBackground from '../../../components/partials/GradientBackground';
 import imgoverlay from "../../../components/img/question.png";
 import { useNavigate } from 'react-router-dom';
-import { MAINPURPOSE as COMPONENT }  from '../../../components/utils/componentConstants';
-import useTranslations from '../../../components/utils/useTranslations';  
+import { MAINPURPOSE as COMPONENT } from '../../../components/utils/componentConstants';
+import useTranslations from '../../../components/utils/useTranslations';
 import { submitSurveyResponses } from '../../../components/utils/sendInputUtils';
-
+import { UnifiedContext } from '../../../routes/UnifiedContext';
+import { useCurrentStepIndex } from '../../../components/utils/useCurrentIndex';
+import { goToNextStep } from '../../../components/utils/navigationUtils';
 // Keyframes for animations
 const fadeIn = keyframes`
   from {
@@ -106,6 +108,10 @@ const MainPurpose = () => {
   const [language, setLanguage] = useState(localStorage.getItem('selectedLanguage'));
   const navigate = useNavigate(); // Initialize useNavigate
 
+  const { routes } = useContext(UnifiedContext);
+  const currentStepIndex = useCurrentStepIndex(routes);
+  const { activeBlocks, appendActiveBlocks, removeActiveBlocks } = useContext(UnifiedContext);
+
   const translations = useTranslations(COMPONENT, language);
 
   const handlePurposeChange = (event) => {
@@ -119,37 +125,36 @@ const MainPurpose = () => {
   const handleNextClick = async () => {
     // Prepare the data to be sent
     const purposes = [
-        { id: 'pleasureVacation', value: 'Pleasure/Vacation', ref: 'PUR01' },
-        { id: 'businessProfessional', value: 'Business/Professional Work', ref: 'PUR02' },
-        { id: 'educationalFieldtrip', value: 'Educational/Fieldtrip', ref: 'PUR03' },
-        { id: 'healthWellnessRetirement', value: 'Health/Wellness/Retirement', ref: 'PUR04' },
-        { id: 'visitFriendsRelatives', value: 'Visit Friends and Relatives', ref: 'PUR05' },
-        { id: 'meetingIncentiveConventionExhibition', value: 'Meeting, Incentive, Convention, Exhibition', ref: 'PUR06' },
+      { id: 'pleasureVacation', value: 'Pleasure/Vacation', ref: 'PUR01' },
+      { id: 'businessProfessional', value: 'Business/Professional Work', ref: 'PUR02' },
+      { id: 'educationalFieldtrip', value: 'Educational/Fieldtrip', ref: 'PUR03' },
+      { id: 'healthWellnessRetirement', value: 'Health/Wellness/Retirement', ref: 'PUR04' },
+      { id: 'visitFriendsRelatives', value: 'Visit Friends and Relatives', ref: 'PUR05' },
+      { id: 'meetingIncentiveConventionExhibition', value: 'Meeting, Incentive, Convention, Exhibition', ref: 'PUR06' },
     ];
 
     try {
       // Create an array to hold all survey responses
       const surveyResponses = [];
-  
+
       // Loop through each purpose and collect the responses
       for (const purpose of purposes) {
-          const checkbox = document.getElementById(purpose.id);
-          const surveyResponse = {
-              surveyquestion_ref: purpose.ref, // Unique reference for each purpose
-              response_value: checkbox.checked ? 'YES' : 'NO', // Send 'YES' or 'NO' based on checkbox state
-          };
-  
-          // Add the response to the array
-          surveyResponses.push(surveyResponse);
+        const checkbox = document.getElementById(purpose.id);
+        const surveyResponse = {
+          surveyquestion_ref: purpose.ref, // Unique reference for each purpose
+          response_value: checkbox.checked ? 'YES' : 'NO', // Send 'YES' or 'NO' based on checkbox state
+        };
+
+        // Add the response to the array
+        surveyResponses.push(surveyResponse);
       }
-  
+
       // Send the array of responses in a single request
       await submitSurveyResponses(surveyResponses);
-
-        navigate('/'); // Navigate to the next question
+      goToNextStep(currentStepIndex, navigate, routes, activeBlocks);
     } catch (error) {
-        console.error('Error submitting survey responses:', error);
-        alert('Failed to submit survey responses. Please try again.');
+      console.error('Error submitting survey responses:', error);
+      alert('Failed to submit survey responses. Please try again.');
     }
   };
 

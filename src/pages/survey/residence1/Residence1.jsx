@@ -10,8 +10,10 @@ import useTranslations from '../../../components/utils/useTranslations';
 import { RESIDENCE1 as COMPONENT } from '../../../components/utils/componentConstants';
 import { submitSurveyResponses } from '../../../components/utils/sendInputUtils';
 import { countries } from 'countries-list';
-import { NextButtonU,fontColorU } from '../../../components/utils/styles1';
+import { NextButtonU, fontColorU } from '../../../components/utils/styles1';
 import { UnifiedContext } from '../../../routes/UnifiedContext';
+import { useCurrentStepIndex } from '../../../components/utils/useCurrentIndex';
+import { goToNextStep } from '../../../components/utils/navigationUtils';
 
 // Animations
 const fadeIn = keyframes`
@@ -170,13 +172,17 @@ const FadeTransition = styled(CSSTransition)`
 `;
 
 const Residence1 = () => {
-  const { activeBlocks, appendActiveBlocks } = useContext(UnifiedContext);
-  const [language,setLanguage] = useState(localStorage.getItem('selectedLanguage'));
+  const [language, setLanguage] = useState(localStorage.getItem('selectedLanguage'));
   const [location, setLocation] = useState({
     inCity: false,
     outsideCity: false,
     foreignCountry: false,
   });
+
+  // -----------------------------<>----------------------------
+  const { routes } = useContext(UnifiedContext);
+  const currentStepIndex = useCurrentStepIndex(routes);
+  const { activeBlocks,appendActiveBlocks,removeActiveBlocks } = useContext(UnifiedContext);
 
   const [provinceInput, setProvinceInput] = useState('');
   const [cityMunInput, setCityMunInput] = useState('');
@@ -200,8 +206,8 @@ const Residence1 = () => {
   useEffect(() => {
     const fetchMunicipalities = async () => {
       try {
-        const response = await axios.get(`${process.env.REACT_APP_API_HOST}/api/municipalities`, 
-          {withCredentials: true});
+        const response = await axios.get(`${process.env.REACT_APP_API_HOST}/api/municipalities`,
+          { withCredentials: true });
         const data = response.data;
 
         const formattedData = data.reduce((acc, row) => {
@@ -222,18 +228,31 @@ const Residence1 = () => {
     fetchMunicipalities();
   }, []);
 
-  const translations = useTranslations('residence1', language);  
+  const translations = useTranslations('residence1', language);
 
   const handleLocationChange = (e) => {
     const { name, checked } = e.target;
     const newLocation = { inCity: false, outsideCity: false, foreignCountry: false, [name]: checked };
 
+    // Remove all related blocks first to avoid duplicates
+    removeActiveBlocks('iprovblock');
+    removeActiveBlocks('oprovblock');
+
     if (checked) {
-      setLocation(newLocation);
-    } else {
-      setLocation({ ...location, [name]: checked });
+      // Append the corresponding block based on the checkbox
+      if (name === 'inCity') {
+        appendActiveBlocks(['iprovblock']);
+      } else if (name === 'outsideCity') {
+        appendActiveBlocks(['oprovblock']);
+      } else if (name === 'foreignCountry') {
+        appendActiveBlocks(['oprovblock']);
+      }
     }
+
+    // Update the location state
+    setLocation(newLocation);
   };
+
 
   const handleProvinceInputChange = (e) => {
     const value = e.target.value;
@@ -288,7 +307,7 @@ const Residence1 = () => {
     ];
     try {
       await submitSurveyResponses(surveyResponses);
-      navigate('/');
+      goToNextStep(currentStepIndex, navigate,routes,activeBlocks); //<---------------------------
     } catch (error) {
       console.log('Error submitting survey responses:');
     }

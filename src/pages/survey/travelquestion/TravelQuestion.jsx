@@ -1,5 +1,5 @@
 // src/pages/TravelQuestion.js
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import styled from 'styled-components';
 import { useSpring, animated } from 'react-spring';
 import BodyPartial from '../../../components/partials/BodyPartial';
@@ -9,6 +9,9 @@ import { useNavigate } from 'react-router-dom';
 import useTranslations from '../../../components/utils/useTranslations';
 import { NextButtonU } from '../../../components/utils/styles1';
 import { submitSurveyResponses } from '../../../components/utils/sendInputUtils'; // Import the function
+import { useCurrentStepIndex } from '../../../components/utils/useCurrentIndex';
+import { UnifiedContext } from '../../../routes/UnifiedContext';
+import { goToNextStep } from '../../../components/utils/navigationUtils';
 
 const Container = styled.div`
   display: flex;
@@ -63,6 +66,11 @@ const TravelQuestion = () => {
   const [language, setLanguage] = useState(localStorage.getItem('selectedLanguage'));
   const translations = useTranslations('TravelQuestion', language);
 
+  const { routes } = useContext(UnifiedContext);
+  const currentStepIndex = useCurrentStepIndex(routes);
+  const { activeBlocks,appendActiveBlocks,removeActiveBlocks } = useContext(UnifiedContext);
+  
+
   const buttonAnimation = useSpring({
     transform: 'scale(1)',
     from: { transform: 'scale(0)' },
@@ -79,7 +87,7 @@ const TravelQuestion = () => {
     // Send the response to the backend
     try {
       await submitSurveyResponses([surveyResponse]);
-      navigate('/');
+      goToNextStep(currentStepIndex, navigate,routes,activeBlocks); //<---------------------------
     } catch (error) {
       console.error('Error submitting survey response:', error);
     }

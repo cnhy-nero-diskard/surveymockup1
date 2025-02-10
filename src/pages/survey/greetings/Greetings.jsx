@@ -12,6 +12,7 @@ import SurveyRoutesContext from '../../../routes/__SurveyRoutesContext';
 import { useNavigate } from 'react-router-dom';
 import { useCurrentStepIndex } from '../../../components/utils/useCurrentIndex';
 import { goToNextStep } from '../../../components/utils/navigationUtils';
+import { UnifiedContext } from '../../../routes/UnifiedContext';
 
 const Container = styled.div`
   display: flex;
@@ -64,8 +65,11 @@ const Greetings = () => {
   const [language, setLanguage] = useState(localStorage.getItem('selectedLanguage'));
   const translations = useTranslations(GREETINGS, language);
   const navigate = useNavigate();
-  const currentStepIndex = useCurrentStepIndex();
-  const sroutes = useContext(SurveyRoutesContext);
+
+  const {routes} = useContext(UnifiedContext);
+  const [currentStep, setCurrentStep] = useState();
+  const currentStepIndex = useCurrentStepIndex(routes);
+  const {activeBlocks, setActiveBlocks} = useContext(UnifiedContext);
 
   const buttonProps = useSpring({
     from: { opacity: 0, transform: 'scale(0.9)' },
@@ -90,7 +94,7 @@ const Greetings = () => {
       .catch((error) => {
         console.error('Error submitting survey responses:', error);
       });
-    goToNextStep(currentStepIndex, navigate, sroutes )
+    goToNextStep(currentStepIndex, navigate, routes, activeBlocks )
   };
 
   return (

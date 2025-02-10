@@ -5,7 +5,6 @@ import BodyPartial from '../../components/partials/BodyPartial';
 import GradientBackground from '../../components/partials/GradientBackground';
 import { Container } from '../utils/styles1';
 import imgOverlay from "../../components/img/city.png";
-import { useNavigate } from 'react-router-dom';
 import useTranslations from '../utils/useTranslations';
 import { VISITFREQUENCYFORM } from '../utils/componentConstants';
 import { submitSurveyResponses } from '../utils/sendInputUtils';
@@ -54,7 +53,7 @@ const ChoiceButton = styled.button`
 `;
 
  
-const VisitCounterR = ({ title, surveyquestion_ref }) => {
+const VisitCounterR = ({ title, surveyquestion_ref,handNext }) => {
   const [visitCount, setVisitCount] = useState(null);
   const [language, setLanguage] = useState(localStorage.getItem('selectedLanguage'));
 
@@ -63,7 +62,6 @@ const VisitCounterR = ({ title, surveyquestion_ref }) => {
     setVisitCount(numericalValue);
   };
 
-  const navigate = useNavigate();
 
   const handleNextClick = async () => {
     console.log(`Selected visit count (numerical): ${visitCount}`);
@@ -78,10 +76,10 @@ const VisitCounterR = ({ title, surveyquestion_ref }) => {
     try {
       await submitSurveyResponses(surveyResponses);
       console.log('Survey responses submitted successfully!');
-      navigate('/');
     } catch (error) {
       console.error('Failed to submit survey responses:', error);
     }
+    handNext()
   };
 
   const containerAnimation = useSpring({

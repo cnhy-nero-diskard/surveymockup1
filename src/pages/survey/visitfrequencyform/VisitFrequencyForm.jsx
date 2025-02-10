@@ -9,19 +9,28 @@ import axios from 'axios';
 import { VISITFREQUENCYFORM } from '../../../components/utils/componentConstants';
 import useTranslations from '../../../components/utils/useTranslations';
 import VisitCounterR from '../../../components/partials/VisitCounterR';
-
+import { useContext } from 'react';
+import { useCurrentStepIndex } from '../../../components/utils/useCurrentIndex';
+import { UnifiedContext } from '../../../routes/UnifiedContext';
+import { goToNextStep } from '../../../components/utils/navigationUtils';
 
 
 const VisitFrequencyForm = () => {
   const [visitCount, setVisitCount] = useState(null);
   const [language, setLanguage] = useState(localStorage.getItem('selectedLanguage'));
+  const { routes } = useContext(UnifiedContext);
+  const currentStepIndex = useCurrentStepIndex(routes);
+  const { activeBlocks, appendActiveBlocks, removeActiveBlocks } = useContext(UnifiedContext);
+
+
 
   const handleChoice = (value) => {
     setVisitCount(value);
   };
 
-  const handleNext = () => {
-    console.log(`Selected visit count: ${visitCount}`);
+  const handleNextClick = () => {
+    goToNextStep(currentStepIndex, navigate, routes, activeBlocks); //<-------------------
+
   };
 
   const containerAnimation = useSpring({
@@ -36,14 +45,14 @@ const VisitFrequencyForm = () => {
   });
 
   const navigate = useNavigate(); // Initialize useNavigate
-  const handleNextClick = () => {
-    navigate('/'); // Navigate to the next question
-  };
+
 
   const translations = useTranslations(VISITFREQUENCYFORM, language);
 
   return (
-      <VisitCounterR title={translations.VisitFrequencyForm_Title} surveyquestion_ref={'VSFRM'} />  );
+    <VisitCounterR title={translations.VisitFrequencyForm_Title}
+     surveyquestion_ref={'VSFRM'} 
+     handNext={handleNextClick}/>);
 };
 
 export default VisitFrequencyForm;

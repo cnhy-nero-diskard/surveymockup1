@@ -9,9 +9,9 @@ import { NextButtonU } from '../../../components/utils/styles1';
 import { submitSurveyResponses } from '../../../components/utils/sendInputUtils';
 import GradientBackground from '../../../components/partials/GradientBackground';
 import { useCurrentStepIndex } from '../../../components/utils/useCurrentIndex';
-import SurveyRoutesContext from '../../../routes/__SurveyRoutesContext';
 import axios from 'axios';
 import { goToNextStep } from '../../../components/utils/navigationUtils';
+import { UnifiedContext } from '../../../routes/UnifiedContext';
 export const theme = {
     colors: {
         primary: '#007bff',
@@ -65,31 +65,33 @@ const InputField = styled.input`
 
 const Form = () => {
     const navigate = useNavigate();
-    const sroutes = useContext(SurveyRoutesContext);
-    const [currentStep, setCurrentStep] = useState();
-    const currentStepIndex = useCurrentStepIndex();
     const [formData, setFormData] = useState({
         fullName: '',
         email: '',
     });
     const [language] = useState(localStorage.getItem('selectedLanguage') || 'en');
     const translations = useTranslations(FORM, language);
+    const { routes } = useContext(UnifiedContext);
+    const [currentStep, setCurrentStep] = useState();
+    const currentStepIndex = useCurrentStepIndex(routes);
+    const { activeBlocks, setActiveBlocks } = useContext(UnifiedContext);
+
 
 
     useEffect(() => {
         const fetchProgress = async () => {
-          try {
-            console.log("GET SURVEYPROGRESS")
-            const response = await axios.get(`${process.env.REACT_APP_API_HOST}/api/survey/progress`, { withCredentials: true });
-            setCurrentStep(response.data.currentStep);
-    
-          } catch (err) {
-            console.error(err);
-          }
+            try {
+                console.log("GET SURVEYPROGRESS")
+                const response = await axios.get(`${process.env.REACT_APP_API_HOST}/api/survey/progress`, { withCredentials: true });
+                setCurrentStep(response.data.currentStep);
+
+            } catch (err) {
+                console.error(err);
+            }
         };
         fetchProgress();
-      }, [navigate]);
-    
+    }, [navigate]);
+
 
 
 
@@ -132,16 +134,16 @@ const Form = () => {
             console.error('Failed to submit survey responses:', error);
         }
 
-        goToNextStep(currentStepIndex, navigate, sroutes);
+        goToNextStep(currentStepIndex, navigate, routes, activeBlocks);
     };
 
     return (
         <ThemeProvider theme={theme}>
             <BodyPartial />
-<GradientBackground>
+            <GradientBackground>
                 <FormContainer style={formAnimation}>
                     <FormTitle>
-                        <span>{translations.formWelcomeTourists}</span> 
+                        <span>{translations.formWelcomeTourists}</span>
                         <span>{translations.formFillOutForm}</span>
                     </FormTitle>
                     <form onSubmit={handleSubmit}>
@@ -165,8 +167,8 @@ const Form = () => {
                         </NextButtonU>
                     </form>
                 </FormContainer>
-    
-</GradientBackground>        </ThemeProvider>
+
+            </GradientBackground>        </ThemeProvider>
     );
 };
 

@@ -2,17 +2,27 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import VisitCounterR from '../../../components/partials/VisitCounterR';
 import useTranslations from '../../../components/utils/useTranslations';
+import { useCurrentStepIndex } from '../../../components/utils/useCurrentIndex';
+import { UnifiedContext } from '../../../routes/UnifiedContext';
+import { useContext } from 'react';
+import { goToNextStep } from '../../../components/utils/navigationUtils';
 
 const VisitCounterAtt = () => {
   const [selectedOption, setSelectedOption] = useState(null);
   const navigate = useNavigate(); // Initialize useNavigate
+  const { routes } = useContext(UnifiedContext);
+  const currentStepIndex = useCurrentStepIndex(routes);
+  const { activeBlocks } = useContext(UnifiedContext);
+
+
 
   const handleNextClick = () => {
-    navigate('/'); // Navigate to the next question
+    console.log ('COMPONENT -- nextclick')
+    goToNextStep(currentStepIndex, navigate,routes,activeBlocks);
   };
 
   // Retrieve the selected language from localStorage
-  const [language, setLanguage] = useState(localStorage.getItem('selectedLanguage'));
+  const [language] = useState(localStorage.getItem('selectedLanguage'));
 
   // Fetch translations using the useTranslations hook
   const translations = useTranslations('VisitCounterAtt', language);
@@ -25,7 +35,7 @@ const VisitCounterAtt = () => {
       title={visitCounterTitle} 
       selectedOption={selectedOption} 
       setSelectedOption={setSelectedOption} 
-      handleNextClick={handleNextClick} 
+      handNext={handleNextClick} 
       surveyquestion_ref={'VSCATT'}
     />
   );
