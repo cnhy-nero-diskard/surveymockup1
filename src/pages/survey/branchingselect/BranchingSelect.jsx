@@ -1,5 +1,4 @@
-// src/components/BranchingSelect.jsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useContext } from 'react';
 import { useSpring, animated } from 'react-spring';
 import styled from 'styled-components';
 import './BranchingSelect.css';
@@ -8,7 +7,11 @@ import GradientBackground from '../../../components/partials/GradientBackground'
 import imgoverlay from "../../../components/img/emailbg.png";
 import { Container } from '../../../components/utils/styles1';
 import useTranslations from '../../../components/utils/useTranslations';
-import { submitSurveyResponses } from '../../../components/utils/sendInputUtils'; // Import the API utility function
+import { submitSurveyResponses } from '../../../components/utils/sendInputUtils';
+import { useCurrentStepIndex } from '../../../components/utils/useCurrentIndex';
+import { UnifiedContext } from '../../../routes/UnifiedContext';
+import { goToNextStep } from '../../../components/utils/navigationUtils';
+import { useNavigate } from 'react-router-dom';
 
 const Option = styled(animated.div)`
   padding: 15px;
@@ -47,50 +50,66 @@ const NextButton = styled(animated.button)`
 `;
 
 const BranchingSelect = () => {
+
+  const navigate = useNavigate();
   const [selectedOptions, setSelectedOptions] = useState([]);
   const [language, setLanguage] = useState(localStorage.getItem('selectedLanguage'));
   const translations = useTranslations('BranchingSelect', language);
+
+  const { routes } = useContext(UnifiedContext);
+  const currentStepIndex = useCurrentStepIndex(routes);
+  const { activeBlocks, appendActiveBlocks, removeActiveBlocks } = useContext(UnifiedContext);
 
   const springProps = useSpring({
     opacity: selectedOptions.length > 0 ? 1 : 0,
     transform: selectedOptions.length > 0 ? 'scale(1)' : 'scale(0.95)',
   });
 
+  // Map options to their respective strings for activeBlocks
+  const optionToBlockMap = {
+    ACCOMODATION: 'accom',
+    TRANSPORTATION: 'transp',
+    'EVENT/ACTIVITIES': 'evatt',
+    SERVICES: 'serv',
+  };
+
   const handleOptionClick = (option) => {
+    console.log(`ACTIVE CONDITIONAL BLOCKS - ${JSON.stringify(activeBlocks)}`);
     setSelectedOptions((prevOptions) => {
       if (prevOptions.includes(option)) {
+        // If the option is already selected, remove it
+        removeActiveBlocks([optionToBlockMap[option]]); // Remove the corresponding block
         return prevOptions.filter((opt) => opt !== option);
       } else {
+        // If the option is not selected, add it
+        appendActiveBlocks([optionToBlockMap[option]]); // Add the corresponding block
         return [...prevOptions, option];
       }
     });
   };
 
   const handleNextClick = async () => {
-    // Map selected options to key-value objects
     const surveyResponses = selectedOptions.map((option) => ({
-      surveyquestion_ref: getSurveyQuestionRef(option), // Generate a unique 5-character reference
-      response_value: option, // Use the selected option as the response value
+      surveyquestion_ref: getSurveyQuestionRef(option),
+      response_value: option,
     }));
 
     try {
-      // Submit the survey responses to the backend
       await submitSurveyResponses(surveyResponses);
-      console.log('Survey responses submitted successfully:', surveyResponses);
+      goToNextStep(currentStepIndex, navigate, routes, activeBlocks);
     } catch (error) {
       console.error('Failed to submit survey responses:', error);
     }
   };
 
-  // Helper function to generate a unique 5-character surveyquestion_ref
   const getSurveyQuestionRef = (option) => {
     const refMap = {
       ACCOMODATION: 'BRACC',
       TRANSPORTATION: 'BRTRA',
-      'EVENT/ACTIVITIES': 'BREV', 
+      'EVENT/ACTIVITIES': 'BREV',
       SERVICES: 'BRSER',
     };
-    return refMap[option] || 'UNKWN'; // Default to 'UNKWN' if option is not found
+    return refMap[option] || 'UNKWN';
   };
 
   return (

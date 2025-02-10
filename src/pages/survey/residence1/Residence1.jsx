@@ -14,6 +14,7 @@ import { NextButtonU, fontColorU } from '../../../components/utils/styles1';
 import { UnifiedContext } from '../../../routes/UnifiedContext';
 import { useCurrentStepIndex } from '../../../components/utils/useCurrentIndex';
 import { goToNextStep } from '../../../components/utils/navigationUtils';
+import { toast } from 'react-toastify';
 
 // Animations
 const fadeIn = keyframes`
@@ -182,7 +183,7 @@ const Residence1 = () => {
   // -----------------------------<>----------------------------
   const { routes } = useContext(UnifiedContext);
   const currentStepIndex = useCurrentStepIndex(routes);
-  const { activeBlocks,appendActiveBlocks,removeActiveBlocks } = useContext(UnifiedContext);
+  const { activeBlocks, appendActiveBlocks, removeActiveBlocks } = useContext(UnifiedContext);
 
   const [provinceInput, setProvinceInput] = useState('');
   const [cityMunInput, setCityMunInput] = useState('');
@@ -297,6 +298,17 @@ const Residence1 = () => {
   };
 
   const handleNextClick = async () => {
+    // Check if at least one location option is selected
+    const isLocationSelected = location.inCity || location.outsideCity || location.foreignCountry;
+
+    // Check if the required inputs are filled based on the selected location
+    const isProvinceFilled = !location.outsideCity || (location.outsideCity && provinceInput && cityMunInput);
+    const isCountryFilled = !location.foreignCountry || (location.foreignCountry && specifyInput);
+
+    if (!isLocationSelected || !isProvinceFilled || !isCountryFilled) {
+      return;
+    }
+
     const surveyResponses = [
       { surveyquestion_ref: 'LOCIN', response_value: location.inCity ? 'Yes' : 'No' },
       { surveyquestion_ref: 'LOCOUT', response_value: location.outsideCity ? 'Yes' : 'No' },
@@ -305,14 +317,14 @@ const Residence1 = () => {
       { surveyquestion_ref: 'CITY', response_value: cityMunInput || ' ' },
       { surveyquestion_ref: 'CNTRY', response_value: specifyInput || ' ' },
     ];
+
     try {
       await submitSurveyResponses(surveyResponses);
-      goToNextStep(currentStepIndex, navigate,routes,activeBlocks); //<---------------------------
+      goToNextStep(currentStepIndex, navigate, routes, activeBlocks);
     } catch (error) {
       console.log('Error submitting survey responses:');
     }
   };
-
   return (
     <>
       <BodyPartial />

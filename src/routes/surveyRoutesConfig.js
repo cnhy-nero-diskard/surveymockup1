@@ -72,11 +72,16 @@ export const sroutes = [
     { label: 'Package Paid', path: 'packagepaid', component: PackagePaid, conditionalBlock: 'pkgtour'},
     { label: 'Package Tour Feedback', path: 'packagetourfeedback', component: PackageTourFeedback, conditionalBlock: 'pkgtour'},
     
-    { label: 'Expense Tracker', path: 'expensetracker', component: ExpenseTracker},
-
-
-
-    { label: 'Branching Select', path: 'branchingselect', component: BranchingSelect},
+    { label: 'Expense Tracker', path: 'expensetracker', component: ExpenseTracker, conditionalBlock: 'universal'},
+    { label: 'Percentage Share List', path: 'percentagesharelist', component: PercentageShareList, conditionalBlock: 'perclist'},
+    
+    { label: 'Branching Select', path: 'branchingselect', component: BranchingSelect, conditionalBlock: 'universal'},
+    { label: 'How Many Nights', path: 'howmanynights', component: HowManyNights, conditionalBlock: 'accom'},
+    { label: 'Primary Attraction', path: 'primaryatt', component: PrimaryAtt, conditionalBlock: 'evatt'},
+    { label: 'Pack Transpo', path: 'packtranspo', component: PackTranspo, conditionalBlock: 'transp'},
+    { label: 'Services 2', path: 'services2', component: Services2, conditionalBlock: 'serv'},
+    
+    
     { label: 'Survey Evaluation VERSION1', path: 'surveyevaluation05', component: SurveyEvaluation05},
     // { label: 'Survey Evaluation VERSION2', path: 'surveyevaluationb', component: },
     { label: 'Will Recommend', path: 'willrecom', component: Willrecom},
@@ -85,18 +90,13 @@ export const sroutes = [
     { label: 'Open Ended Lifestyle', path: 'openended2', component: OpenEnded2},
     { label: 'Open Ended 1', path: 'openended1', component: OpenEndedHotel},
     // { label: '(DUPLICATE)How Many Visits', path: 'howmanyvisits', component: },
-    { label: 'Primary Attraction', path: 'primaryatt', component: PrimaryAtt},
     { label: 'Rate Attraction', path: 'rateattraction', component: RateAttraction},
     { label: 'Events Open 1', path: 'eventsopen1', component: EventsOpen1},
     { label: 'Attractions Feedback', path: 'attractionsfeedback', component: AttractionsFeedback},
     { label: 'Attraction Form', path: 'attractionform', component: AttractionForm},
-    { label: 'Services 2', path: 'services2', component: Services2},
     { label: 'Services 1', path: 'services1', component: Services1},
     { label: 'Destination Shopping List', path: 'destinationshoppinglist', component: DestinationShoppingList},
-    { label: 'Percentage Share List', path: 'percentagesharelist', component: PercentageShareList},
     // { label: '(DUPLICATE)Expense Companions', path: 'expensecompanions', component: },
-    { label: 'Pack Transpo', path: 'packtranspo', component: PackTranspo},
-    { label: 'How Many Nights', path: 'howmanynights', component: HowManyNights},
     { label: 'Accommodation Form', path: 'accommodationform', component: AccommodationForm},
     { label: 'Booking Form', path: 'bookingform', component: BookingForm},
     { label: 'Where Stay Arrival', path: 'wherestayarrival', component: WhereStayArrival},

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import styled from 'styled-components';
 import { useSpring, animated } from 'react-spring';
 import BodyPartial from '../../../components/partials/BodyPartial';
@@ -6,6 +6,9 @@ import GradientBackground from '../../../components/partials/GradientBackground'
 import { useNavigate } from "react-router-dom";
 import imgOverlay from "../../../components/img/money.png";
 import useTranslations from '../../../components/utils/useTranslations';
+import { useCurrentStepIndex } from '../../../components/utils/useCurrentIndex';
+import { UnifiedContext } from '../../../routes/UnifiedContext';
+import { goToNextStep } from '../../../components/utils/navigationUtils';
 
 const Container = styled.div`
   display: flex;
@@ -77,13 +80,15 @@ const ConversionResult = styled.div`
 `;
 
 const PackTranspo = () => {
+    const { routes } = useContext(UnifiedContext);
+    const currentStepIndex = useCurrentStepIndex(routes);
+    const { activeBlocks, appendActiveBlocks, removeActiveBlocks } = useContext(UnifiedContext);
+  
     const navigate = useNavigate();
     const [language, setLanguage] = useState(localStorage.getItem('selectedLanguage') || 'en');
     const translations = useTranslations('PackTranspo', language);
 
-    const handleNext = () => {
-        navigate("/");
-    };
+
 
     const [price, setPrice] = useState('');
     const [currency, setCurrency] = useState('USD');
@@ -117,6 +122,8 @@ const PackTranspo = () => {
 
         const convertedPrice = (parseFloat(price) * conversionRates[currency]).toFixed(2);
         alert(`${translations.packTranspoAlertMessage} ${price} ${currency}, ${translations.packTranspoAlertConvertedMessage} ${convertedPrice} PHP.`);
+        goToNextStep(currentStepIndex, navigate, routes, activeBlocks);
+
     };
 
     // Dynamic conversion logic
@@ -171,7 +178,7 @@ const PackTranspo = () => {
                             <span></span>
                         )}
                     </ConversionResult>
-                    <NextButton style={buttonAnimation} onClick={handleNext}>
+                    <NextButton style={buttonAnimation} onClick={handleNextClick}>
                         {translations.packTranspoNextButton}
                     </NextButton>
                 </Container>

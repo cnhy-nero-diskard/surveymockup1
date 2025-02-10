@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
 import BodyPartial from '../../../components/partials/BodyPartial';
@@ -8,11 +8,19 @@ import { useNavigate } from 'react-router-dom';
 import useTranslations from '../../../components/utils/useTranslations';
 import { NextButtonU } from '../../../components/utils/styles1';
 import { submitSurveyResponses } from '../../../components/utils/sendInputUtils'; // Import the submit function
+import { useCurrentStepIndex } from '../../../components/utils/useCurrentIndex';
+import { UnifiedContext } from '../../../routes/UnifiedContext';
+import { goToNextStep } from '../../../components/utils/navigationUtils';
 
 const TravelWith = () => {
     const [selectedOptions, setSelectedOptions] = useState([]); // State to store selected options as objects
     const [language, setLanguage] = useState(localStorage.getItem('selectedLanguage'));
     const translations = useTranslations('TravelWith', language);
+
+    const { routes } = useContext(UnifiedContext);
+    const currentStepIndex = useCurrentStepIndex(routes);
+    const { activeBlocks,appendActiveBlocks,removeActiveBlocks } = useContext(UnifiedContext);
+
 
     const handleOptionClick = (option) => {
         // const optionKey = option.toUpperCase().replace(/\s+/g, '_').substring(0, 5); // Generate a 5-char key
@@ -42,7 +50,7 @@ const TravelWith = () => {
         try {
             // Submit the selected options to the backend
             await submitSurveyResponses(selectedOptions);
-            navigate('/'); // Navigate to the next question
+            goToNextStep(currentStepIndex, navigate,routes,activeBlocks); //<---------------------------
         } catch (error) {
             console.error('Error submitting survey responses:', error);
         }

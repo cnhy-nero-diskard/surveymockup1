@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import styled, { keyframes } from 'styled-components';
 import { Container, NextButtonU } from '../../../components/utils/styles1';
 import { useNavigate } from 'react-router-dom';
@@ -8,6 +8,9 @@ import useTranslations from '../../../components/utils/useTranslations';
 import { submitSurveyResponses } from '../../../components/utils/sendInputUtils';
 import BodyPartial from '../../../components/partials/BodyPartial';
 import GradientBackground from '../../../components/partials/GradientBackground';
+import { useCurrentStepIndex } from '../../../components/utils/useCurrentIndex';
+import { UnifiedContext } from '../../../routes/UnifiedContext';
+import { goToNextStep } from '../../../components/utils/navigationUtils';
 
 const fadeIn = keyframes`
   from {
@@ -98,6 +101,10 @@ const NextButton = styled.button`
 `;
 
 const HowManyNights = () => {
+  const { routes } = useContext(UnifiedContext);
+  const currentStepIndex = useCurrentStepIndex(routes);
+  const { activeBlocks, appendActiveBlocks, removeActiveBlocks } = useContext(UnifiedContext);
+
   const [stayOvernight, setStayOvernight] = useState(null);
   const [nights, setNights] = useState('');
   const [responses, setResponses] = useState([]);
@@ -144,7 +151,7 @@ const HowManyNights = () => {
   const handleNextClick = async () => {
     // Submit responses to backend
     await submitSurveyResponses(responses);
-    navigate("/");
+    goToNextStep(currentStepIndex, navigate, routes, activeBlocks);
   };
 
   useEffect(() => {

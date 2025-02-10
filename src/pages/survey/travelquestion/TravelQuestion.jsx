@@ -69,7 +69,7 @@ const TravelQuestion = () => {
   const { routes } = useContext(UnifiedContext);
   const currentStepIndex = useCurrentStepIndex(routes);
   const { activeBlocks,appendActiveBlocks,removeActiveBlocks } = useContext(UnifiedContext);
-  
+
 
   const buttonAnimation = useSpring({
     transform: 'scale(1)',

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
 import GradientBackground from '../../../components/partials/GradientBackground';
@@ -7,6 +7,9 @@ import imgoverlay from "../../../components/img/beach.png";
 import { useNavigate } from 'react-router-dom';
 import useTranslations from '../../../components/utils/useTranslations';
 import { submitSurveyResponses } from '../../../components/utils/sendInputUtils';
+import { useCurrentStepIndex } from '../../../components/utils/useCurrentIndex';
+import { UnifiedContext } from '../../../routes/UnifiedContext';
+import { goToNextStep } from '../../../components/utils/navigationUtils';
 
 const Container = styled(motion.div)`
   display: flex;
@@ -50,6 +53,11 @@ const PrimaryAtt = () => {
     const [language, setLanguage] = useState(localStorage.getItem('selectedLanguage'));
     const [responses, setResponses] = useState([]);
 
+    const { routes } = useContext(UnifiedContext);
+    const currentStepIndex = useCurrentStepIndex(routes);
+    const { activeBlocks, appendActiveBlocks, removeActiveBlocks } = useContext(UnifiedContext);
+  
+
     const translations = useTranslations('PrimaryAtt', language);
 
     const handleOptionClick = (option) => {
@@ -77,7 +85,7 @@ const PrimaryAtt = () => {
 
     const navigate = useNavigate();
     const handleNextClick = () => {
-        navigate('/');
+        goToNextStep(currentStepIndex, navigate, routes, activeBlocks);
     };
 
     const NextPage = () => (
