@@ -51,7 +51,6 @@ import ProponentLgu from '../pages/survey/proponentlgu/ProponentLgu';
 
 
 export const sroutes = [
-
     { label: 'Language', path: '', component: LanguageSelector, conditionalBlock: 'universal'},
     { label: 'Page 1', path: 'page1', component: Page1, conditionalBlock: 'universal'},
     { label: 'Survey Consent', path: 'surveyconsent', component: SurveyConsent, conditionalBlock: 'universal'},
@@ -66,19 +65,28 @@ export const sroutes = [
     { label: 'Visit Frequency Form', path: 'visitfrequencyform', component: VisitFrequencyForm, conditionalBlock: 'universal'},
     { label: 'Travel Question', path: 'travelquestion', component: TravelQuestion, conditionalBlock: 'universal'},
     { label: 'Travel With', path: 'travelwith', component: TravelWith, conditionalBlock: 'universal'},
-    { label: 'Travel Options', path: 'traveloptions', component: TravelOptions, conditionalBlock: 'universal'},
     
+    { label: 'Travel Options', path: 'traveloptions', component: TravelOptions, conditionalBlock: 'universal'},
     { label: 'Package Tour Items', path: 'packagetouritems', component: PackageTourItems, conditionalBlock: 'pkgtour'},
     { label: 'Package Paid', path: 'packagepaid', component: PackagePaid, conditionalBlock: 'pkgtour'},
     { label: 'Package Tour Feedback', path: 'packagetourfeedback', component: PackageTourFeedback, conditionalBlock: 'pkgtour'},
     
     { label: 'Expense Tracker', path: 'expensetracker', component: ExpenseTracker, conditionalBlock: 'universal'},
     { label: 'Percentage Share List', path: 'percentagesharelist', component: PercentageShareList, conditionalBlock: 'perclist'},
+    { label: 'Expense Companions', path: 'expensecompanions', component: ExpenseCompanions, conditionalBlock: 'universal'},
     
     { label: 'Branching Select', path: 'branchingselect', component: BranchingSelect, conditionalBlock: 'universal'},
+    
+    
     { label: 'How Many Nights', path: 'howmanynights', component: HowManyNights, conditionalBlock: 'accom'},
+    
+    
     { label: 'Primary Attraction', path: 'primaryatt', component: PrimaryAtt, conditionalBlock: 'evatt'},
+    
+    
     { label: 'Pack Transpo', path: 'packtranspo', component: PackTranspo, conditionalBlock: 'transp'},
+    
+    
     { label: 'Services 2', path: 'services2', component: Services2, conditionalBlock: 'serv'},
     
     
@@ -96,7 +104,6 @@ export const sroutes = [
     { label: 'Attraction Form', path: 'attractionform', component: AttractionForm},
     { label: 'Services 1', path: 'services1', component: Services1},
     { label: 'Destination Shopping List', path: 'destinationshoppinglist', component: DestinationShoppingList},
-    // { label: '(DUPLICATE)Expense Companions', path: 'expensecompanions', component: },
     { label: 'Accommodation Form', path: 'accommodationform', component: AccommodationForm},
     { label: 'Booking Form', path: 'bookingform', component: BookingForm},
     { label: 'Where Stay Arrival', path: 'wherestayarrival', component: WhereStayArrival},

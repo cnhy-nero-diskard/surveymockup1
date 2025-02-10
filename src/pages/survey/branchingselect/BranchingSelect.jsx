@@ -13,12 +13,16 @@ import { UnifiedContext } from '../../../routes/UnifiedContext';
 import { goToNextStep } from '../../../components/utils/navigationUtils';
 import { useNavigate } from 'react-router-dom';
 
+
+
 const Option = styled(animated.div)`
   padding: 15px;
   margin: 10px 0;
   border: 1px solid #ccc;
   border-radius: 20px;
   cursor: pointer;
+  color:white;
+  border-color:transparent;
   transition: background-color 0.3s ease;
   background-color: rgb(47, 134, 206);
 
@@ -117,7 +121,7 @@ const BranchingSelect = () => {
       <BodyPartial />
       <GradientBackground overlayImage={imgoverlay}>
         <Container>
-          <h2>{translations.branchingSelectSurveyTitle}</h2>
+          <h3>{translations.branchingSelectSurveyTitle}</h3>
           <Option
             onClick={() => handleOptionClick('ACCOMODATION')}
             selected={selectedOptions.includes('ACCOMODATION')}

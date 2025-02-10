@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
 import BodyPartial from '../../../components/partials/BodyPartial';
@@ -9,6 +9,9 @@ import Slider from 'rc-slider'; // Import the slider component
 import 'rc-slider/assets/index.css'; // Import the default styles
 import { submitSurveyResponses } from '../../../components/utils/sendInputUtils'; // Import the submission function
 import { NextButtonU } from '../../../components/utils/styles1';
+import { useCurrentStepIndex } from '../../../components/utils/useCurrentIndex';
+import { UnifiedContext } from '../../../routes/UnifiedContext';
+import { goToNextStep } from '../../../components/utils/navigationUtils';
 
 const Container = styled.div`
   font-family: Arial, sans-serif;
@@ -78,6 +81,11 @@ const NextButton = styled.button`
 `;
 
 const PercentageShareList = () => {
+    const { routes } = useContext(UnifiedContext);
+    const currentStepIndex = useCurrentStepIndex(routes);
+    const { activeBlocks, appendActiveBlocks, removeActiveBlocks } = useContext(UnifiedContext);
+
+
     const [items, setItems] = useState([
         { key: 'accommodation', percentage: 25 },
         { key: 'foodAndBeverage', percentage: 20 },
@@ -95,10 +103,10 @@ const PercentageShareList = () => {
     const handleSliderChange = (index, value) => {
         const newItems = [...items];
         newItems[index].percentage = parseFloat(value);
-        
+
         // Adjust percentages to ensure they sum to exactly100%
         adjustPercentages(newItems, index);
-        
+
         setItems(newItems);
     };
 
@@ -106,40 +114,40 @@ const PercentageShareList = () => {
         const totalPercentage = newItems.reduce((sum, item) => sum + item.percentage, 0);
 
         if (totalPercentage > 100) {
-            const excess = totalPercentage -100; 
+            const excess = totalPercentage - 100;
             redistributePercentages(newItems, changedIndex, -excess);
-        } else if (totalPercentage <100) {
-            const deficit =100 - totalPercentage; 
+        } else if (totalPercentage < 100) {
+            const deficit = 100 - totalPercentage;
             redistributePercentages(newItems, changedIndex, deficit);
         }
     };
 
     const redistributePercentages = (newItems, changedIndex, amount) => {
-        const otherItems = newItems.filter((item, i) => i !== changedIndex && item.percentage >0);
-        
-        if (otherItems.length ===0) return;
+        const otherItems = newItems.filter((item, i) => i !== changedIndex && item.percentage > 0);
 
-        const totalOtherPercentages = otherItems.reduce((sum, item) => sum + item.percentage,0);
-        
+        if (otherItems.length === 0) return;
+
+        const totalOtherPercentages = otherItems.reduce((sum, item) => sum + item.percentage, 0);
+
         otherItems.forEach((item) => {
-            const proportion = item.percentage / totalOtherPercentages; 
-            item.percentage += amount * proportion; 
+            const proportion = item.percentage / totalOtherPercentages;
+            item.percentage += amount * proportion;
         });
     };
 
     const prepareSurveyResponses = () => {
         return items.map((item) => ({
-            surveyquestion_ref:`${item.key.toUpperCase().substring(0,5)}`, // Create a unique ref
-            response_value:item.percentage.toFixed(1), // Store percentage as string
+            surveyquestion_ref: `${item.key.toUpperCase().substring(0, 5)}`, // Create a unique ref
+            response_value: item.percentage.toFixed(1), // Store percentage as string
         }));
     };
 
-    const handleNext = async () => {
+    const handleNextClick = async () => {
         const surveyResponses = prepareSurveyResponses();
-        
+
         try {
             await submitSurveyResponses(surveyResponses); // Submit survey responses
-            navigate('/'); // Navigate after successful submission
+            goToNextStep(currentStepIndex, navigate, routes, activeBlocks);
         } catch (error) {
             console.error("Error submitting survey responses:", error);
             // Handle error appropriately here (e.g., show a message)
@@ -147,44 +155,44 @@ const PercentageShareList = () => {
     };
 
     return (
-      <>
-          <BodyPartial />
-          <GradientBackground>
-                  <Title>{translations.percentageShareListTitle}</Title>
-                  {items.map((item, index) => (
-                      <ListItem
-                          key={index}
-                          initial={{ opacity:0,y :20 }}
-                          animate={{ opacity :1,y :0 }}
-                          transition={{ delay:index *0.1 }}
-                      >
-                          <ItemName>{translations[item.key]}</ItemName>
-                          <SliderContainer>
-                              <Slider
-                                  min={0}
-                                  max={100}
-                                  value={item.percentage}
-                                  onChange={(value) => handleSliderChange(index,value)}
-                                  trackStyle={{ backgroundColor:'#007bff', height :4 }}
-                                  handleStyle={{
-                                      borderColor:'#007bff',
-                                      height :20,
-                                      width :20,
-                                      marginTop:-8,
-                                      backgroundColor:'#fff',
-                                  }}
-                                  railStyle={{ backgroundColor:'#ddd', height :4 }}
-                              />
-                              <PercentageDisplay>{item.percentage.toFixed(1)}%</PercentageDisplay>
-                          </SliderContainer>
-                      </ListItem>
-                  ))}
-                  {/* <TotalPercentage>
+        <>
+            <BodyPartial />
+            <GradientBackground>
+                <Title>{translations.percentageShareListTitle}</Title>
+                {items.map((item, index) => (
+                    <ListItem
+                        key={index}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: index * 0.1 }}
+                    >
+                        <ItemName>{translations[item.key]}</ItemName>
+                        <SliderContainer>
+                            <Slider
+                                min={0}
+                                max={100}
+                                value={item.percentage}
+                                onChange={(value) => handleSliderChange(index, value)}
+                                trackStyle={{ backgroundColor: '#007bff', height: 4 }}
+                                handleStyle={{
+                                    borderColor: '#007bff',
+                                    height: 20,
+                                    width: 20,
+                                    marginTop: -8,
+                                    backgroundColor: '#fff',
+                                }}
+                                railStyle={{ backgroundColor: '#ddd', height: 4 }}
+                            />
+                            <PercentageDisplay>{item.percentage.toFixed(1)}%</PercentageDisplay>
+                        </SliderContainer>
+                    </ListItem>
+                ))}
+                {/* <TotalPercentage>
                       {translations.percentageShareListTotalPercentage}: {items.reduce((sum,item) => sum + item.percentage ,0).toFixed(1)}%
                   </TotalPercentage> */}
-                  <NextButtonU onClick={handleNext}>{translations.percentageShareListNextButton}</NextButtonU>
-          </GradientBackground>
-      </>
+                <NextButtonU onClick={handleNextClick}>{translations.percentageShareListNextButton}</NextButtonU>
+            </GradientBackground>
+        </>
     );
 };
 

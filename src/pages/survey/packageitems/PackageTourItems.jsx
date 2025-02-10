@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
 import BodyPartial from '../../../components/partials/BodyPartial';
@@ -7,6 +7,9 @@ import imgoverlay from "../../../components/img/items.png";
 import { useNavigate } from 'react-router-dom';
 import useTranslations from '../../../components/utils/useTranslations';
 import { submitSurveyResponses } from '../../../components/utils/sendInputUtils';
+import { useCurrentStepIndex } from '../../../components/utils/useCurrentIndex';
+import { UnifiedContext } from '../../../routes/UnifiedContext';
+import { goToNextStep } from '../../../components/utils/navigationUtils';
 
 const ChecklistContainer = styled(motion.div)`
   display: flex;
@@ -20,7 +23,7 @@ const ChecklistContainer = styled(motion.div)`
 const ChecklistTitle = styled.h2`
   font-size: 1.8rem;
   margin-bottom: 20px;
-  color: #333;
+  color: white;
   text-align: center;
   width: 100%;
 `;
@@ -34,6 +37,7 @@ const ChecklistItem = styled.label`
   border-radius:15px;
   cursor: pointer;
   font-size: 1rem;
+  color:white;
   background-color:rgb(3, 112, 207);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease;
@@ -110,6 +114,10 @@ const LoadingSpinner = styled.div`
 `;
 
 const PackageTourItems = () => {
+    const { routes } = useContext(UnifiedContext);
+  const currentStepIndex = useCurrentStepIndex(routes);
+  const { activeBlocks, appendActiveBlocks, removeActiveBlocks } = useContext(UnifiedContext);
+
     const [selectedItems, setSelectedItems] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
     const [language, setLanguage] = useState(localStorage.getItem('selectedLanguage'));
@@ -150,11 +158,12 @@ const PackageTourItems = () => {
         try {
             await submitSurveyResponses(selectedItems);
             setIsLoading(false);
-            navigate('/'); // Navigate to the next question
+            goToNextStep(currentStepIndex, navigate, routes, activeBlocks);
         } catch (error) {
             console.error('Error submitting survey responses:', error);
             setIsLoading(false);
         }
+        
     };
 
     const checklistItems = [

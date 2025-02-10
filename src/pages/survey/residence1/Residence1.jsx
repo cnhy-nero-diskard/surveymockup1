@@ -320,6 +320,7 @@ const Residence1 = () => {
 
     try {
       await submitSurveyResponses(surveyResponses);
+      //-------------------------<>-------------------------
       goToNextStep(currentStepIndex, navigate, routes, activeBlocks);
     } catch (error) {
       console.log('Error submitting survey responses:');

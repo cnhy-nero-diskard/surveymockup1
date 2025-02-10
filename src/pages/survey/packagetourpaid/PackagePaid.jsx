@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import styled from 'styled-components';
 import { useSpring, animated } from 'react-spring';
 import BodyPartial from '../../../components/partials/BodyPartial';
@@ -8,6 +8,9 @@ import { useNavigate } from 'react-router-dom';
 import useTranslations from '../../../components/utils/useTranslations';
 import { submitSurveyResponses } from '../../../components/utils/sendInputUtils';
 import { NextButtonU } from '../../../components/utils/styles1';
+import { useCurrentStepIndex } from '../../../components/utils/useCurrentIndex';
+import { UnifiedContext } from '../../../routes/UnifiedContext';
+import { goToNextStep } from '../../../components/utils/navigationUtils';
 
 const Container = styled.div`
   display: flex;
@@ -78,6 +81,10 @@ const ConversionResult = styled.div`
 `;
 
 const PackagePaid = () => {
+  const { routes } = useContext(UnifiedContext);
+  const currentStepIndex = useCurrentStepIndex(routes);
+  const { activeBlocks, appendActiveBlocks, removeActiveBlocks } = useContext(UnifiedContext);
+
   const [responses, setResponses] = useState({ price: '', currency: 'USD' });
   const [language, setLanguage] = useState(localStorage.getItem('selectedLanguage'));
   const translations = useTranslations('PackagePaid', language);
@@ -107,7 +114,8 @@ const PackagePaid = () => {
       { surveyquestion_ref: 'CONVR', response_value: convertedPrice }
     ];
     await submitSurveyResponses(surveyResponses);
-    navigate('/');
+    goToNextStep(currentStepIndex, navigate, routes, activeBlocks);
+    
   };
 
   return (

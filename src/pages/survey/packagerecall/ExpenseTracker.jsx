@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { useSpring, animated } from 'react-spring';
 import { useNavigate } from 'react-router-dom';
@@ -118,6 +118,7 @@ const ExpenseTracker = () => {
         newExpenses[index].value = e.target.value; // Update specific expense value
         setExpenses(newExpenses);
     };
+
     const handleNextClick = async () => {
         // Check if at least one expense has a value
         const hasAtLeastOneExpense = expenses.some(expense => expense.value.trim() !== '');
@@ -158,12 +159,19 @@ const ExpenseTracker = () => {
     });
 
     const navigate = useNavigate();
+    const [shouldNavigate, setShouldNavigate] = useState(false);
+
     const handleForgetButtonClick = () => {
-        //   navigate('/percentagesharelist');
-        removeActiveBlocks(['perclist']);
         appendActiveBlocks(['perclist']);
-        goToNextStep(currentStepIndex, navigate, routes, activeBlocks); // Proceed to the next step
+        setShouldNavigate(true); // Set a flag to indicate that navigation should occur
     };
+
+    useEffect(() => {
+        if (shouldNavigate) {
+            goToNextStep(currentStepIndex, navigate, routes, activeBlocks);
+            setShouldNavigate(false); // Reset the flag
+        }
+    }, [activeBlocks, shouldNavigate, currentStepIndex, navigate, routes]);
 
     const translations = useTranslations('ExpenseTracker', language);
 

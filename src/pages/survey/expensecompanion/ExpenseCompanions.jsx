@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import styled from 'styled-components';
 import { useSpring, animated } from 'react-spring';
 import BodyPartial from '../../../components/partials/BodyPartial';
@@ -6,7 +6,11 @@ import GradientBackground from '../../../components/partials/GradientBackground'
 import imgOverlay from "../../../components/img/peoples.png";
 import { useNavigate } from "react-router-dom";
 import useTranslations from '../../../components/utils/useTranslations';
-
+import { submitSurveyResponses } from '../../../components/utils/sendInputUtils';
+import { NextButtonU } from '../../../components/utils/styles1';
+import { useCurrentStepIndex } from '../../../components/utils/useCurrentIndex';
+import { UnifiedContext } from '../../../routes/UnifiedContext';
+import { goToNextStep } from '../../../components/utils/navigationUtils';
 const Container = styled.div`
   display: flex;
   flex-direction: column;
@@ -37,8 +41,8 @@ const Input = styled.input`
   padding: 10px;
   font-size: 1rem;
   border: 1px solid #ccc;
-  border-radius: 5px;
-  margin-right: 10px;
+  border-radius: 15px;
+  margin: 10px;
 `;
 
 const NextButton = styled(animated.button)`
@@ -57,7 +61,13 @@ const NextButton = styled(animated.button)`
 `;
 
 const ExpenseCompanions = () => {
-  const [value, setValue] = useState('');
+  const { routes } = useContext(UnifiedContext);
+  const currentStepIndex = useCurrentStepIndex(routes);
+  const { activeBlocks, appendActiveBlocks, removeActiveBlocks } = useContext(UnifiedContext);
+
+  const [inputs, setInputs] = useState([
+    { key: 'EXPC', value: '' }, // Example key, you can add more fields as needed
+  ]);
   const [language, setLanguage] = useState(localStorage.getItem('selectedLanguage'));
   const translations = useTranslations('ExpenseCompanions', language);
 
@@ -69,9 +79,25 @@ const ExpenseCompanions = () => {
 
   const navigate = useNavigate();
 
-  const handleNext = () => {
-    // Handle next action here
-    navigate('/');
+  const handleInputChange = (index, event) => {
+    const newInputs = [...inputs];
+    newInputs[index].value = event.target.value;
+    setInputs(newInputs);
+  };
+
+  const handleNext = async () => {
+    const surveyResponses = inputs.map(input => ({
+      surveyquestion_ref: input.key,
+      response_value: input.value,
+    }));
+
+    try {
+      await submitSurveyResponses(surveyResponses);
+      goToNextStep(currentStepIndex, navigate, routes, activeBlocks);
+      
+    } catch (error) {
+      console.error('Failed to submit survey responses:', error);
+    }
   };
 
   useEffect(() => {
@@ -86,17 +112,19 @@ const ExpenseCompanions = () => {
           <QuestionText>
             {translations.expenseCompanionsQuestionText}
           </QuestionText>
-          <InputContainer>
-            <Input
-              type="number"
-              value={value}
-              onChange={(e) => setValue(e.target.value)}
-              placeholder={translations.expenseCompanionsInputPlaceholder}
-            />
-            <NextButton style={buttonAnimation} onClick={handleNext}>
-              {translations.expenseCompanionsNextButtonText}
-            </NextButton>
-          </InputContainer>
+          {inputs.map((input, index) => (
+            <InputContainer key={input.key}>
+              <Input
+                type="number"
+                value={input.value}
+                onChange={(e) => handleInputChange(index, e)}
+                placeholder={translations.expenseCompanionsInputPlaceholder}
+              />
+            </InputContainer>
+          ))}
+          <NextButtonU style={buttonAnimation} onClick={handleNext}>
+            {translations.expenseCompanionsNextButtonText}
+          </NextButtonU>
         </QuestionContainer>
       </GradientBackground>
     </>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useContext } from 'react';
 import styled from 'styled-components';
 import { useSpring, animated } from 'react-spring';
 import BodyPartial from '../../../components/partials/BodyPartial';
@@ -9,7 +9,7 @@ import useTranslations from '../../../components/utils/useTranslations';
 import { useCurrentStepIndex } from '../../../components/utils/useCurrentIndex';
 import { UnifiedContext } from '../../../routes/UnifiedContext';
 import { goToNextStep } from '../../../components/utils/navigationUtils';
-
+import { submitSurveyResponses } from '../../../components/utils/sendInputUtils';
 const Container = styled.div`
   display: flex;
   flex-direction: column;
@@ -82,13 +82,11 @@ const ConversionResult = styled.div`
 const PackTranspo = () => {
     const { routes } = useContext(UnifiedContext);
     const currentStepIndex = useCurrentStepIndex(routes);
-    const { activeBlocks, appendActiveBlocks, removeActiveBlocks } = useContext(UnifiedContext);
+    const { activeBlocks } = useContext(UnifiedContext);
   
     const navigate = useNavigate();
     const [language, setLanguage] = useState(localStorage.getItem('selectedLanguage') || 'en');
     const translations = useTranslations('PackTranspo', language);
-
-
 
     const [price, setPrice] = useState('');
     const [currency, setCurrency] = useState('USD');
@@ -106,27 +104,32 @@ const PackTranspo = () => {
         setCurrency(e.target.value);
     };
 
-    const handleNextClick = () => {
-        const conversionRates = {
-            USD: 56, // Example rate to PHP
-            EUR: 60, // Example rate to PHP
-            JPY: 0.4, // Example rate to PHP
-            PHP: 1, // PHP itself
-            CNY: 8, // Chinese Yuan to PHP
-            INR: 0.7, // Indian Rupee to PHP
-            RUB: 0.75, // Russian Ruble to PHP
-            KRW: 0.04, // Korean Won to PHP
-            FRF: 60, // French Franc (assuming Euro rate)
-            ESP: 60, // Spanish Peseta (assuming Euro rate)
-        };
+    const handleNextClick = async () => {
+        // Prepare the survey responses array
+        const surveyResponses = [
+            {
+                surveyquestion_ref: 'NPCURNC', 
+                response_value: price, // The price value
+            },
+            {
+                surveyquestion_ref: 'NPRCAM', 
+                response_value: currency, // The currency value
+            },
+            {
+                surveyquestion_ref: 'NPCONVR', 
+                response_value: (parseFloat(price) * conversionRates[currency]).toFixed(2), // The converted price
+            }
+        ];
 
-        const convertedPrice = (parseFloat(price) * conversionRates[currency]).toFixed(2);
-        alert(`${translations.packTranspoAlertMessage} ${price} ${currency}, ${translations.packTranspoAlertConvertedMessage} ${convertedPrice} PHP.`);
-        goToNextStep(currentStepIndex, navigate, routes, activeBlocks);
-
+        // Submit the responses to the backend
+        try {
+            await submitSurveyResponses(surveyResponses);
+            goToNextStep(currentStepIndex, navigate, routes, activeBlocks);
+        } catch (error) {
+            console.error('Error submitting survey responses:', error);
+        }
     };
 
-    // Dynamic conversion logic
     const conversionRates = {
         USD: 56, // Example rate to PHP
         EUR: 60, // Example rate to PHP
