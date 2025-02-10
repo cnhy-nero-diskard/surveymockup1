@@ -10,7 +10,8 @@ import { submitSurveyResponses } from '../../../components/utils/sendInputUtils'
 import axios from 'axios';
 import { useCurrentStepIndex } from '../../../components/utils/useCurrentIndex';
 import { goToNextStep } from '../../../components/utils/navigationUtils';
-import SurveyRoutesContext from '../../../routes/SurveyRoutesContext';
+import SurveyRoutesContext from '../../../routes/__SurveyRoutesContext';
+import { UnifiedContext } from '../../../routes/UnifiedContext';
 const Container = styled.div`
   display: flex;
   flex-direction: column;
@@ -96,12 +97,14 @@ const Button = styled(animated.button)`
 `;
 
 const SurveyConsent = () => {
-  const [currentStep, setCurrentStep] = useState();
   const [translations, setTranslations] = useState({});
   const [language, setLanguage] = useState(localStorage.getItem('selectedLanguage') || 'en');
   const [surveyResponses, setSurveyResponses] = useState([]);
-  const sroutes = useContext(SurveyRoutesContext);
-  const currentStepIndex = useCurrentStepIndex(sroutes);
+
+  const {routes} = useContext(UnifiedContext);
+  const [currentStep, setCurrentStep] = useState();
+  const currentStepIndex = useCurrentStepIndex(routes);
+  const {activeBlocks, setActiveBlocks} = useContext(UnifiedContext);
 
   const titleProps = useSpring({
     from: { opacity: 0, transform: 'translateY(-20px)' },
@@ -150,7 +153,7 @@ const SurveyConsent = () => {
     } catch (error) {
       console.error('Error submitting survey responses:', error);
     }
-    goToNextStep(currentStepIndex, navigate, sroutes);
+    goToNextStep(currentStepIndex, navigate, routes, activeBlocks);
   };
 
   useEffect(() => {

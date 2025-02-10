@@ -1,37 +1,29 @@
 // navigationUtils.js
 import axios from "axios";
-
-
-/**
- * Navigates to the next step in the survey process.
- *
- * This function updates the survey progress on the backend and then navigates
- * to the next step in the survey based on the `surveyRoutes` array. If there
- * are no more steps, it navigates to a completion page or home.
- *
- * @param {number} currentStepIndex - The index of the current step in the survey.
- * @param {function} navigate - The navigation function to change the route.
- *
- * @returns {Promise<void>} A promise that resolves when the navigation is complete.
- *
- * @throws Will throw an error if the backend update or navigation fails.
- */
-export const goToNextStep = async (currentStepIndex, navigate, surveyRoutes, increment = 1) => {
+export const goToNextStep = async (currentStepIndex, navigate, surveyRoutes, activeBlocks, increment = 1) => {
   console.log(`NAVUTILS - CURRENT STEP = ${currentStepIndex}`);
   try {
     // Update progress on the backend
-    const pluswhat = currentStepIndex + increment;
+    let nextStepIndex = currentStepIndex + increment;
+
+    // Find the next step that is not part of an inactive conditional block
+    while (nextStepIndex < surveyRoutes.length) {
+      const nextStep = surveyRoutes[nextStepIndex];
+      if (!nextStep.conditionalBlock || activeBlocks.includes(nextStep.conditionalBlock)) {
+        break;
+      }
+      console.log("NAVUTILS - SKIPPING");
+      nextStepIndex++;
+    }
+
     await axios.post(`${process.env.REACT_APP_API_HOST}/api/survey/progress`, {
-      currentStep: pluswhat,
-      
-    },{withCredentials:true});
+      currentStep: nextStepIndex,
+    }, { withCredentials: true });
 
     // Get the next step from the surveyRoutes array
-    const nextStep = surveyRoutes[currentStepIndex + 1];
-    
+    const nextStep = surveyRoutes[nextStepIndex];
 
     if (nextStep) {
-
       console.log(`NAVUTILS - TO NEXT ROUTE ${nextStep.path}`);
       // Navigate to the next step
       navigate(`/survey/${nextStep.path}`);

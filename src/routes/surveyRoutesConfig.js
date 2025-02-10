@@ -52,20 +52,21 @@ import ProponentLgu from '../pages/survey/proponentlgu/ProponentLgu';
 
 export const sroutes = [
 
-    { label: 'Language', path: '', component: LanguageSelector},
-    { label: 'Page 1', path: 'page1', component: Page1},
-    { label: 'Survey Consent', path: 'surveyconsent', component: SurveyConsent},
-    { label: 'Gmail Form', path: 'form', component: Form},
-    { label: 'Greetings', path: 'greetings', component: Greetings},
-    { label: 'Residence 1', path: 'residence1', component: Residence1},
-    { label: 'Transportation 1', path: 'transportation1', component: Transportation1},
-    { label: 'Transportation 2', path: 'transportation2', component: Transportation2},
+    { label: 'Language', path: '', component: LanguageSelector, conditionalBlock: 'universal'},
+    { label: 'Page 1', path: 'page1', component: Page1, conditionalBlock: 'universal'},
+    { label: 'Survey Consent', path: 'surveyconsent', component: SurveyConsent, conditionalBlock: 'universal'},
+    { label: 'Gmail Form', path: 'form', component: Form, conditionalBlock: 'universal'},
+    { label: 'Greetings', path: 'greetings', component: Greetings, conditionalBlock: 'universal'},
+    { label: 'Residence 1', path: 'residence1', component: Residence1, conditionalBlock: 'universal'},
+    { label: 'Transportation 1', path: 'transportation1', component: Transportation1, conditionalBlock: 'oprovblock'},
+    { label: 'Transportation 2', path: 'transportation2', component: Transportation2, conditionalBlock: 'iprovblock'},
+
+
     { label: 'Main Purpose', path: 'mainpurpose', component: MainPurpose},
     { label: 'Visit Frequency Form', path: 'visitfrequencyform', component: VisitFrequencyForm},
     { label: 'Branching Select', path: 'branchingselect', component: BranchingSelect},
     { label: 'Survey Evaluation VERSION1', path: 'surveyevaluation05', component: SurveyEvaluation05},
     // { label: 'Survey Evaluation VERSION2', path: 'surveyevaluationb', component: },
-    { label: 'Thank You Message', path: 'thankyoumessage', component: ThankYouMessage},
     { label: 'Will Recommend', path: 'willrecom', component: Willrecom},
     { label: 'Where Learn', path: 'wherelearn', component: WhereLearn},
     { label: 'Survey Venue', path: 'surveyvenue', component: SurveyVenue},
@@ -102,5 +103,6 @@ export const sroutes = [
     { label: 'Personal Profile 2', path: 'pprofile2', component: PProfile2},
     { label: 'Personal Profile 1', path: 'pprofile1', component: PProfile1},
     { label: 'Proponent LGU', path: 'proponentlgu', component: ProponentLgu},
-
+    { label: 'Thank You Message', path: 'survey-complete', component: ThankYouMessage},
+    
 ];

@@ -1,7 +1,8 @@
 // useCurrentStepIndex.js
 import { useContext } from "react";
 import { useLocation } from "react-router-dom";
-import SurveyRoutesContext from "../../routes/SurveyRoutesContext";
+import SurveyRoutesContext from "../../routes/__SurveyRoutesContext";
+import { UnifiedContext } from "../../routes/UnifiedContext";
 /**
  * Custom hook to get the index of the current step in the survey based on the current URL path.
  *
@@ -18,11 +19,12 @@ import SurveyRoutesContext from "../../routes/SurveyRoutesContext";
 export const useCurrentStepIndex = (__surveyRoutes = []) => {
   const location = useLocation();
   const currentPath = location.pathname;
-  const surveyRoutes = useContext(SurveyRoutesContext);
+  const {routes} = useContext(UnifiedContext);
+  console.log(`GYATT -- ${routes.length}`)
   console.log(`useCurrentindex.js - we are in current path ${currentPath}`);
 
   // Find the index of the current route in the surveyRoutes array
-  const currentStepIndex = surveyRoutes.findIndex((route) => {
+  const currentStepIndex = routes.findIndex((route) => {
     const routeBasePath = route.path.split('/').pop(); // Extract the last part of the route path
     const currentBasePath = currentPath.split('/').pop(); // Extract the last part of the current path
     return routeBasePath === currentBasePath; // Compare the base paths to find the matching route

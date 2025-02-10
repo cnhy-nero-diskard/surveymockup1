@@ -10,18 +10,22 @@ import BodyPartial from '../../../components/partials/BodyPartial';
 import { NextButtonU } from '../../../components/utils/styles1';
 import { useCurrentStepIndex } from '../../../components/utils/useCurrentIndex';
 import { goToNextStep } from '../../../components/utils/navigationUtils';
-import SurveyRoutesContext from '../../../routes/SurveyRoutesContext';
 import 'flag-icons/css/flag-icons.min.css';
+import { UnifiedContext } from '../../../routes/UnifiedContext';
+
+
+
 const LanguageSelector = () => {
   const { setSelectedLanguage } = useLanguage(); // Access the context
   // const { setSelectedLanguage } = useState(); // Access the context
   const navigate = useNavigate();
   const [languages, setLanguages] = useState([]); // State to hold the languages
   const [selectedLanguageCode, setSelectedLanguageCode] = useState(null); // State to hold the selected language code
-  const sroutes = useContext(SurveyRoutesContext);
   
+  const {routes} = useContext(UnifiedContext);
   const [currentStep, setCurrentStep] = useState();
-  const currentStepIndex = useCurrentStepIndex(sroutes);
+  const currentStepIndex = useCurrentStepIndex(routes);
+  const {activeBlocks, setActiveBlocks} = useContext(UnifiedContext);
 
 
   useEffect(() => {
@@ -79,7 +83,7 @@ const LanguageSelector = () => {
         console.error('Error saving response:', error);
       }
 
-      goToNextStep(currentStepIndex, navigate,sroutes);
+      goToNextStep(currentStepIndex, navigate,routes,activeBlocks);
     } else {
       alert('Please select a language before proceeding.');
     }

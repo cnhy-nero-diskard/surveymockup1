@@ -10,7 +10,8 @@ import axios from 'axios';
 
 import { useCurrentStepIndex } from '../../../components/utils/useCurrentIndex';
 import { goToNextStep } from '../../../components/utils/navigationUtils';
-import SurveyRoutesContext from '../../../routes/SurveyRoutesContext';
+import SurveyRoutesContext from '../../../routes/__SurveyRoutesContext';
+import { UnifiedContext } from '../../../routes/UnifiedContext';
 // Define keyframes for animations
 const fadeIn = keyframes`
   from {
@@ -89,10 +90,12 @@ const Page1 = () => {
   const [language, setLanguage] = useState(localStorage.getItem('selectedLanguage'));
   const translations = useTranslations('residence1', language);
   const navigate = useNavigate();
-  const sroutes = useContext(SurveyRoutesContext);
   
+  const {routes} = useContext(UnifiedContext);
   const [currentStep, setCurrentStep] = useState();
-  const currentStepIndex = useCurrentStepIndex(sroutes);
+  const currentStepIndex = useCurrentStepIndex({routes});
+  const {activeBlocks, setActiveBlocks} = useContext(UnifiedContext);
+
   /**
    * Fetches the current survey progress from the API and updates the current step state.
    * 
@@ -121,7 +124,7 @@ const Page1 = () => {
 
   const handleNextClick = () => {
     console.log("Current Step Index:", currentStepIndex);
-    goToNextStep(currentStepIndex, navigate, sroutes);
+    goToNextStep(currentStepIndex, navigate, routes, activeBlocks);
   };
 
   return (

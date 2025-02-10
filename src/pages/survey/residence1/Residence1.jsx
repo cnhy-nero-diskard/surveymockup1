@@ -1,7 +1,7 @@
 // Residence1Styles.js
 import styled, { keyframes } from 'styled-components';
 import { CSSTransition } from 'react-transition-group';
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useContext } from 'react';
 import axios from 'axios';
 import BodyPartial from '../../../components/partials/BodyPartial';
 import GradientBackground from '../../../components/partials/GradientBackground';
@@ -11,6 +11,7 @@ import { RESIDENCE1 as COMPONENT } from '../../../components/utils/componentCons
 import { submitSurveyResponses } from '../../../components/utils/sendInputUtils';
 import { countries } from 'countries-list';
 import { NextButtonU,fontColorU } from '../../../components/utils/styles1';
+import { UnifiedContext } from '../../../routes/UnifiedContext';
 
 // Animations
 const fadeIn = keyframes`
@@ -169,6 +170,7 @@ const FadeTransition = styled(CSSTransition)`
 `;
 
 const Residence1 = () => {
+  const { activeBlocks, appendActiveBlocks } = useContext(UnifiedContext);
   const [language,setLanguage] = useState(localStorage.getItem('selectedLanguage'));
   const [location, setLocation] = useState({
     inCity: false,

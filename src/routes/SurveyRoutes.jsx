@@ -1,32 +1,30 @@
-import React, { useContext, useEffect } from 'react';
+import React, { useContext } from 'react';
 import { Route, Routes, useNavigate } from 'react-router-dom';
 import { LanguageProvider } from '../components/partials/LanguageContext';
 import SurveyStepGuard from './SurveyStepGuard';
 import NotFound from '../components/admin/fallback/NotFound';
 import { sroutes } from './surveyRoutesConfig';
-import SurveyRoutesContext from './SurveyRoutesContext';
-
+import { UnifiedContext, UnifiedProvider } from './UnifiedContext';
 const SurveyRoutes = () => {
     return (
         <LanguageProvider>
-            <SurveyRoutesContext.Provider value={sroutes}>
+            <UnifiedProvider routes={sroutes}> {/* Pass sroutes as a prop */}
                 <SurveyRoutesContent />
-            </SurveyRoutesContext.Provider>
+            </UnifiedProvider>
         </LanguageProvider>
     );
 };
 
 const SurveyRoutesContent = () => {
     const navigate = useNavigate();
-    const sroute = useContext(SurveyRoutesContext);
-
+    const { routes } = useContext(UnifiedContext); // Access routes from the context
 
     console.log("SURVEY ROUTES NAV");
 
     return (
         <Routes>
             {/* Dynamically generate survey routes */}
-            {sroute.map((route, index) => (
+            {routes.map((route, index) => (
                 <Route
                     key={route.path}
                     path={route.path}
@@ -34,7 +32,7 @@ const SurveyRoutesContent = () => {
                         <SurveyStepGuard
                             route={route}
                             index={index}
-                            totalSteps={sroute.length}
+                            totalSteps={routes.length}
                         />
                     }
                 />

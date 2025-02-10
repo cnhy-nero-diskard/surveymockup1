@@ -9,7 +9,7 @@ import { NextButtonU } from '../../../components/utils/styles1';
 import { submitSurveyResponses } from '../../../components/utils/sendInputUtils';
 import GradientBackground from '../../../components/partials/GradientBackground';
 import { useCurrentStepIndex } from '../../../components/utils/useCurrentIndex';
-import SurveyRoutesContext from '../../../routes/SurveyRoutesContext';
+import SurveyRoutesContext from '../../../routes/__SurveyRoutesContext';
 import axios from 'axios';
 import { goToNextStep } from '../../../components/utils/navigationUtils';
 export const theme = {

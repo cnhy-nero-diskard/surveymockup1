@@ -1,36 +1,42 @@
 // SurveyStepGuard.js
-import { useEffect } from "react";
+import { useEffect, useContext } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 import { sroutes as surveyRoutes } from "./surveyRoutesConfig";
-/**
- * SurveyStepGuard component ensures that the user is on the correct survey step.
- * It validates the current step by making an API call and redirects if necessary.
- *
- * @component
- * @param {Object} props - The component props.
- * @param {Object} props.route - The route object containing the component to render.
- * @param {number} props.index - The index of the current step.
- * @param {number} props.totalSteps - The total number of steps in the survey.
- *
- * @returns {JSX.Element} The component for the current survey step.
- *
- * @example
- * <SurveyStepGuard route={route} index={2} totalSteps={5} />
- */
+import { UnifiedContext } from "./UnifiedContext";
+
 const SurveyStepGuard = ({ route, index, totalSteps }) => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { activeBlocks } = useContext(UnifiedContext);
 
   useEffect(() => {
     console.log(`SURVEY STEP GUARD - TRYING TO RENDER COMPONENT- route ${route.path} index ${index}`);
 
+    /**
+     * Validates access to the current survey step.
+     * 
+     * This function checks if the user is allowed to access the current survey step
+     * by making an API call to get the user's current progress. If the user is not
+     * allowed to access the step, they are redirected to the appropriate step.
+     * 
+     * @async
+     * @function validateStepAccess
+     * @throws Will navigate to the home page if there is an error validating step access.
+     */
     const validateStepAccess = async () => {
       try {
         console.log("SSGUARD VERIFYING");
         const response = await axios.get(`${process.env.REACT_APP_API_HOST}/api/survey/progress`, { withCredentials: true });
-        const currentStep = response.data.currentStep;
-    
+        let currentStep = response.data.currentStep;
+
+        // Check if the current step belongs to a conditional block
+        // If the step is part of a conditional block and the block is not active,
+        // update the current step to skip this step and go to the next one.
+        if (route.conditionalBlock && !activeBlocks.includes(route.conditionalBlock)) {
+          currentStep = index + 1;
+        }
+
         if (index !== currentStep) {
           console.log(`SSGUARD invalid entry index of ${index} not matching with currentStep ${currentStep}`);
           navigate(`/survey/${surveyRoutes[currentStep].path}`);
@@ -42,7 +48,7 @@ const SurveyStepGuard = ({ route, index, totalSteps }) => {
     };
 
     validateStepAccess();
-  }, [navigate, location, index]);
+  }, [navigate, location, index, route, activeBlocks]);
 
   // Render the component for the current step
   const StepComponent = route.component;
