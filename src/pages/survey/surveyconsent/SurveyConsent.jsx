@@ -18,7 +18,6 @@ const Container = styled.div`
   align-items: center;
   justify-content: center;
   max-width: 100vw;
-  padding: 2em;
   background: linear-gradient(135deg, #95b1ed, #3abde9);
   font-family: Arial, sans-serif;
   border-radius: 40px;
@@ -43,7 +42,7 @@ const Title = styled(animated.h1)`
 `;
 
 const Text = styled(animated.p)`
-  font-size: 1.8rem;
+  font-size: 20px;
   text-align: justify;
   margin-bottom: 20px;
   color: #cbe5f4;
@@ -87,24 +86,23 @@ const Button = styled(animated.button)`
 
   @media (min-width: 601px) and (max-width: 900px) {
     width: 70%;
-    font-size: 1.1rem;
+    font-size: 1rem;
   }
 
   @media (min-width: 901px) {
     width: 50%;
-    font-size: 1.2rem;
+    font-size: 1rem;
   }
 `;
 
 const SurveyConsent = () => {
   const [translations, setTranslations] = useState({});
-  const [language, setLanguage] = useState(localStorage.getItem('selectedLanguage') || 'en');
-  const [surveyResponses, setSurveyResponses] = useState([]);
+  const [language, ] = useState(localStorage.getItem('selectedLanguage') || 'en');
 
   const {routes} = useContext(UnifiedContext);
-  const [currentStep, setCurrentStep] = useState();
+  const [setCurrentStep] = useState();
   const currentStepIndex = useCurrentStepIndex(routes);
-  const {activeBlocks, setActiveBlocks} = useContext(UnifiedContext);
+  const {activeBlocks } = useContext(UnifiedContext);
 
   const titleProps = useSpring({
     from: { opacity: 0, transform: 'translateY(-20px)' },

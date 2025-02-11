@@ -1,5 +1,5 @@
 // SurveyStepGuard.js
-import { useEffect, useContext } from "react";
+import { useEffect, useContext, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 import { sroutes as surveyRoutes } from "./surveyRoutesConfig";
@@ -9,6 +9,7 @@ const SurveyStepGuard = ({ route, index, totalSteps }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const { activeBlocks } = useContext(UnifiedContext);
+  const [redirectCount, setRedirectCount] = useState(0); // Track the number of redirections
 
   useEffect(() => {
     console.log(`SURVEY STEP GUARD - TRYING TO RENDER COMPONENT- route ${route.path} index ${index}`);
@@ -39,7 +40,21 @@ const SurveyStepGuard = ({ route, index, totalSteps }) => {
 
         if (index !== currentStep) {
           console.log(`SSGUARD invalid entry index of ${index} not matching with currentStep ${currentStep}`);
+          
+          // Increment the redirect count
+          setRedirectCount(prevCount => prevCount + 1);
+
+          // If redirect count exceeds a threshold, navigate to 404
+          if (redirectCount >= 3) {
+            console.error("Runaway render detected. Redirecting to 404.");
+            navigate("/404");
+            return;
+          }
+
           navigate(`/survey/${surveyRoutes[currentStep].path}`);
+        } else {
+          // Reset the redirect count if the step is valid
+          setRedirectCount(0);
         }
       } catch (err) {
         console.error("Error validating step access:", err);
@@ -48,7 +63,7 @@ const SurveyStepGuard = ({ route, index, totalSteps }) => {
     };
 
     validateStepAccess();
-  }, [navigate, location, index, route, activeBlocks]);
+  }, [navigate, location, index, route, activeBlocks, redirectCount]);
 
   // Render the component for the current step
   const StepComponent = route.component;

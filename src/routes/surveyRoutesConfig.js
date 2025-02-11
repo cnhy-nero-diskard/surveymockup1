@@ -88,6 +88,7 @@ export const sroutes = [
     
     
     { label: 'Services 2', path: 'services2', component: Services2, conditionalBlock: 'serv'},
+    { label: 'Destination Shopping List', path: 'destinationshoppinglist', component: DestinationShoppingList, conditionalBlock: 'serv'},
     
     
     { label: 'Survey Evaluation VERSION1', path: 'surveyevaluation05', component: SurveyEvaluation05},
@@ -96,14 +97,13 @@ export const sroutes = [
     { label: 'Where Learn', path: 'wherelearn', component: WhereLearn},
     { label: 'Survey Venue', path: 'surveyvenue', component: SurveyVenue},
     { label: 'Open Ended Lifestyle', path: 'openended2', component: OpenEnded2},
-    { label: 'Open Ended 1', path: 'openended1', component: OpenEndedHotel},
+    { label: 'Open Ended 1', path: 'openendedservice', component: OpenEndedHotel},
     // { label: '(DUPLICATE)How Many Visits', path: 'howmanyvisits', component: },
     { label: 'Rate Attraction', path: 'rateattraction', component: RateAttraction},
     { label: 'Events Open 1', path: 'eventsopen1', component: EventsOpen1},
     { label: 'Attractions Feedback', path: 'attractionsfeedback', component: AttractionsFeedback},
     { label: 'Attraction Form', path: 'attractionform', component: AttractionForm},
     { label: 'Services 1', path: 'services1', component: Services1},
-    { label: 'Destination Shopping List', path: 'destinationshoppinglist', component: DestinationShoppingList},
     { label: 'Accommodation Form', path: 'accommodationform', component: AccommodationForm},
     { label: 'Booking Form', path: 'bookingform', component: BookingForm},
     { label: 'Where Stay Arrival', path: 'wherestayarrival', component: WhereStayArrival},
