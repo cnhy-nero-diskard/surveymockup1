@@ -1,9 +1,17 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import FeedbackForm from '../../../components/partials/FeedbackForm';
 import { useNavigate } from 'react-router-dom';
 import useTranslations from '../../../components/utils/useTranslations';
+import { useCurrentStepIndex } from '../../../components/utils/useCurrentIndex';
+import { UnifiedContext } from '../../../routes/UnifiedContext';
+import { goToNextStep } from '../../../components/utils/navigationUtils';
 
 const AccomodationOpen1 = () => {
+  const { routes } = useContext(UnifiedContext);
+  const currentStepIndex = useCurrentStepIndex(routes);
+  const { activeBlocks, appendActiveBlocks, removeActiveBlocks } = useContext(UnifiedContext);
+
+  
   const navigate = useNavigate();
   const [language, setLanguage] = useState(localStorage.getItem('selectedLanguage'));
   const translations = useTranslations('AccomodationOpen1', language); // Fetch translations for this component
@@ -11,7 +19,7 @@ const AccomodationOpen1 = () => {
   const handleNext = (selectedOptionValue, feedback) => {
     // Handle the next action based on the selected option and feedback
     console.log('Selected Option:', selectedOptionValue, 'Feedback:', feedback);
-    navigate('/'); // Navigate to the next question
+    goToNextStep(currentStepIndex, navigate, routes, activeBlocks);
   };
 
   return (

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import styled from 'styled-components';
 import { useSpring, animated } from 'react-spring';
 import BodyPartial from '../../../components/partials/BodyPartial';
@@ -7,6 +7,10 @@ import imageoverlay from '../../../components/img/pricetag.png';
 import { useNavigate } from 'react-router-dom';
 import useTranslations from '../../../components/utils/useTranslations';
 import { submitSurveyResponses } from '../../../components/utils/sendInputUtils';
+import { useCurrentStepIndex } from '../../../components/utils/useCurrentIndex';
+import { UnifiedContext } from '../../../routes/UnifiedContext';
+import { goToNextStep } from '../../../components/utils/navigationUtils';
+import { NextButtonU } from '../../../components/utils/styles1';
 
 const Container = styled.div`
   font-family: Arial, sans-serif;
@@ -75,6 +79,12 @@ const emojiMap = {
 const surveyQuestionRefs = ["LOCARTS", "APPAR", "FOODDE", "ACCESS", "COSM", "PERSO"];
 
 const DestinationShoppingList = () => {
+  const { routes } = useContext(UnifiedContext);
+  const currentStepIndex = useCurrentStepIndex(routes);
+  const { activeBlocks } = useContext(UnifiedContext);
+
+
+  
   const [items, setItems] = useState([]);
   const [surveyResponses, setSurveyResponses] = useState([]);
   const [language, setLanguage] = useState(localStorage.getItem('selectedLanguage') || 'en');
@@ -104,7 +114,7 @@ const DestinationShoppingList = () => {
       response_value: item.rating.toString()
     }));
     await submitSurveyResponses(formattedResponses);
-    navigate('/');
+    goToNextStep(currentStepIndex, navigate, routes, activeBlocks);
   };
 
   const animations = useSpring({ opacity: 1, from: { opacity: 0 } });
@@ -133,7 +143,7 @@ const DestinationShoppingList = () => {
               </Item>
             ))}
           </ItemList>
-          <NextButton onClick={handleNextClick}>{translations.destinationShoppingListNextButton}</NextButton>
+          <NextButtonU onClick={handleNextClick}>{translations.destinationShoppingListNextButton}</NextButtonU>
         </Container>
       </GradientBackground>
     </>

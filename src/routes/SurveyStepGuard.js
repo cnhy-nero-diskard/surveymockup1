@@ -1,59 +1,56 @@
-// SurveyStepGuard.js
 import { useEffect, useContext, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 import { sroutes as surveyRoutes } from "./surveyRoutesConfig";
 import { UnifiedContext } from "./UnifiedContext";
+import { goToNextStep } from "../components/utils/navigationUtils";
 
 const SurveyStepGuard = ({ route, index, totalSteps }) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { activeBlocks } = useContext(UnifiedContext);
+  const { activeBlocks, routes } = useContext(UnifiedContext);
   const [redirectCount, setRedirectCount] = useState(0); // Track the number of redirections
+  const [isLoopRunning, setIsLoopRunning] = useState(false); // Track if the while loop is running
 
   useEffect(() => {
     console.log(`SURVEY STEP GUARD - TRYING TO RENDER COMPONENT- route ${route.path} index ${index}`);
 
-    /**
-     * Validates access to the current survey step.
-     * 
-     * This function checks if the user is allowed to access the current survey step
-     * by making an API call to get the user's current progress. If the user is not
-     * allowed to access the step, they are redirected to the appropriate step.
-     * 
-     * @async
-     * @function validateStepAccess
-     * @throws Will navigate to the home page if there is an error validating step access.
-     */
     const validateStepAccess = async () => {
       try {
         console.log("SSGUARD VERIFYING");
         const response = await axios.get(`${process.env.REACT_APP_API_HOST}/api/survey/progress`, { withCredentials: true });
         let currentStep = response.data.currentStep;
 
-        // Check if the current step belongs to a conditional block
-        // If the step is part of a conditional block and the block is not active,
-        // update the current step to skip this step and go to the next one.
-        if (route.conditionalBlock && !activeBlocks.includes(route.conditionalBlock)) {
-          currentStep = index + 1;
-        }
+        if (currentStep === 0 && index !== 0) { navigate("/survey/") }
 
+        let newindex = index;
+        if (route.conditionalBlock && !activeBlocks.includes(route.conditionalBlock)) {
+          setIsLoopRunning(true); // Set the loop running state to true
+          while (routes[newindex].conditionalBlock !== 'universal') { 
+            console.log(`SSGUARD route -> ${index}`)
+            newindex--; 
+          }
+          setIsLoopRunning(false); // Set the loop running state to false after the loop completes
+
+          await axios.post(`${process.env.REACT_APP_API_HOST}/api/survey/progress`, {
+            currentStep: newindex,
+          }, { withCredentials: true });
+      
+          navigate(`/survey/${route.path}`);
+        }
         if (index !== currentStep) {
           console.log(`SSGUARD invalid entry index of ${index} not matching with currentStep ${currentStep}`);
-          
-          // Increment the redirect count
+
           setRedirectCount(prevCount => prevCount + 1);
 
-          // If redirect count exceeds a threshold, navigate to 404
-          if (redirectCount >= 3) {
-            console.error("Runaway render detected. Redirecting to 404.");
-            navigate("/404");
-            return;
-          }
+          // if (redirectCount >= 3) {
+          //   console.error("Runaway render detected. Redirecting to 404.");
+          //   navigate("/404");
+          //   return;
+          // }
 
           navigate(`/survey/${surveyRoutes[currentStep].path}`);
         } else {
-          // Reset the redirect count if the step is valid
           setRedirectCount(0);
         }
       } catch (err) {
@@ -62,10 +59,13 @@ const SurveyStepGuard = ({ route, index, totalSteps }) => {
       }
     };
 
-    validateStepAccess();
-  }, [navigate, location, index, route, activeBlocks, redirectCount]);
+    if (!isLoopRunning) {
+      validateStepAccess();
+    }
+  }, [navigate, location, index, route, activeBlocks, redirectCount, isLoopRunning]);
 
   // Render the component for the current step
+  console.log('SSGUARD - VERIFIED');
   const StepComponent = route.component;
   return <StepComponent />;
 };

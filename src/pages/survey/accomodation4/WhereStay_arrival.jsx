@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
 import BodyPartial from '../../../components/partials/BodyPartial';
@@ -9,6 +9,9 @@ import useTranslations from '../../../components/utils/useTranslations';
 import axios from 'axios';
 import { v4 as uuidv4 } from 'uuid'; // For generating UUIDs
 import { submitSurveyResponses } from '../../../components/utils/sendInputUtils';
+import { goToNextStep } from '../../../components/utils/navigationUtils';
+import { useCurrentStepIndex } from '../../../components/utils/useCurrentIndex';
+import { UnifiedContext } from '../../../routes/UnifiedContext';
 
 const Container = styled(motion.div)`
   font-family: Arial, sans-serif;
@@ -75,6 +78,12 @@ const DurationSelect = styled(Select)`
 `;
 
 const WhereStayArrival = () => {
+    const { routes } = useContext(UnifiedContext);
+    const currentStepIndex = useCurrentStepIndex(routes);
+    const { activeBlocks, appendActiveBlocks, removeActiveBlocks } = useContext(UnifiedContext);
+
+
+
     const [selectedOption, setSelectedOption] = useState('');
     const [duration, setDuration] = useState('');
     const [durationUnit, setDurationUnit] = useState('days');
@@ -116,9 +125,7 @@ const WhereStayArrival = () => {
         try {
             // Submit each survey response using the utility function
             await submitSurveyResponses(surveyResponses);
-
-
-            navigate('/');
+            goToNextStep(currentStepIndex, navigate, routes, activeBlocks);
         } catch (err) {
             console.error('Failed to submit survey response:', err);
         }

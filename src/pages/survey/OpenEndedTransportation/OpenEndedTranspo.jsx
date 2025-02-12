@@ -11,7 +11,7 @@ import { goToNextStep } from '../../../components/utils/navigationUtils';
 import { useCurrentStepIndex } from '../../../components/utils/useCurrentIndex';
 import { UnifiedContext } from '../../../routes/UnifiedContext';
 
-const OpenEnded1Services = () => {
+const OpenEndedTranspo = () => {
     const { routes } = useContext(UnifiedContext);
     const currentStepIndex = useCurrentStepIndex(routes);
     const { activeBlocks } = useContext(UnifiedContext);
@@ -30,8 +30,8 @@ const OpenEnded1Services = () => {
 
     const handleNextClick = async () => {
         const surveyResponses = [
-            { surveyquestion_ref: 'SATLVHTL', response_value: selectedButton },
-            { surveyquestion_ref: 'FDBKHTL', response_value: textFieldValue }
+            { surveyquestion_ref: 'SATLVTRN', response_value: selectedButton },
+            { surveyquestion_ref: 'FDBKTRN', response_value: textFieldValue }
         ];
 
         try {
@@ -55,7 +55,7 @@ const OpenEnded1Services = () => {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5 }}
                 >
-                    <Title>{translations.openEnded1Title}</Title>
+                    <Title>{translations.openEndedTranspoTitle}</Title>
 
                     <div>
                         {['Dissatisfied', 'Neutral', 'Satisfied', 'VerySatisfied'].map((option) => (
@@ -95,4 +95,4 @@ const OpenEnded1Services = () => {
     );
 };
 
-export default OpenEnded1Services;
+export default OpenEndedTranspo;

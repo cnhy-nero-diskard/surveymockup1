@@ -10,6 +10,7 @@ import { useCurrentStepIndex } from '../../../components/utils/useCurrentIndex';
 import { UnifiedContext } from '../../../routes/UnifiedContext';
 import { goToNextStep } from '../../../components/utils/navigationUtils';
 import { submitSurveyResponses } from '../../../components/utils/sendInputUtils';
+import { NextButtonU } from '../../../components/utils/styles1';
 const Container = styled.div`
   display: flex;
   flex-direction: column;
@@ -181,9 +182,9 @@ const PackTranspo = () => {
                             <span></span>
                         )}
                     </ConversionResult>
-                    <NextButton style={buttonAnimation} onClick={handleNextClick}>
+                    <NextButtonU style={buttonAnimation} onClick={handleNextClick}>
                         {translations.packTranspoNextButton}
-                    </NextButton>
+                    </NextButtonU>
                 </Container>
             </GradientBackground>
         </>

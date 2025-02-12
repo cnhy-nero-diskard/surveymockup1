@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
@@ -7,6 +7,10 @@ import useTranslations from '../../../components/utils/useTranslations';
 import { submitSurveyResponses } from '../../../components/utils/sendInputUtils';
 import BodyPartial from '../../../components/partials/BodyPartial';
 import GradientBackground from '../../../components/partials/GradientBackground';
+import { useCurrentStepIndex } from '../../../components/utils/useCurrentIndex';
+import { UnifiedContext } from '../../../routes/UnifiedContext';
+import { goToNextStep } from '../../../components/utils/navigationUtils';
+import { NextButtonU } from '../../../components/utils/styles1';
 
 const FormContainer = styled(motion.div)`
   font-family: Arial, sans-serif;
@@ -114,6 +118,11 @@ const emojiToRating = { '☹️': 1, '😐': 2, '🙂': 3, '😄': 4 };
 const ratingToEmoji = { 1: '☹️', 2: '😐', 3: '🙂', 4: '😄' };
 
 const AccommodationForm = () => {
+  const { routes } = useContext(UnifiedContext);
+  const currentStepIndex = useCurrentStepIndex(routes);
+  const { activeBlocks, appendActiveBlocks, removeActiveBlocks } = useContext(UnifiedContext);
+
+  
   const [isCommercial, setIsCommercial] = useState(null);
   const [ratings, setRatings] = useState({
     Hotel: '',
@@ -211,7 +220,7 @@ const AccommodationForm = () => {
   const handleSubmit = async () => {
     try {
       await submitSurveyResponses(surveyResponses);
-      navigate('/');
+      goToNextStep(currentStepIndex, navigate, routes, activeBlocks);
     } catch (error) {
       console.error('Error submitting survey responses:', error);
     }
@@ -221,6 +230,8 @@ const AccommodationForm = () => {
     handleCommercialResponse('NO');
     setIsCommercial(false);
     handleSubmit();
+    goToNextStep(currentStepIndex, navigate, routes, activeBlocks);
+
   };
 
   useEffect(() => {
@@ -305,13 +316,13 @@ const AccommodationForm = () => {
                   ))}
                 </tbody>
               </Table>
-              <NextButton
+              <NextButtonU
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={handleSubmit}
               >
                 {translations.accommodationFormNextButton}
-              </NextButton>
+              </NextButtonU>
             </>
           )}
         </FormContainer>

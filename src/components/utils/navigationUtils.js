@@ -5,8 +5,9 @@ export const goToNextStep = async (currentStepIndex, navigate, surveyRoutes, act
   try {
     // Update progress on the backend
     let nextStepIndex = currentStepIndex + increment;
+    console.log(`NAVUTILS - ACTIVE BLOCKS: ${JSON.stringify(activeBlocks)}`);
 
-    // Find the next step that is not part of an inactive conditional block
+    // Find the next step that is a part of the active conditional blocks
     while (nextStepIndex < surveyRoutes.length) {
       const nextStep = surveyRoutes[nextStepIndex];
       if (!nextStep.conditionalBlock || activeBlocks.includes(nextStep.conditionalBlock)) {

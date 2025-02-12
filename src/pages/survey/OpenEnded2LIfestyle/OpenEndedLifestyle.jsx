@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { motion } from 'framer-motion';
 import BodyPartial from '../../../components/partials/BodyPartial';
 import GradientBackground from '../../../components/partials/GradientBackground';
@@ -7,7 +7,17 @@ import imgoverlay from "../../../components/img/review.png";
 import { useNavigate } from 'react-router-dom';
 import useTranslations from '../../../components/utils/useTranslations';
 import { submitSurveyResponses } from '../../../components/utils/sendInputUtils';
+import { useCurrentStepIndex } from '../../../components/utils/useCurrentIndex';
+import { UnifiedContext } from '../../../routes/UnifiedContext';
+import { goToNextStep } from '../../../components/utils/navigationUtils';
+
+
 const OpenEndedLifestyle = () => {
+    const { routes } = useContext(UnifiedContext);
+    const currentStepIndex = useCurrentStepIndex(routes);
+    const { activeBlocks, appendActiveBlocks, removeActiveBlocks } = useContext(UnifiedContext);
+
+
     const [selectedSatisfaction, setSelectedSatisfaction] = useState(null);
     const [textFeedback, setTextFeedback] = useState('');
     const [language, setLanguage] = useState(localStorage.getItem('selectedLanguage'));
@@ -42,7 +52,7 @@ const OpenEndedLifestyle = () => {
 
         try {
             await submitSurveyResponses(surveyResponses);
-            navigate('/'); // Navigate to the next page after submission
+            goToNextStep(currentStepIndex, navigate, routes, activeBlocks);
         } catch (error) {
             console.error('Error submitting survey responses:', error);
         }

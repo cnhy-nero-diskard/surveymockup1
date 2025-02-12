@@ -14,7 +14,7 @@ import Willrecom from '../pages/survey/reccommevent/Willrecom';
 import WhereLearn from '../pages/survey/wherelearn/WhereLearn';
 import SurveyVenue from '../pages/survey/surveyvenue/SurveyVenue';
 import OpenEnded2 from '../pages/survey/OpenEnded2LIfestyle/OpenEndedLifestyle';
-import OpenEndedHotel from '../pages/survey/OpenEnded1Hotel/OpenEndedHotel';
+import OpenEnded1Services from '../pages/survey/OpenEnded1Hotel/OpenEndedHotel';
 import HowManyVisits from '../pages/survey/events1/HowManyVisits';
 import PrimaryAtt from '../pages/survey/events2/PrimaryAtt';
 import RateAttraction from '../pages/survey/events3/RateAttraction';
@@ -48,6 +48,7 @@ import Transportation2 from '../pages/survey/transportation2/Transportation2';
 import PProfile2 from '../pages/survey/personalprofile2/PProfile2';
 import PProfile1 from '../pages/survey/personalprofile1/PProfile1';
 import ProponentLgu from '../pages/survey/proponentlgu/ProponentLgu';
+import OpenEndedTranspo from '../pages/survey/OpenEndedTransportation/OpenEndedTranspo';
 
 
 export const sroutes = [
@@ -59,7 +60,6 @@ export const sroutes = [
     { label: 'Residence 1', path: 'residence1', component: Residence1, conditionalBlock: 'universal'},
     { label: 'Transportation 1', path: 'transportation1', component: Transportation1, conditionalBlock: 'oprovblock'},
     { label: 'Transportation 2', path: 'transportation2', component: Transportation2, conditionalBlock: 'iprovblock'},
-    { label: 'Transportation 3', path: 'transportation3', component: Transportation3, conditionalBlock: 'universal'},
     { label: 'Visit Counter', path: 'visitcounteratt', component: VisitCounterAtt, conditionalBlock: 'universal'},
     { label: 'Main Purpose', path: 'mainpurpose', component: MainPurpose, conditionalBlock: 'universal'},
     { label: 'Visit Frequency Form', path: 'visitfrequencyform', component: VisitFrequencyForm, conditionalBlock: 'universal'},
@@ -79,36 +79,38 @@ export const sroutes = [
     
     
     { label: 'How Many Nights', path: 'howmanynights', component: HowManyNights, conditionalBlock: 'accom'},
+    { label: 'Accommodation Form', path: 'accommodationform', component: AccommodationForm, conditionalBlock: 'yesaccom'},
+    { label: 'Where Stay Departure', path: 'wherestayarrival', component: WhereStayArrival, conditionalBlock: 'noaccom'},
+    { label: 'Accommodation Open 1', path: 'accomodationopen1', component: AccomodationOpen1, conditionalBlock: 'accom'},
     
     
     { label: 'Primary Attraction', path: 'primaryatt', component: PrimaryAtt, conditionalBlock: 'evatt'},
     
     
     { label: 'Pack Transpo', path: 'packtranspo', component: PackTranspo, conditionalBlock: 'transp'},
+    { label: 'Transportation 3', path: 'transportation3', component: Transportation3, conditionalBlock: 'transp'},
+    { label: 'Open Ended Transportation', path: 'opentranspo', component: OpenEndedTranspo, conditionalBlock: 'transp'},
     
     
     { label: 'Services 2', path: 'services2', component: Services2, conditionalBlock: 'serv'},
-    { label: 'Destination Shopping List', path: 'destinationshoppinglist', component: DestinationShoppingList, conditionalBlock: 'serv'},
+    { label: 'Destination Shopping List', path: 'destshlist', component: DestinationShoppingList, conditionalBlock: 'serv'},
+    { label: 'Open Ended 1', path: 'openendedservice', component: OpenEnded1Services, conditionalBlock: 'serv'},
+    { label: 'Open Ended Lifestyle', path: 'openendedlifestyle', component: OpenEnded2,conditionalBlock: 'serv'},
     
-    
+
     { label: 'Survey Evaluation VERSION1', path: 'surveyevaluation05', component: SurveyEvaluation05},
     // { label: 'Survey Evaluation VERSION2', path: 'surveyevaluationb', component: },
     { label: 'Will Recommend', path: 'willrecom', component: Willrecom},
     { label: 'Where Learn', path: 'wherelearn', component: WhereLearn},
     { label: 'Survey Venue', path: 'surveyvenue', component: SurveyVenue},
-    { label: 'Open Ended Lifestyle', path: 'openended2', component: OpenEnded2},
-    { label: 'Open Ended 1', path: 'openendedservice', component: OpenEndedHotel},
     // { label: '(DUPLICATE)How Many Visits', path: 'howmanyvisits', component: },
     { label: 'Rate Attraction', path: 'rateattraction', component: RateAttraction},
     { label: 'Events Open 1', path: 'eventsopen1', component: EventsOpen1},
     { label: 'Attractions Feedback', path: 'attractionsfeedback', component: AttractionsFeedback},
     { label: 'Attraction Form', path: 'attractionform', component: AttractionForm},
     { label: 'Services 1', path: 'services1', component: Services1},
-    { label: 'Accommodation Form', path: 'accommodationform', component: AccommodationForm},
     { label: 'Booking Form', path: 'bookingform', component: BookingForm},
-    { label: 'Where Stay Arrival', path: 'wherestayarrival', component: WhereStayArrival},
     // { label: '(IGNORE)Where Stay Departure', path: 'wherestaydepart', component: },
-    { label: 'Accommodation Open 1', path: 'accomodationopen1', component: AccomodationOpen1},
     { label: 'Accommodation Open 2', path: 'accomodationopen2', component: AccomodationOpen2},
     { label: 'Personal Profile 2', path: 'pprofile2', component: PProfile2},
     { label: 'Personal Profile 1', path: 'pprofile1', component: PProfile1},

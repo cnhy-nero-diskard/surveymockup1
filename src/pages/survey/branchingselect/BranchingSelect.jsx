@@ -5,7 +5,7 @@ import './BranchingSelect.css';
 import BodyPartial from '../../../components/partials/BodyPartial';
 import GradientBackground from '../../../components/partials/GradientBackground';
 import imgoverlay from "../../../components/img/emailbg.png";
-import { Container } from '../../../components/utils/styles1';
+import { Container, NextButtonU } from '../../../components/utils/styles1';
 import useTranslations from '../../../components/utils/useTranslations';
 import { submitSurveyResponses } from '../../../components/utils/sendInputUtils';
 import { useCurrentStepIndex } from '../../../components/utils/useCurrentIndex';
@@ -152,9 +152,9 @@ const BranchingSelect = () => {
             </animated.div>
           )}
           {selectedOptions.length > 0 && (
-            <NextButton style={springProps} onClick={handleNextClick}>
+            <NextButtonU style={springProps} onClick={handleNextClick}>
               {translations.branchingSelectNextButton}
-            </NextButton>
+            </NextButtonU>
           )}
         </Container>
       </GradientBackground>

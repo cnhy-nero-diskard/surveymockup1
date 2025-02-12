@@ -103,12 +103,13 @@ const NextButton = styled.button`
 const HowManyNights = () => {
   const { routes } = useContext(UnifiedContext);
   const currentStepIndex = useCurrentStepIndex(routes);
-  const { activeBlocks, appendActiveBlocks, removeActiveBlocks } = useContext(UnifiedContext);
+  const { activeBlocks, appendActiveBlocks } = useContext(UnifiedContext);
 
   const [stayOvernight, setStayOvernight] = useState(null);
   const [nights, setNights] = useState('');
   const [responses, setResponses] = useState([]);
   const [language, setLanguage] = useState(localStorage.getItem('selectedLanguage'));
+  const [blocksUpdated, setBlocksUpdated] = useState(false); // New state to track if blocks are updated
   const translations = useTranslations('HowManyNights', language);
 
   const handleRadioChange = (e) => {
@@ -151,8 +152,24 @@ const HowManyNights = () => {
   const handleNextClick = async () => {
     // Submit responses to backend
     await submitSurveyResponses(responses);
-    goToNextStep(currentStepIndex, navigate, routes, activeBlocks);
+
+    // Update activeBlocks based on the response
+    if (stayOvernight === "yes") {
+      appendActiveBlocks(['yesaccom']);
+    } else if (stayOvernight === "no") {
+      appendActiveBlocks(['noaccom']);
+    }
+
+    // Set blocksUpdated to true to trigger useEffect
+    setBlocksUpdated(true);
   };
+
+  useEffect(() => {
+    if (blocksUpdated) {
+      goToNextStep(currentStepIndex, navigate, routes, activeBlocks);
+      setBlocksUpdated(false); // Reset the state after navigation
+    }
+  }, [blocksUpdated, activeBlocks, currentStepIndex, navigate, routes]);
 
   useEffect(() => {
     setLanguage(localStorage.getItem('selectedLanguage'));
