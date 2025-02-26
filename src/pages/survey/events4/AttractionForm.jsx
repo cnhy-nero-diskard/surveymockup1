@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import styled from 'styled-components';
 import { useSpring, animated } from 'react-spring';
 import { ToastContainer, toast } from 'react-toastify';
@@ -6,10 +6,13 @@ import 'react-toastify/dist/ReactToastify.css';
 import BodyPartial from '../../../components/partials/BodyPartial';
 import GradientBackground from '../../../components/partials/GradientBackground';
 import imgOverlay from "../../../components/img/umb.png";
-import { Button, Container } from '../../../components/utils/styles1';
+import { Button, Container, NextButtonU } from '../../../components/utils/styles1';
 import { useNavigate } from 'react-router-dom';
 import useTranslations from '../../../components/utils/useTranslations';
 import { submitSurveyResponses } from '../../../components/utils/sendInputUtils';
+import { useCurrentStepIndex } from '../../../components/utils/useCurrentIndex';
+import { UnifiedContext } from '../../../routes/UnifiedContext';
+import { goToNextStep } from '../../../components/utils/navigationUtils';
 
 const TableContainer = styled(animated.div)`
   width: 105%;
@@ -162,6 +165,10 @@ const Title = styled.h1`
   }
 `;
 const AttractionForm = () => {
+  const { routes } = useContext(UnifiedContext);
+  const currentStepIndex = useCurrentStepIndex(routes);
+  const { activeBlocks, appendActiveBlocks, removeActiveBlocks } = useContext(UnifiedContext);
+
   const [rows, setRows] = useState([]);
   const [currentInput, setCurrentInput] = useState({
     attraction: '',
@@ -255,7 +262,7 @@ const AttractionForm = () => {
     try {
       // Call the function to submit the responses
       await submitSurveyResponses(surveyResponses);
-      navigate('/'); // Navigate to the next question
+      goToNextStep(currentStepIndex, navigate, routes, activeBlocks);
     } catch (error) {
       toast.error(translations.attractionFormErrorSubmission, {
         position: 'top-right',
@@ -360,7 +367,7 @@ const AttractionForm = () => {
             </ScrollableTableContainer>
           </TableContainer>
           <Button onClick={handleAddRow}>{translations.attractionFormButtonAddRow}</Button>
-          <Button onClick={handleNextClick}>{translations.attractionFormButtonNext}</Button>
+          <NextButtonU onClick={handleNextClick}>{translations.attractionFormButtonNext}</NextButtonU>
         </Container>
       </GradientBackground>
       <ToastContainer />

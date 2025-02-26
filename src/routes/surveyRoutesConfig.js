@@ -60,7 +60,6 @@ export const sroutes = [
     { label: 'Residence 1', path: 'residence1', component: Residence1, conditionalBlock: 'universal'},
     { label: 'Transportation 1', path: 'transportation1', component: Transportation1, conditionalBlock: 'oprovblock'},
     { label: 'Transportation 2', path: 'transportation2', component: Transportation2, conditionalBlock: 'iprovblock'},
-    { label: 'Visit Counter', path: 'visitcounteratt', component: VisitCounterAtt, conditionalBlock: 'universal'},
     { label: 'Main Purpose', path: 'mainpurpose', component: MainPurpose, conditionalBlock: 'universal'},
     { label: 'Visit Frequency Form', path: 'visitfrequencyform', component: VisitFrequencyForm, conditionalBlock: 'universal'},
     { label: 'Travel Question', path: 'travelquestion', component: TravelQuestion, conditionalBlock: 'universal'},
@@ -75,16 +74,27 @@ export const sroutes = [
     { label: 'Percentage Share List', path: 'percentagesharelist', component: PercentageShareList, conditionalBlock: 'perclist'},
     { label: 'Expense Companions', path: 'expensecompanions', component: ExpenseCompanions, conditionalBlock: 'universal'},
     
+    //ACCOMODATION: 'accom', TRANSPORTATION; 'transp', 'EVENT/ACTIVITIES': 'evatt', 'SERVICES': 'serv'
     { label: 'Branching Select', path: 'branchingselect', component: BranchingSelect, conditionalBlock: 'universal'},
     
     
     { label: 'How Many Nights', path: 'howmanynights', component: HowManyNights, conditionalBlock: 'accom'},
     { label: 'Accommodation Form', path: 'accommodationform', component: AccommodationForm, conditionalBlock: 'yesaccom'},
     { label: 'Where Stay Departure', path: 'wherestayarrival', component: WhereStayArrival, conditionalBlock: 'noaccom'},
+    { label: 'Booking Form', path: 'bookingform', component: BookingForm},
     { label: 'Accommodation Open 1', path: 'accomodationopen1', component: AccomodationOpen1, conditionalBlock: 'accom'},
+    { label: 'Accommodation Open 2 (GENERAL) ', path: 'accomodationopen2', component: AccomodationOpen2, conditionalBlock: 'accom'},
     
     
     { label: 'Primary Attraction', path: 'primaryatt', component: PrimaryAtt, conditionalBlock: 'evatt'},
+    { label: 'Visit Counter', path: 'visitcounteratt', component: VisitCounterAtt, conditionalBlock: 'evatt'},
+    { label: 'Rate Attraction', path: 'rateattraction', component: RateAttraction, conditionalBlock: 'evatt'},
+    { label: 'Attraction Form', path: 'attractionform', component: AttractionForm, conditionalBlock: 'evatt'},
+    { label: 'Will Recommend', path: 'willrecom', component: Willrecom, conditionalBlock: 'evatt'},
+    { label: 'Where Learn', path: 'wherelearn', component: WhereLearn, conditionalBlock: 'evatt'},
+    { label: 'Events Open 1', path: 'eventsopen1', component: EventsOpen1, conditionalBlock: 'evatt'},
+    { label: 'Attractions Feedback', path: 'attractionsfeedback', component: AttractionsFeedback, conditionalBlock: 'evatt'},
+
     
     
     { label: 'Pack Transpo', path: 'packtranspo', component: PackTranspo, conditionalBlock: 'transp'},
@@ -97,24 +107,18 @@ export const sroutes = [
     { label: 'Open Ended 1', path: 'openendedservice', component: OpenEnded1Services, conditionalBlock: 'serv'},
     { label: 'Open Ended Lifestyle', path: 'openendedlifestyle', component: OpenEnded2,conditionalBlock: 'serv'},
     
-
-    { label: 'Survey Evaluation VERSION1', path: 'surveyevaluation05', component: SurveyEvaluation05},
-    // { label: 'Survey Evaluation VERSION2', path: 'surveyevaluationb', component: },
-    { label: 'Will Recommend', path: 'willrecom', component: Willrecom},
-    { label: 'Where Learn', path: 'wherelearn', component: WhereLearn},
-    { label: 'Survey Venue', path: 'surveyvenue', component: SurveyVenue},
-    // { label: '(DUPLICATE)How Many Visits', path: 'howmanyvisits', component: },
-    { label: 'Rate Attraction', path: 'rateattraction', component: RateAttraction},
-    { label: 'Events Open 1', path: 'eventsopen1', component: EventsOpen1},
-    { label: 'Attractions Feedback', path: 'attractionsfeedback', component: AttractionsFeedback},
-    { label: 'Attraction Form', path: 'attractionform', component: AttractionForm},
-    { label: 'Services 1', path: 'services1', component: Services1},
-    { label: 'Booking Form', path: 'bookingform', component: BookingForm},
+    
+    
+    
+    { label: 'Services 1', path: 'services1', component: Services1, conditionalBlock: 'universal'},
+    { label: 'Personal Profile 1', path: 'pprofile1', component: PProfile1, conditionalBlock: 'universal'},
+    { label: 'Personal Profile 2', path: 'pprofile2', component: PProfile2, conditionalBlock: 'universal'},
+    { label: 'Survey Venue', path: 'surveyvenue', component: SurveyVenue, conditionalBlock: 'universal'},
+    { label: 'Proponent LGU', path: 'proponentlgu', component: ProponentLgu, conditionalBlock: 'universal'},
+    { label: 'Survey Evaluation VERSION1', path: 'surveyevaluation05', component: SurveyEvaluation05, conditionalBlock: 'universal'},
+    { label: 'Thank You Message', path: 'survey-complete', component: ThankYouMessage, conditionalBlock: 'universal'},
     // { label: '(IGNORE)Where Stay Departure', path: 'wherestaydepart', component: },
-    { label: 'Accommodation Open 2', path: 'accomodationopen2', component: AccomodationOpen2},
-    { label: 'Personal Profile 2', path: 'pprofile2', component: PProfile2},
-    { label: 'Personal Profile 1', path: 'pprofile1', component: PProfile1},
-    { label: 'Proponent LGU', path: 'proponentlgu', component: ProponentLgu},
-    { label: 'Thank You Message', path: 'survey-complete', component: ThankYouMessage},
+    // { label: 'Survey Evaluation VERSION2', path: 'surveyevaluationb', component: },
+    // { label: 'How Many Visits', path: 'howmanyvisits', component: HowManyVisits, conditionalBlock: 'evatt'},
     
 ];

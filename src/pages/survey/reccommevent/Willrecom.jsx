@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import './Willrecom.css';
 import GradientBackground from '../../../components/partials/GradientBackground';
 import BodyPartial from '../../../components/partials/BodyPartial';
@@ -7,8 +7,16 @@ import imgoverlay from "../../../components/img/shutter.png";
 import { Container } from '../../../components/utils/styles1';
 import useTranslations from '../../../components/utils/useTranslations';
 import { submitSurveyResponses } from '../../../components/utils/sendInputUtils';
+import { goToNextStep } from '../../../components/utils/navigationUtils';
 import { useNavigate } from 'react-router-dom';
+import { useCurrentStepIndex } from '../../../components/utils/useCurrentIndex';
+import { UnifiedContext } from '../../../routes/UnifiedContext';
+
 const Willrecom = () => {
+  const { routes } = useContext(UnifiedContext);
+  const currentStepIndex = useCurrentStepIndex(routes);
+  const { activeBlocks, appendActiveBlocks, removeActiveBlocks } = useContext(UnifiedContext);
+
   const navigate = useNavigate();
 
   const [language, setLanguage] = useState(localStorage.getItem('selectedLanguage') || 'en');
@@ -16,30 +24,24 @@ const Willrecom = () => {
   const translations = useTranslations('Willrecom', language);
 
   const handleOptionClick = (option) => {
-    // Create a new response object
     const newResponse = {
-      surveyquestion_ref: 'WLRCM', // Example 5-character reference, all caps
+      surveyquestion_ref: 'WLRCM',
       response_value: option
     };
 
-    // Update the responses array
     setResponses([...responses, newResponse]);
 
-    // Log the response for debugging
     console.log(`User selected: ${option}`);
 
-    // Submit the responses to the backend
     submitSurveyResponses([newResponse])
       .then(() => {
         console.log('Response submitted successfully');
 
-        // Optionally, navigate to the next page or show a success message
       })
       .catch((error) => {
         console.error('Failed to submit response:', error);
-        // Optionally, show an error message to the user
       });
-      navigate('/');
+    goToNextStep(currentStepIndex, navigate, routes, activeBlocks);
   };
 
   useEffect(() => {

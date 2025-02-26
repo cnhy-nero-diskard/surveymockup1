@@ -148,7 +148,7 @@ const RatingSlider = ({ title, categories, onRatingComplete, surveyquestion_refs
   // Use useEffect to log responses after they are updated
   useEffect(() => {
     if (responses.length === categories.length) {
-      console.log(`RESPONSES: >>>> ${JSON.stringify(responses)}`);
+      // console.log(`RESPONSES: >>>> ${JSON.stringify(responses)}`);
       submitSurveyResponses(responses)
         .then(() => {
           onRatingComplete();

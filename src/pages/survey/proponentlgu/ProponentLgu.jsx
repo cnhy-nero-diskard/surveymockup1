@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
 import BodyPartial from '../../../components/partials/BodyPartial';
@@ -6,6 +6,9 @@ import GradientBackground from '../../../components/partials/GradientBackground'
 import { useNavigate } from 'react-router-dom';
 import { submitSurveyResponses } from '../../../components/utils/sendInputUtils'; // import the submission function
 import imgoverlay from '../../../components/img/profile.png';
+import { goToNextStep } from '../../../components/utils/navigationUtils';
+import { useCurrentStepIndex } from '../../../components/utils/useCurrentIndex';
+import { UnifiedContext } from '../../../routes/UnifiedContext';
 
 const Container = styled(motion.div)`
   display: flex;
@@ -72,20 +75,23 @@ const Button = styled(motion.button)`
 `;
 
 const ProponentLgu = () => {
-  const navigate = useNavigate(); // Initialize useNavigate
+  const { routes } = useContext(UnifiedContext);
+  const currentStepIndex = useCurrentStepIndex(routes);
+  const { activeBlocks, appendActiveBlocks, removeActiveBlocks } = useContext(UnifiedContext);
+
+
+  const navigate = useNavigate(); 
   const [inputs, setInputs] = useState([
     { key: 'PRCITY', value: 'PANGLAO' },
     { key: 'PRPROV', value: 'BOHOL' },
   ]);
 
-  // Function to handle the change in input fields
   const handleInputChange = (index, newValue) => {
     const updatedInputs = [...inputs];
     updatedInputs[index].value = newValue;
     setInputs(updatedInputs);
   };
 
-  // Submit the responses to the backend
   const handleNextClick = async () => {
     const surveyResponses = inputs.map(input => ({
       surveyquestion_ref: input.key,
@@ -93,8 +99,8 @@ const ProponentLgu = () => {
     }));
 
     try {
-      await submitSurveyResponses(surveyResponses); // Submit the responses to backend
-      navigate('/'); // Navigate to the next question or page
+      await submitSurveyResponses(surveyResponses); 
+      goToNextStep(currentStepIndex, navigate, routes, activeBlocks);
     } catch (error) {
       console.error('Error submitting survey responses:', error);
     }

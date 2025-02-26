@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import styled from 'styled-components';
 import { useSpring, animated } from 'react-spring';
 import DatePicker from 'react-datepicker';
@@ -10,6 +10,9 @@ import imgoverlay from '../../../components/img/profile.png';
 import useTranslations from '../../../components/utils/useTranslations';
 import { submitSurveyResponses } from '../../../components/utils/sendInputUtils';
 import { NextButtonU } from '../../../components/utils/styles1';
+import { useCurrentStepIndex } from '../../../components/utils/useCurrentIndex';
+import { UnifiedContext } from '../../../routes/UnifiedContext';
+import { goToNextStep } from '../../../components/utils/navigationUtils';
 
 const FormContainer = styled(animated.div)`
   display: flex;
@@ -56,6 +59,10 @@ const NextButton = styled(animated.button)`
 `;
 
 const PProfile2 = () => {
+  const { routes } = useContext(UnifiedContext);
+  const currentStepIndex = useCurrentStepIndex(routes);
+  const { activeBlocks, appendActiveBlocks, removeActiveBlocks } = useContext(UnifiedContext);
+
   const navigate = useNavigate();
   const [responses, setResponses] = useState([
     { ref: 'ARRDT', value: null, label: 'pprofile2ArrivalDateLabel' },
@@ -89,7 +96,7 @@ const PProfile2 = () => {
     }));
 
     await submitSurveyResponses(surveyResponses);
-    navigate('/');
+    goToNextStep(currentStepIndex, navigate, routes, activeBlocks);
   };
 
   return (

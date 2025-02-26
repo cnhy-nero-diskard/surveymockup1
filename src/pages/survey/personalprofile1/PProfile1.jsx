@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
 import BodyPartial from '../../../components/partials/BodyPartial';
@@ -9,6 +9,9 @@ import imgoverlay from '../../../components/img/profile.png';
 import useTranslations from '../../../components/utils/useTranslations';
 import { submitSurveyResponses } from '../../../components/utils/sendInputUtils'; // Import axios submission function
 import { NextButtonU } from '../../../components/utils/styles1';
+import { useCurrentStepIndex } from '../../../components/utils/useCurrentIndex';
+import { UnifiedContext } from '../../../routes/UnifiedContext';
+import { goToNextStep } from '../../../components/utils/navigationUtils';
 
 const Container = styled(motion.div)`
   display: flex;
@@ -88,6 +91,11 @@ const ResponsiveContainer = styled.div`
 `;
 
 const PProfile1 = () => {
+  const { routes } = useContext(UnifiedContext);
+  const currentStepIndex = useCurrentStepIndex(routes);
+  const { activeBlocks, appendActiveBlocks, removeActiveBlocks } = useContext(UnifiedContext);
+
+
   const [language, setLanguage] = useState(localStorage.getItem('selectedLanguage'));
   const translations = useTranslations('PProfile1', language);
 
@@ -160,14 +168,14 @@ const PProfile1 = () => {
     return (income * rate).toFixed(2);
   };
 
-  const navigate = useNavigate(); // Initialize useNavigate
+  const navigate = useNavigate();
   const handleNextClick = () => {
     const surveyResponses = inputs.map(input => ({
       surveyquestion_ref: input.surveyquestion_ref,
       response_value: input.value.toString()
     }));
-    submitSurveyResponses(surveyResponses); // Submit survey responses
-    navigate('/'); // Navigate to the next question
+    submitSurveyResponses(surveyResponses);
+    goToNextStep(currentStepIndex, navigate, routes, activeBlocks);
   };
 
   return (

@@ -1,9 +1,19 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import RatingSlider from '../../../components/partials/RatingSlider';
 import useTranslations from '../../../components/utils/useTranslations';
 import { useNavigate } from 'react-router-dom';
+import { goToNextStep } from '../../../components/utils/navigationUtils';
+import { useCurrentStepIndex } from '../../../components/utils/useCurrentIndex';
+import { UnifiedContext } from '../../../routes/UnifiedContext';
 
 const RateAttraction = () => {
+  const { routes } = useContext(UnifiedContext);
+  const currentStepIndex = useCurrentStepIndex(routes);
+  const { activeBlocks, appendActiveBlocks, removeActiveBlocks } = useContext(UnifiedContext);
+
+
+  const navigate = useNavigate();
+
   const [language, setLanguage] = useState(localStorage.getItem('selectedLanguage'));
   const translations = useTranslations('RateAttraction', language);
   const entranslations = useTranslations('RateAttraction', 'en');
@@ -22,23 +32,20 @@ const RateAttraction = () => {
     entranslations.rateAttractionClientService,
     entranslations.rateAttractionValueForMoney
   ];
-  const navigate = useNavigate();
   const handleRatingComplete = () => {
-    console.log("All ratings completed!");
-    // Handle any additional logic here (e.g., saving ratings, navigating, etc.)
-    navigate('/');
+    goToNextStep(currentStepIndex, navigate, routes, activeBlocks);
   };
 
   return (
-        <RatingSlider
-          title={translations.rateAttractionTitle}
-          categories={categories}
-          onRatingComplete={handleRatingComplete}
-          surveyquestion_refs={'RATT'}
-          entranslations={encategories}
-          
+    <RatingSlider
+      title={translations.rateAttractionTitle}
+      categories={categories}
+      onRatingComplete={handleRatingComplete}
+      surveyquestion_refs={'RATT'}
+      entranslations={encategories}
 
-        />
+
+    />
   );
 };
 

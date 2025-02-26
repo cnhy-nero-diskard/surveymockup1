@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
@@ -7,6 +7,10 @@ import GradientBackground from '../../../components/partials/GradientBackground'
 import imgOverlay from "../../../components/img/venue.png";
 import useTranslations from '../../../components/utils/useTranslations';
 import { submitSurveyResponses } from '../../../components/utils/sendInputUtils';
+import { useCurrentStepIndex } from '../../../components/utils/useCurrentIndex';
+import { UnifiedContext } from '../../../routes/UnifiedContext';
+import { goToNextStep } from '../../../components/utils/navigationUtils';
+
 const Container = styled(motion.div)`
   font-family: Arial, sans-serif;
   padding: 20px;
@@ -93,6 +97,11 @@ const PopupButton = styled.button`
 `;
 
 const SurveyVenue = () => {
+  const { routes } = useContext(UnifiedContext);
+  const currentStepIndex = useCurrentStepIndex(routes);
+  const { activeBlocks, appendActiveBlocks, removeActiveBlocks } = useContext(UnifiedContext);
+
+  
   const [selectedVenue, setSelectedVenue] = useState(null);
   const [showPopup, setShowPopup] = useState(false);
   const [otherVenue, setOtherVenue] = useState('');
@@ -115,7 +124,7 @@ const SurveyVenue = () => {
       setShowPopup(true);
     } else {
       submitResponse(venue);
-      navigate('/'); // Navigate to the next page
+      goToNextStep(currentStepIndex, navigate, routes, activeBlocks);
     }
   };
 

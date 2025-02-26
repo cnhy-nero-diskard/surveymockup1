@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import styled from 'styled-components';
 import { useSpring, animated } from 'react-spring';
 import BodyPartial from '../../../components/partials/BodyPartial';
@@ -6,6 +6,9 @@ import GradientBackground from '../../../components/partials/GradientBackground'
 import imgOverlay from "../../../components/img/gift.png";
 import { useNavigate } from 'react-router-dom';
 import useTranslations from '../../../components/utils/useTranslations';
+import { useCurrentStepIndex } from '../../../components/utils/useCurrentIndex';
+import { UnifiedContext } from '../../../routes/UnifiedContext';
+import { goToNextStep } from '../../../components/utils/navigationUtils';
 
 const Container = styled.div`
   display: flex;
@@ -76,6 +79,13 @@ const NextButton = styled(animated.button)`
 `;
 
 const VisitCounter = () => {
+  const { routes } = useContext(UnifiedContext);
+  const currentStepIndex = useCurrentStepIndex(routes);
+  const { activeBlocks } = useContext(UnifiedContext);
+  const navigate = useNavigate();
+
+
+
   const [selectedOption, setSelectedOption] = useState(null);
   const [language, setLanguage] = useState(localStorage.getItem('selectedLanguage'));
   const translations = useTranslations('VisitCounter', language);
@@ -89,9 +99,8 @@ const VisitCounter = () => {
     setSelectedOption(option);
   };
 
-  const navigate = useNavigate(); // Initialize useNavigate
   const handleNextClick = () => {
-    navigate('/'); // Navigate to the next question
+    goToNextStep(currentStepIndex, navigate, routes, activeBlocks);
   };
 
   useEffect(() => {

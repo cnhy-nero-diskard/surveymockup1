@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import styled from 'styled-components';
 import { useSpring, animated } from 'react-spring';
 import BodyPartial from '../../../components/partials/BodyPartial';
@@ -8,6 +8,9 @@ import { useNavigate } from 'react-router-dom';
 import imgoverlay from '../../../components/img/bed.png';
 import useTranslations from '../../../components/utils/useTranslations';
 import { submitSurveyResponses } from '../../../components/utils/sendInputUtils';
+import { useCurrentStepIndex } from '../../../components/utils/useCurrentIndex';
+import { UnifiedContext } from '../../../routes/UnifiedContext';
+import { goToNextStep } from '../../../components/utils/navigationUtils';
 
 const Container = styled.div`
   font-family: Arial, sans-serif;
@@ -57,6 +60,10 @@ const Button = styled.button`
 `;
 
 const BookingForm = () => {
+    const { routes } = useContext(UnifiedContext);
+    const currentStepIndex = useCurrentStepIndex(routes);
+    const { activeBlocks, appendActiveBlocks, removeActiveBlocks } = useContext(UnifiedContext);
+
     const [bookingMethod, setBookingMethod] = useState('');
     const [bookingPlatform, setBookingPlatform] = useState('');
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -119,15 +126,15 @@ const BookingForm = () => {
     const handleNext = async () => {
         try {
             await submitSurveyResponses(responses);
-            navigate('/');
+            goToNextStep(currentStepIndex, navigate, routes, activeBlocks);
         } catch (error) {
             console.error('Failed to submit survey responses:', error);
         }
     };
-    
+
     const isNextDisabled =
         !bookingMethod || (bookingMethod !== 'Others (specify)' && !bookingPlatform) || (bookingMethod === 'Others (specify)' && !bookingPlatform.trim());
-    
+
     return (
         <>
             <BodyPartial />
@@ -144,7 +151,7 @@ const BookingForm = () => {
                             ))}
                         </Dropdown>
                     </FormGroup>
-    
+
                     {bookingMethod && bookingMethod !== 'Others (specify)' && (
                         <FormGroup>
                             <Label>{translations.bookingFormBookingPlatformLabel}</Label>
@@ -160,14 +167,14 @@ const BookingForm = () => {
                             </animated.div>
                         </FormGroup>
                     )}
-    
+
                     {bookingMethod === 'Others (specify)' && (
                         <FormGroup>
                             <Label>{translations.bookingFormOthersSpecifyLabel}</Label>
                             <Input type="text" value={bookingPlatform} onChange={handleOthersSpecifyChange} />
                         </FormGroup>
                     )}
-    
+
                     <NextButtonU onClick={handleNext} disabled={isNextDisabled}>
                         {translations.bookingFormNextButton}
                     </NextButtonU>
@@ -175,7 +182,7 @@ const BookingForm = () => {
             </GradientBackground>
         </>
     );
-    
+
 };
 
 export default BookingForm;

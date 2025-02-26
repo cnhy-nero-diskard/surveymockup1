@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import styled, { keyframes } from 'styled-components';
 import { FaCheckCircle } from 'react-icons/fa'; // Importing a checkmark icon
 import GradientBackground from '../../../components/partials/GradientBackground';
@@ -7,6 +7,9 @@ import imgoverlay from "../../../components/img/thank.png";
 import useTranslations from '../../../components/utils/useTranslations';
 import { submitSurveyResponses } from '../../../components/utils/sendInputUtils';
 import { useNavigate } from 'react-router-dom';
+import { goToNextStep } from '../../../components/utils/navigationUtils';
+import { useCurrentStepIndex } from '../../../components/utils/useCurrentIndex';
+import { UnifiedContext } from '../../../routes/UnifiedContext';
 // Keyframes for animations
 const fadeIn = keyframes`
   from {
@@ -73,13 +76,17 @@ const FinishButton = styled.button`
 `;
 
 const ThankYouMessage = () => {
+  const { routes } = useContext(UnifiedContext);
+  const currentStepIndex = useCurrentStepIndex(routes);
+  const { activeBlocks, appendActiveBlocks, removeActiveBlocks } = useContext(UnifiedContext);
+
+  
   const navigate = useNavigate();
   const language = localStorage.getItem('selectedLanguage');
   const translations = useTranslations('ThankYouMessage', language);
   const [surveyResponses, setSurveyResponses] = useState([]);
 
   useEffect(() => {
-    // Simulate fetching or constructing survey responses
     const responses = [
     ];
     setSurveyResponses(responses);
@@ -87,16 +94,14 @@ const ThankYouMessage = () => {
 
   const handleFinish = async () => {
     try {
-      // Submit the survey responses to the backend
       await submitSurveyResponses(surveyResponses);
       console.log('Survey responses submitted successfully');
       
-      // Indicate that the tourist has finished the survey
       const finishResponse = { surveyquestion_ref: 'FINISH', response_value: 'Survey Completed' };
       await submitSurveyResponses([finishResponse]);
       
       console.log('Survey completion indicated');
-      navigate('/');
+      goToNextStep(currentStepIndex, navigate, routes, activeBlocks);
     } catch (error) {
       console.error('Error submitting survey responses:', error);
     }

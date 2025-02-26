@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
+import { useNavigate } from 'react-router-dom';
 import BodyPartial from '../../../components/partials/BodyPartial';
 import GradientBackground from '../../../components/partials/GradientBackground';
 import { motion } from 'framer-motion';
@@ -7,8 +8,18 @@ import imgoverlay from "../../../components/img/shutter.png";
 import useTranslations from '../../../components/utils/useTranslations';
 import { NextButtonU } from '../../../components/utils/styles1';
 import { submitSurveyResponses } from '../../../components/utils/sendInputUtils';
+import { useCurrentStepIndex } from '../../../components/utils/useCurrentIndex';
+import { UnifiedContext } from '../../../routes/UnifiedContext';
+import { goToNextStep } from '../../../components/utils/navigationUtils';
 
 const SurveyEvaluation05 = () => {
+  const { routes } = useContext(UnifiedContext);
+  const currentStepIndex = useCurrentStepIndex(routes);
+  const { activeBlocks, appendActiveBlocks, removeActiveBlocks } = useContext(UnifiedContext);
+  const navigate = useNavigate();
+
+
+  
   const [responses, setResponses] = useState([]);
   const [language, setLanguage] = useState(localStorage.getItem('selectedLanguage'));
 
@@ -46,12 +57,9 @@ const SurveyEvaluation05 = () => {
     submitSurveyResponses(responses)
       .then(() => {
         console.log('Responses submitted successfully');
-        // Optionally, you can redirect or show a success message here
-      })
-      .catch((error) => {
-        console.error('Failed to submit responses:', error);
-        // Optionally, you can show an error message here
       });
+    goToNextStep(currentStepIndex, navigate, routes, activeBlocks);
+
   };
 
   return (

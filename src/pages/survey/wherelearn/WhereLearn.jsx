@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import './WhereLearn.css';
 import GradientBackground from '../../../components/partials/GradientBackground';
 import BodyPartial from '../../../components/partials/BodyPartial';
@@ -7,33 +7,36 @@ import imgOverlay from "../../../components/img/soundwave.png";
 import { Container } from '../../../components/utils/styles1';
 import useTranslations from '../../../components/utils/useTranslations';
 import { submitSurveyResponses } from '../../../components/utils/sendInputUtils';
+import { useCurrentStepIndex } from '../../../components/utils/useCurrentIndex';
+import { UnifiedContext } from '../../../routes/UnifiedContext';
+import { goToNextStep } from '../../../components/utils/navigationUtils';
+
+
 const WhereLearn = () => {
+  const { routes } = useContext(UnifiedContext);
+  const currentStepIndex = useCurrentStepIndex(routes);
+  const { activeBlocks, appendActiveBlocks, removeActiveBlocks } = useContext(UnifiedContext);
+
   const [selectedSource, setSelectedSource] = useState(null);
   const navigate = useNavigate();
   const [language, setLanguage] = useState(localStorage.getItem('selectedLanguage'));
   const [animate, setAnimate] = useState(false);
 
-  // Use the useTranslations hook to get translations
   const translations = useTranslations('WhereLearn', language);
 
-  // Define the survey question reference (strictly 5 chars long, all caps)
   const surveyQuestionRef = 'WLRN1'; // Example: WLRN1 for "Where Learn"
 
-  // Handle source selection and prepare the data for submission
   const handleSourceSelection = (value) => {
     setSelectedSource(value);
 
-    // Prepare the survey response object
     const surveyResponse = {
       surveyquestion_ref: surveyQuestionRef,
-      response_value: value, // The selected value (e.g., 'Friends,Family/Relatives')
+      response_value: value, 
     };
 
-    // Submit the survey response
     submitSurveyResponses([surveyResponse])
       .then(() => {
-        // Navigate to the next page after successful submission
-        navigate('/'); // Replace '/next-page' with the actual path to your next page
+        goToNextStep(currentStepIndex, navigate, routes, activeBlocks);
       })
       .catch((error) => {
         console.error('Error submitting survey response:', error);
