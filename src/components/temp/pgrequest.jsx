@@ -8,7 +8,7 @@ const ItemList = () => {
     const fetchItems = async () => {
       try {
         const response = await axios.get('http://localhost:5000/api/municipalities', 
-        // {withCredentials: true});
+        {withCredentials: true});
         setItems(response.data);
       } catch (err) {
         console.error(err);

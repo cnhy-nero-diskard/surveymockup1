@@ -39,7 +39,6 @@ ChartJS.register(
   BarElement
 );
 
-// Dummy data for charts (replace with backend data later)
 const dummyData = {
   geographicDistribution: {
     USA: 50,
@@ -77,20 +76,15 @@ const UsersDashboard = () => {
       }
     };
 
-    // Fetch data immediately when the component mounts
     fetchData();
 
-    // Set up an interval to fetch data every 5 seconds
     const intervalId = setInterval(fetchData, 5000);
 
-    // Clean up the interval when the component unmounts
     return () => clearInterval(intervalId);
   }, []);
 
-  // Calculate the number of active users
   const activeUsers = anonymousUsers.filter((user) => user.is_active).length;
 
-  // Data for charts
   const geographicData = {
     labels: Object.keys(dummyData.geographicDistribution),
     datasets: [
