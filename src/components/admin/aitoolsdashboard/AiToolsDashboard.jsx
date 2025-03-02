@@ -1,4 +1,3 @@
-// AiToolsDashboard.jsx
 import React, { useState, useEffect } from 'react';
 import {
   Container,
@@ -15,7 +14,14 @@ import {
   DialogContent,
   DialogActions,
   Fade,
-  Slide, // Added Slide import
+  Slide,
+  Snackbar,
+  Alert,
+  TextField,
+  List,
+  ListItem,
+  ListItemText,
+  Chip,
 } from '@mui/material';
 import { Bar } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
@@ -23,25 +29,52 @@ import axios from 'axios';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
+
+ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
+
 const AIToolsDashboard = () => {
   const isActive = true; // Replace with your actual logic to determine if active
-const createdAt = new Date(); // Replace with your actual "Created At" value
-const isRecentlyCreated = (new Date() - new Date(createdAt)) < 5 * 60 * 1000; // Less than 5 minutes ago
-  const [isScanning, setIsScanning] = useState(false);
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [scanResult, setScanResult] = useState(null);
-  const [showAnalysisResults, setShowAnalysisResults] = useState(false);
-  const [selectedSentimentModel, setSelectedSentimentModel] = useState("");
-  const [selectedTopicModel, setSelectedTopicModel] = useState("");
-  const [openMetricsDialog, setOpenMetricsDialog] = useState(false);
-  const [selectedMetrics, setSelectedMetrics] = useState(null);
-  const [isLoaded, setIsLoaded] = useState(true);
+  const createdAt = new Date(); // Replace with your actual "Created At" value
+  const isRecentlyCreated = (new Date() - new Date(createdAt)) < 5 * 60 * 1000; // Less than 5 minutes ago
+
+  // State for API Configuration
   const [hfTokens, setHfTokens] = useState([]);
   const [selectedHFToken, setSelectedHFToken] = useState("");
-  const [openPreviewDialog, setOpenPreviewDialog] = useState(false);
+
+  // State for Sentiment Analysis
+  const [sentimentText, setSentimentText] = useState("");
+  const [isSentimentAnalyzing, setIsSentimentAnalyzing] = useState(false);
+  const [sentimentResults, setSentimentResults] = useState(null);
+  const [sentimentError, setSentimentError] = useState(null);
+
+  // State for Topic Modeling
+  const [topicText, setTopicText] = useState("");
+  const [isTopicModeling, setIsTopicModeling] = useState(false);
   const [topicModelingResult, setTopicModelingResult] = useState(null);
-  const [apiToken, setApiToken] = useState(""); // Added apiToken state
-  const [analysisResults, setAnalysisResults] = useState(null);
+  const [topicModelingError, setTopicModelingError] = useState(null);
+
+  // State for Dialogs
+  const [openMetricsDialog, setOpenMetricsDialog] = useState(false);
+  const [selectedMetrics, setSelectedMetrics] = useState(null);
+
+  // State for Snackbar
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [snackbarSeverity, setSnackbarSeverity] = useState("info");
+
+  // State for API Usage Data
+  const [apiUsageData, setApiUsageData] = useState({
+    labels: ['Sentiment Analysis', 'Topic Modeling'],
+    datasets: [
+      {
+        label: 'API Calls',
+        data: [0, 0], // Initialize with 0
+        backgroundColor: ['rgba(75, 192, 192, 0.2)', 'rgba(153, 102, 255, 0.2)'],
+        borderColor: ['rgba(75, 192, 192, 1)', 'rgba(153, 102, 255, 1)'],
+        borderWidth: 1,
+      },
+    ],
+  });
 
   useEffect(() => {
     const fetchHFTokens = async () => {
@@ -55,18 +88,36 @@ const isRecentlyCreated = (new Date() - new Date(createdAt)) < 5 * 60 * 1000; //
     fetchHFTokens();
   }, []);
 
-  const handleScan = () => {
-    setIsScanning(true);
-    setTimeout(() => {
-      const detectedEntries = Math.floor(Math.random() * 100) + 1;
-      setScanResult(detectedEntries);
-      setIsScanning(false);
-    }, 2000);
-  };
+  useEffect(() => {
+    const fetchApiUsage = async () => {
+      try {
+        const response = await axios.get(`${process.env.REACT_APP_API_HOST}/api/usage`, { withCredentials: true });
+        setApiUsageData((prevData) => ({
+          ...prevData,
+          datasets: [
+            {
+              ...prevData.datasets[0],
+              data: [response.data.sentiment, response.data.topicModeling],
+            },
+          ],
+        }));
+      } catch (error) {
+        console.error('Error fetching API usage:', error);
+      }
+    };
+    fetchApiUsage();
+  }, []);
 
-  const handleStartAnalysis = async () => {
-    setIsAnalyzing(true);
-    console.log('Starting analysis...');
+  const handleSentimentAnalysis = async () => {
+    setIsSentimentAnalyzing(true);
+    setSentimentError(null);
+    setSnackbarMessage("Just a heads-up, the first response might take a little longer, around 20-30 seconds. This is only if it's the first time you're using it in about 15 minutes, as the AI endpoint needs to initialize");
+    setSnackbarSeverity("info");
+    setSnackbarOpen(true);
+    function keyExists(obj, key) {
+      return obj.hasOwnProperty(key);
+    }
+
     try {
       const selectedToken = hfTokens.find((token) => token.id === selectedHFToken);
       if (!selectedToken) {
@@ -76,31 +127,75 @@ const isRecentlyCreated = (new Date() - new Date(createdAt)) < 5 * 60 * 1000; //
       const response = await axios.post(
         `${process.env.REACT_APP_API_HOST}/api/analyzesentiment`,
         {
-          text: 'I did love you, but no more', // Replace with actual text to analyze
+          text: sentimentText,
           tokenLabel: selectedToken.label,
         }, { withCredentials: true }
       );
 
-      // Handle the response from Hugging Face
       if (response.data && Array.isArray(response.data)) {
-        const sentimentResults = response.data[0]; // Extract the sentiment results
-        console.log('Sentiment Analysis Results:', sentimentResults);
-        setShowAnalysisResults(true);
-        setAnalysisResults(sentimentResults); // Store the results in state
+        setSentimentResults(response.data);
       } else {
         console.error('Unexpected response format:', response.data);
+        console.log(response.data);
+        if (response.data.hasOwnProperty("error")) {
+          setSnackbarMessage("THE AI ENDPOINT IS CURRENTLY UNAVAILABLE. PLEASE TRY AGAIN LATER");
+          setSnackbarSeverity("error");
+          setSnackbarOpen(true);
+        }
+        setSentimentResults(null);
       }
 
-      setIsAnalyzing(false);
+      setIsSentimentAnalyzing(false);
     } catch (error) {
-      console.error('Error during analysis:', error);
-      setIsAnalyzing(false);
+      console.error('Error during sentiment analysis:', error);
+      setSentimentError(error.message);
+
+
+      setIsSentimentAnalyzing(false);
+    }
+  };
+  const handleStoreSentimentResults = async () => {
+    if (!sentimentResults) return;
+
+    try {
+      // Placeholder for API call to store sentiment results
+      // const response = await axios.post(
+      //   `${process.env.REACT_APP_API_HOST}/api/store-sentiment-results`,
+      //   {
+      //     results: sentimentResults,
+      //   },
+      //   { withCredentials: true }
+      // );
+
+      // if (response.data.success) {
+      //   setSnackbarMessage("Sentiment analysis results stored successfully!");
+      //   setSnackbarSeverity("success");
+      //   setSnackbarOpen(true);
+      // } else {
+      //   setSnackbarMessage("Failed to store sentiment analysis results.");
+      //   setSnackbarSeverity("error");
+      //   setSnackbarOpen(true);
+      // }
+
+      // Temporary success message for placeholder
+      setSnackbarMessage("Sentiment analysis results stored successfully! (Placeholder)");
+      setSnackbarSeverity("success");
+      setSnackbarOpen(true);
+    } catch (error) {
+      console.error('Error storing sentiment analysis results:', error);
+      setSnackbarMessage("Error storing sentiment analysis results.");
+      setSnackbarSeverity("error");
+      setSnackbarOpen(true);
     }
   };
 
-  const handleStartTopicModeling = async () => {
-    setIsAnalyzing(true);
-    console.log('Starting topic modeling...');
+  const handleTopicModeling = async () => {
+    setIsTopicModeling(true);
+    setTopicModelingError(null);
+    setSnackbarMessage("Just a heads-up, the first response might take a little longer, around 20-30 seconds. This is only if it's the first time you're using it in about 15 minutes, as the AI endpoint needs to initialize");
+    setSnackbarSeverity("info");
+    setSnackbarOpen(true);
+
     try {
       const selectedToken = hfTokens.find((token) => token.id === selectedHFToken);
       if (!selectedToken) {
@@ -110,24 +205,59 @@ const isRecentlyCreated = (new Date() - new Date(createdAt)) < 5 * 60 * 1000; //
       const response = await axios.post(
         `${process.env.REACT_APP_API_HOST}/api/analyzetopics`,
         {
-          text: 'Sample text for topic modeling',
+          text: topicText,
           tokenLabel: selectedToken.label,
-        },
+        }, { withCredentials: true }
       );
 
       setTopicModelingResult(response.data);
-      setIsAnalyzing(false);
-      console.log('Topic modeling result:', response.data);
+
+      if (response.data.hasOwnProperty("error")) {
+        setSnackbarMessage("THE AI ENDPOINT IS CURRENTLY UNAVAILABLE. PLEASE TRY AGAIN LATER");
+        setSnackbarSeverity("error");
+        setSnackbarOpen(true);
+      }
+      setIsTopicModeling(false);
     } catch (error) {
-      console.error('Error during topic modeling:', error);
-      setIsAnalyzing(false);
+      console.error('Error during topic modeling (analyzetopics):', error);
+      setTopicModelingError(error.message);
+      setIsTopicModeling(false);
     }
   };
 
+  const handleStoreTopicModelingResult = async () => {
+    if (!topicModelingResult) return;
 
-  const handleReloadToken = () => {
-    setApiToken("hf_xxxxxxxxxxxxxxxxxx"); // Example implementation
+    try {
+      // const response = await axios.post(
+      //   `${process.env.REACT_APP_API_HOST}/api/store-topic-modeling`,
+      //   {
+      //     result: topicModelingResult,
+      //   },
+      //   { withCredentials: true }
+      // );
+
+      // if (response.data.success) {
+      //   setSnackbarMessage("Topic modeling results stored successfully!");
+      //   setSnackbarSeverity("success");
+      //   setSnackbarOpen(true);
+      // } else {
+      //   setSnackbarMessage("Failed to store topic modeling results.");
+      //   setSnackbarSeverity("error");
+      //   setSnackbarOpen(true);
+      // }
+      setSnackbarMessage("Topic Modeling Analysis results stored successfully! (Placeholder)");
+      setSnackbarSeverity("success");
+      setSnackbarOpen(true);
+
+    } catch (error) {
+      console.error('Error storing topic modeling results:', error);
+      setSnackbarMessage("Error storing topic modeling results.");
+      setSnackbarSeverity("error");
+      setSnackbarOpen(true);
+    }
   };
+
 
   const handleOpenMetricsDialog = (metrics) => {
     setSelectedMetrics(metrics);
@@ -138,43 +268,25 @@ const isRecentlyCreated = (new Date() - new Date(createdAt)) < 5 * 60 * 1000; //
     setOpenMetricsDialog(false);
   };
 
-  const handlePreview = () => {
-    setOpenPreviewDialog(true);
-  };
-
-  const handleClosePreviewDialog = () => {
-    setOpenPreviewDialog(false);
-  };
-
-  const apiUsageData = {
-    labels: ['Sentiment Analysis', 'Topic Modeling'],
-    datasets: [
-      {
-        label: 'API Calls',
-        data: [100, 50],
-        backgroundColor: ['rgba(75, 192, 192, 0.2)', 'rgba(153, 102, 255, 0.2)'],
-        borderColor: ['rgba(75, 192, 192, 1)', 'rgba(153, 102, 255, 1)'],
-        borderWidth: 1,
-      },
-    ],
+  const handleCloseSnackbar = () => {
+    setSnackbarOpen(false);
   };
 
   return (
     <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-      <Fade in={isLoaded} timeout={1000}>
+      <Fade in timeout={1000}>
         <Typography variant="h4" gutterBottom sx={{ fontWeight: 'bold', color: 'primary.main' }}>
           AI Tools Dashboard
         </Typography>
       </Fade>
 
       <Grid container spacing={3}>
-        {/* API Configuration Section */}
-        <Grid item xs={12} md={6}>
-          <Slide in={isLoaded} direction="up" timeout={1000}>
-            <Paper elevation={3} sx={{ p: 3, bgcolor: 'background.paper', borderRadius: 2 }}>
-              <Typography variant="h6" gutterBottom sx={{ fontWeight: 'medium', color: 'text.primary' }}>
-                API Configuration
-              </Typography>
+        {/* API Configuration Section - Full Width */}
+        <Grid item xs={12}>
+          <Slide in direction="up" timeout={1000}>
+            <Paper elevation={3} sx={{ p: 3, bgcolor: 'background.paper', borderRadius: 2 }}>              <Typography variant="h6" gutterBottom sx={{ fontWeight: 'medium', color: 'text.primary' }}>
+              API Configuration
+            </Typography>
               <Box sx={{ mb: 3 }}>
                 <Typography variant="subtitle1" sx={{ color: 'text.secondary', mb: 1 }}>
                   API Token Manager
@@ -185,6 +297,7 @@ const isRecentlyCreated = (new Date() - new Date(createdAt)) < 5 * 60 * 1000; //
                     value={selectedHFToken}
                     onChange={(e) => setSelectedHFToken(e.target.value)}
                     sx={{ mb: 2 }}
+                    aria-label="Select API Token"
                   >
                     {hfTokens.map((token) => (
                       <MenuItem key={token.id} value={token.id}>
@@ -198,67 +311,139 @@ const isRecentlyCreated = (new Date() - new Date(createdAt)) < 5 * 60 * 1000; //
           </Slide>
         </Grid>
 
-        {/* Unanalyzed Entries Section */}
+        {/* Sentiment Analysis Section */}
         <Grid item xs={12} md={6}>
-          <Slide in={isLoaded} direction="up" timeout={1200}>
+          <Slide in direction="up" timeout={1200}>
             <Paper elevation={3} sx={{ p: 3, bgcolor: 'background.paper', borderRadius: 2 }}>
               <Typography variant="h6" gutterBottom sx={{ fontWeight: 'medium', color: 'text.primary' }}>
-                Unanalyzed Entries
+                Sentiment Analysis
               </Typography>
-              {scanResult === null ? (
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                  <Typography variant="body1" sx={{ color: 'text.secondary' }}>
-                    Scan for new survey responses not analyzed yet.
+              <Box>
+                <Typography variant="body1" sx={{ color: 'text.secondary', mb: 2 }}>
+                  Enter text for sentiment analysis.
+                </Typography>
+                <TextField
+                  value={sentimentText}
+                  onChange={(e) => setSentimentText(e.target.value)}
+                  multiline
+                  rows={4}
+                  fullWidth
+                  variant="outlined"
+                  sx={{ mb: 2 }}
+                />
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={handleSentimentAnalysis}
+                  disabled={isSentimentAnalyzing || !sentimentText || !selectedHFToken}
+                  sx={{ textTransform: 'none' }}
+                >
+                  {isSentimentAnalyzing ? <CircularProgress size={24} /> : 'ANALYZE SENTIMENT'}
+                </Button>
+                {isSentimentAnalyzing && <CircularProgress sx={{ ml: 2 }} />}
+              </Box>
+              {sentimentResults && (
+                <Box sx={{ mt: 2, maxHeight: '400px', overflowY: 'auto', pr: 2 }}>
+                  <Typography variant="body1" sx={{ color: 'text.secondary', fontWeight: 'bold', mb: 2 }}>
+                    Sentiment Analysis Results:
                   </Typography>
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    onClick={handleScan}
-                    disabled={isScanning}
-                    sx={{ textTransform: 'none' }}
-                  >
-                    {isScanning ? <CircularProgress size={24} /> : 'Scan'}
-                  </Button>
-                </Box>
-              ) : (
-                <Box>
-                  <Typography variant="body1" sx={{ color: 'text.secondary', mb: 2 }}>
-                    {scanResult} entries were detected.
-                  </Typography>
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    onClick={handlePreview}
-                    sx={{ textTransform: 'none', mr: 2 }}
-                  >
-                    PREVIEW
-                  </Button>
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    onClick={handleStartAnalysis}
-                    disabled={!scanResult || isAnalyzing}
-                    sx={{ textTransform: 'none' }}
-                  >
-                    {isAnalyzing ? <CircularProgress size={24} /> : 'START AI ANALYSIS'}
-                  </Button>
 
-                  {/* Example Output Display */}
-                  {analysisResults && (
-                    <Box sx={{ mt: 2 }}>
-                      <Typography variant="body1" sx={{ color: 'text.secondary' }}>
-                        Sentiment Analysis Results:
-                      </Typography>
-                      <Box sx={{ mt: 1 }}>
-                        {analysisResults.map((result, index) => (
-                          <Typography key={index} variant="body2" sx={{ color: 'text.secondary' }}>
-                            {result.label}: {result.score.toFixed(4)}
+                  {/* Enhanced Results Display */}
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                    {sentimentResults.map((result, index) => (
+                      <Paper key={index} elevation={2} sx={{ p: 2, borderRadius: 2, bgcolor: 'background.paper' }}>
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                          <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 'medium' }}>
+                            {result.text}
                           </Typography>
-                        ))}
-                      </Box>
-                    </Box>
-                  )}
+                          <Chip
+                            label={result.sentiment.toUpperCase()}
+                            color={
+                              result.sentiment === 'positive' ? 'success' :
+                                result.sentiment === 'negative' ? 'error' : 'warning'
+                            }
+                            size="small"
+                          />
+                        </Box>
+                        <Box sx={{ mt: 1 }}>
+                          <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                            Confidence: <strong>{(result.confidence * 100).toFixed(2)}%</strong>
+                          </Typography>
+                        </Box>
+                      </Paper>
+                    ))}
+                  </Box>
+
+                  {/* Sentiment Count and Average Section */}
+                  <Box sx={{ mt: 3 }}>
+                    <Typography variant="body1" sx={{ color: 'text.secondary', fontWeight: 'bold', mb: 1 }}>
+                      Sentiment Summary:
+                    </Typography>
+                    {(() => {
+                      // Calculate sentiment counts
+                      const sentimentCounts = sentimentResults.reduce(
+                        (acc, result) => {
+                          acc[result.sentiment] = (acc[result.sentiment] || 0) + 1;
+                          return acc;
+                        },
+                        { positive: 0, neutral: 0, negative: 0 }
+                      );
+
+                      // Calculate average sentiment
+                      const total = sentimentResults.length;
+                      const positiveRatio = sentimentCounts.positive / total;
+                      const negativeRatio = sentimentCounts.negative / total;
+                      const neutralRatio = sentimentCounts.neutral / total;
+
+                      let averageSentiment = "neutral";
+                      if (positiveRatio > negativeRatio && positiveRatio > neutralRatio) {
+                        averageSentiment = "positive";
+                      } else if (negativeRatio > positiveRatio && negativeRatio > neutralRatio) {
+                        averageSentiment = "negative";
+                      }
+
+                      return (
+                        <>
+                          <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
+                            <Chip
+                              label={`POSITIVE (${sentimentCounts.positive})`}
+                              color="success"
+                              variant="outlined"
+                            />
+                            <Chip
+                              label={`NEGATIVE (${sentimentCounts.negative})`}
+                              color="error"
+                              variant="outlined"
+                            />
+                            <Chip
+                              label={`NEUTRAL (${sentimentCounts.neutral})`}
+                              color="warning"
+                              variant="outlined"
+                            />
+                          </Box>
+                          <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                            Average Sentiment: <strong>{averageSentiment.toUpperCase()}</strong>
+                          </Typography>
+                        </>
+                      );
+                    })()}
+                  </Box>
+
+                  {/* Store Results to Database Button */}
+                  <Button
+                    variant="contained"
+                    color="secondary"
+                    onClick={handleStoreSentimentResults}
+                    sx={{ mt: 2, textTransform: 'none' }}
+                  >
+                    Store Results to Database
+                  </Button>
                 </Box>
+              )}
+              {sentimentError && (
+                <Alert severity="error" sx={{ mt: 2 }}>
+                  {sentimentError}
+                </Alert>
               )}
             </Paper>
           </Slide>
@@ -266,107 +451,116 @@ const isRecentlyCreated = (new Date() - new Date(createdAt)) < 5 * 60 * 1000; //
 
         {/* Topic Modeling Section */}
         <Grid item xs={12} md={6}>
-          <Slide in={isLoaded} direction="up" timeout={1400}>
+          <Slide in direction="up" timeout={1400}>
             <Paper elevation={3} sx={{ p: 3, bgcolor: 'background.paper', borderRadius: 2 }}>
               <Typography variant="h6" gutterBottom sx={{ fontWeight: 'medium', color: 'text.primary' }}>
                 Topic Modeling
               </Typography>
               <Box>
                 <Typography variant="body1" sx={{ color: 'text.secondary', mb: 2 }}>
-                  Analyze topics from the detected entries.
+                  Enter text for topic modeling.
                 </Typography>
+                <TextField
+                  value={topicText}
+                  onChange={(e) => setTopicText(e.target.value)}
+                  multiline
+                  rows={4}
+                  fullWidth
+                  variant="outlined"
+                  sx={{ mb: 2 }}
+                />
                 <Button
                   variant="contained"
                   color="primary"
-                  onClick={handleStartTopicModeling}
-                  disabled={!scanResult || isAnalyzing}
+                  onClick={handleTopicModeling}
+                  disabled={isTopicModeling || !topicText || !selectedHFToken}
                   sx={{ textTransform: 'none' }}
                 >
-                  {isAnalyzing ? <CircularProgress size={24} /> : 'START TOPIC MODELING'}
+                  {isTopicModeling ? <CircularProgress size={24} /> : 'ANALYZE TOPICS'}
                 </Button>
+                {isTopicModeling && <CircularProgress sx={{ ml: 2 }} />}
               </Box>
               {topicModelingResult && (
-                <Box sx={{ mt: 2 }}>
+                <Box sx={{ mt: 2, maxHeight: '400px', overflowY: 'auto', pr: 2 }}>
                   <Typography variant="body1" sx={{ color: 'text.secondary' }}>
                     Topic Modeling Results:
                   </Typography>
-                  <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                    {JSON.stringify(topicModelingResult, null, 2)}
-                  </Typography>
+                  <Box sx={{ mt: 1 }}>
+                    {topicModelingResult.map((topic, index) => (
+                      <Box key={index} sx={{ mb: 3 }}>
+                        <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 'bold' }}>
+                          Topic {index + 1}: {topic.customLabel}
+                        </Typography>
+                        <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                          Probability: {(topic.probability * 100).toFixed(2)}%
+                        </Typography>
+                        <Box sx={{ mt: 1 }}>
+                          <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                            Top Words:
+                          </Typography>
+                          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+                            {topic.top_words.map((word, wordIndex) => (
+                              <Chip key={wordIndex} label={word} variant="outlined" />
+                            ))}
+                          </Box>
+                        </Box>
+                        <Box sx={{ mt: 1 }}>
+                          <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                            Contributions:
+                          </Typography>
+                          <List>
+                            {topic.contribution.map((contrib, contribIndex) => (
+                              <ListItem key={contribIndex}>
+                                <ListItemText
+                                  primary={`${contrib[1]}: ${contrib[2]}`}
+                                  secondary={`Topic ${contrib[0]}`}
+                                />
+                              </ListItem>
+                            ))}
+                          </List>
+                        </Box>
+                      </Box>
+                    ))}
+                  </Box>
+                  <Button
+                    variant="contained"
+                    color="secondary"
+                    onClick={handleStoreTopicModelingResult}
+                    sx={{ mt: 2, textTransform: 'none' }}
+                  >
+                    Store Results to Database
+                  </Button>
                 </Box>
+              )}
+              {topicModelingError && (
+                <Alert severity="error" sx={{ mt: 2 }}>
+                  {topicModelingError}
+                </Alert>
               )}
             </Paper>
           </Slide>
         </Grid>
       </Grid>
 
-      {/* // Preview Dialog */}
-      <Dialog open={openPreviewDialog} onClose={handleClosePreviewDialog}>
-        <DialogTitle>Preview Data</DialogTitle>
-        <DialogContent>
-          <Typography variant="body1" sx={{ color: 'text.secondary' }}>
-            Here is a preview of the dummy data:
-          </Typography>
-          <Box sx={{ mt: 2 }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-              <thead>
-                <tr>
-                  <th style={{ textAlign: 'left', padding: '8px', borderBottom: '1px solid #ddd' }}>Detected Entries</th>
-                  <th style={{ textAlign: 'left', padding: '8px', borderBottom: '1px solid #ddd' }}>Selected Model</th>
-                  <th style={{ textAlign: 'left', padding: '8px', borderBottom: '1px solid #ddd' }}>API Token</th>
-                  <th style={{ textAlign: 'left', padding: '8px', borderBottom: '1px solid #ddd' }}>Status</th>
-                  <th style={{ textAlign: 'left', padding: '8px', borderBottom: '1px solid #ddd' }}>Created At</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td style={{ padding: '8px', borderBottom: '1px solid #ddd' }}>{scanResult}</td>
-                  <td style={{ padding: '8px', borderBottom: '1px solid #ddd' }}>{selectedSentimentModel}</td>
-                  <td style={{ padding: '8px', borderBottom: '1px solid #ddd' }}>{selectedHFToken}</td>
-                  <td style={{ padding: '8px', borderBottom: '1px solid #ddd' }}>
-                    <div
-                      style={{
-                        width: '12px',
-                        height: '12px',
-                        borderRadius: '50%',
-                        backgroundColor: isActive ? 'green' : 'red',
-                      }}
-                    ></div>
-                  </td>
-                  <td
-                    style={{
-                      padding: '8px',
-                      borderBottom: '1px solid #ddd',
-                      backgroundColor: isRecentlyCreated ? 'rgba(82, 82, 214, 0.73)' : 'transparent',
-                    }}
-                  >
-                    {createdAt}
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </Box>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleClosePreviewDialog} color="primary">
-            Close
-          </Button>
-        </DialogActions>
-      </Dialog>
-
       {/* Metrics Dialog */}
       <Dialog open={openMetricsDialog} onClose={handleCloseMetricsDialog}>
         <DialogTitle>API Call Metrics</DialogTitle>
         <DialogContent>
           {selectedMetrics && (
-            <Box>
-              <Typography variant="body1" sx={{ color: 'text.secondary' }}>
-                Sentiment Analysis: {selectedMetrics.sentiment}
-              </Typography>
-              <Typography variant="body1" sx={{ color: 'text.secondary' }}>
-                Topic Modeling: {selectedMetrics.topicModeling}
-              </Typography>
-            </Box>
+            <Bar
+              data={{
+                labels: ['Sentiment Analysis', 'Topic Modeling'],
+                datasets: [
+                  {
+                    label: 'API Calls',
+                    data: [selectedMetrics.sentiment, selectedMetrics.topicModeling],
+                    backgroundColor: ['rgba(75, 192, 192, 0.2)', 'rgba(153, 102, 255, 0.2)'],
+                    borderColor: ['rgba(75, 192, 192, 1)', 'rgba(153, 102, 255, 1)'],
+                    borderWidth: 1,
+                  },
+                ],
+              }}
+            />
           )}
         </DialogContent>
         <DialogActions>
@@ -375,6 +569,18 @@ const isRecentlyCreated = (new Date() - new Date(createdAt)) < 5 * 60 * 1000; //
           </Button>
         </DialogActions>
       </Dialog>
+
+      {/* Snackbar for Error Messages */}
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={6000}
+        onClose={handleCloseSnackbar}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+      >
+        <Alert onClose={handleCloseSnackbar} severity={snackbarSeverity} sx={{ width: '100%' }}>
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
     </Container>
   );
 };
