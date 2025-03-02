@@ -4,10 +4,10 @@ import { motion } from 'framer-motion';
 import BodyPartial from '../../../components/partials/BodyPartial';
 import GradientBackground from '../../../components/partials/GradientBackground';
 import { useNavigate } from 'react-router-dom';
-import useTranslations from '../../../components/utils/useTranslations'; // Import the translation hook
-import Slider from 'rc-slider'; // Import the slider component
-import 'rc-slider/assets/index.css'; // Import the default styles
-import { submitSurveyResponses } from '../../../components/utils/sendInputUtils'; // Import the submission function
+import useTranslations from '../../../components/utils/useTranslations'; 
+import Slider from 'rc-slider'; 
+import 'rc-slider/assets/index.css';
+import { submitSurveyResponses } from '../../../components/utils/sendInputUtils'; 
 import { NextButtonU } from '../../../components/utils/styles1';
 import { useCurrentStepIndex } from '../../../components/utils/useCurrentIndex';
 import { UnifiedContext } from '../../../routes/UnifiedContext';
@@ -104,7 +104,6 @@ const PercentageShareList = () => {
         const newItems = [...items];
         newItems[index].percentage = parseFloat(value);
 
-        // Adjust percentages to ensure they sum to exactly100%
         adjustPercentages(newItems, index);
 
         setItems(newItems);
@@ -150,14 +149,13 @@ const PercentageShareList = () => {
             goToNextStep(currentStepIndex, navigate, routes, activeBlocks);
         } catch (error) {
             console.error("Error submitting survey responses:", error);
-            // Handle error appropriately here (e.g., show a message)
         }
     };
 
     return (
         <>
             <BodyPartial />
-            <GradientBackground>
+            <GradientBackground handleNextClick={handleNextClick}>
                 <Title>{translations.percentageShareListTitle}</Title>
                 {items.map((item, index) => (
                     <ListItem
@@ -190,7 +188,6 @@ const PercentageShareList = () => {
                 {/* <TotalPercentage>
                       {translations.percentageShareListTotalPercentage}: {items.reduce((sum,item) => sum + item.percentage ,0).toFixed(1)}%
                   </TotalPercentage> */}
-                <NextButtonU onClick={handleNextClick}>{translations.percentageShareListNextButton}</NextButtonU>
             </GradientBackground>
         </>
     );

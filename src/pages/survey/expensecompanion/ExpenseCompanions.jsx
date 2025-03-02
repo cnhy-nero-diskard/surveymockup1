@@ -7,10 +7,11 @@ import imgOverlay from "../../../components/img/peoples.png";
 import { useNavigate } from "react-router-dom";
 import useTranslations from '../../../components/utils/useTranslations';
 import { submitSurveyResponses } from '../../../components/utils/sendInputUtils';
-import { NextButtonU } from '../../../components/utils/styles1';
+import { NextButtonU, QuestionText } from '../../../components/utils/styles1';
 import { useCurrentStepIndex } from '../../../components/utils/useCurrentIndex';
 import { UnifiedContext } from '../../../routes/UnifiedContext';
 import { goToNextStep } from '../../../components/utils/navigationUtils';
+
 const Container = styled.div`
   display: flex;
   flex-direction: column;
@@ -24,11 +25,6 @@ const QuestionContainer = styled.div`
   padding: 20px;
   border-radius: 10px;
   text-align: center;
-`;
-
-const QuestionText = styled.p`
-  font-size: 1.5rem;
-  margin-bottom: 20px;
 `;
 
 const InputContainer = styled.div`
@@ -80,12 +76,16 @@ const ExpenseCompanions = () => {
   const navigate = useNavigate();
 
   const handleInputChange = (index, event) => {
-    const newInputs = [...inputs];
-    newInputs[index].value = event.target.value;
-    setInputs(newInputs);
+    const value = event.target.value;
+    // Only allow numbers
+    if (/^\d*$/.test(value)) {
+      const newInputs = [...inputs];
+      newInputs[index].value = value;
+      setInputs(newInputs);
+    }
   };
 
-  const handleNext = async () => {
+  const handleNextClick = async () => {
     const surveyResponses = inputs.map(input => ({
       surveyquestion_ref: input.key,
       response_value: input.value,
@@ -94,7 +94,6 @@ const ExpenseCompanions = () => {
     try {
       await submitSurveyResponses(surveyResponses);
       goToNextStep(currentStepIndex, navigate, routes, activeBlocks);
-      
     } catch (error) {
       console.error('Failed to submit survey responses:', error);
     }
@@ -104,10 +103,13 @@ const ExpenseCompanions = () => {
     setLanguage(localStorage.getItem('selectedLanguage'));
   }, []);
 
+  // Check if the input has a valid number
+  const hasValidNumber = inputs.every(input => input.value !== '' && !isNaN(input.value));
+
   return (
     <>
       <BodyPartial />
-      <GradientBackground overlayImage={imgOverlay} opacity={0.3} blendMode="screen">
+      <GradientBackground overlayImage={imgOverlay} opacity={0.3} blendMode="screen" handleNextClick={handleNextClick} buttonAppear={hasValidNumber}>
         <QuestionContainer>
           <QuestionText>
             {translations.expenseCompanionsQuestionText}
@@ -115,16 +117,13 @@ const ExpenseCompanions = () => {
           {inputs.map((input, index) => (
             <InputContainer key={input.key}>
               <Input
-                type="number"
+                type="text" // Changed to text to allow for custom validation
                 value={input.value}
                 onChange={(e) => handleInputChange(index, e)}
                 placeholder={translations.expenseCompanionsInputPlaceholder}
               />
             </InputContainer>
           ))}
-          <NextButtonU style={buttonAnimation} onClick={handleNext}>
-            {translations.expenseCompanionsNextButtonText}
-          </NextButtonU>
         </QuestionContainer>
       </GradientBackground>
     </>
