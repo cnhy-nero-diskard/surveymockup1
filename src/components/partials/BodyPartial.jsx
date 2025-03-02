@@ -32,6 +32,7 @@ const BodyPartial = ({ backgroundColor, gradient, fonts, backgroundImage }) => {
 
   return (
     <Helmet>
+
       {/* Preconnect to the Google Fonts server for optimization */}
       <link rel="preconnect" href="https://fonts.googleapis.com" />
       <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="true" />

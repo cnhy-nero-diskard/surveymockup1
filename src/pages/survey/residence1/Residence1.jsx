@@ -1,4 +1,3 @@
-// Residence1Styles.js
 import styled, { keyframes } from 'styled-components';
 import { CSSTransition } from 'react-transition-group';
 import React, { useState, useRef, useEffect, useContext } from 'react';
@@ -10,7 +9,7 @@ import useTranslations from '../../../components/utils/useTranslations';
 import { RESIDENCE1 as COMPONENT } from '../../../components/utils/componentConstants';
 import { submitSurveyResponses } from '../../../components/utils/sendInputUtils';
 import { countries } from 'countries-list';
-import { NextButtonU, fontColorU } from '../../../components/utils/styles1';
+import { Container, NextButtonU, fontColorU } from '../../../components/utils/styles1';
 import { UnifiedContext } from '../../../routes/UnifiedContext';
 import { useCurrentStepIndex } from '../../../components/utils/useCurrentIndex';
 import { goToNextStep } from '../../../components/utils/navigationUtils';
@@ -39,26 +38,27 @@ const slideIn = keyframes`
   }
 `;
 
-// Styled Components
-const Container = styled.div`
-  max-width: 600px;
-  margin: 0 auto;
-  padding: 2rem;
-  border-radius: 15px;
-  animation: ${fadeIn} 0.5s ease-in-out;
-`;
+// const Container = styled.div`
+//   max-width: 600px;
+//   margin: 0 auto;
+//   padding: 2rem;
+//   border-radius: 15px;
+//   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+//   animation: ${fadeIn} 0.5s ease-in-out;
+// `;
 
 const Title = styled.h1`
-  font-size: 2rem;
-  font-color: ${fontColorU};
-  margin-bottom: 1rem;
+  font-size: 2.25rem;
+  font-weight: 700;
+  color: ${fontColorU};
+  margin-bottom: 1.5rem;
   text-align: center;
   animation: ${slideIn} 0.5s ease-in-out;
 `;
 
 const Paragraph = styled.p`
   font-size: 1rem;
-  font-color: ${fontColorU};
+  color: ${fontColorU};
   margin-bottom: 2rem;
   text-align: center;
   animation: ${slideIn} 0.5s ease-in-out;
@@ -67,15 +67,25 @@ const Paragraph = styled.p`
 const Option = styled.div`
   display: flex;
   align-items: center;
-  margin-bottom: 1rem;
+  margin-bottom: 1.5rem;
   animation: ${slideIn} 0.5s ease-in-out;
 `;
 
 const CustomCheckbox = styled.label`
-  margin-left: 0.5rem;
-  font-size: 1.5rem;
-  font-color: ${fontColorU};
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 1.1rem;
+  color: ${fontColorU};
   cursor: pointer;
+`;
+
+const CheckboxInput = styled.input`
+  width: 1.25rem;
+  height: 1.25rem;
+  accent-color: #007bff;
+  cursor: pointer;
+  margin-right:10px;
 `;
 
 const InputGroup = styled.div`
@@ -85,11 +95,10 @@ const InputGroup = styled.div`
 
 const Label = styled.label`
   display: block;
-  font-size: 1.2rem;
-  font-color: ${fontColorU};
-
-  
-  margin-bottom: 0.5rem;
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: ${fontColorU};
+  margin-bottom: 0.75rem;
 `;
 
 const Input = styled.input`
@@ -98,10 +107,15 @@ const Input = styled.input`
   border: 1px solid #ccc;
   border-radius: 8px;
   font-size: 1rem;
-  transition: border-color 0.3s ease;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+
+  &:hover {
+    border-color: #999;
+  }
 
   &:focus {
     border-color: #007bff;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
     outline: none;
   }
 
@@ -121,6 +135,9 @@ const Suggestions = styled.ul`
   overflow-y: auto;
   background: white;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  opacity: ${({ show }) => (show ? 1 : 0)};
+  transform: ${({ show }) => (show ? 'translateY(0)' : 'translateY(-10px)')};
+  transition: opacity 0.3s ease, transform 0.3s ease;
 `;
 
 const SuggestionItem = styled.li`
@@ -135,24 +152,11 @@ const SuggestionItem = styled.li`
   }
 `;
 
-const Button = styled.button`
-  width: 100%;
-  padding: 1rem;
-  background-color: #007bff;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-
-  &:hover {
-    background-color: #0056b3;
-  }
-
-  &:active {
-    background-color: #004080;
-  }
+const ErrorMessage = styled.p`
+  color: #dc3545;
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+  text-align: center;
 `;
 
 const FadeTransition = styled(CSSTransition)`
@@ -180,7 +184,6 @@ const Residence1 = () => {
     foreignCountry: false,
   });
 
-  // -----------------------------<>----------------------------
   const { routes } = useContext(UnifiedContext);
   const currentStepIndex = useCurrentStepIndex(routes);
   const { activeBlocks, appendActiveBlocks, removeActiveBlocks } = useContext(UnifiedContext);
@@ -196,10 +199,10 @@ const Residence1 = () => {
   const [showProvinceSuggestions, setShowProvinceSuggestions] = useState(false);
   const [showCityMunSuggestions, setShowCityMunSuggestions] = useState(false);
   const [showSpecifySuggestions, setShowSpecifySuggestions] = useState(false);
+  const [error, setError] = useState('');
+
   const navigate = useNavigate();
-
   const [provincesWithMunicipalities, setProvincesWithMunicipalities] = useState({});
-
   const provinceRef = useRef(null);
   const cityMunRef = useRef(null);
   const specifyRef = useRef(null);
@@ -207,8 +210,9 @@ const Residence1 = () => {
   useEffect(() => {
     const fetchMunicipalities = async () => {
       try {
-        const response = await axios.get(`${process.env.REACT_APP_API_HOST}/api/municipalities`,
-          { withCredentials: true });
+        const response = await axios.get(`${process.env.REACT_APP_API_HOST}/api/municipalities`, {
+          withCredentials: true,
+        });
         const data = response.data;
 
         const formattedData = data.reduce((acc, row) => {
@@ -222,7 +226,7 @@ const Residence1 = () => {
 
         setProvincesWithMunicipalities(formattedData);
       } catch (err) {
-        console.error("ERROR");
+        console.error("Error fetching municipalities:", err);
       }
     };
 
@@ -235,12 +239,10 @@ const Residence1 = () => {
     const { name, checked } = e.target;
     const newLocation = { inCity: false, outsideCity: false, foreignCountry: false, [name]: checked };
 
-    // Remove all related blocks first to avoid duplicates
     removeActiveBlocks('iprovblock');
     removeActiveBlocks('oprovblock');
 
     if (checked) {
-      // Append the corresponding block based on the checkbox
       if (name === 'inCity') {
         appendActiveBlocks(['iprovblock']);
       } else if (name === 'outsideCity') {
@@ -250,10 +252,8 @@ const Residence1 = () => {
       }
     }
 
-    // Update the location state
     setLocation(newLocation);
   };
-
 
   const handleProvinceInputChange = (e) => {
     const value = e.target.value;
@@ -298,17 +298,16 @@ const Residence1 = () => {
   };
 
   const handleNextClick = async () => {
-    // Check if at least one location option is selected
     const isLocationSelected = location.inCity || location.outsideCity || location.foreignCountry;
-
-    // Check if the required inputs are filled based on the selected location
     const isProvinceFilled = !location.outsideCity || (location.outsideCity && provinceInput && cityMunInput);
     const isCountryFilled = !location.foreignCountry || (location.foreignCountry && specifyInput);
 
     if (!isLocationSelected || !isProvinceFilled || !isCountryFilled) {
+      setError('Please complete all required fields.');
       return;
     }
 
+    setError('');
     const surveyResponses = [
       { surveyquestion_ref: 'LOCIN', response_value: location.inCity ? 'Yes' : 'No' },
       { surveyquestion_ref: 'LOCOUT', response_value: location.outsideCity ? 'Yes' : 'No' },
@@ -320,34 +319,29 @@ const Residence1 = () => {
 
     try {
       await submitSurveyResponses(surveyResponses);
-      //-------------------------<>-------------------------
       goToNextStep(currentStepIndex, navigate, routes, activeBlocks);
     } catch (error) {
-      console.log('Error submitting survey responses:');
+      console.error('Error submitting survey responses:', error);
     }
   };
+
   return (
     <>
       <BodyPartial />
-      <GradientBackground >
+      <GradientBackground handleNextClick={handleNextClick}>
         <Container>
           <Title>{translations.title}</Title>
           <Paragraph>{translations.note}</Paragraph>
+          {error && <ErrorMessage>{error}</ErrorMessage>}
           <Option>
-            <input type="checkbox" name="inCity" id="in-city" checked={location.inCity} onChange={handleLocationChange} />
+            <CheckboxInput type="checkbox" name="inCity" id="in-city" checked={location.inCity} onChange={handleLocationChange} />
             <CustomCheckbox htmlFor="in-city">{translations.inCity}</CustomCheckbox>
           </Option>
           <Option>
-            <input type="checkbox" name="outsideCity" id="outside-city" checked={location.outsideCity} onChange={handleLocationChange} />
+            <CheckboxInput type="checkbox" name="outsideCity" id="outside-city" checked={location.outsideCity} onChange={handleLocationChange} />
             <CustomCheckbox htmlFor="outside-city">{translations.outsideCity}</CustomCheckbox>
           </Option>
-          <FadeTransition
-            in={location.outsideCity}
-            timeout={300}
-            classNames="fade"
-            nodeRef={provinceRef}
-            unmountOnExit
-          >
+          <FadeTransition in={location.outsideCity} timeout={300} classNames="fade" nodeRef={provinceRef} unmountOnExit>
             <InputGroup ref={provinceRef}>
               <Label htmlFor="province">{translations.province}</Label>
               <Input
@@ -356,9 +350,11 @@ const Residence1 = () => {
                 name="province"
                 value={provinceInput}
                 onChange={handleProvinceInputChange}
+                placeholder="Enter your province..."
+                aria-label="Province Input"
               />
               {showProvinceSuggestions && provinceSuggestions.length > 0 && (
-                <Suggestions>
+                <Suggestions show={showProvinceSuggestions}>
                   {provinceSuggestions.map((suggestion, index) => (
                     <SuggestionItem
                       key={index}
@@ -371,13 +367,7 @@ const Residence1 = () => {
               )}
             </InputGroup>
           </FadeTransition>
-          <FadeTransition
-            in={location.outsideCity && provinceInput}
-            timeout={300}
-            classNames="fade"
-            nodeRef={cityMunRef}
-            unmountOnExit
-          >
+          <FadeTransition in={location.outsideCity && provinceInput} timeout={300} classNames="fade" nodeRef={cityMunRef} unmountOnExit>
             <InputGroup ref={cityMunRef}>
               <Label htmlFor="city-mun">{translations.cityMun}</Label>
               <Input
@@ -387,9 +377,11 @@ const Residence1 = () => {
                 value={cityMunInput}
                 onChange={handleCityMunInputChange}
                 disabled={!provinceInput}
+                placeholder="Enter your city/municipality..."
+                aria-label="City/Municipality Input"
               />
               {showCityMunSuggestions && cityMunSuggestions.length > 0 && (
-                <Suggestions>
+                <Suggestions show={showCityMunSuggestions}>
                   {cityMunSuggestions.map((suggestion, index) => (
                     <SuggestionItem
                       key={index}
@@ -403,16 +395,10 @@ const Residence1 = () => {
             </InputGroup>
           </FadeTransition>
           <Option>
-            <input type="checkbox" name="foreignCountry" id="foreign-country" checked={location.foreignCountry} onChange={handleLocationChange} />
+            <CheckboxInput type="checkbox" name="foreignCountry" id="foreign-country" checked={location.foreignCountry} onChange={handleLocationChange} />
             <CustomCheckbox htmlFor="foreign-country">{translations.foreignCountry}</CustomCheckbox>
           </Option>
-          <FadeTransition
-            in={location.foreignCountry}
-            timeout={300}
-            classNames="fade"
-            nodeRef={specifyRef}
-            unmountOnExit
-          >
+          <FadeTransition in={location.foreignCountry} timeout={300} classNames="fade" nodeRef={specifyRef} unmountOnExit>
             <InputGroup ref={specifyRef}>
               <Label htmlFor="specify">{translations.specify}</Label>
               <Input
@@ -421,9 +407,11 @@ const Residence1 = () => {
                 name="specify"
                 value={specifyInput}
                 onChange={handleSpecifyInputChange}
+                placeholder="Enter your country..."
+                aria-label="Country Input"
               />
               {showSpecifySuggestions && specifySuggestions.length > 0 && (
-                <Suggestions>
+                <Suggestions show={showSpecifySuggestions}>
                   {specifySuggestions.map((countryCode, index) => (
                     <SuggestionItem
                       key={index}
@@ -436,9 +424,6 @@ const Residence1 = () => {
               )}
             </InputGroup>
           </FadeTransition>
-          <NextButtonU onClick={handleNextClick}>
-            {translations.next}
-          </NextButtonU>
         </Container>
       </GradientBackground>
     </>

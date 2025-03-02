@@ -14,7 +14,7 @@ import {
   Divider,
 } from "@mui/material";
 import styled from "@emotion/styled";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import {
   Dashboard as DashboardIcon,
   LocationCity as MunicipalityIcon,
@@ -28,7 +28,7 @@ import {
   ApiRounded as AiToolsIcon,
   ComputerOutlined as CompIcon,
   VerifiedUserOutlined as UserIcon,
-  QrCode2Outlined as SurveyTouchpointsIcon,  
+  QrCode2Outlined as SurveyTouchpointsIcon,
 } from "@mui/icons-material";
 
 // Import Google Fonts (Poppins)
@@ -78,6 +78,8 @@ const CustomTypography = styled(Typography)`
 `;
 
 const Sidebar = ({ drawerWidth }) => {
+  const location = useLocation();
+
   const handleLogout = async () => {
     try {
       console.log('Logging out...');
@@ -85,10 +87,11 @@ const Sidebar = ({ drawerWidth }) => {
         method: 'GET',
         credentials: 'include', // Include cookies in the request
         headers: {
-            'Content-type': 'application/json',
+          'Content-type': 'application/json',
         },
-    });
-console.log(response.status); if (response.status === 200) {
+      });
+      console.log(response.status);
+      if (response.status === 200) {
         // Handle successful logout, e.g., redirect to login page
         window.location.href = '/login'; // Redirect to login page
       }
@@ -168,14 +171,27 @@ console.log(response.status); if (response.status === 200) {
             { text: "Topic Modelling", icon: <GraphIcon />, to: "tmgraph" },
             { text: "Sentiment Analysis", icon: <InsightsIcon />, to: "sentimentgraphs" },
           ].map((item, index) => (
-            <ListItem button component={Link} to={item.to} key={index}>
-              <ListItemIcon>{item.icon}</ListItemIcon>
+            <ListItem
+              button
+              component={Link}
+              to={item.to}
+              key={index}
+              sx={{
+                backgroundColor: location.pathname === item.to ? "#0077b6" : "inherit",
+                color: location.pathname === item.to ? "white" : "inherit",
+                "&:hover": {
+                  backgroundColor: location.pathname === item.to ? "#005f8a" : "#f0f0f0",
+                },
+              }}
+            >
+              <ListItemIcon sx={{ color: location.pathname === item.to ? "white" : "inherit" }}>
+                {item.icon}
+              </ListItemIcon>
               <ListItemText
                 primary={item.text}
                 primaryTypographyProps={{ fontFamily: "Poppins, sans-serif" }}
               />
-            </ListItem>
-          ))}
+            </ListItem>))}
         </List>
       </Box>
       <Box sx={{ p: 2 }}>

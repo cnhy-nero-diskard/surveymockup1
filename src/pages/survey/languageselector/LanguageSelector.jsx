@@ -1,38 +1,164 @@
 import React, { useContext, useEffect, useState } from 'react';
+import styled from 'styled-components';
 import GradientBackground from '../../../components/partials/GradientBackground';
-import { Container, Title } from '../../../components/utils/styles1';
+import { Container, NextButtonU, Title } from '../../../components/utils/styles1';
 import translate from "../../../components/img/translate.png";
 import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '../../../components/partials/LanguageContext';
 import axios from 'axios';
-import './LanguageSelector.css'
 import BodyPartial from '../../../components/partials/BodyPartial';
-import { NextButtonU } from '../../../components/utils/styles1';
 import { useCurrentStepIndex } from '../../../components/utils/useCurrentIndex';
 import { goToNextStep } from '../../../components/utils/navigationUtils';
 import 'flag-icons/css/flag-icons.min.css';
 import { UnifiedContext } from '../../../routes/UnifiedContext';
+import '../../../components/utils/styles.css';
+import { FaGlobe } from 'react-icons/fa';
 
+const LanguageButtonsGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 20px;
+  justify-content: center;
+  margin-bottom: 30px;
+  
 
+  @media (max-width: 600px) {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+  }
+
+  @media (max-width: 400px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+`;
+
+const LanguageButton = styled.button`
+  background-color: ${({ isSelected }) => (isSelected ? '#003d80' : '#0d79ec')};
+  border: ${({ isSelected }) => (isSelected ? '2px solid #ffffff' : 'none')};
+  box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 150px;
+  border-radius: 20px;
+  width: 100%;
+  height: 120px;
+  animation: fadeIn 0.5s ease-in-out;
+
+  &:hover {
+    background-color: #003d80;
+    transform: scale(1.05);
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+
+  @media (max-width: 600px) {
+    min-width: 120px;
+    height: 100px;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+`;
+
+const FlagIcon = styled.span`
+  width: 70px;
+  height: 36px;
+  margin-bottom: 10px;
+
+  @media (max-width: 600px) {
+    width: 32px;
+    height: 24px;
+  }
+`;
+
+const LanguageName = styled.span`
+  font-size: 1rem;
+  font-weight: bold;
+  color: aliceblue;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+  position: relative;
+
+  &:hover::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 5px;
+    border-radius: 5px;
+    font-size: 0.875rem;
+    white-space: nowrap;
+  }
+`;
+
+const ConfirmationModal = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
+
+const ModalContent = styled.div`
+  background-color: white;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+`;
+
+const ModalButton = styled.button`
+  margin: 10px;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  background-color: #0d79ec;
+  color: white;
+  transition: background-color 0.3s ease;
+
+  &:hover {
+    background-color: #003d80;
+  }
+`;
 
 const LanguageSelector = () => {
-  const { setSelectedLanguage } = useLanguage(); // Access the context
-  // const { setSelectedLanguage } = useState(); // Access the context
+  const { setSelectedLanguage } = useLanguage();
   const navigate = useNavigate();
-  const [languages, setLanguages] = useState([]); // State to hold the languages
-  const [selectedLanguageCode, setSelectedLanguageCode] = useState(null); // State to hold the selected language code
-  
-  const {routes} = useContext(UnifiedContext);
+  const [languages, setLanguages] = useState([]);
+  const [selectedLanguageCode, setSelectedLanguageCode] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [showConfirmation, setShowConfirmation] = useState(false);
+
+  const { routes } = useContext(UnifiedContext);
   const [currentStep, setCurrentStep] = useState();
   const currentStepIndex = useCurrentStepIndex(routes);
-  const {activeBlocks, setActiveBlocks} = useContext(UnifiedContext);
-
+  const { activeBlocks } = useContext(UnifiedContext);
 
   useEffect(() => {
     const fetchProgress = async () => {
       try {
-        console.log("GET SURVEYPROGRESS")
-        const response = await axios.get(`${process.env.REACT_APP_API_HOST}/api/survey/progress`, {withCredentials: true});
+        const response = await axios.get(
+          `${process.env.REACT_APP_API_HOST}/api/survey/progress`,
+          { withCredentials: true }
+        );
         setCurrentStep(response.data.currentStep);
       } catch (err) {
         console.error(err);
@@ -41,17 +167,19 @@ const LanguageSelector = () => {
     fetchProgress();
   }, [navigate]);
 
-
   useEffect(() => {
     const fetchLanguages = async () => {
       try {
-        const response = await axios.get(`${process.env.REACT_APP_API_HOST}/api/languageselect`,
+        const response = await axios.get(
+          `${process.env.REACT_APP_API_HOST}/api/languageselect`,
           { withCredentials: true }
         );
-        const data = response.data;
-        setLanguages(data);
+        setLanguages(response.data);
       } catch (error) {
         console.error('Error fetching languages:', error);
+        setError('Failed to load languages. Please try again later.');
+      } finally {
+        setIsLoading(false);
       }
     };
 
@@ -59,60 +187,81 @@ const LanguageSelector = () => {
   }, []);
 
   const handleLanguageSelect = (code) => {
-    setSelectedLanguageCode(code); // Update the selected language code in state
-    console.log(`Selected language: ${code}`);
-    
+    setSelectedLanguageCode(code);
   };
 
-  const handleNextClick = async () => {
+  const handleNextClick = () => {
     if (selectedLanguageCode) {
-      setSelectedLanguage(selectedLanguageCode); // Update the selected language in context
+      setShowConfirmation(true);
+    }
+    goToNextStep(currentStepIndex, navigate, routes, activeBlocks);
+  };
 
-      // Prepare the data for the POST request
-      const postData = {
-        surveyquestion_ref: 'LANGPERF', // Example reference, adjust as needed
-        response_value : selectedLanguageCode
-      };
+  const confirmNext = async () => {
+    setShowConfirmation(false);
+    setSelectedLanguage(selectedLanguageCode);
 
-      try {
-        const response = await axios.post(`${process.env.REACT_APP_API_HOST}/api/survey/submit`, postData, {
-          withCredentials: true
-        });
-        console.log('Response saved:', response.data);
-      } catch (error) {
-        console.error('Error saving response:', error);
-      }
+    const postData = {
+      surveyquestion_ref: 'LANGPERF',
+      response_value: selectedLanguageCode,
+    };
 
-      goToNextStep(currentStepIndex, navigate,routes,activeBlocks);
-    } else {
-      alert('Please select a language before proceeding.');
+    try {
+      await axios.post(
+        `${process.env.REACT_APP_API_HOST}/api/survey/submit`,
+        postData,
+        { withCredentials: true }
+      );
+      goToNextStep(currentStepIndex, navigate, routes, activeBlocks);
+    } catch (error) {
+      console.error('Error saving response:', error);
     }
   };
-  console.log(`LANGSEL - languages are ${JSON.stringify(languages)}`);
+
+
 
   return (
     <>
       <BodyPartial />
-      <GradientBackground overlayImage={translate}>
-        <Title>Select Your Language</Title>
+      <GradientBackground overlayImage={translate} handleNextClick={handleNextClick}>
+        <Title>
+          <FaGlobe style={{ marginRight: '10px' }} />
+          Select
+          <br />
+          Your
+          <br />
+          Language
+        </Title>
         <Container>
-          <div className="language-buttons-grid">
-            {languages.map((language) => (
-              <button
-                key={language.code}
-                className="language-button"
-                onClick={() => handleLanguageSelect(language.code)}
-              >
-                <span className={`fi fi-${language.flag} flag-icon`}></span>
-                <span className="language-name">{language.name}</span>
-              </button>
-            ))}
+          {error ? (
+            <div style={{ color: 'red', textAlign: 'center' }}>{error}</div>
+          ) : isLoading ? (
+            <div>Loading languages...</div>
+          ) : (
+            <LanguageButtonsGrid>
+              {languages.map((language) => {
+                const isSelected = selectedLanguageCode === language.code;
+                return (
+                  <LanguageButton
+                    key={language.code}
+                    isSelected={isSelected}
+                    onClick={() => handleLanguageSelect(language.code)}
+                  >
+                    <FlagIcon className={`fi fi-${language.flag}`} />
+                    <LanguageName data-tooltip={language.name}>{language.name}</LanguageName>
+                  </LanguageButton>
+                );
+              })}
+            </LanguageButtonsGrid>
+          )}
+          <div style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>
+
+
           </div>
-          <NextButtonU onClick={handleNextClick} className="next-button">
-            NEXT
-          </NextButtonU>
         </Container>
       </GradientBackground>
+
+
     </>
   );
 };

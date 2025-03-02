@@ -114,100 +114,94 @@ const LoadingSpinner = styled.div`
 `;
 
 const PackageTourItems = () => {
-    const { routes } = useContext(UnifiedContext);
+  const { routes } = useContext(UnifiedContext);
   const currentStepIndex = useCurrentStepIndex(routes);
   const { activeBlocks, appendActiveBlocks, removeActiveBlocks } = useContext(UnifiedContext);
 
-    const [selectedItems, setSelectedItems] = useState([]);
-    const [isLoading, setIsLoading] = useState(false);
-    const [language, setLanguage] = useState(localStorage.getItem('selectedLanguage'));
-    const translations = useTranslations('PackageTourItems', language);
+  const [selectedItems, setSelectedItems] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [language, setLanguage] = useState(localStorage.getItem('selectedLanguage'));
+  const translations = useTranslations('PackageTourItems', language);
 
-    // Mapping of translations to English values
-    const englishValues = {
-        [translations.packageTourItemsAccommodation]: 'Accommodation',
-        [translations.packageTourItemsEstablishment]: 'Establishment',
-        [translations.packageTourItemsFoodBeverages]: 'Food & Beverages',
-        [translations.packageTourItemsShopping]: 'Shopping',
-        [translations.packageTourItemsLocalTransport]: 'Local Transport',
-        [translations.packageTourItemsTourismActivities]: 'Tourism Activities',
-        [translations.packageTourItemsEntertainment]: 'Entertainment',
-        [translations.packageTourItemsMiscellaneous]: 'Miscellaneous',
+  // Mapping of translations to English values
+  const englishValues = {
+    [translations.packageTourItemsAccommodation]: 'Accommodation',
+    [translations.packageTourItemsEstablishment]: 'Establishment',
+    [translations.packageTourItemsFoodBeverages]: 'Food & Beverages',
+    [translations.packageTourItemsShopping]: 'Shopping',
+    [translations.packageTourItemsLocalTransport]: 'Local Transport',
+    [translations.packageTourItemsTourismActivities]: 'Tourism Activities',
+    [translations.packageTourItemsEntertainment]: 'Entertainment',
+    [translations.packageTourItemsMiscellaneous]: 'Miscellaneous',
+  };
+
+  const handleCheckboxChange = (item) => {
+    const englishValue = englishValues[item];
+    const surveyResponse = {
+      surveyquestion_ref: 'PKGITEMS', // Example 5-char ref, can be dynamic if needed
+      response_value: englishValue,
     };
 
-    const handleCheckboxChange = (item) => {
-        const englishValue = englishValues[item];
-        const surveyResponse = {
-            surveyquestion_ref: 'PKGITEMS', // Example 5-char ref, can be dynamic if needed
-            response_value: englishValue,
-        };
+    if (selectedItems.some((i) => i.response_value === englishValue)) {
+      setSelectedItems(selectedItems.filter((i) => i.response_value !== englishValue));
+    } else {
+      setSelectedItems([...selectedItems, surveyResponse]);
+    }
+  };
 
-        if (selectedItems.some((i) => i.response_value === englishValue)) {
-            setSelectedItems(selectedItems.filter((i) => i.response_value !== englishValue));
-        } else {
-            setSelectedItems([...selectedItems, surveyResponse]);
-        }
-    };
+  const navigate = useNavigate();
 
-    const navigate = useNavigate();
+  const handleNextClick = async () => {
+    if (isLoading) return;
+    setIsLoading(true);
+    console.log('Selected Items:', selectedItems);
 
-    const handleNextClick = async () => {
-        setIsLoading(true);
-        console.log('Selected Items:', selectedItems);
+    try {
+      await submitSurveyResponses(selectedItems);
+      setIsLoading(false);
+      goToNextStep(currentStepIndex, navigate, routes, activeBlocks);
+    } catch (error) {
+      console.error('Error submitting survey responses:', error);
+      setIsLoading(false);
+    }
 
-        try {
-            await submitSurveyResponses(selectedItems);
-            setIsLoading(false);
-            goToNextStep(currentStepIndex, navigate, routes, activeBlocks);
-        } catch (error) {
-            console.error('Error submitting survey responses:', error);
-            setIsLoading(false);
-        }
-        
-    };
+  };
 
-    const checklistItems = [
-        translations.packageTourItemsAccommodation,
-        translations.packageTourItemsEstablishment,
-        translations.packageTourItemsFoodBeverages,
-        translations.packageTourItemsShopping,
-        translations.packageTourItemsLocalTransport,
-        translations.packageTourItemsTourismActivities,
-        translations.packageTourItemsEntertainment,
-        translations.packageTourItemsMiscellaneous,
-    ];
+  const checklistItems = [
+    translations.packageTourItemsAccommodation,
+    translations.packageTourItemsEstablishment,
+    translations.packageTourItemsFoodBeverages,
+    translations.packageTourItemsShopping,
+    translations.packageTourItemsLocalTransport,
+    translations.packageTourItemsTourismActivities,
+    translations.packageTourItemsEntertainment,
+    translations.packageTourItemsMiscellaneous,
+  ];
 
-    return (
-        <>
-            <BodyPartial />
-            <GradientBackground overlayImage={imgoverlay} opacity={0.1} blendMode="normal">   
-                <ChecklistContainer
-                    initial={{ opacity: 0, y: -50 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5 }}
-                >
-                    <ChecklistTitle>{translations.packageTourItemsTitle}</ChecklistTitle>
-                    {checklistItems.map((item) => (
-                        <ChecklistItem key={item}>
-                            <Checkbox
-                                checked={selectedItems.some((i) => i.response_value === englishValues[item])}
-                                onChange={() => handleCheckboxChange(item)}
-                            />
-                            {item}
-                        </ChecklistItem>
-                    ))}
-                    <NextButton
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                        onClick={handleNextClick}
-                        disabled={isLoading}
-                    >
-                        {isLoading ? <LoadingSpinner/> : translations.packageTourItemsNextButton}
-                    </NextButton>
-                </ChecklistContainer>
-            </GradientBackground>
-        </>
-    );
+  return (
+    <>
+      <BodyPartial />
+      <GradientBackground overlayImage={imgoverlay} opacity={0.1} blendMode="normal" handleNextClick={handleNextClick} buttonAppear={selectedItems.length > 0}>
+        <ChecklistContainer
+          initial={{ opacity: 0, y: -50 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          <ChecklistTitle>{translations.packageTourItemsTitle}</ChecklistTitle>
+          {checklistItems.map((item) => (
+            <ChecklistItem key={item}>
+              <Checkbox
+                checked={selectedItems.some((i) => i.response_value === englishValues[item])}
+                onChange={() => handleCheckboxChange(item)}
+              />
+              {item}
+            </ChecklistItem>
+          ))}
+
+        </ChecklistContainer>
+      </GradientBackground>
+    </>
+  );
 };
 
 export default PackageTourItems;

@@ -21,6 +21,7 @@
     "currency-converter-lt": "^2.0.1",
     "emoji-mart": "^5.6.0",
     "fetch": "^1.1.0",
+    "file-saver": "^2.0.5",
     "flag-icons": "^7.3.2",
     "formik": "^2.4.6",
     "framer-motion": "^11.15.0",
@@ -56,6 +57,7 @@
     "styled-components": "^6.1.13",
     "uuid": "^11.0.5",
     "web-vitals": "^4.2.4",
+    "xlsx": "^0.18.5",
     "yup": "^1.6.1"
   },
   "scripts": {

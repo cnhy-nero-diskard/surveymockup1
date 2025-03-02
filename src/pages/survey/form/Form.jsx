@@ -140,7 +140,7 @@ const Form = () => {
     return (
         <ThemeProvider theme={theme}>
             <BodyPartial />
-            <GradientBackground>
+            <GradientBackground handleNextClick={handleSubmit}>
                 <FormContainer style={formAnimation}>
                     <FormTitle>
                         <span>{translations.formWelcomeTourists}</span>
@@ -162,9 +162,9 @@ const Form = () => {
                             onChange={handleInputChange}
                             required
                         />
-                        <NextButtonU type="submit">
+                        {/* <NextButtonU type="submit">
                             {translations.formSubmitButton}
-                        </NextButtonU>
+                        </NextButtonU> */}
                     </form>
                 </FormContainer>
 

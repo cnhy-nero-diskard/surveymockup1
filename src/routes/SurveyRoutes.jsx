@@ -22,26 +22,28 @@ const SurveyRoutesContent = () => {
     console.log("SURVEY ROUTES NAV");
 
     return (
-        <Routes>
-            {/* Dynamically generate survey routes */}
-            {routes.map((route, index) => (
-                <Route
-                    key={route.path}
-                    path={route.path}
-                    element={
-                        <SurveyStepGuard
-                            route={route}
-                            index={index}
-                            totalSteps={routes.length}
-                        />
-                    }
-                />
-            ))}
-
-            {/* Fallback route */}
-            <Route path="*" element={<NotFound />} />
-        </Routes>
-    );
+<>  
+            <Routes>
+                {/* Dynamically generate survey routes */}
+                {routes.map((route, index) => (
+                    <Route
+                        key={route.path}
+                        path={route.path}
+                        element={
+                            <SurveyStepGuard
+                                route={route}
+                                index={index}
+                                totalSteps={routes.length}
+                            />
+                        }
+                    />
+                ))}
+    
+                {/* Fallback route */}
+                <Route path="*" element={<NotFound />} />
+            </Routes>
+    
+</>    );
 };
 
 export default SurveyRoutes;

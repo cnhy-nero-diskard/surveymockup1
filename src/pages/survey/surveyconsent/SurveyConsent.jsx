@@ -45,11 +45,12 @@ const Text = styled(animated.p)`
   font-size: 20px;
   text-align: justify;
   margin-bottom: 20px;
-  color: #cbe5f4;
+  padding: 0 2px 0 2px;
+  color:rgb(255, 255, 255);
   width: 100%;
 
   @media (max-width: 600px) {
-    font-size: 1.2rem;
+    font-size: 1.1rem;
   }
 
   @media (min-width: 601px) and (max-width: 900px) {
@@ -173,15 +174,15 @@ const SurveyConsent = () => {
     <>
       <BodyPartial />
 
-      <GradientBackground>
+      <GradientBackground handleNextClick={handleNextClick}>
         <Container>
           <Title style={titleProps}>{translations.SurveyConsentTitle}</Title>
           <Text style={textProps}>
             {translations.SurveyConsentDescription || 'Thank you for taking part in our survey for the Department of Tourism. This survey aims to improve tourism services, and your participation is voluntary. You can stop at any time without any consequences. Your responses will be kept anonymous and used only for the purpose of this survey.'}
           </Text>
-          <Button style={buttonProps} onClick={handleNextClick}>
+          {/* <Button style={buttonProps} onClick={handleNextClick}>
             {translations.SurveyConsentAgreeButton || 'AGREE'}
-          </Button>
+          </Button> */}
         </Container>
       </GradientBackground>
 

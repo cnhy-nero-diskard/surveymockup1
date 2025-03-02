@@ -7,7 +7,7 @@ import imgoverlay from "../../../components/img/money.png";
 import { useNavigate } from 'react-router-dom';
 import useTranslations from '../../../components/utils/useTranslations';
 import { submitSurveyResponses } from '../../../components/utils/sendInputUtils';
-import { NextButtonU } from '../../../components/utils/styles1';
+import { NextButtonU, QuestionText } from '../../../components/utils/styles1';
 import { useCurrentStepIndex } from '../../../components/utils/useCurrentIndex';
 import { UnifiedContext } from '../../../routes/UnifiedContext';
 import { goToNextStep } from '../../../components/utils/navigationUtils';
@@ -19,66 +19,101 @@ const Container = styled.div`
   justify-content: center;
   height: 60vh;
   font-family: 'Arial', sans-serif;
+  padding: 20px;
 `;
 
-const Question = styled.h1`
-  font-size: 24px;
+const Question = styled(animated.h1)`
+  font-size: 28px;
+  font-weight: 700;
   color: #333;
-  margin-bottom: 20px;
+  margin-bottom: 30px;
+  text-align: center;
 `;
 
 const InputContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
+  gap: 15px;
 `;
 
 const InputLabel = styled.label`
   font-size: 18px;
+  font-weight: 600;
   color: #555;
-  margin-bottom: 10px;
 `;
 
 const CurrencyInput = styled.input`
   font-size: 16px;
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  width: 200px;
+  padding: 12px;
+  border: 2px solid #ccc;
+  border-radius: 8px;
+  width: 220px;
   text-align: center;
-  margin-bottom: 15px;
+  transition: border-color 0.3s ease;
+
+  &:focus {
+    border-color: #007bff;
+    outline: none;
+  }
+
+  &::placeholder {
+    color: #999;
+  }
 `;
 
 const CurrencySelect = styled.select`
   font-size: 16px;
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  width: 220px;
-  margin-bottom: 20px;
+  padding: 12px;
+  border: 2px solid #ccc;
+  border-radius: 8px;
+  width: 240px;
+  background-color: #fff;
+  cursor: pointer;
+  transition: border-color 0.3s ease;
+
+  &:focus {
+    border-color: #007bff;
+    outline: none;
+  }
 `;
 
 const NextButton = styled(animated.button)`
-  margin-top: 20px;
-  padding: 10px 20px;
+  margin-top: 30px;
+  padding: 12px 24px;
   font-size: 16px;
+  font-weight: 600;
   color: #fff;
   background-color: #007bff;
   border: none;
-  border-radius: 5px;
+  border-radius: 8px;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  opacity: ${({ disabled }) => (disabled ? 0.6 : 1)};
+  pointer-events: ${({ disabled }) => (disabled ? 'none' : 'auto')};
 
   &:hover {
     background-color: #0056b3;
+    transform: scale(1.05);
+  }
+
+  &:active {
+    transform: scale(0.95);
   }
 `;
 
 const ConversionResult = styled.div`
   margin-top: 20px;
   font-size: 18px;
+  font-weight: 500;
   color: #333;
+  background-color: #f0f8ff;
+  padding: 12px;
+  border-radius: 8px;
+  text-align: center;
 `;
+
+
 
 const PackagePaid = () => {
   const { routes } = useContext(UnifiedContext);
@@ -86,6 +121,7 @@ const PackagePaid = () => {
   const { activeBlocks, appendActiveBlocks, removeActiveBlocks } = useContext(UnifiedContext);
 
   const [responses, setResponses] = useState({ price: '', currency: 'USD' });
+  const [isLoading, setIsLoading] = useState(false);
   const [language, setLanguage] = useState(localStorage.getItem('selectedLanguage'));
   const translations = useTranslations('PackagePaid', language);
   const navigate = useNavigate();
@@ -93,6 +129,13 @@ const PackagePaid = () => {
   const buttonAnimation = useSpring({
     transform: 'scale(1)',
     from: { transform: 'scale(0.9)' },
+    config: { tension: 200, friction: 10 },
+  });
+
+  const questionAnimation = useSpring({
+    opacity: 1,
+    transform: 'translateY(0)',
+    from: { opacity: 0, transform: 'translateY(-20px)' },
     config: { tension: 200, friction: 10 },
   });
 
@@ -108,47 +151,54 @@ const PackagePaid = () => {
   const convertedPrice = (parseFloat(responses.price) * conversionRates[responses.currency]).toFixed(2);
 
   const handleNextClick = async () => {
+    setIsLoading(true);
     const surveyResponses = [
       { surveyquestion_ref: 'PRCAM', response_value: responses.price },
       { surveyquestion_ref: 'CURNC', response_value: responses.currency },
       { surveyquestion_ref: 'CONVR', response_value: convertedPrice }
     ];
     await submitSurveyResponses(surveyResponses);
+    setIsLoading(false);
     goToNextStep(currentStepIndex, navigate, routes, activeBlocks);
-    
   };
 
   return (
     <>
       <BodyPartial />
-      <GradientBackground overlayImage={imgoverlay} opacity={0.3} blendMode="screen">
+      <GradientBackground 
+        overlayImage={imgoverlay} 
+        opacity={0.3} blendMode="screen" 
+        buttonAppear={!!responses.price}
+        handleNextClick={handleNextClick}
+      >
         <Container>
-          <Question>{translations.packagePaidQuestion}</Question>
+          <QuestionText style={questionAnimation}>{translations.packagePaidQuestion}</QuestionText>
           <InputContainer>
             <InputLabel>{translations.packagePaidInputLabel}</InputLabel>
             <CurrencyInput
               type="number"
               name="price"
-              placeholder={translations.packagePaidInputPlaceholder}
+              placeholder="Enter amount"
               value={responses.price}
               onChange={handleInputChange}
+              aria-label="Enter package price"
             />
-            <CurrencySelect name="currency" value={responses.currency} onChange={handleInputChange}>
+            <CurrencySelect 
+              name="currency" 
+              value={responses.currency} 
+              onChange={handleInputChange}
+              aria-label="Select currency"
+            >
               {Object.keys(conversionRates).map(code => (
                 <option key={code} value={code}>{translations[`packagePaidCurrency${code}`]}</option>
               ))}
             </CurrencySelect>
           </InputContainer>
-          <ConversionResult>
-            {responses.price && responses.currency && (
-              <span>
-                {translations.packagePaidConversionResult} {responses.price} {responses.currency} {translations.packagePaidConversionResultApprox} {convertedPrice} PHP.
-              </span>
-            )}
-          </ConversionResult>
-          <NextButtonU style={buttonAnimation} onClick={handleNextClick}>
-            {translations.packagePaidNextButton}
-          </NextButtonU>
+          {responses.price && responses.currency && (
+            <ConversionResult>
+              {translations.packagePaidConversionResult} {responses.price} {responses.currency} {translations.packagePaidConversionResultApprox} {convertedPrice} PHP.
+            </ConversionResult>
+          )}
         </Container>
       </GradientBackground>
     </>

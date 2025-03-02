@@ -100,16 +100,16 @@ const Greetings = () => {
   return (
     <>
       <BodyPartial />
-      <GradientBackground overlayImage={imgoverlay}>
-        <Container>
+      <GradientBackground overlayImage={imgoverlay} handleNextClick={handleStartSurvey} nextmsg={translations.greetingsStartSurvey}>
+        <Container >
           <Title>{translations.greetingsTitle}</Title>
           <Subtitle>{translations.greetingsInvitation}</Subtitle>
           <Subtitle>{translations.greetingsDOTSurvey}</Subtitle>
           <Paragraph>{translations.greetingsSurveyPurpose}</Paragraph>
           <Paragraph>{translations.greetingsDataPrivacy}</Paragraph>
-          <NextButtonU style={buttonProps} onClick={handleStartSurvey}>
+          {/* <NextButtonU style={buttonProps} onClick={handleStartSurvey}>
             {translations.greetingsStartSurvey}
-          </NextButtonU>
+          </NextButtonU> */}
         </Container>
       </GradientBackground>
     </>

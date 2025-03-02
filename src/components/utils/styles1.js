@@ -10,16 +10,20 @@ export const Container = styled(motion.div)`
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 20px;
+  padding: 10px;
   border-radius: 10px;
-  max-height: 80vh;
+  height: 80vh;
+  
 `;
 
 export const Title = styled.h2`
   font-size: 1.5rem;
   color: #fff;
-  margin-bottom: 10px;
+  background: rgba(0,0,0,0.1);
+  border-radius: 15px;
+  padding: 10px;
   justify-content: center;
+  text-align: center;
 `;
 
 export const Paragraph = styled.p`
@@ -56,7 +60,12 @@ export const EmojiButton = styled(Button)`
     color: white;
   `}
 `;
-
+export const QuestionText = styled.p`
+  font-size: 2rem;
+  font-weight: bold;
+  margin-bottom: 10px;
+  color: white;
+`;
 export const TextField = styled.textarea`
   width: 100%;
   height: 100px;
@@ -82,12 +91,12 @@ const pulse = keyframes`
 
 
 export const NextButtonU = styled.button`
-  background: linear-gradient(135deg,rgba(107, 17, 203, 0.38), #2575fc);
+  background: linear-gradient(135deg,rgb(36, 17, 203), #2575fc);
   color: white;
   border: none;
   padding: 15px 30px;
   font-size: 1.2rem;
-  border-radius: 25px;
+  border-radius: 30px;
   cursor: pointer;
   transition: background 0.3s ease-in-out, transform 0.2s ease-in-out;
   animation: ${pulse} 2s infinite;

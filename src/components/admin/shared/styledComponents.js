@@ -40,10 +40,11 @@ export const DynamicGridContainer = styled.div`
   font-family: Arial, sans-serif;
   margin: 0;
   padding: 20px;
-  background-color: rgba(6, 80, 122, 0.4);
+  background-color: rgba(0, 93, 146, 0.4);
   display: grid;
   gap: 20px;
   height: 100vh;
+  width: 80vw;
   overflow-y: auto; // Allow scrolling if content overflows
 
   /* Default: 3 columns */

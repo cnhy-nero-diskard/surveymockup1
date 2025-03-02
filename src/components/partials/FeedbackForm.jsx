@@ -7,77 +7,122 @@ import GradientBackground from './GradientBackground';
 import imgOverlay from "../../components/img/ball.png";
 import useTranslations from '../utils/useTranslations';
 import { submitSurveyResponses } from '../utils/sendInputUtils';
+import { QuestionText } from '../utils/styles1';
 
 const FeedbackFormContainer = styled(animated.div)`
   max-width: 600px;
   margin: 0 auto;
   padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
 `;
 
 const Title = styled.h2`
-  font-size: 1.5rem;
-  margin-bottom: 20px;
+  font-size: 1.8rem;
+  margin-bottom: 24px;
   text-align: center;
+  color: #333;
+  font-weight: 600;
 `;
 
 const OptionsContainer = styled.div`
   display: flex;
-  justify-content: space-between;
-  margin-bottom: 20px;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 24px;
 `;
 
 const OptionButton = styled.button`
-  padding: 10px 20px;
-  margin: 5px;
-  border-radius: 20px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  padding: 12px 24px;
+  border-radius: 25px;
+  border: 2px solid #ddd;
+  background-color: #fff;
+  color: #333;
+  font-size: 1rem;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 
   &.selected {
     background-color: #4caf50;
     color: white;
     border-color: #4caf50;
+    transform: scale(1.05);
   }
 
   &:hover {
-    background-color: rgb(65, 141, 255);
+    background-color: #f0f0f0;
+    border-color: #4caf50;
+  }
+
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.3);
   }
 `;
 
 const FeedbackTextarea = styled.textarea`
   width: 100%;
-  height: 100px;
-  padding: 10px;
-  margin-bottom: 20px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+  height: 120px;
+  padding: 12px;
+  margin-bottom: 24px;
+  border: 2px solid #ddd;
+  border-radius: 8px;
   resize: none;
+  font-size: 1rem;
+  color: #333;
+  transition: border-color 0.3s ease;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+
+  &:focus {
+    border-color: #4caf50;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.3);
+  }
+
+  &::placeholder {
+    color: #999;
+  }
 `;
 
 const NextButton = styled.button`
   display: block;
   width: 100%;
-  padding: 10px;
+  padding: 12px;
   border: none;
-  border-radius: 15px;
+  border-radius: 25px;
   background-color: #4caf50;
   color: white;
-  font-size: 1rem;
+  font-size: 1.1rem;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  transition: background-color 0.3s ease, transform 0.2s ease;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 
   &:hover {
     background-color: #45a049;
+    transform: translateY(-2px);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+
+  &:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+    transform: none;
   }
 `;
 
-const WarningMessage = styled.div`
-  color: red;
-  margin-bottom: 10px;
+const WarningMessage = styled(animated.div)`
+  color: #d32f2f;
+  margin-bottom: 16px;
   text-align: center;
+  font-size: 0.9rem;
+  padding: 8px;
+  background-color: rgba(211, 47, 47, 0.1);
+  border-radius: 8px;
 `;
 
 const FeedbackForm = ({ title, onNext, squestion_identifier, satisfactionOptions = {
@@ -93,7 +138,6 @@ const FeedbackForm = ({ title, onNext, squestion_identifier, satisfactionOptions
     const [isFormValid, setIsFormValid] = useState(false);
     const [showWarning, setShowWarning] = useState(false);
 
-    // Fetch translations based on the selected language
     const translations = useTranslations('FeedbackForm', language);
 
     useEffect(() => {
@@ -101,14 +145,12 @@ const FeedbackForm = ({ title, onNext, squestion_identifier, satisfactionOptions
     }, [language, translations]);
 
     useEffect(() => {
-        // Check if all required fields are filled
         setIsFormValid(selectedOption !== null && feedback.trim() !== '');
     }, [selectedOption, feedback]);
 
     const handleOptionClick = (option) => {
         setSelectedOption(option);
 
-        // Update placeholder text based on the selected option
         switch (option) {
             case 'Dissatisfied':
                 setPlaceholderText(translations.feedbackFormPlaceholderDissatisfied);
@@ -133,7 +175,13 @@ const FeedbackForm = ({ title, onNext, squestion_identifier, satisfactionOptions
         config: { duration: 1000 },
     });
 
-    const navigate = useNavigate(); // Initialize useNavigate
+    const warningAnimation = useSpring({
+        opacity: showWarning ? 1 : 0,
+        transform: showWarning ? 'translateY(0)' : 'translateY(-10px)',
+        config: { tension: 300, friction: 20 },
+    });
+
+    const navigate = useNavigate();
 
     const handleNextClick = async () => {
         if (!isFormValid) {
@@ -141,29 +189,25 @@ const FeedbackForm = ({ title, onNext, squestion_identifier, satisfactionOptions
             return;
         }
 
-        // Prepare the survey responses array
         const surveyResponses = [];
 
-        // Add the selected satisfaction option to the responses
         if (selectedOption) {
             surveyResponses.push({
-                surveyquestion_ref: 'SATLV' + squestion_identifier, // 5 chars, all caps
-                response_value: selectedOption, // English value
+                surveyquestion_ref: 'SATLV' + squestion_identifier,
+                response_value: selectedOption,
             });
         }
 
-        // Add the feedback text to the responses
         if (feedback) {
             surveyResponses.push({
-                surveyquestion_ref: 'FDBK' + squestion_identifier, // 5 chars, all caps
-                response_value: feedback, // English value
+                surveyquestion_ref: 'FDBK' + squestion_identifier,
+                response_value: feedback,
             });
         }
 
-        // Submit the survey responses to the backend
         try {
             await submitSurveyResponses(surveyResponses);
-            onNext(selectedOption, feedback); // Pass the selected option and feedback to the parent component
+            onNext(selectedOption, feedback);
         } catch (error) {
             console.error('Error submitting survey responses:', error);
         }
@@ -171,15 +215,22 @@ const FeedbackForm = ({ title, onNext, squestion_identifier, satisfactionOptions
 
     return (
         <><BodyPartial />
-            <GradientBackground overlayImage={imgOverlay} opacity={0.15} blendMode='screen'>
+            <GradientBackground overlayImage={imgOverlay}
+                opacity={0.15}
+                blendMode='screen'
+                buttonAppear={isFormValid}
+                handleNextClick={handleNextClick}
+
+            >
                 <FeedbackFormContainer style={animation}>
-                    <Title>{title || translations.feedbackFormTitle}</Title>
+                    <QuestionText>{title || translations.feedbackFormTitle}</QuestionText>
                     <OptionsContainer>
                         {Object.keys(satisfactionOptions).map((option) => (
                             <OptionButton
                                 key={option}
                                 className={selectedOption === option ? 'selected' : ''}
                                 onClick={() => handleOptionClick(option)}
+                                aria-pressed={selectedOption === option}
                             >
                                 {translations[`feedbackFormOption${option}`]}
                             </OptionButton>
@@ -189,14 +240,17 @@ const FeedbackForm = ({ title, onNext, squestion_identifier, satisfactionOptions
                         placeholder={placeholderText}
                         value={feedback}
                         onChange={(e) => setFeedback(e.target.value)}
+                        aria-label="Feedback textarea"
                     />
-                    {showWarning && !isFormValid && (
-                        <WarningMessage>{translations.feedbackFormWarningMessage}</WarningMessage>
+                    {showWarning && (
+                        <WarningMessage style={warningAnimation}>
+                            {translations.feedbackFormWarning}
+                        </WarningMessage>
                     )}
-                    <NextButton onClick={handleNextClick}>{translations.feedbackFormNextButton}</NextButton>
                 </FeedbackFormContainer>
             </GradientBackground>
-        </>);
+        </>
+    );
 };
 
 export default FeedbackForm;

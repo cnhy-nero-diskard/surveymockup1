@@ -10,6 +10,7 @@ import { submitSurveyResponses } from '../../../components/utils/sendInputUtils'
 import { UnifiedContext } from '../../../routes/UnifiedContext';
 import { useCurrentStepIndex } from '../../../components/utils/useCurrentIndex';
 import { goToNextStep } from '../../../components/utils/navigationUtils';
+
 // Keyframes for animations
 const fadeIn = keyframes`
   from {
@@ -34,51 +35,60 @@ const pulse = keyframes`
   }
 `;
 
-// Styled components
 export const Container = styled.div`
   max-width: 800px;
   margin: 0 auto;
-  padding: 20px;
+  padding: 40px 20px;
   text-align: center;
   animation: ${fadeIn} 0.5s ease-in-out;
 `;
 
 export const Header = styled.h1`
-  font-size: 2.5rem;
-  color: #333;
-  margin-bottom: 20px;
+  font-size: 2.1rem;
+  color: #2c3e50;
+  margin-bottom: 30px;
+  font-weight: 600;
 `;
 
 export const OptionsGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 20px;
-  margin-bottom: 30px;
+  gap: 25px;
+  margin-bottom: 40px;
 `;
 
 export const Option = styled.div`
   display: flex;
   align-items: center;
-  background:rgb(184, 201, 255);
-  padding: 15px;
-  border-radius: 10px;
-  box-shadow: 0 4px 6px rgba(0, 44, 241, 0.69);
-  transition: transform 0.2s ease-in-out;
+  background: ${({ selected }) => (selected ? 'rgb(8, 65, 252)' : 'rgb(184, 201, 255)')};
+  padding: 10px;
+  border-radius: 25px;
+  box-shadow: 0 4px 6px rgba(29, 43, 105, 0.69);
+  transition: all 0.3s ease-in-out;
+  cursor: pointer;
 
   &:hover {
     transform: translateY(-5px);
+    background: ${({ selected }) => (selected ? '#6a11cb' : '#2575fc')};
   }
 `;
 
 export const CustomCheckbox = styled.input.attrs({ type: 'checkbox' })`
-  margin-right: 10px;
+  margin-right: 15px;
   cursor: pointer;
+  opacity: 0;
+  position: absolute;
+
+  &:checked + label {
+    color: white;
+  }
 `;
 
 export const Label = styled.label`
-  font-size: 1.2rem;
-  color: #555;
+  font-size: 1.3rem;
+  color: ${({ selected }) => (selected ? 'white' : '#555')};
   cursor: pointer;
+  transition: color 0.3s ease-in-out;
 `;
 
 export const NextButton = styled.button`
@@ -100,13 +110,20 @@ export const NextButton = styled.button`
   &:active {
     transform: scale(0.95);
   }
+
+  &:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+    animation: none;
+  }
 `;
 
 const MainPurpose = () => {
   const [selectedPurpose, setSelectedPurpose] = useState('');
-  const [showOptions, setShowOptions] = useState(true); // State to control visibility
+  const [showOptions, setShowOptions] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [language, setLanguage] = useState(localStorage.getItem('selectedLanguage'));
-  const navigate = useNavigate(); // Initialize useNavigate
+  const navigate = useNavigate();
 
   const { routes } = useContext(UnifiedContext);
   const currentStepIndex = useCurrentStepIndex(routes);
@@ -118,12 +135,8 @@ const MainPurpose = () => {
     setSelectedPurpose(event.target.value);
   };
 
-  const toggleOptionsVisibility = () => {
-    setShowOptions(!showOptions); // Toggle the visibility state
-  };
-
   const handleNextClick = async () => {
-    // Prepare the data to be sent
+    setIsSubmitting(true);
     const purposes = [
       { id: 'pleasureVacation', value: 'Pleasure/Vacation', ref: 'PUR01' },
       { id: 'businessProfessional', value: 'Business/Professional Work', ref: 'PUR02' },
@@ -134,111 +147,54 @@ const MainPurpose = () => {
     ];
 
     try {
-      // Create an array to hold all survey responses
-      const surveyResponses = [];
+      const surveyResponses = purposes.map(purpose => ({
+        surveyquestion_ref: purpose.ref,
+        response_value: document.getElementById(purpose.id).checked ? 'YES' : 'NO',
+      }));
 
-      // Loop through each purpose and collect the responses
-      for (const purpose of purposes) {
-        const checkbox = document.getElementById(purpose.id);
-        const surveyResponse = {
-          surveyquestion_ref: purpose.ref, // Unique reference for each purpose
-          response_value: checkbox.checked ? 'YES' : 'NO', // Send 'YES' or 'NO' based on checkbox state
-        };
-
-        // Add the response to the array
-        surveyResponses.push(surveyResponse);
-      }
-
-      // Send the array of responses in a single request
       await submitSurveyResponses(surveyResponses);
       goToNextStep(currentStepIndex, navigate, routes, activeBlocks);
     } catch (error) {
       console.error('Error submitting survey responses:', error);
       alert('Failed to submit survey responses. Please try again.');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   return (
     <>
       <BodyPartial />
-      <GradientBackground overlayImage={imgoverlay}>
+      <GradientBackground overlayImage={imgoverlay} handleNextClick={handleNextClick}>
         <Container>
           <Header>{translations.MainPurposeHeader}</Header>
           <form>
-            {showOptions && ( // Conditionally render the options
+            {showOptions && (
               <OptionsGrid>
-                <Option>
-                  <CustomCheckbox
-                    type="checkbox"
-                    id="pleasureVacation"
-                    value="Pleasure/Vacation"
-                    onChange={handlePurposeChange}
-                  />
-                  <Label htmlFor="pleasureVacation">
-                    {translations.MainPurposePleasureVacation}
-                  </Label>
-                </Option>
-                <Option>
-                  <CustomCheckbox
-                    type="checkbox"
-                    id="businessProfessional"
-                    value="Business/Professional Work"
-                    onChange={handlePurposeChange}
-                  />
-                  <Label htmlFor="businessProfessional">
-                    {translations.MainPurposeBusinessProfessional}
-                  </Label>
-                </Option>
-                <Option>
-                  <CustomCheckbox
-                    type="checkbox"
-                    id="educationalFieldtrip"
-                    value="Educational/Fieldtrip"
-                    onChange={handlePurposeChange}
-                  />
-                  <Label htmlFor="educationalFieldtrip">
-                    {translations.MainPurposeEducationalFieldtrip}
-                  </Label>
-                </Option>
-                <Option>
-                  <CustomCheckbox
-                    type="checkbox"
-                    id="healthWellnessRetirement"
-                    value="Health/Wellness/Retirement"
-                    onChange={handlePurposeChange}
-                  />
-                  <Label htmlFor="healthWellnessRetirement">
-                    {translations.MainPurposeHealthWellnessRetirement}
-                  </Label>
-                </Option>
-                <Option>
-                  <CustomCheckbox
-                    type="checkbox"
-                    id="visitFriendsRelatives"
-                    value="Visit Friends and Relatives"
-                    onChange={handlePurposeChange}
-                  />
-                  <Label htmlFor="visitFriendsRelatives">
-                    {translations.MainPurposeVisitFriendsRelatives}
-                  </Label>
-                </Option>
-                <Option>
-                  <CustomCheckbox
-                    type="checkbox"
-                    id="meetingIncentiveConventionExhibition"
-                    value="Meeting, Incentive, Convention, Exhibition"
-                    onChange={handlePurposeChange}
-                  />
-                  <Label htmlFor="meetingIncentiveConventionExhibition">
-                    {translations.MainPurposeMeetingIncentiveConventionExhibition}
-                  </Label>
-                </Option>
+                {[
+                  { id: 'pleasureVacation', label: translations.MainPurposePleasureVacation },
+                  { id: 'businessProfessional', label: translations.MainPurposeBusinessProfessional },
+                  { id: 'educationalFieldtrip', label: translations.MainPurposeEducationalFieldtrip },
+                  { id: 'healthWellnessRetirement', label: translations.MainPurposeHealthWellnessRetirement },
+                  { id: 'visitFriendsRelatives', label: translations.MainPurposeVisitFriendsRelatives },
+                  { id: 'meetingIncentiveConventionExhibition', label: translations.MainPurposeMeetingIncentiveConventionExhibition },
+                ].map(({ id, label }) => (
+                  <Option key={id} selected={selectedPurpose === id}>
+                    <CustomCheckbox
+                      type="checkbox"
+                      id={id}
+                      value={label}
+                      onChange={handlePurposeChange}
+                      aria-label={label}
+                    />
+                    <Label htmlFor={id} selected={selectedPurpose === id}>
+                      {label}
+                    </Label>
+                  </Option>
+                ))}
               </OptionsGrid>
             )}
           </form>
-          <NextButton onClick={handleNextClick}>
-            {translations.MainPurposeNextButton}
-          </NextButton>
         </Container>
       </GradientBackground>
     </>

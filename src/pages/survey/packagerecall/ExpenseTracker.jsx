@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import BodyPartial from '../../../components/partials/BodyPartial';
 import GradientBackground from '../../../components/partials/GradientBackground';
 import useTranslations from '../../../components/utils/useTranslations';
-import { submitSurveyResponses } from '../../../components/utils/sendInputUtils'; // Importing the function
+import { submitSurveyResponses } from '../../../components/utils/sendInputUtils';
 import { goToNextStep } from '../../../components/utils/navigationUtils';
 import { useCurrentStepIndex } from '../../../components/utils/useCurrentIndex';
 import { UnifiedContext } from '../../../routes/UnifiedContext';
@@ -70,15 +70,15 @@ const CurrencySelect = styled.select`
 `;
 
 const NextButton = styled(animated.button)`
- margin-top:20px; 
- padding:10px 
- // ... rest of your styles
+  margin-top: 20px;
+  padding: 10px;
+  // ... rest of your styles
 `;
 
 const ForgetButton = styled(animated.button)`
- margin-top:10px; 
- padding:10px 
- // ... rest of your styles
+  margin-top: 10px;
+  padding: 10px;
+  // ... rest of your styles
 `;
 
 const ExpenseTracker = () => {
@@ -100,18 +100,21 @@ const ExpenseTracker = () => {
     const conversionRates = {
         USD: 56,
         EUR: 60,
-        JPY: .4,
+        JPY: 0.4,
         PHP: 1,
-        CNY: .7,
-        INR: .75,
-        RUB: .04,
-        KRW: .6,
-        FRF: .6,
-        ESP: .6,
+        CNY: 0.7,
+        INR: 0.75,
+        RUB: 0.04,
+        KRW: 0.6,
+        FRF: 0.6,
+        ESP: 0.6,
     };
 
     const totalExpenses = expenses.reduce((sum, expense) => sum + (parseFloat(expense.value) || 0), 0);
     const convertedTotal = totalExpenses * conversionRates[selectedCurrency];
+
+    // Define hasAtLeastOneExpense
+    const hasAtLeastOneExpense = expenses.some(expense => expense.value.trim() !== '');
 
     const handleChange = (e, index) => {
         const newExpenses = [...expenses];
@@ -120,9 +123,6 @@ const ExpenseTracker = () => {
     };
 
     const handleNextClick = async () => {
-        // Check if at least one expense has a value
-        const hasAtLeastOneExpense = expenses.some(expense => expense.value.trim() !== '');
-
         if (!hasAtLeastOneExpense) {
             // alert(translations.expenseTrackerValidationMessage || 'Please fill in at least one expense before proceeding.');
             return;
@@ -178,7 +178,7 @@ const ExpenseTracker = () => {
     return (
         <>
             <BodyPartial />
-            <GradientBackground>
+            <GradientBackground buttonAppear={!hasAtLeastOneExpense} handleNextClick={handleNextClick}>
                 <Container>
                     <Title>{translations.expenseTrackerTitle}</Title>
                     <CurrencySelect value={selectedCurrency} onChange={handleCurrencyChange}>
@@ -203,7 +203,6 @@ const ExpenseTracker = () => {
                         <SummaryValue>{translations.expenseTrackerTotalInCurrency} {selectedCurrency}: {totalExpenses.toFixed(2)}</SummaryValue>
                         <SummaryValue><br />{translations.expenseTrackerTotalInPHP}: ₱{convertedTotal.toFixed(2)}</SummaryValue>
                     </Summary>
-                    <NextButton style={buttonAnimation} onClick={handleNextClick}>{translations.expenseTrackerNextButton}</NextButton>
                     <ForgetButton style={buttonAnimation} onClick={handleForgetButtonClick}>{translations.expenseTrackerForgetButton}</ForgetButton>
                 </Container>
             </GradientBackground>
@@ -212,4 +211,3 @@ const ExpenseTracker = () => {
 };
 
 export default ExpenseTracker;
-

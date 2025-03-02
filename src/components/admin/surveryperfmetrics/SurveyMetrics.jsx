@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Box, Typography, Card, CardContent, Grid, useTheme, ThemeProvider, Modal, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
+import { Box, Typography, Card, CardContent, Grid, useTheme, ThemeProvider, Modal, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button } from '@mui/material';
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
@@ -9,6 +9,7 @@ import { sentimentColors } from '../../../config/sentimentConfig';
 import styled, { ThemeProvider as StyledThemeProvider } from 'styled-components';
 import { fontFamily, fontSize, fontWeight } from '../../../config/fontConfig';
 import { dummyData } from './dummydata';
+import * as XLSX from 'xlsx';
 
 // Styled components
 const StyledCardContent = styled(CardContent)`
@@ -19,7 +20,7 @@ const StyledCardContent = styled(CardContent)`
   justify-content: center;
   align-items: center;
   border-radius: 32px; // Rounded corners
-  background: linear-gradient(135deg, rgba(68, 180, 255, 0.74), rgba(251, 197, 49, 0.67)); // Gradient background
+  background: linear-gradient(135deg, rgba(68, 180, 255, 0.74), rgba(85, 187, 255, 0.97)); // Gradient background
   &:hover {
     transform: scale(1.05);
   }
@@ -110,12 +111,80 @@ const SurveyMetrics = () => {
     // Unique colors for survey distribution pie chart
     const distributionColors = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#AF19FF', '#FF1919'];
 
+    // Function to export dummyData to Excel
+    const exportToExcel = () => {
+        // Create a new workbook
+        const workbook = XLSX.utils.book_new();
+    
+        // Add metadata sheet with all dummyData
+        const metadata = Object.entries(dummyData).map(([key, value]) => {
+            if (typeof value === 'object' && !Array.isArray(value)) {
+                // Handle nested objects (e.g., surveyDistribution, surveyResponsesByDevice)
+                return [key, JSON.stringify(value)];
+            }
+            return [key, value];
+        });
+    
+        // Add header row
+        metadata.unshift(['Key', 'Value']);
+    
+        // Create metadata sheet
+        const metadataSheet = XLSX.utils.aoa_to_sheet(metadata);
+    
+        // Style metadata sheet
+        metadataSheet['!cols'] = [{ width: 30 }, { width: 50 }]; // Set column widths
+        metadataSheet['A1'].s = { font: { bold: true }, fill: { fgColor: { rgb: "D3D3D3" } } }; // Header styling
+        metadataSheet['B1'].s = { font: { bold: true }, fill: { fgColor: { rgb: "D3D3D3" } } }; // Header styling
+    
+        XLSX.utils.book_append_sheet(workbook, metadataSheet, 'Metadata');
+    
+        // Helper function to create a styled sheet
+        const createStyledSheet = (data, sheetName, headers) => {
+            const sheet = XLSX.utils.json_to_sheet(data, { header: headers });
+            sheet['!cols'] = headers.map(() => ({ width: 20 })); // Set column widths
+    
+            // Style headers
+            headers.forEach((header, index) => {
+                const cellAddress = XLSX.utils.encode_cell({ r: 0, c: index });
+                sheet[cellAddress].s = { font: { bold: true }, fill: { fgColor: { rgb: "E0E0E0" } } }; // Bold and gray background
+            });
+    
+            return sheet;
+        };
+    
+        // Add survey distribution data
+        const distributionSheet = createStyledSheet(surveyDistributionData, 'Survey Distribution', ['Entrypoint', 'Responses']);
+        XLSX.utils.book_append_sheet(workbook, distributionSheet, 'Survey Distribution');
+    
+        // Add survey responses by device data
+        const deviceSheet = createStyledSheet(surveyResponsesByDeviceData, 'Responses by Device', ['Device', 'Responses']);
+        XLSX.utils.book_append_sheet(workbook, deviceSheet, 'Responses by Device');
+    
+        // Add survey responses by region data
+        const regionSheet = createStyledSheet(surveyResponsesByRegionData, 'Responses by Region', ['Region', 'Responses']);
+        XLSX.utils.book_append_sheet(workbook, regionSheet, 'Responses by Region');
+    
+        // Add survey responses by age group data
+        const ageGroupSheet = createStyledSheet(surveyResponsesByAgeGroupData, 'Responses by Age Group', ['Age Group', 'Responses']);
+        XLSX.utils.book_append_sheet(workbook, ageGroupSheet, 'Responses by Age Group');
+    
+        // Add survey responses by month data
+        const monthSheet = createStyledSheet(surveyResponsesByMonthData, 'Responses by Month', ['Month', 'Responses']);
+        XLSX.utils.book_append_sheet(workbook, monthSheet, 'Responses by Month');
+    
+        // Save the workbook
+        XLSX.writeFile(workbook, 'SurveyMetrics.xlsx');
+    };
+
     return (
         <StyledThemeProvider theme={theme}>
             <Box sx={{ padding: 4 }}>
                 <Typography variant="h4" gutterBottom sx={{ fontWeight: 'bold', color: theme.palette.primary.main }}>
                     Survey Performance Metrics
                 </Typography>
+                <Button variant="contained" color="primary" onClick={exportToExcel} sx={{ mb: 4 }}>
+                    Export to Excel
+                </Button>
                 <Grid container spacing={4}>
                     {/* Total Surveys Completed */}
                     <Grid item xs={12} md={6} lg={3}>

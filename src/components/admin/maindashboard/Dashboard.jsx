@@ -31,8 +31,8 @@ const MainContent = styled(Box)`
 const CardContainer = styled(Box)`
   background: linear-gradient(
     135deg,
-    rgba(115, 151, 252, 0.6),
-    rgba(220, 230, 245, 0.6)
+    rgba(135, 191, 255, 0.93),
+    rgba(26, 86, 175, 0.73)
   );
   padding: 16px;
   border-radius: 8px;

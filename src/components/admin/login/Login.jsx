@@ -36,7 +36,7 @@ const StyledPaper = styled(Paper)`
   width: 100%;
   border-radius: 20px;
   max-width: 400px;
-  background: #ffffff;
+  background:rgb(255, 255, 255);
 `;
 
 const StyledForm = styled.form`

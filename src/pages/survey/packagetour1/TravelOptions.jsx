@@ -6,7 +6,7 @@ import GradientBackground from '../../../components/partials/GradientBackground'
 import imgOverlay from "../../../components/img/peopless.png";
 import { useNavigate } from 'react-router-dom';
 import useTranslations from '../../../components/utils/useTranslations';
-import { NextButtonU } from '../../../components/utils/styles1';
+import { NextButtonU, QuestionText } from '../../../components/utils/styles1';
 import { submitSurveyResponses } from '../../../components/utils/sendInputUtils'; // Import the API utility function
 import { UnifiedContext } from '../../../routes/UnifiedContext';
 import { useContext } from 'react';
@@ -96,9 +96,9 @@ const TravelOptions = () => {
     return (
         <>
             <BodyPartial />
-            <GradientBackground overlayImage={imgOverlay} opacity={0.5} blendMode="screen">
+            <GradientBackground overlayImage={imgOverlay} opacity={0.5} blendMode="screen" buttonAppear={false}>
                 <Container>
-                    <Question>{translations.travelOptionsQuestion}</Question>
+                    <QuestionText>{translations.travelOptionsQuestion}</QuestionText>
                     <OptionsContainer>
                         <NextButtonU
                             onClick={() => handleOptionClick('Package Tour')}

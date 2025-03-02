@@ -7,11 +7,10 @@ import { useNavigate } from 'react-router-dom';
 import { NextButtonU } from '../../../components/utils/styles1';
 import useTranslations from '../../../components/utils/useTranslations';
 import axios from 'axios';
-
 import { useCurrentStepIndex } from '../../../components/utils/useCurrentIndex';
 import { goToNextStep } from '../../../components/utils/navigationUtils';
-import SurveyRoutesContext from '../../../routes/__SurveyRoutesContext';
 import { UnifiedContext } from '../../../routes/UnifiedContext';
+
 // Define keyframes for animations
 const fadeIn = keyframes`
   from {
@@ -24,12 +23,21 @@ const fadeIn = keyframes`
 
 const slideIn = keyframes`
   from {
-    transform: translateY(20px);
+    transform: translateY(10px);
     opacity: 0;
   }
   to {
     transform: translateY(0);
     opacity: 1;
+  }
+`;
+
+const zoomIn = keyframes`
+  from {
+    transform: scale(1.1);
+  }
+  to {
+    transform: scale(1);
   }
 `;
 
@@ -50,7 +58,7 @@ const Wave = styled.div`
   background-image: url(${bg});
   background-size: cover;
   background-position: center;
-  animation: ${fadeIn} 1.5s ease-in-out;
+  animation: ${zoomIn} 2s ease-in-out, ${fadeIn} 1.5s ease-in-out;
 `;
 
 const Content = styled.div`
@@ -59,13 +67,14 @@ const Content = styled.div`
   left: 50%;
   transform: translate(-50%, -50%);
   text-align: center;
-  animation: ${slideIn} 1s ease-in-out;
 `;
 
 const Logo = styled.img`
   width: 100px;
   height: 100px;
   margin-bottom: 20px;
+  animation: ${slideIn} 0.8s ease-in-out 0.2s forwards;
+  opacity: 0;
 `;
 
 const Title = styled.h1`
@@ -73,6 +82,8 @@ const Title = styled.h1`
   color: #fff;
   margin-bottom: 30px;
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  animation: ${slideIn} 0.8s ease-in-out 0.4s forwards;
+  opacity: 0;
 `;
 
 const NextButton = styled.input`
@@ -80,6 +91,8 @@ const NextButton = styled.input`
   border: none;
   cursor: pointer;
   transition: transform 0.3s ease-in-out;
+  opacity: 0;
+  animation: ${slideIn} 0.8s ease-in-out 0.6s forwards;
 
   &:hover {
     transform: scale(1.1);
@@ -90,37 +103,23 @@ const Page1 = () => {
   const [language, setLanguage] = useState(localStorage.getItem('selectedLanguage'));
   const translations = useTranslations('residence1', language);
   const navigate = useNavigate();
-  
-  const {routes} = useContext(UnifiedContext);
+  const { routes } = useContext(UnifiedContext);
   const [currentStep, setCurrentStep] = useState();
-  const currentStepIndex = useCurrentStepIndex({routes});
-  const {activeBlocks, setActiveBlocks} = useContext(UnifiedContext);
+  const currentStepIndex = useCurrentStepIndex({ routes });
+  const { activeBlocks, setActiveBlocks } = useContext(UnifiedContext);
 
-  /**
-   * Fetches the current survey progress from the API and updates the current step state.
-   * 
-   * Makes a GET request to the survey progress endpoint using Axios. If the request is successful,
-   * it updates the current step state with the data received from the response. If an error occurs,
-   * it logs the error to the console.
-   * 
-   * @async
-   * @function fetchProgress
-   * @returns {Promise<void>} A promise that resolves when the fetch operation is complete.
-   */
   useEffect(() => {
     const fetchProgress = async () => {
       try {
-        console.log("GET SURVEYPROGRESS")
+        console.log("GET SURVEYPROGRESS");
         const response = await axios.get(`${process.env.REACT_APP_API_HOST}/api/survey/progress`, { withCredentials: true });
         setCurrentStep(response.data.currentStep);
-
       } catch (err) {
         console.error(err);
       }
     };
     fetchProgress();
   }, [navigate]);
-
 
   const handleNextClick = () => {
     console.log("Current Step Index:", currentStepIndex);
@@ -135,7 +134,8 @@ const Page1 = () => {
         <Logo src={logo} alt="Department of Tourism Philippines logo" />
         <Title>TOURISM PRODUCT MARKET SURVEY</Title>
         <NextButtonU onClick={handleNextClick}>
-          {translations.next}</NextButtonU>
+          {translations.next}
+        </NextButtonU>
       </Content>
     </>
   );

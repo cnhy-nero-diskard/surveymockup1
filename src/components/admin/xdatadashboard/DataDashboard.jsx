@@ -22,6 +22,10 @@ const StyledPaper = styled(Paper)`
     align-items: center;
 `;
 
+const StyledBox = styled(Box)`
+    background-color: green
+`;
+
 /**
  * Styled FormControl component with a fixed width.
  */
@@ -34,6 +38,7 @@ const StyledFormControl = styled(FormControl)`
  */
 const StyledGridContainer = styled(Grid)`
   padding: 24px;
+  background-color: rgba(0,0,0,0)  
 `;
 
 /**
@@ -45,6 +50,8 @@ const StyledGridContainer = styled(Grid)`
  * @param {string} props.entityLabel - The label for the entity selector.
  * @param {string} props.entityKey - The default entity key to display data for.
  */
+
+
 const DataDashboard = ({ data, entities, entityLabel, entityKey }) => {
   // State to hold the currently selected entity
   const [selectedEntity, setSelectedEntity] = useState(entityKey);
