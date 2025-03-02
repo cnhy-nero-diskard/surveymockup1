@@ -22,7 +22,7 @@ const OverallSurveyTopic = () => {
     <MainContent>
       <Grid container spacing={4}>
         <Typography variant="h6" align="center" gutterBottom>
-          TOP 3 RELEVANT BARANGAYS DATA
+           TOP 3 RELEVANT BARANGAYS DATA
         </Typography>
         <ChartContainer>
           <BarChart

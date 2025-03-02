@@ -22,6 +22,7 @@ import {
   ListItem,
   ListItemText,
   Chip,
+  colors,
 } from '@mui/material';
 import { Bar } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
@@ -273,7 +274,7 @@ const AIToolsDashboard = () => {
   };
 
   return (
-    <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+    <Container  maxWidth="lg" sx={{ mt: 4, mb: 4, backgroundColor: 'rgba(0, 0, 0, 0)' }}>
       <Fade in timeout={1000}>
         <Typography variant="h4" gutterBottom sx={{ fontWeight: 'bold', color: 'primary.main' }}>
           AI Tools Dashboard

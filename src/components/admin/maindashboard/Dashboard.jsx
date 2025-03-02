@@ -31,8 +31,8 @@ const MainContent = styled(Box)`
 const CardContainer = styled(Box)`
   background: linear-gradient(
     135deg,
-    rgba(13, 239, 255, 0.6),
-    rgba(162, 190, 228, 0.29)
+    rgba(115, 151, 252, 0.6),
+    rgba(220, 230, 245, 0.6)
   );
   padding: 16px;
   border-radius: 8px;
@@ -50,6 +50,7 @@ const ContentBox = styled(Box)`
   justify-content: center;
   align-items: center;
 `;
+
 const CustomTypography = styled(Typography)`
   font-family: ${fontFamily};
   padding-top: 16px;
@@ -65,11 +66,25 @@ const Dashboard = () => {
     };
   }, []);
 
+  // Function to get the current date formatted as "MONTH DD, YYYY"
+  const getCurrentDate = () => {
+    const date = new Date();
+    const options = { year: 'numeric', month: 'long', day: '2-digit' };
+    return date.toLocaleDateString('en-US', options).replace(',', '');
+  };
+
   return (
     <>
       <GlobalStyle />
       <MainContent>
-        <CustomTypography variant="h4" gutterBottom>AS OF JANUARY 22, 2025</CustomTypography>
+        <CustomTypography variant="h4" sx={{
+          fontFamily: fontFamily,
+          fontSize: fontSize + 5,
+          fontWeight: fontWeight,
+        }}
+          gutterBottom>
+          As of {getCurrentDate()}
+        </CustomTypography>
 
         <Grid container spacing={2}>
           {/* First Row */}
@@ -80,7 +95,7 @@ const Dashboard = () => {
                 gutterBottom
                 sx={{
                   fontFamily: fontFamily,
-                  fontSize: fontSize+5,
+                  fontSize: fontSize + 5,
                   fontWeight: fontWeight,
                 }}
               >
@@ -98,7 +113,7 @@ const Dashboard = () => {
                 gutterBottom
                 sx={{
                   fontFamily: fontFamily,
-                  fontSize: fontSize+5,
+                  fontSize: fontSize + 5,
                   fontWeight: fontWeight,
                 }}
               >
@@ -118,7 +133,7 @@ const Dashboard = () => {
                 gutterBottom
                 sx={{
                   fontFamily: fontFamily,
-                  fontSize: fontSize+5,
+                  fontSize: fontSize + 5,
                   fontWeight: fontWeight,
                 }}
               >
@@ -136,7 +151,7 @@ const Dashboard = () => {
                 gutterBottom
                 sx={{
                   fontFamily: fontFamily,
-                  fontSize: fontSize+5,
+                  fontSize: fontSize + 5,
                   fontWeight: fontWeight,
                 }}
               >

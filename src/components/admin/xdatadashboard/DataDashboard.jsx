@@ -8,6 +8,9 @@ import { useState } from 'react';
 const COLORS = ['#0088FE', '#FF8042', '#00C49F', '#FFBB28', '#8884D8'];
 
 // Styled Components
+/**
+ * Styled Paper component with custom padding, width, and alignment.
+ */
 const StyledPaper = styled(Paper)`
     padding: 16px;
     width: 100%;
@@ -19,18 +22,40 @@ const StyledPaper = styled(Paper)`
     align-items: center;
 `;
 
+/**
+ * Styled FormControl component with a fixed width.
+ */
 const StyledFormControl = styled(FormControl)`
   width: 300px;
 `;
 
+/**
+ * Styled Grid container with padding.
+ */
 const StyledGridContainer = styled(Grid)`
   padding: 24px;
 `;
 
+/**
+ * DataDashboard component that displays various charts and data related to survey responses.
+ * 
+ * @param {Object} props - The component props.
+ * @param {Object} props.data - An object containing survey data categorized by entities.
+ * @param {Array} props.entities - An array of entity objects with keys and names.
+ * @param {string} props.entityLabel - The label for the entity selector.
+ * @param {string} props.entityKey - The default entity key to display data for.
+ */
 const DataDashboard = ({ data, entities, entityLabel, entityKey }) => {
+  // State to hold the currently selected entity
   const [selectedEntity, setSelectedEntity] = useState(entityKey);
+  // Data for the currently selected entity
   const entityData = data[selectedEntity];
 
+  /**
+   * Handler for changing the selected entity.
+   * 
+   * @param {Object} event - The event object from the select change.
+   */
   const handleEntityChange = (event) => {
     setSelectedEntity(event.target.value);
   };
@@ -82,7 +107,6 @@ const DataDashboard = ({ data, entities, entityLabel, entityKey }) => {
                 cx="50%"
                 cy="50%"
                 outerRadius={80}
-                fill="#8884d8"
                 dataKey="value"
                 label
               >
@@ -132,7 +156,7 @@ const DataDashboard = ({ data, entities, entityLabel, entityKey }) => {
               <YAxis />
               <Tooltip />
               <Legend />
-              <Bar dataKey="count" fill="#82ca9d" />
+              <Bar dataKey="count" fill="#ffc658" />
             </BarChart>
           </StyledPaper>
         </Box>

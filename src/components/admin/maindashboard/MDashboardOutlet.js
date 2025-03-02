@@ -12,7 +12,7 @@ const Container = styled(Box)`
 const MainContent = styled(Box)`
   flex-grow: 1;
   padding: 24px;
-  background-color: #80bfff;
+  background-color: rgba(0,0,0,0);
   min-height: 100vh;
   margin-left: ${({ drawerWidth }) => `${drawerWidth}px`}; // Offset for the sidebar
 `;
