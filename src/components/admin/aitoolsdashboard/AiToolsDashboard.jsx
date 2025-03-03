@@ -274,7 +274,7 @@ const AIToolsDashboard = () => {
   };
 
   return (
-    <Container  maxWidth="lg" sx={{ mt: 4, mb: 4, backgroundColor: 'rgba(0, 0, 0, 0)' }}>
+    <Container maxWidth="lg" sx={{ mt: 4, mb: 4, backgroundColor: 'rgba(0, 0, 0, 0)' }}>
       <Fade in timeout={1000}>
         <Typography variant="h4" gutterBottom sx={{ fontWeight: 'bold', color: 'primary.main' }}>
           AI Tools Dashboard
@@ -368,7 +368,7 @@ const AIToolsDashboard = () => {
                         </Box>
                         <Box sx={{ mt: 1 }}>
                           <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                            Confidence: <strong>{(result.confidence * 100).toFixed(2)}%</strong>
+                            Confidence: <strong>{(result.confidence).toFixed(2)}%</strong>
                           </Typography>
                         </Box>
                       </Paper>
@@ -489,7 +489,7 @@ const AIToolsDashboard = () => {
                   <Box sx={{ mt: 1 }}>
                     {topicModelingResult.map((topic, index) => (
                       <Box key={index} sx={{ mb: 3 }}>
-                        <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 'bold' }}>
+                        <Typography variant="body1" sx={{ color: 'text.secondary', fontWeight: 'bold', fontSize: '1.2rem' }}>
                           Topic {index + 1}: {topic.customLabel}
                         </Typography>
                         <Typography variant="body2" sx={{ color: 'text.secondary' }}>

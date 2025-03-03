@@ -73,7 +73,7 @@ const App = () => {
           <Route path="/login" element={<Login />} />
 
           {/* App Routes */}
-          <Route path="/devpath1/*" element={<WebpageRoutesDev />} />
+          {/* <Route path="/devpath1/*" element={<WebpageRoutesDev />} /> */}
           <Route path="/survey/*" element={<SurveyRoutes />} />
 
           {/* Fallback route */}

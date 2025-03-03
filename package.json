@@ -53,6 +53,7 @@
     "rechart": "^0.0.1",
     "recharts": "^2.15.0",
     "request": "^2.88.2",
+    "save-svg-as-png": "^1.4.17",
     "style-components": "^0.1.0",
     "styled-components": "^6.1.13",
     "uuid": "^11.0.5",

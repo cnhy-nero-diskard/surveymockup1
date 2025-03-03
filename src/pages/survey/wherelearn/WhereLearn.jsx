@@ -51,8 +51,7 @@ const WhereLearn = () => {
   return (
     <>
       <BodyPartial />
-      <GradientBackground overlayImage={imgOverlay} opacity={0.1} blendMode='screen'>
-        <Container className={animate ? 'intro-animation' : ''}>
+      <GradientBackground overlayImage={imgOverlay} opacity={0.1} blendMode='screen' buttonAppear={false}>
           <h2>{translations.whereLearnTitle}</h2>
           <form>
             <div className="text-button-group">
@@ -87,7 +86,6 @@ const WhereLearn = () => {
               </button>
             </div>
           </form>
-        </Container>
       </GradientBackground>
     </>
   );

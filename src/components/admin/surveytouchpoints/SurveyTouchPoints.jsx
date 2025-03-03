@@ -1,67 +1,77 @@
-import React, { useState } from 'react';
-import { Container, Typography, Grid, Select, MenuItem, Box, Link } from '@mui/material';
+import React, { useState, useEffect } from 'react';
+import { Container, Typography, Grid, Select, MenuItem, Box, Link, CircularProgress, Snackbar, Button } from '@mui/material';
 import { QRCodeSVG } from 'qrcode.react';
 import styled from 'styled-components';
-
-// Dummy data structure
-const dummyData = {
-  establishments: ['Establishment 1', 'Establishment 2', 'Establishment 3'],
-  attractions: ['Attraction 1', 'Attraction 2', 'Attraction 3'],
-  transportationPoints: ['Transport Point 1', 'Transport Point 2', 'Transport Point 3'],
-  barangays: ['Barangay 1', 'Barangay 2', 'Barangay 3'],
-};
+import { saveSvgAsPng } from 'save-svg-as-png';
 
 // Styled Components
 const StyledContainer = styled(Container)`
-    height: 100%;
-    width: 100%;
-    border-radius: 20px;
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
-    background-color:rgba(0, 89, 255, 0.31);
-    padding: 2rem;
-
-    & > .MuiGrid-container {
-        width: 100%;
-    }
-
-    & > .MuiGrid-container > .MuiGrid-item {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    }
+  height: 100%;
+  width: 100%;
+  border-radius: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(0, 89, 255, 0.1);
+  padding: 2rem;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 `;
 
 const Title = styled(Typography)`
-  margin-bottom: 1rem;
+  margin-bottom: 1.5rem;
   color: #3f51b5;
   font-weight: bold;
+  text-align: center;
 `;
 
 const StyledSelect = styled(Select)`
   width: 100%;
-  background-color: #ffffff;
   border-radius: 8px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+
+  &:hover {
+    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+  }
 `;
 
 const QRCodeContainer = styled(Box)`
-        display: inline-block;
-    height: 100%;
-    text-align: center;
-    padding: 1.5rem;
-    background-color:rgb(255, 255, 255);
-    border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  display: inline-block;
+  text-align: center;
+  padding: 2rem;
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+  }
 `;
 
 const StyledLink = styled(Link)`
   color: #3f51b5;
   text-decoration: none;
+  font-weight: 500;
+  transition: all 0.3s ease;
+
   &:hover {
     text-decoration: underline;
+    color: #1a237e;
+  }
+`;
+
+const DownloadButton = styled(Button)`
+  margin-top: 1rem;
+  background-color: #3f51b5;
+  color: #ffffff;
+  font-weight: bold;
+  transition: all 0.3s ease;
+
+  &:hover {
+    background-color: #1a237e;
   }
 `;
 
@@ -69,6 +79,28 @@ const SurveyTouchpoints = () => {
   const [selectedType, setSelectedType] = useState('');
   const [selectedItem, setSelectedItem] = useState('');
   const [qrValue, setQrValue] = useState('');
+  const [establishments, setEstablishments] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    if (selectedType === 'establishments') {
+      setLoading(true);
+      fetch(`${process.env.REACT_APP_API_HOST}/api/admin/establishments`, {
+        credentials: 'include',
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          setEstablishments(data.map((item) => item.est_name));
+          setLoading(false);
+        })
+        .catch((error) => {
+          console.error('Error fetching establishments:', error);
+          setError('Failed to fetch data. Please try again later.');
+          setLoading(false);
+        });
+    }
+  }, [selectedType]);
 
   const handleTypeChange = (event) => {
     setSelectedType(event.target.value);
@@ -82,29 +114,40 @@ const SurveyTouchpoints = () => {
   };
 
   const generateQRCode = (value) => {
-    return <QRCodeSVG value={value} size={256} />;
+    return <QRCodeSVG value={value} size={256} includeMargin={true} level="H" />;
+  };
+
+  const handleDownloadQRCode = () => {
+    const svg = document.getElementById('qr-code-svg');
+    saveSvgAsPng(svg, `${selectedItem}_QRCode.png`, { scale: 2 });
+  };
+
+  const handleCloseError = () => {
+    setError('');
   };
 
   return (
     <StyledContainer maxWidth="lg">
-      {/* Grid for Permanent QR Code */}
-      <Grid container spacing={4} justifyContent="center">
-        <Grid item xs={12} md={6}>
-          <QRCodeContainer>
-            <Title variant="h5" gutterBottom>
-              TOURISM PRODUCT MARKET SURVEY
-            </Title>
-            {generateQRCode(`${process.env.REACT_APP_API_HOST}/tpms/`)}
-            <Typography variant="body1" sx={{ mt: 2 }}>
-              <StyledLink href={`${process.env.REACT_APP_API_HOST}/tpms/`} target="_blank" rel="noopener">
-                {`${process.env.REACT_APP_API_HOST}/tpms/`}
-              </StyledLink>
-            </Typography>
-          </QRCodeContainer>
+      {/* Permanent QR Code */}
+      <Container>
+        <Grid container spacing={4} justifyContent="start">
+          <Grid item xs={12} md={6}>
+            <QRCodeContainer>
+              <Title variant="h5" gutterBottom>
+                TOURISM PRODUCT MARKET SURVEY
+              </Title>
+              {generateQRCode(`${process.env.REACT_APP_API_HOST}/tpms/`)}
+              <Typography variant="body1" sx={{ mt: 2 }}>
+                <StyledLink href={`${process.env.REACT_APP_SELF_URL}/survey/`} target="_blank" rel="noopener">
+                  {`${process.env.REACT_APP_SELF_URL}/survey/`}
+                </StyledLink>
+              </Typography>
+            </QRCodeContainer>
+          </Grid>
         </Grid>
-      </Grid>
+      </Container>
 
-      {/* Grid for Dynamic QR Code Generator */}
+      {/* Dynamic QR Code Generator */}
       <Grid container spacing={4} justifyContent="center" sx={{ mt: 4 }}>
         <Grid item xs={12} md={8}>
           <QRCodeContainer>
@@ -117,6 +160,7 @@ const SurveyTouchpoints = () => {
                   value={selectedType}
                   onChange={handleTypeChange}
                   displayEmpty
+                  aria-label="Select Type"
                 >
                   <MenuItem value="" disabled>
                     Select Type
@@ -131,14 +175,15 @@ const SurveyTouchpoints = () => {
                 <StyledSelect
                   value={selectedItem}
                   onChange={handleItemChange}
-                  disabled={!selectedType}
+                  disabled={!selectedType || loading}
                   displayEmpty
+                  aria-label="Select Item"
                 >
                   <MenuItem value="" disabled>
-                    Select {selectedType}
+                    {loading ? 'Loading...' : `Select ${selectedType}`}
                   </MenuItem>
-                  {selectedType &&
-                    dummyData[selectedType].map((item, index) => (
+                  {selectedType === 'establishments' &&
+                    establishments.map((item, index) => (
                       <MenuItem key={index} value={item}>
                         {item}
                       </MenuItem>
@@ -148,17 +193,30 @@ const SurveyTouchpoints = () => {
             </Grid>
             {qrValue && (
               <>
-                {generateQRCode(qrValue)}
+                <Box id="qr-code-svg" sx={{ mt: 3 }}>
+                  {generateQRCode(qrValue)}
+                </Box>
                 <Typography variant="body1" sx={{ mt: 2 }}>
                   <StyledLink href={qrValue} target="_blank" rel="noopener">
                     {qrValue}
                   </StyledLink>
                 </Typography>
+                <DownloadButton onClick={handleDownloadQRCode}>
+                  Download QR Code
+                </DownloadButton>
               </>
             )}
           </QRCodeContainer>
         </Grid>
       </Grid>
+
+      {/* Error Handling */}
+      <Snackbar
+        open={!!error}
+        autoHideDuration={6000}
+        onClose={handleCloseError}
+        message={error}
+      />
     </StyledContainer>
   );
 };

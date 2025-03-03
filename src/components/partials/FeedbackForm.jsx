@@ -145,7 +145,7 @@ const FeedbackForm = ({ title, onNext, squestion_identifier, satisfactionOptions
     }, [language, translations]);
 
     useEffect(() => {
-        setIsFormValid(selectedOption !== null && feedback.trim() !== '');
+        setIsFormValid(selectedOption !== null && feedback.trim().length >= 20);
     }, [selectedOption, feedback]);
 
     const handleOptionClick = (option) => {

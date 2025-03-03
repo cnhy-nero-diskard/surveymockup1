@@ -12,6 +12,7 @@ import { NextButtonU } from '../../../components/utils/styles1';
 import { useCurrentStepIndex } from '../../../components/utils/useCurrentIndex';
 import { UnifiedContext } from '../../../routes/UnifiedContext';
 import { goToNextStep } from '../../../components/utils/navigationUtils';
+import 'react-datepicker/dist/react-datepicker.css';
 
 const FormContainer = styled(animated.div)`
   display: flex;

@@ -10,7 +10,7 @@ import { useCurrentStepIndex } from '../../../components/utils/useCurrentIndex';
 import { UnifiedContext } from '../../../routes/UnifiedContext';
 import { goToNextStep } from '../../../components/utils/navigationUtils';
 import { submitSurveyResponses } from '../../../components/utils/sendInputUtils';
-import { NextButtonU } from '../../../components/utils/styles1';
+import { NextButtonU, QuestionText } from '../../../components/utils/styles1';
 const Container = styled.div`
   display: flex;
   flex-direction: column;
@@ -150,8 +150,7 @@ const PackTranspo = () => {
         <>
             <BodyPartial />
             <GradientBackground overlayImage={imgOverlay} opacity={0.2} blendMode="screen" handleNextClick={handleNextClick} buttonAppear={price && currency }>
-                <Container>
-                    <Question>{translations.packTranspoQuestion}</Question>
+                    <QuestionText>{translations.packTranspoQuestion}</QuestionText>
                     <InputContainer>
                         <InputLabel>{translations.packTranspoInputLabel}</InputLabel>
                         <CurrencyInput
@@ -182,7 +181,6 @@ const PackTranspo = () => {
                             <span></span>
                         )}
                     </ConversionResult>
-                </Container>
             </GradientBackground>
         </>
     );
