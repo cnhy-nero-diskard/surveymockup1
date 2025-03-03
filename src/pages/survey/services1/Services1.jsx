@@ -1,9 +1,18 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useTranslations from '../../../components/utils/useTranslations';
 import RatingSlider from '../../../components/partials/RatingSlider';
+import { goToNextStep } from '../../../components/utils/navigationUtils';
+import { useCurrentStepIndex } from '../../../components/utils/useCurrentIndex';
+import { UnifiedContext } from '../../../routes/UnifiedContext';
 
 const Services1 = () => {
+
+  const { routes } = useContext(UnifiedContext);
+  const [setCurrentStep] = useState();
+  const currentStepIndex = useCurrentStepIndex(routes);
+  const { activeBlocks } = useContext(UnifiedContext);
+
   const [language, setLanguage] = useState(localStorage.getItem('selectedLanguage'));
   const translations = useTranslations('Services2', language);
   const entranslations = useTranslations('Services2', 'en');
@@ -40,7 +49,7 @@ const Services1 = () => {
 
   const handleRatingComplete = () => {
     console.log(translations.services2AllRatingsCompleted);
-    navigate('/');
+    goToNextStep(currentStepIndex, navigate, routes, activeBlocks);
   };
 
 

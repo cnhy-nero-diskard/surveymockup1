@@ -19,7 +19,7 @@ const FormContainer = styled(animated.div)`
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 20px;
+  padding: 50px;
   width: 300px;
   margin: 0 auto;
 `;
@@ -99,9 +99,23 @@ const PProfile2 = () => {
     goToNextStep(currentStepIndex, navigate, routes, activeBlocks);
   };
 
+  const areAllFieldsFilled = () => {
+    return responses.every(item => item.value !== null && item.value !== '');
+  };
+
+  useEffect(() => {
+    // This ensures the component re-renders when responses change
+  }, [responses]);
+
   return (
     <><BodyPartial />
-      <GradientBackground overlayImage={imgoverlay} opacity={0.2} blendMode="darken">
+      <GradientBackground
+        overlayImage={imgoverlay}
+        opacity={0.2}
+        blendMode="darken"
+        handleNextClick={handleNextClick}
+        buttonAppear={areAllFieldsFilled()}
+      >
         <FormContainer style={formAnimation}>
           <FormTitle>{translations.pprofile2FormTitle}</FormTitle>
           {responses.map((item, index) => (
@@ -112,13 +126,15 @@ const PProfile2 = () => {
                 onChange={(date) => handleInputChange(index, date)}
                 dateFormat="MM/dd/yyyy"
                 disabled={item.ref === 'ACCMP'}
+                popperPlacement="bottom"
               />
             </FormField>
           ))}
-          <NextButtonU style={buttonAnimation} onClick={handleNextClick}>{translations.pprofile2NextButton}</NextButtonU>
         </FormContainer>
       </GradientBackground>
     </>);
 };
+
+
 
 export default PProfile2;

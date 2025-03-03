@@ -112,7 +112,7 @@ const VisitCounterR = ({ title, surveyquestion_ref, handNext }) => {
   return (
     <>
       <BodyPartial />
-      <GradientBackground imgOverlay={imgOverlay} handleNextClick={handleNextClick}>
+      <GradientBackground imgOverlay={imgOverlay} handleNextClick={handleNextClick} buttonAppear={visitCount !== null}>
         <Container>
           <AnimatedContainer style={containerAnimation}>
             <Title>{title}</Title>

@@ -61,7 +61,7 @@ export const EmojiButton = styled(Button)`
   `}
 `;
 export const QuestionText = styled.p`
-  font-size: 2rem;
+  font-size: 1.8rem;
   font-weight: bold;
   margin-bottom: 10px;
   color: white;

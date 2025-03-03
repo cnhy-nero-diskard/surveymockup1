@@ -109,7 +109,7 @@ const ProponentLgu = () => {
   return (
     <>
       <BodyPartial />
-      <GradientBackground overlayImage={imgoverlay} opacity={0.2} blendMode="darken">
+      <GradientBackground overlayImage={imgoverlay} opacity={0.2} blendMode="darken" handleNextClick={handleNextClick}>
         <Container
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -127,13 +127,6 @@ const ProponentLgu = () => {
               />
             </InputGroup>
           ))}
-          <Button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={handleNextClick}
-          >
-            Next
-          </Button>
         </Container>
       </GradientBackground>
     </>

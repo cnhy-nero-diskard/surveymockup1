@@ -5,7 +5,7 @@ import './BranchingSelect.css';
 import BodyPartial from '../../../components/partials/BodyPartial';
 import GradientBackground from '../../../components/partials/GradientBackground';
 import imgoverlay from "../../../components/img/emailbg.png";
-import { Container, NextButtonU } from '../../../components/utils/styles1';
+import { Container, NextButtonU, QuestionText } from '../../../components/utils/styles1';
 import useTranslations from '../../../components/utils/useTranslations';
 import { submitSurveyResponses } from '../../../components/utils/sendInputUtils';
 import { useCurrentStepIndex } from '../../../components/utils/useCurrentIndex';
@@ -119,9 +119,9 @@ const BranchingSelect = () => {
   return (
     <>
       <BodyPartial />
-      <GradientBackground overlayImage={imgoverlay}>
+      <GradientBackground overlayImage={imgoverlay} handleNextClick={handleNextClick} buttonAppear={selectedOptions.length > 0}>
         <Container>
-          <h3>{translations.branchingSelectSurveyTitle}</h3>
+          <QuestionText>{translations.branchingSelectSurveyTitle}</QuestionText>
           <Option
             onClick={() => handleOptionClick('ACCOMODATION')}
             selected={selectedOptions.includes('ACCOMODATION')}
@@ -151,11 +151,7 @@ const BranchingSelect = () => {
               {translations.branchingSelectSelectedOptions} {selectedOptions.join(', ')}
             </animated.div>
           )}
-          {selectedOptions.length > 0 && (
-            <NextButtonU style={springProps} onClick={handleNextClick}>
-              {translations.branchingSelectNextButton}
-            </NextButtonU>
-          )}
+
         </Container>
       </GradientBackground>
     </>

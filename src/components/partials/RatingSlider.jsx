@@ -211,7 +211,7 @@ const RatingSlider = ({ title, categories, onRatingComplete, surveyquestion_refs
   return (
     <>
       <BodyPartial />
-      <GradientBackground overlayImage={imgOverlay} opacity={0.2} blendMode='screen'>
+      <GradientBackground overlayImage={imgOverlay} opacity={0.2} blendMode='screen' buttonAppear={false}>
         <Container>
           <Title>{title}</Title>
           <SlidesContainer>

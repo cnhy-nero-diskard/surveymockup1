@@ -165,7 +165,7 @@ const MainPurpose = () => {
   return (
     <>
       <BodyPartial />
-      <GradientBackground overlayImage={imgoverlay} handleNextClick={handleNextClick}>
+      <GradientBackground overlayImage={imgoverlay} handleNextClick={handleNextClick} buttonAppear={selectedPurpose !== ''}>
         <Container>
           <Header>{translations.MainPurposeHeader}</Header>
           <form>

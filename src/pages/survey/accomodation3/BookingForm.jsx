@@ -123,7 +123,7 @@ const BookingForm = () => {
 
     const navigate = useNavigate();
 
-    const handleNext = async () => {
+    const handleNextClick = async () => {
         try {
             await submitSurveyResponses(responses);
             goToNextStep(currentStepIndex, navigate, routes, activeBlocks);
@@ -138,7 +138,7 @@ const BookingForm = () => {
     return (
         <>
             <BodyPartial />
-            <GradientBackground overlayImage={imgoverlay} opacity={0.2} blendMode="multiply">
+            <GradientBackground overlayImage={imgoverlay} opacity={0.2} blendMode="multiply" handleNextClick={handleNextClick} buttonAppear={!isNextDisabled}>
                 <Container>
                     <FormGroup>
                         <Label>{translations.bookingFormBookingMethodLabel}</Label>
@@ -175,9 +175,6 @@ const BookingForm = () => {
                         </FormGroup>
                     )}
 
-                    <NextButtonU onClick={handleNext} disabled={isNextDisabled}>
-                        {translations.bookingFormNextButton}
-                    </NextButtonU>
                 </Container>
             </GradientBackground>
         </>

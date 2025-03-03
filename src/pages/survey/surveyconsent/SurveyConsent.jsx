@@ -148,7 +148,6 @@ const SurveyConsent = () => {
     try {
       await submitSurveyResponses(responses); // Submit the responses
       notify();
-      goToNextStep(currentStepIndex, navigate);
     } catch (error) {
       console.error('Error submitting survey responses:', error);
     }

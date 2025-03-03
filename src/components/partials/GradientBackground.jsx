@@ -50,15 +50,24 @@ const ProgressBarContainer = styled.div`
   overflow: hidden;
 `;
 
-// Styled-component for the progress bar
+const getColor = (progress) => {
+  const r = Math.min(255, Math.floor(255 * (1 - progress / 100)));
+  const g = Math.min(255, Math.floor(255 * (progress / 100)));
+  return `rgba(${r}, ${g}, 0, 0.8)`;
+};
+
+// Update the ProgressBar styled-component
 const ProgressBar = styled.div`
   height: 100%;
-  background-color: white;
+  background: linear-gradient(
+    to right,
+    ${({ progress }) => getColor(progress)},
+    ${({ progress }) => getColor(progress)}
+  );
   border-radius: 5px;
   width: ${({ progress }) => progress}%;
-  transition: width 0.5s ease-out; /* Smooth transition for width changes */
+  transition: width 0.5s ease-out, background 0.5s ease-out;
 `;
-
 // Styled-component for the progress text
 const ProgressText = styled.p`
   position: absolute;
@@ -106,8 +115,8 @@ const GradientBackground = ({ children, overlayImage, opacity = 0.3, blendMode =
           style={{ display: buttonAppear ? 'block' : 'none' }}
         >
           {nextmsg === "" ? translations.next : nextmsg}
-        </NextButtonU>)} 
-        </>
+        </NextButtonU>)}
+    </>
   );
 };
 

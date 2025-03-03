@@ -135,6 +135,7 @@ const PProfile1 = () => {
     { value: '  ', label: translations.nationalityOther },
   ];
 
+
   const currencies = Object.keys(conversionRates).map((key) => ({
     value: key,
     label: key,
@@ -152,7 +153,7 @@ const PProfile1 = () => {
     { value: 'widowed', label: translations.civilStatusWidowed },
     { value: 'separated', label: translations.civilStatusSeparated },
   ];
-
+const isFormComplete = inputs.every(input => input.value !== null && input.value !== '');
   const handleInputChange = (id, value) => {
     setInputs((prevInputs) =>
       prevInputs.map((input) =>
@@ -181,7 +182,7 @@ const PProfile1 = () => {
   return (
     <>
       <BodyPartial />
-      <GradientBackground overlayImage={imgoverlay} opacity={0.2} blendMode="darken">
+      <GradientBackground overlayImage={imgoverlay} opacity={0.2} blendMode="darken" handleNextClick={handleNextClick} buttonAppear={isFormComplete}>
         <ResponsiveContainer>
           <Container
             initial={{ opacity: 0, y: -50 }}
@@ -246,9 +247,6 @@ const PProfile1 = () => {
               styles={customSelectStyles}
             />          <Label>{translations.convertedIncomeLabel} {convertIncome()}</Label>
 
-            <NextButtonU whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={handleNextClick}>
-              {translations.nextButton}
-            </NextButtonU>
           </Container>
         </ResponsiveContainer>      </GradientBackground>
     </>

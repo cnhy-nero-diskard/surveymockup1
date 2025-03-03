@@ -117,7 +117,7 @@ const ExpenseCompanions = () => {
           {inputs.map((input, index) => (
             <InputContainer key={input.key}>
               <Input
-                type="text" // Changed to text to allow for custom validation
+                type="text"
                 value={input.value}
                 onChange={(e) => handleInputChange(index, e)}
                 placeholder={translations.expenseCompanionsInputPlaceholder}

@@ -39,7 +39,7 @@ const ListItem = styled(motion.li)`
   padding: 10px;
   border-radius: 10px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  background-color: ${({ selected }) => (selected ? '#007bff' :' rgba(35, 144, 245, 0.86)')};
+  background-color: ${({ selected }) => (selected ? '#007bff' : ' rgba(35, 144, 245, 0.86)')};
   color: ${({ selected }) => (selected ? 'white' : '#fff')};
 
   &:hover {
@@ -101,7 +101,7 @@ const SurveyVenue = () => {
   const currentStepIndex = useCurrentStepIndex(routes);
   const { activeBlocks, appendActiveBlocks, removeActiveBlocks } = useContext(UnifiedContext);
 
-  
+
   const [selectedVenue, setSelectedVenue] = useState(null);
   const [showPopup, setShowPopup] = useState(false);
   const [otherVenue, setOtherVenue] = useState('');
@@ -133,13 +133,13 @@ const SurveyVenue = () => {
       setSelectedVenue(otherVenue);
       submitResponse(otherVenue);
       setShowPopup(false);
-      navigate('/next-page'); // Navigate to the next page after specifying the venue
+      goToNextStep(currentStepIndex, navigate, routes, activeBlocks);
     }
   };
 
   const submitResponse = (responseValue) => {
     const surveyResponses = [{
-      surveyquestion_ref: 'VENUE', // 5 characters, all caps
+      surveyquestion_ref: 'VENUE',
       response_value: responseValue,
     }];
 
@@ -155,7 +155,7 @@ const SurveyVenue = () => {
   return (
     <>
       <BodyPartial />
-      <GradientBackground overlayImage={imgOverlay} opacity={0.05} blendMode='darken'>
+      <GradientBackground overlayImage={imgOverlay} opacity={0.05} blendMode='darken' buttonAppear={false}>
         <Container
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}

@@ -10,6 +10,7 @@ import { useNavigate } from 'react-router-dom';
 import { goToNextStep } from '../../../components/utils/navigationUtils';
 import { useCurrentStepIndex } from '../../../components/utils/useCurrentIndex';
 import { UnifiedContext } from '../../../routes/UnifiedContext';
+import { QuestionText } from '../../../components/utils/styles1';
 // Keyframes for animations
 const fadeIn = keyframes`
   from {
@@ -42,7 +43,7 @@ const Header = styled.h1`
 
 const Paragraph = styled.p`
   font-size: 1.2rem;
-  color: #e0e0e0;
+  color:rgb(247, 246, 246);
   margin-bottom: 1rem;
   line-height: 1.6;
 `;
@@ -110,9 +111,9 @@ const ThankYouMessage = () => {
   return (
     <>
       <BodyPartial />
-      <GradientBackground overlayImage={imgoverlay}>
+      <GradientBackground overlayImage={imgoverlay} buttonAppear={false}>
         <Container>
-          <Header>{translations.thankYouMessageHeader}</Header>
+          <QuestionText>{translations.thankYouMessageHeader}</QuestionText>
           <Paragraph>{translations.thankYouMessageParagraph1}</Paragraph>
           <Paragraph>{translations.thankYouMessageParagraph2}</Paragraph>
           <FinishButton onClick={handleFinish}>

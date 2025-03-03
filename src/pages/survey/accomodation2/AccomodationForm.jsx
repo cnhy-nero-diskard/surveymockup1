@@ -217,7 +217,7 @@ const AccommodationForm = () => {
     });
   };
 
-  const handleSubmit = async () => {
+  const handleNextClick = async () => {
     try {
       await submitSurveyResponses(surveyResponses);
       goToNextStep(currentStepIndex, navigate, routes, activeBlocks);
@@ -229,7 +229,7 @@ const AccommodationForm = () => {
   const handleNoButtonClick = () => {
     handleCommercialResponse('NO');
     setIsCommercial(false);
-    handleSubmit();
+    handleNextClick();
     goToNextStep(currentStepIndex, navigate, routes, activeBlocks);
 
   };
@@ -251,7 +251,7 @@ const AccommodationForm = () => {
   return (
     <>
       <BodyPartial />
-      <GradientBackground overlayImage={imgoverlay} opacity={0.2} blendMode="multiply">
+      <GradientBackground overlayImage={imgoverlay} opacity={0.2} blendMode="multiply" handleNextClick={handleNextClick}>
         <FormContainer
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -319,7 +319,7 @@ const AccommodationForm = () => {
               <NextButtonU
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                onClick={handleSubmit}
+                onClick={handleNextClick}
               >
                 {translations.accommodationFormNextButton}
               </NextButtonU>

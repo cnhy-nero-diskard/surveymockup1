@@ -53,19 +53,30 @@ const SurveyEvaluation05 = () => {
     });
   };
 
-  const handleSubmit = () => {
-    submitSurveyResponses(responses)
-      .then(() => {
-        console.log('Responses submitted successfully');
-      });
-    goToNextStep(currentStepIndex, navigate, routes, activeBlocks);
-
+  const handleNextClick = () => {
+    if (validateResponses()) {
+      submitSurveyResponses(responses)
+        .then(() => {
+          console.log('Responses submitted successfully');
+        });
+      goToNextStep(currentStepIndex, navigate, routes, activeBlocks);
+    } else {
+      return
+    }
   };
+  const validateResponses = () => {
+    const requiredQuestions = ['RAT01', 'PREF01', 'RES01'];
+    return requiredQuestions.every(questionRef => 
+      responses.some(response => response.surveyquestion_ref === questionRef && response.response_value !== undefined)
+    );
+  };
+  
+  
 
   return (
     <>
       <BodyPartial />
-      <GradientBackground overlayImage={imgoverlay}>
+      <GradientBackground overlayImage={imgoverlay} handleNextClick={handleNextClick} buttonAppear={validateResponses()}>
         <motion.div 
           className="survey-container"
           initial={{ opacity: 0, y: 20 }}
@@ -175,10 +186,6 @@ const SurveyEvaluation05 = () => {
             </div>
           </motion.div>
 
-          {/* Submit Button */}
-          <NextButtonU onClick={handleSubmit}>
-            {translations.surveyEvaluation05ButtonNext}
-          </NextButtonU>
         </motion.div>
       </GradientBackground>
     </>

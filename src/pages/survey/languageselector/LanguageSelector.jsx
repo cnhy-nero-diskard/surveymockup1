@@ -223,7 +223,7 @@ const LanguageSelector = () => {
   return (
     <>
       <BodyPartial />
-      <GradientBackground overlayImage={translate} handleNextClick={handleNextClick}>
+      <GradientBackground overlayImage={translate} handleNextClick={handleNextClick} buttonAppear={selectedLanguageCode !== null}>
         <Title>
           <FaGlobe style={{ marginRight: '10px' }} />
           Select

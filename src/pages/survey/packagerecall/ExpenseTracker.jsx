@@ -178,7 +178,7 @@ const ExpenseTracker = () => {
     return (
         <>
             <BodyPartial />
-            <GradientBackground buttonAppear={!hasAtLeastOneExpense} handleNextClick={handleNextClick}>
+            <GradientBackground buttonAppear={hasAtLeastOneExpense} handleNextClick={handleNextClick} >
                 <Container>
                     <Title>{translations.expenseTrackerTitle}</Title>
                     <CurrencySelect value={selectedCurrency} onChange={handleCurrencyChange}>

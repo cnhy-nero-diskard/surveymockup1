@@ -12,6 +12,7 @@ import { useCurrentStepIndex } from '../../../components/utils/useCurrentIndex';
 import axios from 'axios';
 import { goToNextStep } from '../../../components/utils/navigationUtils';
 import { UnifiedContext } from '../../../routes/UnifiedContext';
+
 export const theme = {
     colors: {
         primary: '#007bff',
@@ -33,7 +34,6 @@ export const theme = {
     boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
 };
 
-// Styled components
 const FormContainer = styled(animated.div)`
     max-width: 400px;
     margin: 0 auto;
@@ -69,6 +69,7 @@ const Form = () => {
         fullName: '',
         email: '',
     });
+    const [isFormValid, setIsFormValid] = useState(false);
     const [language] = useState(localStorage.getItem('selectedLanguage') || 'en');
     const translations = useTranslations(FORM, language);
     const { routes } = useContext(UnifiedContext);
@@ -76,15 +77,12 @@ const Form = () => {
     const currentStepIndex = useCurrentStepIndex(routes);
     const { activeBlocks, setActiveBlocks } = useContext(UnifiedContext);
 
-
-
     useEffect(() => {
         const fetchProgress = async () => {
             try {
-                console.log("GET SURVEYPROGRESS")
+                console.log("GET SURVEYPROGRESS");
                 const response = await axios.get(`${process.env.REACT_APP_API_HOST}/api/survey/progress`, { withCredentials: true });
                 setCurrentStep(response.data.currentStep);
-
             } catch (err) {
                 console.error(err);
             }
@@ -92,15 +90,18 @@ const Form = () => {
         fetchProgress();
     }, [navigate]);
 
-
-
+    useEffect(() => {
+        // Check if all fields are filled and the email is valid
+        const isFullNameValid = formData.fullName.trim() !== '';
+        const isEmailValid = /^[a-zA-Z0-9._%+-]+@gmail\.com$/.test(formData.email);
+        setIsFormValid(isFullNameValid && isEmailValid);
+    }, [formData]);
 
     const formAnimation = useSpring({
         from: { opacity: 0, transform: 'translateY(-50px)' },
         to: { opacity: 1, transform: 'translateY(0)' },
         config: { duration: 500 },
     });
-
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -113,23 +114,26 @@ const Form = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        // Prepare the survey responses array
+        if (!isFormValid) {
+            alert('Please fill out all fields correctly.');
+            return;
+        }
+
         const surveyResponses = [
             {
-                surveyquestion_ref: 'FNAME', // 5 chars, all caps
+                surveyquestion_ref: 'FNAME',
                 response_value: formData.fullName,
             },
             {
-                surveyquestion_ref: 'EMAIL', // 5 chars, all caps
+                surveyquestion_ref: 'EMAIL',
                 response_value: formData.email,
             },
         ];
 
         try {
-            // Submit the survey responses
             await submitSurveyResponses(surveyResponses);
             console.log('Survey responses submitted successfully!');
-            navigate('/'); // Navigate to the next page after submission
+            navigate('/');
         } catch (error) {
             console.error('Failed to submit survey responses:', error);
         }
@@ -140,7 +144,7 @@ const Form = () => {
     return (
         <ThemeProvider theme={theme}>
             <BodyPartial />
-            <GradientBackground handleNextClick={handleSubmit}>
+            <GradientBackground handleNextClick={handleSubmit} buttonAppear={isFormValid}>
                 <FormContainer style={formAnimation}>
                     <FormTitle>
                         <span>{translations.formWelcomeTourists}</span>
@@ -155,20 +159,17 @@ const Form = () => {
                             onChange={handleInputChange}
                         />
                         <InputField
-                            type="text"
+                            type="email"
                             name="email"
                             placeholder={translations.formEmailPlaceholder}
                             value={formData.email}
                             onChange={handleInputChange}
                             required
                         />
-                        {/* <NextButtonU type="submit">
-                            {translations.formSubmitButton}
-                        </NextButtonU> */}
                     </form>
                 </FormContainer>
-
-            </GradientBackground>        </ThemeProvider>
+            </GradientBackground>
+        </ThemeProvider>
     );
 };
 

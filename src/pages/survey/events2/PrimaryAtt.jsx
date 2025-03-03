@@ -95,7 +95,7 @@ const PrimaryAtt = () => {
     return (
         <>
             <BodyPartial />
-            <GradientBackground overlayImage={imgoverlay} opacity={0.15} blendMode='screen'>
+            <GradientBackground overlayImage={imgoverlay} opacity={0.15} blendMode='screen' buttonAppear={false}>
                 {showNextPage ? (
                     <NextPage />
                 ) : (

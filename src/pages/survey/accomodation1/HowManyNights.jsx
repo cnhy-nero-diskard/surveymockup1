@@ -3,7 +3,6 @@ import styled, { keyframes } from 'styled-components';
 import { Container, NextButtonU } from '../../../components/utils/styles1';
 import { useNavigate } from 'react-router-dom';
 import imgOverlay from "../../../components/img/bed.png";
-
 import useTranslations from '../../../components/utils/useTranslations';
 import { submitSurveyResponses } from '../../../components/utils/sendInputUtils';
 import BodyPartial from '../../../components/partials/BodyPartial';
@@ -21,15 +20,31 @@ const fadeIn = keyframes`
   }
 `;
 
+const slideIn = keyframes`
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+`;
+
 const FormContainer = styled.div`
-  font-family: Arial, sans-serif;
-  max-width: 50vw;
+  font-family: 'Inter', Arial, sans-serif;
   animation: ${fadeIn} 1s ease-in-out;
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px;
+  border-radius: 12px;
 `;
 
 const Question = styled.p`
-  font-size: 18px;
-  margin-bottom: 20px;
+  font-size: 20px;
+  font-weight: 500;
+  margin-bottom: 24px;
+  color: #333;
 `;
 
 const RadioGroup = styled.div`
@@ -43,12 +58,14 @@ const RadioLabel = styled.label`
   display: flex;
   align-items: center;
   cursor: pointer;
-  font-size: 20px;
-  font-weight: bold;
-  padding: 10px 20px;
+  font-size: 18px;
+  font-weight: 500;
+  padding: 12px 24px;
   border: 2px solid #007bff;
   border-radius: 8px;
-  transition: background-color 0.3s ease, color 0.3s ease;
+  transition: all 0.3s ease;
+  background-color: ${props => (props.checked ? '#007bff' : 'transparent')};
+  color: ${props => (props.checked ? 'white' : '#007bff')};
 
   &:hover {
     background-color: #007bff;
@@ -66,6 +83,7 @@ const InputGroup = styled.div`
   display: flex;
   flex-direction: column;
   margin-bottom: 20px;
+  animation: ${slideIn} 0.5s ease-in-out;
 `;
 
 const InputLabel = styled.label`
@@ -81,12 +99,13 @@ const InputField = styled.input`
 `;
 
 const NextButton = styled.button`
-  padding: 10px 20px;
+  padding: 12px 24px;
   font-size: 16px;
+  font-weight: 500;
   color: white;
   background-color: #007bff;
   border: none;
-  border-radius: 4px;
+  border-radius: 8px;
   cursor: pointer;
   transition: background-color 0.3s ease;
 
@@ -100,6 +119,41 @@ const NextButton = styled.button`
   }
 `;
 
+const ProgressBar = styled.div`
+  width: 100%;
+  height: 8px;
+  background-color: #e0e0e0;
+  border-radius: 4px;
+  margin-bottom: 20px;
+  overflow: hidden;
+`;
+
+const ProgressFill = styled.div`
+  width: ${props => props.progress}%;
+  height: 100%;
+  background-color: #007bff;
+  transition: width 0.3s ease;
+`;
+
+const RadioOption = ({ value, label, checked, onChange }) => (
+  <RadioLabel checked={checked}>
+    <RadioInput
+      type="radio"
+      name="stay"
+      value={value}
+      checked={checked}
+      onChange={onChange}
+      aria-label={label}
+    />
+    {label}
+  </RadioLabel>
+);
+
+const SURVEY_QUESTIONS = {
+  STAY: 'STAY',
+  NIGHTS: 'NIGHTS',
+};
+
 const HowManyNights = () => {
   const { routes } = useContext(UnifiedContext);
   const currentStepIndex = useCurrentStepIndex(routes);
@@ -109,22 +163,23 @@ const HowManyNights = () => {
   const [nights, setNights] = useState('');
   const [responses, setResponses] = useState([]);
   const [language, setLanguage] = useState(localStorage.getItem('selectedLanguage'));
-  const [blocksUpdated, setBlocksUpdated] = useState(false); // New state to track if blocks are updated
+  const [blocksUpdated, setBlocksUpdated] = useState(false);
+  const [error, setError] = useState('');
   const translations = useTranslations('HowManyNights', language);
 
   const handleRadioChange = (e) => {
     const value = e.target.value;
     setStayOvernight(value);
+    setError('');
     
-    // Update responses with radio button selection
     setResponses(prev => {
-      const existing = prev.find(item => item.surveyquestion_ref === 'STAY');
+      const existing = prev.find(item => item.surveyquestion_ref === SURVEY_QUESTIONS.STAY);
       if (existing) {
         existing.response_value = value.toUpperCase();
         return [...prev];
       }
       return [...prev, { 
-        surveyquestion_ref: 'STAY',
+        surveyquestion_ref: SURVEY_QUESTIONS.STAY,
         response_value: value.toUpperCase()
       }];
     });
@@ -134,15 +189,14 @@ const HowManyNights = () => {
     const value = e.target.value;
     setNights(value);
     
-    // Update responses with nights input
     setResponses(prev => {
-      const existing = prev.find(item => item.surveyquestion_ref === 'NIGHTS');
+      const existing = prev.find(item => item.surveyquestion_ref === SURVEY_QUESTIONS.NIGHTS);
       if (existing) {
         existing.response_value = value;
         return [...prev];
       }
       return [...prev, { 
-        surveyquestion_ref: 'NIGHTS',
+        surveyquestion_ref: SURVEY_QUESTIONS.NIGHTS,
         response_value: value
       }];
     });
@@ -150,24 +204,27 @@ const HowManyNights = () => {
 
   const navigate = useNavigate();
   const handleNextClick = async () => {
-    // Submit responses to backend
+    if (stayOvernight === "yes" && !nights) {
+      setError(translations.howManyNightsError);
+      return;
+    }
+    setError('');
+    
     await submitSurveyResponses(responses);
 
-    // Update activeBlocks based on the response
     if (stayOvernight === "yes") {
       appendActiveBlocks(['yesaccom']);
     } else if (stayOvernight === "no") {
       appendActiveBlocks(['noaccom']);
     }
 
-    // Set blocksUpdated to true to trigger useEffect
     setBlocksUpdated(true);
   };
 
   useEffect(() => {
     if (blocksUpdated) {
       goToNextStep(currentStepIndex, navigate, routes, activeBlocks);
-      setBlocksUpdated(false); // Reset the state after navigation
+      setBlocksUpdated(false);
     }
   }, [blocksUpdated, activeBlocks, currentStepIndex, navigate, routes]);
 
@@ -175,53 +232,58 @@ const HowManyNights = () => {
     setLanguage(localStorage.getItem('selectedLanguage'));
   }, []);
 
+  useEffect(() => {
+    if (stayOvernight === "yes") {
+      document.getElementById('nightsInput').focus();
+    }
+  }, [stayOvernight]);
+
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      handleNextClick();
+    }
+  };
+
+  useEffect(() => {
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [handleNextClick]);
+
+
   return (
     <>
       <BodyPartial />
-      <GradientBackground overlayImage={imgOverlay} opacity={0.34} blendMode="multiply">
+      <GradientBackground overlayImage={imgOverlay} opacity={0.34} blendMode="multiply" handleNextClick={handleNextClick} buttonAppear={stayOvernight}>
         <Container>
           <FormContainer>
             <Question>{translations.howManyNightsQuestion}</Question>
-            <RadioGroup>
-              <RadioLabel>
-                <RadioInput
-                  type="radio"
-                  name="stay"
-                  value="yes"
-                  checked={stayOvernight === "yes"}
-                  onChange={handleRadioChange}
-                />
-                {translations.howManyNightsYes}
-              </RadioLabel>
-              <RadioLabel>
-                <RadioInput
-                  type="radio"
-                  name="stay"
-                  value="no"
-                  checked={stayOvernight === "no"}
-                  onChange={handleRadioChange}
-                />
-                {translations.howManyNightsNo}
-              </RadioLabel>
+            <RadioGroup role="radiogroup" aria-label={translations.howManyNightsQuestion}>
+              <RadioOption
+                value="yes"
+                label={translations.howManyNightsYes}
+                checked={stayOvernight === "yes"}
+                onChange={handleRadioChange}
+              />
+              <RadioOption
+                value="no"
+                label={translations.howManyNightsNo}
+                checked={stayOvernight === "no"}
+                onChange={handleRadioChange}
+              />
             </RadioGroup>
             {stayOvernight === "yes" && (
               <InputGroup>
                 <InputLabel>{translations.howManyNightsNightsLabel}</InputLabel>
                 <InputField
+                  id="nightsInput"
                   type="number"
                   value={nights}
                   onChange={handleNightsChange}
+                  aria-label={translations.howManyNightsNightsLabel}
                 />
               </InputGroup>
             )}
-            {stayOvernight && (
-              <NextButtonU
-                onClick={handleNextClick} 
-                disabled={stayOvernight === "yes" && !nights}
-              >
-                {translations.howManyNightsNextButton}
-              </NextButtonU>
-            )}
+            {error && <p style={{ color: 'red', marginBottom: '10px' }}>{error}</p>}
           </FormContainer>
         </Container>
       </GradientBackground>
