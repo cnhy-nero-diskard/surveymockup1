@@ -232,7 +232,6 @@ const LanguageSelector = () => {
           <br />
           Language
         </Title>
-        <Container>
           {error ? (
             <div style={{ color: 'red', textAlign: 'center' }}>{error}</div>
           ) : isLoading ? (
@@ -258,7 +257,6 @@ const LanguageSelector = () => {
 
 
           </div>
-        </Container>
       </GradientBackground>
 
 

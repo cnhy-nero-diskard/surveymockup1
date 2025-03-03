@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { useSpring, animated } from 'react-spring';
 import { ToastContainer, toast } from 'react-toastify';
@@ -12,6 +12,7 @@ import useTranslations from '../../../components/utils/useTranslations';
 import { submitSurveyResponses } from '../../../components/utils/sendInputUtils';
 import { useCurrentStepIndex } from '../../../components/utils/useCurrentIndex';
 import { UnifiedContext } from '../../../routes/UnifiedContext';
+import axios from 'axios';
 import { goToNextStep } from '../../../components/utils/navigationUtils';
 
 const TableContainer = styled(animated.div)`
@@ -44,7 +45,6 @@ const ScrollableTableContainer = styled.div`
   padding-bottom: 20px;
 `;
 
-
 const TableHeader = styled.th`
   background-color: #007bff;
   color: white;
@@ -65,6 +65,7 @@ const TableCell = styled.td`
     font-size: 10px;
   }
 `;
+
 const MobileRow = styled.div`
   display: flex;
   flex-direction: column;
@@ -82,7 +83,6 @@ const MobileRowHeader = styled.div`
   color: #007bff;
   margin-bottom: 5px;
 `;
-
 
 const Input = styled.input`
   width: 100%;
@@ -103,27 +103,28 @@ const RadioGroup = styled.div`
     align-items: center;
   }
 `;
+
 const BottomEmojiRadioGroup = styled.div`
   display: flex;
-  gap: 15px; /* Adds more space between the radio buttons */
+  gap: 15px;
   justify-content: center;
   align-items: center;
 
   @media (max-width: 768px) {
-    flex-direction: row; /* Keep row direction on mobile */
-    gap: 10px; /* Smaller gap on mobile */
+    flex-direction: row;
+    gap: 10px;
   }
 
   label {
-    font-size: 24px; /* Increase the size of the labels */
+    font-size: 24px;
   }
 
   input {
-    transform: scale(1.5); /* Scale up the radio buttons */
+    transform: scale(1.5);
   }
 
   span {
-    font-size: 24px; /* Increase the size of the emoji */
+    font-size: 24px;
   }
 `;
 
@@ -164,6 +165,35 @@ const Title = styled.h1`
     font-size: 24px;
   }
 `;
+
+const SuggestionList = styled.ul`
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  max-height: 150px;
+  overflow-y: auto;
+  position: absolute;
+  background-color: blue;
+  width: 100%;
+  z-index: 1;
+
+  &:hover {
+    background-color: lightblue; /* Change this to your desired hover color */
+  }
+`;
+
+
+const SuggestionItem = styled.li`
+  padding: 8px;
+  cursor: pointer;
+
+  &:hover {
+    background-color: #f0f0f0;
+  }
+`;
+
 const AttractionForm = () => {
   const { routes } = useContext(UnifiedContext);
   const currentStepIndex = useCurrentStepIndex(routes);
@@ -176,6 +206,9 @@ const AttractionForm = () => {
     rating: '',
   });
 
+  const [attractionSuggestions, setAttractionSuggestions] = useState([]); // Ensure this is an array
+  const [showSuggestions, setShowSuggestions] = useState(false);
+
   const language = localStorage.getItem('selectedLanguage');
   const translations = useTranslations('AttractionForm', language);
 
@@ -184,13 +217,55 @@ const AttractionForm = () => {
     to: { opacity: 1, transform: 'translateY(0)' },
   });
 
+  useEffect(() => {
+    const fetchAttractionLocalizations = async () => {
+      try {
+        const response = await axios.get(`${process.env.REACT_APP_API_HOST}/api/survey/attraction`, {
+          params: { languageCode: language },
+          withCredentials: true
+        });
+        if (response.status !== 200) {
+          throw new Error('Failed to fetch attraction localizations');
+        }
+        const data = response.data;
+  
+        // Extract the translatedNames array from the response
+        if (data && data.translatedNames && Array.isArray(data.translatedNames)) {
+          setAttractionSuggestions(data.translatedNames);
+        } else {
+          console.error('API response does not contain a valid translatedNames array:', data);
+          setAttractionSuggestions([]); // Set to empty array to avoid errors
+        }
+      } catch (error) {
+        console.error('Error fetching attraction localizations:', error);
+        setAttractionSuggestions([]); // Set to empty array to avoid errors
+      }
+    };
+  
+    fetchAttractionLocalizations();
+  }, [language]);
+  
   const handleChange = (e) => {
     const { name, value } = e.target;
     setCurrentInput({ ...currentInput, [name]: value });
+
+    if (name === 'attraction') {
+      setShowSuggestions(value.length > 0);
+    }
+  };
+
+  const handleSuggestionClick = (attraction) => {
+    // Find the selected attraction in the suggestions array
+    const selectedAttraction = attractionSuggestions.find(item => Object.keys(item)[0] === attraction);
+    setCurrentInput({
+      attraction: attraction,
+      location: selectedAttraction ? selectedAttraction[attraction] : '', // Autofill location
+      rating: currentInput.rating
+    });
+    setShowSuggestions(false);
   };
 
   const handleAddRow = () => {
-    // Check if the maximum number of rows (5) has been reached
     if (rows.length >= 5) {
       toast.error(translations.attractionFormErrorMaxRows, {
         position: 'top-right',
@@ -203,7 +278,6 @@ const AttractionForm = () => {
       return;
     }
 
-    // Check if all fields are filled
     if (!currentInput.attraction || !currentInput.location || !currentInput.rating) {
       toast.error(translations.attractionFormErrorAllFields, {
         position: 'top-right',
@@ -216,14 +290,13 @@ const AttractionForm = () => {
       return;
     }
 
-    // Generate unique references for the new row
     const rowNumber = rows.length + 1;
     const newRow = {
       ...currentInput,
       id: Date.now(),
-      attraction_ref: `ATTRA${rowNumber}`, // Unique attraction_ref
-      location_ref: `LOCAT${rowNumber}`,   // Unique location_ref
-      rating_ref: `RATNG${rowNumber}`      // Unique rating_ref
+      attraction_ref: `ATTRA${rowNumber}`,
+      location_ref: `LOCAT${rowNumber}`,
+      rating_ref: `RATNG${rowNumber}`
     };
 
     setRows([...rows, newRow]);
@@ -252,7 +325,6 @@ const AttractionForm = () => {
 
   const navigate = useNavigate();
   const handleNextClick = async () => {
-    // Prepare survey responses as an array of key-value pairs
     const surveyResponses = rows.map((row) => [
       { surveyquestion_ref: row.attraction_ref, response_value: row.attraction },
       { surveyquestion_ref: row.location_ref, response_value: row.location },
@@ -260,7 +332,6 @@ const AttractionForm = () => {
     ]).flat();
 
     try {
-      // Call the function to submit the responses
       await submitSurveyResponses(surveyResponses);
       goToNextStep(currentStepIndex, navigate, routes, activeBlocks);
     } catch (error) {
@@ -278,7 +349,7 @@ const AttractionForm = () => {
   return (
     <>
       <BodyPartial />
-      <GradientBackground overlayImage={imgOverlay} opacity={0.15} blendMode='screen'>
+      <GradientBackground overlayImage={imgOverlay} opacity={0.15} blendMode='screen' handleNextClick={handleNextClick}>
         <Container>
           <TableContainer style={formAnimation}>
             <Title>{translations.attractionFormTitle}</Title>
@@ -325,7 +396,6 @@ const AttractionForm = () => {
                 </tbody>
               </Table>
 
-              {/* Mobile View for First Row */}
               <div>
                 <MobileRow>
                   <MobileRowHeader>{translations.attractionFormHeaderAttraction}</MobileRowHeader>
@@ -335,6 +405,17 @@ const AttractionForm = () => {
                     onChange={handleChange}
                     placeholder={translations.attractionFormPlaceholderAttraction}
                   />
+                  {showSuggestions && Array.isArray(attractionSuggestions) && (
+                    <SuggestionList>
+                      {attractionSuggestions
+                        .filter(item => Object.keys(item)[0].toLowerCase().includes(currentInput.attraction.toLowerCase()))
+                        .map((item, index) => (
+                          <SuggestionItem key={index} onClick={() => handleSuggestionClick(Object.keys(item)[0])}>
+                            {Object.keys(item)[0]}
+                          </SuggestionItem>
+                        ))}
+                    </SuggestionList>
+                  )}
                   <MobileRowHeader>{translations.attractionFormHeaderLocation}</MobileRowHeader>
                   <Input
                     name="location"
@@ -367,13 +448,13 @@ const AttractionForm = () => {
             </ScrollableTableContainer>
           </TableContainer>
           <Button onClick={handleAddRow}>{translations.attractionFormButtonAddRow}</Button>
-          <NextButtonU onClick={handleNextClick}>{translations.attractionFormButtonNext}</NextButtonU>
         </Container>
       </GradientBackground>
       <ToastContainer />
     </>
   );
 };
+
 
 
 export default AttractionForm;

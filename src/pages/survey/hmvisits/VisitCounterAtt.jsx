@@ -9,7 +9,7 @@ import { goToNextStep } from '../../../components/utils/navigationUtils';
 
 const VisitCounterAtt = () => {
   const [selectedOption, setSelectedOption] = useState(null);
-  const navigate = useNavigate(); // Initialize useNavigate
+  const navigate = useNavigate(); 
   const { routes } = useContext(UnifiedContext);
   const currentStepIndex = useCurrentStepIndex(routes);
   const { activeBlocks } = useContext(UnifiedContext);

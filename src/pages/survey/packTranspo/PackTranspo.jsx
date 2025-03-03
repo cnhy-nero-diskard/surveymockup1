@@ -149,7 +149,7 @@ const PackTranspo = () => {
     return (
         <>
             <BodyPartial />
-            <GradientBackground overlayImage={imgOverlay} opacity={0.2} blendMode="screen">
+            <GradientBackground overlayImage={imgOverlay} opacity={0.2} blendMode="screen" handleNextClick={handleNextClick} buttonAppear={price && currency }>
                 <Container>
                     <Question>{translations.packTranspoQuestion}</Question>
                     <InputContainer>
@@ -182,9 +182,6 @@ const PackTranspo = () => {
                             <span></span>
                         )}
                     </ConversionResult>
-                    <NextButtonU style={buttonAnimation} onClick={handleNextClick}>
-                        {translations.packTranspoNextButton}
-                    </NextButtonU>
                 </Container>
             </GradientBackground>
         </>

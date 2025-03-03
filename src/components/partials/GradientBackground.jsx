@@ -45,7 +45,7 @@ const ProgressBarContainer = styled.div`
   transform: translateX(-50%);
   width: 80%;
   height: 10px;
-  background-color: rgba(255, 255, 255, 0.3);
+  background-color: rgba(255, 255, 255, 0.8);
   border-radius: 5px;
   overflow: hidden;
 `;

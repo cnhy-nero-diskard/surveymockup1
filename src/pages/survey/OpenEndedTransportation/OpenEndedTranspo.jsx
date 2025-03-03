@@ -10,7 +10,6 @@ import { submitSurveyResponses } from '../../../components/utils/sendInputUtils'
 import { goToNextStep } from '../../../components/utils/navigationUtils';
 import { useCurrentStepIndex } from '../../../components/utils/useCurrentIndex';
 import { UnifiedContext } from '../../../routes/UnifiedContext';
-
 const OpenEndedTranspo = () => {
     const { routes } = useContext(UnifiedContext);
     const currentStepIndex = useCurrentStepIndex(routes);
@@ -46,10 +45,18 @@ const OpenEndedTranspo = () => {
         setLanguage(localStorage.getItem('selectedLanguage'));
     }, [localStorage.getItem('selectedLanguage')]);
 
+    // Condition to check if all inputs are valid
+    const isFormValid = selectedButton !== null && textFieldValue.trim().length > 10;
+
     return (
         <>
             <BodyPartial />
-            <GradientBackground overlayImage={imgoverlay} opacity={0.2} >
+            <GradientBackground
+                overlayImage={imgoverlay}
+                opacity={0.2}
+                handleNextClick={handleNextClick}
+                buttonAppear={isFormValid} // Set buttonAppear based on form validity
+            >
                 <Container
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -74,25 +81,17 @@ const OpenEndedTranspo = () => {
                     </div>
 
                     <Paragraph>{translations.openEnded1FeedbackRequest}</Paragraph>
-                    <TextField 
-                        placeholder={translations.openEnded1TextFieldPlaceholder} 
-                        value={textFieldValue} 
+                    <TextField
+                        placeholder={translations.openEnded1TextFieldPlaceholder}
+                        value={textFieldValue}
                         onChange={(e) => setTextFieldValue(e.target.value)}
+                        minLength={11} // Optional: Enforce minimum length in the input field
                     />
-
-                    <NextButtonU
-                        whileHover={{ scale: 1.1 }}
-                        whileTap={{ scale: 0.9 }}
-                        onClick={handleNextClick}
-                        tabIndex={0}
-                        aria-label="Next"
-                    >
-                        {translations.openEnded1NextButton}
-                    </NextButtonU>
                 </Container>
             </GradientBackground>
         </>
     );
 };
+
 
 export default OpenEndedTranspo;
