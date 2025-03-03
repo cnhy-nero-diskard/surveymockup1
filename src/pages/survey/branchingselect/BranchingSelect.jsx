@@ -13,16 +13,14 @@ import { UnifiedContext } from '../../../routes/UnifiedContext';
 import { goToNextStep } from '../../../components/utils/navigationUtils';
 import { useNavigate } from 'react-router-dom';
 
-
-
 const Option = styled(animated.div)`
   padding: 15px;
   margin: 10px 0;
   border: 1px solid #ccc;
   border-radius: 20px;
   cursor: pointer;
-  color:white;
-  border-color:transparent;
+  color: white;
+  border-color: transparent;
   transition: background-color 0.3s ease;
   background-color: rgb(47, 134, 206);
 
@@ -54,7 +52,6 @@ const NextButton = styled(animated.button)`
 `;
 
 const BranchingSelect = () => {
-
   const navigate = useNavigate();
   const [selectedOptions, setSelectedOptions] = useState([]);
   const [language, setLanguage] = useState(localStorage.getItem('selectedLanguage'));
@@ -64,6 +61,15 @@ const BranchingSelect = () => {
   const currentStepIndex = useCurrentStepIndex(routes);
   const { activeBlocks, appendActiveBlocks, removeActiveBlocks } = useContext(UnifiedContext);
 
+  // Intro Animation
+  const introAnimation = useSpring({
+    from: { opacity: 0, transform: 'scale(0.8)' },
+    to: { opacity: 1, transform: 'scale(1)' },
+    config: { tension: 200, friction: 20 },
+    delay: 300,
+  });
+
+  // Next Button Animation
   const springProps = useSpring({
     opacity: selectedOptions.length > 0 ? 1 : 0,
     transform: selectedOptions.length > 0 ? 'scale(1)' : 'scale(0.95)',
@@ -78,7 +84,6 @@ const BranchingSelect = () => {
   };
 
   const handleOptionClick = (option) => {
-    console.log(`ACTIVE CONDITIONAL BLOCKS - ${JSON.stringify(activeBlocks)}`);
     setSelectedOptions((prevOptions) => {
       if (prevOptions.includes(option)) {
         // If the option is already selected, remove it
@@ -120,7 +125,7 @@ const BranchingSelect = () => {
     <>
       <BodyPartial />
       <GradientBackground overlayImage={imgoverlay} handleNextClick={handleNextClick} buttonAppear={selectedOptions.length > 0}>
-        <Container>
+        <animated.div style={introAnimation}>
           <QuestionText>{translations.branchingSelectSurveyTitle}</QuestionText>
           <Option
             onClick={() => handleOptionClick('ACCOMODATION')}
@@ -148,11 +153,24 @@ const BranchingSelect = () => {
           </Option>
           {selectedOptions.length > 0 && (
             <animated.div style={springProps} className="selected-option">
-              {translations.branchingSelectSelectedOptions} {selectedOptions.join(', ')}
+              {translations.branchingSelectSelectedOptions}:{' '}
+              {selectedOptions.map((option) => {
+                switch (option) {
+                  case 'ACCOMODATION':
+                    return translations.branchingSelectAccommodation;
+                  case 'TRANSPORTATION':
+                    return translations.branchingSelectTransportation;
+                  case 'EVENT/ACTIVITIES':
+                    return translations.branchingSelectEventActivities;
+                  case 'SERVICES':
+                    return translations.branchingSelectServices;
+                  default:
+                    return '';
+                }
+              }).join(', ')}
             </animated.div>
           )}
-
-        </Container>
+        </animated.div>
       </GradientBackground>
     </>
   );

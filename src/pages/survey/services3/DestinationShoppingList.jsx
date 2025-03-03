@@ -123,7 +123,7 @@ const DestinationShoppingList = () => {
   return (
     <>
       <BodyPartial />
-      <GradientBackground overlayImage={imageoverlay} opacity={0.15}>
+      <GradientBackground overlayImage={imageoverlay} opacity={0.15} handleNextClick={handleNextClick}>
         <Container>
           <Title>{translations.destinationShoppingListTitle}</Title>
           <ItemList>
@@ -143,7 +143,6 @@ const DestinationShoppingList = () => {
               </Item>
             ))}
           </ItemList>
-          <NextButtonU onClick={handleNextClick}>{translations.destinationShoppingListNextButton}</NextButtonU>
         </Container>
       </GradientBackground>
     </>

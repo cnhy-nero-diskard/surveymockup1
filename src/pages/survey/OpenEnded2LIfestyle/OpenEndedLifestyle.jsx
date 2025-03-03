@@ -11,16 +11,15 @@ import { useCurrentStepIndex } from '../../../components/utils/useCurrentIndex';
 import { UnifiedContext } from '../../../routes/UnifiedContext';
 import { goToNextStep } from '../../../components/utils/navigationUtils';
 
-
 const OpenEndedLifestyle = () => {
     const { routes } = useContext(UnifiedContext);
     const currentStepIndex = useCurrentStepIndex(routes);
-    const { activeBlocks, appendActiveBlocks, removeActiveBlocks } = useContext(UnifiedContext);
-
+    const { activeBlocks } = useContext(UnifiedContext);
 
     const [selectedSatisfaction, setSelectedSatisfaction] = useState(null);
     const [textFeedback, setTextFeedback] = useState('');
     const [language, setLanguage] = useState(localStorage.getItem('selectedLanguage'));
+    const [buttonAppear, setButtonAppear] = useState(false); // New state for button visibility
     const translations = useTranslations('OpenEnded1', language);
     const navigate = useNavigate();
 
@@ -58,10 +57,19 @@ const OpenEndedLifestyle = () => {
         }
     };
 
+    // Effect to control button visibility
+    useEffect(() => {
+        if (selectedSatisfaction !== null && textFeedback.length >= 20) {
+            setButtonAppear(true);
+        } else {
+            setButtonAppear(false);
+        }
+    }, [selectedSatisfaction, textFeedback]);
+
     return (
         <>
             <BodyPartial />
-            <GradientBackground overlayImage={imgoverlay} opacity={0.2}>
+            <GradientBackground overlayImage={imgoverlay} opacity={0.2} buttonAppear={buttonAppear} handleNextClick={handleNextClick}>
                 <Container
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -122,16 +130,6 @@ const OpenEndedLifestyle = () => {
                         onChange={(e) => setTextFeedback(e.target.value)}
                     />
 
-                    {/* Next Button */}
-                    <Button
-                        whileHover={{ scale: 1.1 }}
-                        whileTap={{ scale: 0.9 }}
-                        onClick={handleNextClick}
-                        tabIndex={0}
-                        aria-label="Next"
-                    >
-                        {translations.openEnded1NextButton}
-                    </Button>
                 </Container>
             </GradientBackground>
         </>

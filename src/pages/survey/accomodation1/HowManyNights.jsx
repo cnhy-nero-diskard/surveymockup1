@@ -254,7 +254,6 @@ const HowManyNights = () => {
     <>
       <BodyPartial />
       <GradientBackground overlayImage={imgOverlay} opacity={0.34} blendMode="multiply" handleNextClick={handleNextClick} buttonAppear={stayOvernight}>
-        <Container>
           <FormContainer>
             <Question>{translations.howManyNightsQuestion}</Question>
             <RadioGroup role="radiogroup" aria-label={translations.howManyNightsQuestion}>
@@ -285,7 +284,6 @@ const HowManyNights = () => {
             )}
             {error && <p style={{ color: 'red', marginBottom: '10px' }}>{error}</p>}
           </FormContainer>
-        </Container>
       </GradientBackground>
     </>
   );

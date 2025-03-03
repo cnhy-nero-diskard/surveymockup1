@@ -44,12 +44,11 @@ const WarningMessageContainer = styled.div`
 
 const WarningMessage = ({ message }) => {
   return (
-<GradientBackground>
         <WarningMessageContainer>
           {message}
         </WarningMessageContainer>
     
-</GradientBackground>  );
+  );
 };
 
 export default WarningMessage;

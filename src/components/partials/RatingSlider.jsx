@@ -212,7 +212,6 @@ const RatingSlider = ({ title, categories, onRatingComplete, surveyquestion_refs
     <>
       <BodyPartial />
       <GradientBackground overlayImage={imgOverlay} opacity={0.2} blendMode='screen' buttonAppear={false}>
-        <Container>
           <Title>{title}</Title>
           <SlidesContainer>
             {transitions((style, index) => (
@@ -247,7 +246,6 @@ const RatingSlider = ({ title, categories, onRatingComplete, surveyquestion_refs
             ))}
           </SlidesContainer>
 
-        </Container>
       </GradientBackground>
     </>
   );

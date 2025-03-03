@@ -113,7 +113,6 @@ const VisitCounterR = ({ title, surveyquestion_ref, handNext }) => {
     <>
       <BodyPartial />
       <GradientBackground imgOverlay={imgOverlay} handleNextClick={handleNextClick} buttonAppear={visitCount !== null}>
-        <Container>
           <AnimatedContainer style={containerAnimation}>
             <Title>{title}</Title>
             <ButtonGroup>
@@ -141,7 +140,6 @@ const VisitCounterR = ({ title, surveyquestion_ref, handNext }) => {
             </ButtonGroup>
 
           </AnimatedContainer>
-        </Container>
       </GradientBackground>
     </>
   );

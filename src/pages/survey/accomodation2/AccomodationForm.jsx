@@ -231,7 +231,12 @@ const AccommodationForm = () => {
     setIsCommercial(false);
     handleNextClick();
     goToNextStep(currentStepIndex, navigate, routes, activeBlocks);
+  };
 
+  // Function to check if any row has a value
+  const hasFilledValues = () => {
+    return Object.values(durations).some(duration => duration !== '' && duration !== '0') ||
+           Object.values(ratings).some(rating => rating !== '');
   };
 
   useEffect(() => {
@@ -251,7 +256,13 @@ const AccommodationForm = () => {
   return (
     <>
       <BodyPartial />
-      <GradientBackground overlayImage={imgoverlay} opacity={0.2} blendMode="multiply" handleNextClick={handleNextClick}>
+      <GradientBackground 
+        overlayImage={imgoverlay} 
+        opacity={0.2} 
+        blendMode="multiply" 
+        handleNextClick={handleNextClick} 
+        buttonAppear={hasFilledValues()} // Update this line
+      >
         <FormContainer
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -316,13 +327,6 @@ const AccommodationForm = () => {
                   ))}
                 </tbody>
               </Table>
-              <NextButtonU
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={handleNextClick}
-              >
-                {translations.accommodationFormNextButton}
-              </NextButtonU>
             </>
           )}
         </FormContainer>
@@ -330,6 +334,5 @@ const AccommodationForm = () => {
     </>
   );
 };
-
 
 export default AccommodationForm;

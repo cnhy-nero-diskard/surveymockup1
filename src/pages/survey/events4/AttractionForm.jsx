@@ -19,9 +19,7 @@ const TableContainer = styled(animated.div)`
   width: 105%;
   max-width: 800px;
   margin: 50px auto;
-  padding-bottom: 20px;
-  padding-right: 1px;
-  padding-left: 1px;
+  padding-right:20px;
   max-height: 80vh;
   overflow-y: auto;
   overflow-x: hidden;
@@ -30,11 +28,9 @@ const TableContainer = styled(animated.div)`
 const Table = styled.table`
   width: 100%;
   border-collapse: collapse;
-  margin: 20px 0;
   table-layout: fixed;
   @media (max-width: 768px) {
     display: block;
-    padding: 10px;
     width: 100%;
   }
 `;
@@ -71,7 +67,6 @@ const MobileRow = styled.div`
   flex-direction: column;
   margin-bottom: 20px;
   padding: 10px;
-  border: 1px solid #ddd;
   border-radius: 5px;
   @media (max-width: 768px) {
     width: 100%;
@@ -350,7 +345,6 @@ const AttractionForm = () => {
     <>
       <BodyPartial />
       <GradientBackground overlayImage={imgOverlay} opacity={0.15} blendMode='screen' handleNextClick={handleNextClick}>
-        <Container>
           <TableContainer style={formAnimation}>
             <Title>{translations.attractionFormTitle}</Title>
             <ScrollableTableContainer>
@@ -448,7 +442,6 @@ const AttractionForm = () => {
             </ScrollableTableContainer>
           </TableContainer>
           <Button onClick={handleAddRow}>{translations.attractionFormButtonAddRow}</Button>
-        </Container>
       </GradientBackground>
       <ToastContainer />
     </>

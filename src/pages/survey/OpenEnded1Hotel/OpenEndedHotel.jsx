@@ -19,6 +19,7 @@ const OpenEnded1Services = () => {
     const [selectedButton, setSelectedButton] = useState(null);
     const [textFieldValue, setTextFieldValue] = useState('');
     const [language, setLanguage] = useState(localStorage.getItem('selectedLanguage'));
+    const [buttonAppear, setButtonAppear] = useState(false);
     const translations = useTranslations('OpenEnded1', language);
 
     const navigate = useNavigate();
@@ -46,10 +47,19 @@ const OpenEnded1Services = () => {
         setLanguage(localStorage.getItem('selectedLanguage'));
     }, [localStorage.getItem('selectedLanguage')]);
 
+    useEffect(() => {
+        // Check if all input fields are valid
+        if (selectedButton !== null && textFieldValue.length >= 20) {
+            setButtonAppear(true);
+        } else {
+            setButtonAppear(false);
+        }
+    }, [selectedButton, textFieldValue]);
+
     return (
         <>
             <BodyPartial />
-            <GradientBackground overlayImage={imgoverlay} opacity={0.2} >
+            <GradientBackground overlayImage={imgoverlay} opacity={0.2} handleNextClick={handleNextClick} buttonAppear={buttonAppear} >
                 <Container
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -80,15 +90,7 @@ const OpenEnded1Services = () => {
                         onChange={(e) => setTextFieldValue(e.target.value)}
                     />
 
-                    <NextButtonU
-                        whileHover={{ scale: 1.1 }}
-                        whileTap={{ scale: 0.9 }}
-                        onClick={handleNextClick}
-                        tabIndex={0}
-                        aria-label="Next"
-                    >
-                        {translations.openEnded1NextButton}
-                    </NextButtonU>
+
                 </Container>
             </GradientBackground>
         </>

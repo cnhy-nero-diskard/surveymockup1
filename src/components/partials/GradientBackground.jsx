@@ -1,9 +1,10 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { useCurrentStepIndex } from '../utils/useCurrentIndex';
 import { UnifiedContext } from '../../routes/UnifiedContext';
 import { NextButtonU } from '../utils/styles1';
 import useTranslations from '../utils/useTranslations';
+import { keyframes } from 'styled-components';
 
 // Styled-component for the background
 const BackgroundWrapper = styled.div`
@@ -44,9 +45,9 @@ const ProgressBarContainer = styled.div`
   left: 50%;
   transform: translateX(-50%);
   width: 80%;
-  height: 10px;
-  background-color: rgba(255, 255, 255, 0.8);
-  border-radius: 5px;
+  height: 25px;
+  background-color: rgba(255, 255, 255, 0.6);
+  border-radius: 30px;
   overflow: hidden;
 `;
 
@@ -56,7 +57,34 @@ const getColor = (progress) => {
   return `rgba(${r}, ${g}, 0, 0.8)`;
 };
 
-// Update the ProgressBar styled-component
+const colorChangeAnimation = keyframes`
+  0% {
+    background-color: rgba(149, 177, 237, 0.8); // Light blue
+  }
+  33% {
+    background-color: rgba(0, 153, 255, 0.8); // Cyan
+  }
+  66% {
+    background-color: rgba(102, 51, 153, 0.8); // Purple
+  }
+  100% {
+    background-color: rgba(149, 177, 237, 0.8); // Light blue
+  }
+`;
+
+// Keyframes for pulsating animation
+const pulseAnimation = keyframes`
+  0% {
+    transform: scaleX(1);
+  }
+  50% {
+    transform: scaleX(1.02);
+  }
+  100% {
+    transform: scaleX(1);
+  }
+`;
+
 const ProgressBar = styled.div`
   height: 100%;
   background: linear-gradient(
@@ -64,10 +92,14 @@ const ProgressBar = styled.div`
     ${({ progress }) => getColor(progress)},
     ${({ progress }) => getColor(progress)}
   );
-  border-radius: 5px;
+  border-radius: 1px;
   width: ${({ progress }) => progress}%;
   transition: width 0.5s ease-out, background 0.5s ease-out;
+  animation: ${pulseAnimation} 3s infinite ease-in-out,
+             ${colorChangeAnimation} 5s infinite ease-in-out;
+  will-change: transform, width, background-color;
 `;
+
 // Styled-component for the progress text
 const ProgressText = styled.p`
   position: absolute;
@@ -87,9 +119,14 @@ const GradientBackground = ({ children, overlayImage, opacity = 0.3, blendMode =
   const currentStepIndex = useCurrentStepIndex(routes);
   const { activeBlocks } = useContext(UnifiedContext);
   const [language, setLanguage] = useState(localStorage.getItem('selectedLanguage'));
-  const translations = useTranslations('residence1', language || 'en')
+  const translations = useTranslations('residence1', language || 'en');
 
   const progress = ((currentStepIndex + 1) / routes.length) * 100;
+
+  // Use useEffect to trigger animation updates
+  useEffect(() => {
+    console.log("Progress updated:", progress); // Debugging: Log progress updates
+  }, [progress]);
 
   return (
     <>

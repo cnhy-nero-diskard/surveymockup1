@@ -2,7 +2,6 @@ import React, { useState, useEffect, useContext } from 'react';
 import styled from 'styled-components';
 import { useSpring, animated } from 'react-spring';
 import DatePicker from 'react-datepicker';
-import 'react-datepicker/dist/react-datepicker.css';
 import BodyPartial from '../../../components/partials/BodyPartial';
 import GradientBackground from '../../../components/partials/GradientBackground';
 import { useNavigate } from 'react-router-dom';
