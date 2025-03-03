@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import GradientBackground from '../../../components/partials/GradientBackground';
 import { Container, NextButtonU, Title } from '../../../components/utils/styles1';
 import translate from "../../../components/img/translate.png";
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useLanguage } from '../../../components/partials/LanguageContext';
 import axios from 'axios';
 import BodyPartial from '../../../components/partials/BodyPartial';
@@ -137,8 +137,8 @@ const ModalButton = styled.button`
     background-color: #003d80;
   }
 `;
-
 const LanguageSelector = () => {
+  const location = useLocation();
   const { setSelectedLanguage } = useLanguage();
   const navigate = useNavigate();
   const [languages, setLanguages] = useState([]);
@@ -150,9 +150,23 @@ const LanguageSelector = () => {
   const { routes } = useContext(UnifiedContext);
   const [currentStep, setCurrentStep] = useState();
   const currentStepIndex = useCurrentStepIndex(routes);
-  const { activeBlocks } = useContext(UnifiedContext);
+  const { activeBlocks, appendActiveBlocks } = useContext(UnifiedContext);
 
   useEffect(() => {
+    const getParentPath = (path) => {
+      const segments = path.split("/");
+      return segments.slice(0, -1).join("/");
+    };
+
+    let parentPath = getParentPath(location.pathname);
+
+    // Add blocks based on parentPath
+    if (location.pathname === "/survey" && !activeBlocks.includes("surveytpms")) {
+      appendActiveBlocks(["surveytpms"]);
+    } else if (location.pathname === "/feedback" && !activeBlocks.includes("feedback")) {
+      appendActiveBlocks(["feedback"]);
+    }
+
     const fetchProgress = async () => {
       try {
         const response = await axios.get(
@@ -164,10 +178,7 @@ const LanguageSelector = () => {
         console.error(err);
       }
     };
-    fetchProgress();
-  }, [navigate]);
 
-  useEffect(() => {
     const fetchLanguages = async () => {
       try {
         const response = await axios.get(
@@ -183,8 +194,9 @@ const LanguageSelector = () => {
       }
     };
 
+    fetchProgress();
     fetchLanguages();
-  }, []);
+  }, [location.pathname, activeBlocks, appendActiveBlocks, navigate]);
 
   const handleLanguageSelect = (code) => {
     setSelectedLanguageCode(code);
@@ -218,8 +230,6 @@ const LanguageSelector = () => {
     }
   };
 
-
-
   return (
     <>
       <BodyPartial />
@@ -232,34 +242,30 @@ const LanguageSelector = () => {
           <br />
           Language
         </Title>
-          {error ? (
-            <div style={{ color: 'red', textAlign: 'center' }}>{error}</div>
-          ) : isLoading ? (
-            <div>Loading languages...</div>
-          ) : (
-            <LanguageButtonsGrid>
-              {languages.map((language) => {
-                const isSelected = selectedLanguageCode === language.code;
-                return (
-                  <LanguageButton
-                    key={language.code}
-                    isSelected={isSelected}
-                    onClick={() => handleLanguageSelect(language.code)}
-                  >
-                    <FlagIcon className={`fi fi-${language.flag}`} />
-                    <LanguageName data-tooltip={language.name}>{language.name}</LanguageName>
-                  </LanguageButton>
-                );
-              })}
-            </LanguageButtonsGrid>
-          )}
-          <div style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>
-
-
-          </div>
+        {error ? (
+          <div style={{ color: 'red', textAlign: 'center' }}>{error}</div>
+        ) : isLoading ? (
+          <div>Loading languages...</div>
+        ) : (
+          <LanguageButtonsGrid>
+            {languages.map((language) => {
+              const isSelected = selectedLanguageCode === language.code;
+              return (
+                <LanguageButton
+                  key={language.code}
+                  isSelected={isSelected}
+                  onClick={() => handleLanguageSelect(language.code)}
+                >
+                  <FlagIcon className={`fi fi-${language.flag}`} />
+                  <LanguageName data-tooltip={language.name}>{language.name}</LanguageName>
+                </LanguageButton>
+              );
+            })}
+          </LanguageButtonsGrid>
+        )}
+        <div style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>
+        </div>
       </GradientBackground>
-
-
     </>
   );
 };

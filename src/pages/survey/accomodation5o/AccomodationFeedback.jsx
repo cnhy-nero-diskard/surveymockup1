@@ -6,7 +6,7 @@ import { useCurrentStepIndex } from '../../../components/utils/useCurrentIndex';
 import { UnifiedContext } from '../../../routes/UnifiedContext';
 import { goToNextStep } from '../../../components/utils/navigationUtils';
 
-const AccomodationOpen1 = () => {
+const AccomodationFeedback = () => {
   const { routes } = useContext(UnifiedContext);
   const currentStepIndex = useCurrentStepIndex(routes);
   const { activeBlocks, appendActiveBlocks, removeActiveBlocks } = useContext(UnifiedContext);
@@ -17,6 +17,7 @@ const AccomodationOpen1 = () => {
   const translations = useTranslations('AccomodationOpen1', language); // Fetch translations for this component
 
   const handleNext = (selectedOptionValue, feedback) => {
+    // Handle the next action based on the selected option and feedback
     console.log('Selected Option:', selectedOptionValue, 'Feedback:', feedback);
     goToNextStep(currentStepIndex, navigate, routes, activeBlocks);
   };
@@ -25,12 +26,12 @@ const AccomodationOpen1 = () => {
     <FeedbackForm
       title={translations.accomodationOpen1Title} // Use the translation variable
       onNext={handleNext}
-      squestion_identifier={"ACC1"}
+      squestion_identifier={"TPENT"}
     />
   );
 };
 
-export default AccomodationOpen1;
+export default AccomodationFeedback;
 
 
 

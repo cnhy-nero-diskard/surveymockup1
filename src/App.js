@@ -75,6 +75,7 @@ const App = () => {
           {/* App Routes */}
           {/* <Route path="/devpath1/*" element={<WebpageRoutesDev />} /> */}
           <Route path="/survey/*" element={<SurveyRoutes />} />
+          <Route path="/feedback/*" element={<SurveyRoutes />} />
 
           {/* Fallback route */}
           <Route path="*" element={<NotFound />} />

@@ -49,33 +49,34 @@ import PProfile2 from '../pages/survey/personalprofile2/PProfile2';
 import PProfile1 from '../pages/survey/personalprofile1/PProfile1';
 import ProponentLgu from '../pages/survey/proponentlgu/ProponentLgu';
 import OpenEndedTranspo from '../pages/survey/OpenEndedTransportation/OpenEndedTranspo';
+import AccomodationFeedback from '../pages/survey/accomodation5o/AccomodationFeedback';
 
 
 export const sroutes = [
     { label: 'Language', path: '', component: LanguageSelector, conditionalBlock: 'universal'},
-    { label: 'Page 1', path: 'page1', component: Page1, conditionalBlock: 'universal'},
-    { label: 'Survey Consent', path: 'surveyconsent', component: SurveyConsent, conditionalBlock: 'universal'},
-    { label: 'Gmail Form', path: 'form', component: Form, conditionalBlock: 'universal'},
-    { label: 'Greetings', path: 'greetings', component: Greetings, conditionalBlock: 'universal'},
-    { label: 'Residence 1', path: 'residence1', component: Residence1, conditionalBlock: 'universal'},
+    { label: 'Page 1', path: 'page1', component: Page1, conditionalBlock: 'surveytpms'},
+    { label: 'Survey Consent', path: 'surveyconsent', component: SurveyConsent, conditionalBlock: 'surveytpms'},
+    { label: 'Gmail Form', path: 'form', component: Form, conditionalBlock: 'surveytpms'},
+    { label: 'Greetings', path: 'greetings', component: Greetings, conditionalBlock: 'surveytpms'},
+    { label: 'Residence 1', path: 'residence1', component: Residence1, conditionalBlock: 'surveytpms'},
     { label: 'Transportation 1', path: 'transportation1', component: Transportation1, conditionalBlock: 'oprovblock'},
     { label: 'Transportation 2', path: 'transportation2', component: Transportation2, conditionalBlock: 'iprovblock'},
-    { label: 'Main Purpose', path: 'mainpurpose', component: MainPurpose, conditionalBlock: 'universal'},
-    { label: 'Visit Frequency Form', path: 'visitfrequencyform', component: VisitFrequencyForm, conditionalBlock: 'universal'},
-    { label: 'Travel Question', path: 'travelquestion', component: TravelQuestion, conditionalBlock: 'universal'},
-    { label: 'Travel With', path: 'travelwith', component: TravelWith, conditionalBlock: 'universal'},
+    { label: 'Main Purpose', path: 'mainpurpose', component: MainPurpose, conditionalBlock: 'surveytpms'},
+    { label: 'Visit Frequency Form', path: 'visitfrequencyform', component: VisitFrequencyForm, conditionalBlock: 'surveytpms'},
+    { label: 'Travel Question', path: 'travelquestion', component: TravelQuestion, conditionalBlock: 'surveytpms'},
+    { label: 'Travel With', path: 'travelwith', component: TravelWith, conditionalBlock: 'surveytpms'},
     
-    { label: 'Travel Options', path: 'traveloptions', component: TravelOptions, conditionalBlock: 'universal'},
+    { label: 'Travel Options', path: 'traveloptions', component: TravelOptions, conditionalBlock: 'surveytpms'},
     { label: 'Package Tour Items', path: 'packagetouritems', component: PackageTourItems, conditionalBlock: 'pkgtour'},
     { label: 'Package Paid', path: 'packagepaid', component: PackagePaid, conditionalBlock: 'pkgtour'},
     { label: 'Package Tour Feedback', path: 'packagetourfeedback', component: PackageTourFeedback, conditionalBlock: 'pkgtour'},
     
-    { label: 'Expense Tracker', path: 'expensetracker', component: ExpenseTracker, conditionalBlock: 'universal'},
+    { label: 'Expense Tracker', path: 'expensetracker', component: ExpenseTracker, conditionalBlock: 'surveytpms'},
     { label: 'Percentage Share List', path: 'percentagesharelist', component: PercentageShareList, conditionalBlock: 'perclist'},
-    { label: 'Expense Companions', path: 'expensecompanions', component: ExpenseCompanions, conditionalBlock: 'universal'},
+    { label: 'Expense Companions', path: 'expensecompanions', component: ExpenseCompanions, conditionalBlock: 'surveytpms'},
     
     //ACCOMODATION: 'accom', TRANSPORTATION; 'transp', 'EVENT/ACTIVITIES': 'evatt', 'SERVICES': 'serv'
-    { label: 'Branching Select', path: 'branchingselect', component: BranchingSelect, conditionalBlock: 'universal'},
+    { label: 'Branching Select', path: 'branchingselect', component: BranchingSelect, conditionalBlock: 'surveytpms'},
     
     
     { label: 'How Many Nights', path: 'howmanynights', component: HowManyNights, conditionalBlock: 'accom'},
@@ -110,15 +111,16 @@ export const sroutes = [
     
     
     
-    { label: 'Services 1', path: 'services1', component: Services1, conditionalBlock: 'universal'},
-    { label: 'Personal Profile 1', path: 'pprofile1', component: PProfile1, conditionalBlock: 'universal'},
-    { label: 'Personal Profile 2', path: 'pprofile2', component: PProfile2, conditionalBlock: 'universal'},
-    { label: 'Survey Venue', path: 'surveyvenue', component: SurveyVenue, conditionalBlock: 'universal'},
-    { label: 'Proponent LGU', path: 'proponentlgu', component: ProponentLgu, conditionalBlock: 'universal'},
-    { label: 'Survey Evaluation VERSION1', path: 'surveyevaluation05', component: SurveyEvaluation05, conditionalBlock: 'universal'},
-    { label: 'Thank You Message', path: 'survey-complete', component: ThankYouMessage, conditionalBlock: 'universal'},
+    { label: 'Services 1', path: 'services1', component: Services1, conditionalBlock: 'surveytpms'},
+    { label: 'Personal Profile 1', path: 'pprofile1', component: PProfile1, conditionalBlock: 'surveytpms'},
+    { label: 'Personal Profile 2', path: 'pprofile2', component: PProfile2, conditionalBlock: 'surveytpms'},
+    { label: 'Survey Venue', path: 'surveyvenue', component: SurveyVenue, conditionalBlock: 'surveytpms'},
+    { label: 'Proponent LGU', path: 'proponentlgu', component: ProponentLgu, conditionalBlock: 'surveytpms'},
+    { label: 'Survey Evaluation VERSION1', path: 'surveyevaluation05', component: SurveyEvaluation05, conditionalBlock: 'surveytpms'},
+    { label: 'Thank You Message', path: 'survey-complete', component: ThankYouMessage, conditionalBlock: 'surveytpms'},
     // { label: '(IGNORE)Where Stay Departure', path: 'wherestaydepart', component: },
     // { label: 'Survey Evaluation VERSION2', path: 'surveyevaluationb', component: },
     // { label: 'How Many Visits', path: 'howmanyvisits', component: HowManyVisits, conditionalBlock: 'evatt'},
-    
+    { label: 'FEEDBACK QUICK (OPEN)', path: 'estopenfeedback', component: AccomodationFeedback, conditionalBlock: 'feedback'},
+
 ];

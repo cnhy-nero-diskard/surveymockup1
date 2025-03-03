@@ -20,7 +20,7 @@ const StyledCardContent = styled(CardContent)`
   justify-content: center;
   align-items: center;
   border-radius: 32px; // Rounded corners
-  background: linear-gradient(135deg, rgba(68, 180, 255, 0.74), rgba(85, 187, 255, 0.97)); // Gradient background
+  background: linear-gradient(135deg, rgba(214, 214, 214, 0.74), rgba(242, 250, 255, 0.97)); // Gradient background
   &:hover {
     transform: scale(1.05);
   }
@@ -31,7 +31,7 @@ const StyledCardContent = styled(CardContent)`
 
 const StyledTypography = styled(Typography)`
   margin-bottom: ${({ theme }) => theme.spacing(1)};
-  color: white; // White text for better contrast
+  color: black;
   font-family: ${fontFamily};
   font-size: ${fontSize};
   font-weight: ${fontWeight};
@@ -309,11 +309,11 @@ const SurveyMetrics = () => {
                         </StyledCardContent>
                     </Grid>
 
-                    {/* Survey Responses by Language */}
+                    {/* Survey Responses by Nationality */}
                     <Grid item xs={12} md={6} lg={3}>
                         <StyledCardContent>
                             <StyledTypography variant="h6" sx={{ textAlign: 'center', mb: 2 }}>
-                                Responses by Language
+                                Responses by Nationality
                             </StyledTypography>
                             <ResponsiveContainer width="100%" height={200}>
                                 <BarChart data={surveyResponsesByRegionData}>

@@ -7,10 +7,14 @@ import { UnifiedContext } from "./UnifiedContext";
 const SurveyStepGuard = ({ route, index, totalSteps }) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { activeBlocks, routes } = useContext(UnifiedContext);
+  const { activeBlocks, routes, appendActiveBlocks } = useContext(UnifiedContext);
   const [redirectCount, setRedirectCount] = useState(0);
-  const isMounted = useRef(true); // Track if the component is mounted
+  const isMounted = useRef(true);
 
+  const getParentPath = (path) => {
+    const segments = path.split("/");
+    return segments.slice(0, -1).join("/");
+  };
   useEffect(() => {
     console.log(`SURVEY STEP GUARD - TRYING TO RENDER COMPONENT - route ${route.path} index ${index}`);
 
@@ -19,10 +23,15 @@ const SurveyStepGuard = ({ route, index, totalSteps }) => {
         console.log("SSGUARD VERIFYING");
         const response = await axios.get(`${process.env.REACT_APP_API_HOST}/api/survey/progress`, { withCredentials: true });
         let currentStep = response.data.currentStep;
+        const parentPath = getParentPath(location.pathname)
+        console.log(`PARENT PATH of ${location.pathname} --> ${parentPath}`);
+        if (parentPath ===""){
+          parentPath = location.pathname
+        }
 
         // Redirect to the first step if currentStep is 0 and the user is not on the first step
         if (currentStep === 0 && index !== 0) {
-          navigate("/survey/");
+          navigate(parentPath);
           return;
         }
 
@@ -38,7 +47,7 @@ const SurveyStepGuard = ({ route, index, totalSteps }) => {
             currentStep: newindex,
           }, { withCredentials: true });
 
-          navigate(`/survey/${routes[newindex].path}`);
+          navigate(`${parentPath}/${routes[newindex].path}`);
           return;
         }
 
@@ -56,7 +65,7 @@ const SurveyStepGuard = ({ route, index, totalSteps }) => {
           }
 
           // Redirect to the correct step immediately
-          navigate(`/survey/${surveyRoutes[currentStep].path}`);
+          navigate(`${parentPath}/${surveyRoutes[currentStep].path}`);
           return;
         }
 
@@ -64,7 +73,6 @@ const SurveyStepGuard = ({ route, index, totalSteps }) => {
         setRedirectCount(0);
       } catch (err) {
         console.error("Error validating step access:", err);
-        navigate("/");
       }
     };
 
