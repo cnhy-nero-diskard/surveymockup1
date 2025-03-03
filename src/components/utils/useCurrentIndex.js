@@ -19,9 +19,9 @@ import { UnifiedContext } from "../../routes/UnifiedContext";
 export const useCurrentStepIndex = (__surveyRoutes = []) => {
   const location = useLocation();
   const currentPath = location.pathname;
-  const {routes} = useContext(UnifiedContext);
-  console.log(`GYATT -- ${routes.length}`)
+  const {appendActiveBlocks, activeBlocks, routes} = useContext(UnifiedContext);
   console.log(`useCurrentindex.js - we are in current path ${currentPath}`);
+
 
   // Find the index of the current route in the surveyRoutes array
   const currentStepIndex = routes.findIndex((route) => {

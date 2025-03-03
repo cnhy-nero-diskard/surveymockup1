@@ -26,7 +26,7 @@ const AccomodationFeedback = () => {
     <FeedbackForm
       title={translations.accomodationOpen1Title} // Use the translation variable
       onNext={handleNext}
-      squestion_identifier={"TPENT"}
+      squestion_identifier={"TPNTF"}
     />
   );
 };

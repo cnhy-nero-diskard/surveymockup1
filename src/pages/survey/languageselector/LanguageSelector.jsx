@@ -203,6 +203,7 @@ const LanguageSelector = () => {
   };
 
   const handleNextClick = () => {
+    confirmNext();
     if (selectedLanguageCode) {
       setShowConfirmation(true);
     }
@@ -219,6 +220,7 @@ const LanguageSelector = () => {
     };
 
     try {
+      console.log(`LANGPERF: ${selectedLanguageCode}`);
       await axios.post(
         `${process.env.REACT_APP_API_HOST}/api/survey/submit`,
         postData,

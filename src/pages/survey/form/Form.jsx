@@ -133,7 +133,7 @@ const Form = () => {
         try {
             await submitSurveyResponses(surveyResponses);
             console.log('Survey responses submitted successfully!');
-            navigate('/');
+            goToNextStep(currentStepIndex, navigate, routes, activeBlocks);
         } catch (error) {
             console.error('Failed to submit survey responses:', error);
         }

@@ -1,5 +1,5 @@
 import { useEffect, useContext, useState, useRef } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation, Router } from "react-router-dom";
 import axios from "axios";
 import { sroutes as surveyRoutes } from "./surveyRoutesConfig";
 import { UnifiedContext } from "./UnifiedContext";
@@ -20,7 +20,9 @@ const SurveyStepGuard = ({ route, index, totalSteps }) => {
 
     const validateStepAccess = async () => {
       try {
-        console.log("SSGUARD VERIFYING");
+
+
+        console.log(`SSGUARD VERIFYING with active blocks ${JSON.stringify(activeBlocks)}`);
         const response = await axios.get(`${process.env.REACT_APP_API_HOST}/api/survey/progress`, { withCredentials: true });
         let currentStep = response.data.currentStep;
         const parentPath = getParentPath(location.pathname)
@@ -28,15 +30,21 @@ const SurveyStepGuard = ({ route, index, totalSteps }) => {
         if (parentPath ===""){
           parentPath = location.pathname
         }
-
+        if (location.pathname === "/survey" ) {
+          appendActiveBlocks(["surveytpms"]);
+        } else if (location.pathname === "/feedback" && !activeBlocks.includes("feedback")) {
+          appendActiveBlocks(["feedback"]);
+        }
         // Redirect to the first step if currentStep is 0 and the user is not on the first step
         if (currentStep === 0 && index !== 0) {
+          console.log("SSGUARD detected zero currentStep")
           navigate(parentPath);
           return;
         }
 
         // Handle conditional blocks
         if (route.conditionalBlock && !activeBlocks.includes(route.conditionalBlock)) {
+          console.log(`SSGUARD conditional block ${route.conditionalBlock} not found`);
           let newindex = index;
           while (routes[newindex].conditionalBlock !== 'universal') {
             console.log(`SSGUARD route -> ${index}`);
@@ -83,7 +91,7 @@ const SurveyStepGuard = ({ route, index, totalSteps }) => {
     return () => {
       isMounted.current = false; // Cleanup on unmount
     };
-  }, [navigate, location.pathname, index, route.path, activeBlocks, redirectCount]);
+  }, [navigate, location.pathname, index, route.path, activeBlocks, redirectCount, route.conditionalBlock]);
 
   console.log('SSGUARD - VERIFIED');
   const StepComponent = route.component;

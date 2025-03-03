@@ -75,7 +75,7 @@ const CustomCheckbox = styled.label`
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  font-size: 1.1rem;
+  font-size: 1.5rem;
   color: ${fontColorU};
   cursor: pointer;
 `;
@@ -329,7 +329,6 @@ const Residence1 = () => {
     <>
       <BodyPartial />
       <GradientBackground handleNextClick={handleNextClick}>
-        <Container>
           <Title>{translations.title}</Title>
           <Paragraph>{translations.note}</Paragraph>
           {error && <ErrorMessage>{error}</ErrorMessage>}
@@ -424,7 +423,6 @@ const Residence1 = () => {
               )}
             </InputGroup>
           </FadeTransition>
-        </Container>
       </GradientBackground>
     </>
   );

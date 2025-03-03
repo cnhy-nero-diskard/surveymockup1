@@ -32,7 +32,7 @@ const Container = styled(motion.div)`
 `;
 
 const Title = styled.h2`
-  font-size: 1.5rem;
+  font-size: 2rem;
   margin-bottom: 20px;
   color: #fff;
 
@@ -42,7 +42,7 @@ const Title = styled.h2`
   }
 
   @media (max-width: 480px) {
-    font-size: 1rem;
+    font-size: 1.4rem;
     margin-bottom: 10px;
   }
 `;
@@ -53,7 +53,7 @@ const Option = styled(motion.div)`
   align-items: center;
   justify-content: center;
   width: 100%;
-  padding: 10px;
+  padding: 20px;
   margin: 5px 0;
   border: none;
   border-radius: 10px;
@@ -67,13 +67,13 @@ const Option = styled(motion.div)`
   }
 
   @media (max-width: 768px) {
-    padding: 8px;
+    padding: 14px;
     margin: 3px 0;
   }
 
   @media (max-width: 480px) {
-    font-size: 0.9rem;
-    padding: 6px;
+    font-size: 1.2rem;
+    padding: 10px;
   }
 `;
 
@@ -109,7 +109,7 @@ const Transportation2 = () => {
     return (
         <>
             <BodyPartial />
-            <GradientBackground overlayImage={imgoverlay} opacity={0.3} blendMode="darken">
+            <GradientBackground overlayImage={imgoverlay} opacity={0.3} blendMode="darken" buttonAppear={false}>
                 <Container
                     initial={{ opacity: 0, y: -20 }}
                     animate={{ opacity: 1, y: 0 }}
