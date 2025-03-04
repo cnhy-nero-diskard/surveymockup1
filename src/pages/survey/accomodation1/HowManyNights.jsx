@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
 import styled, { keyframes } from 'styled-components';
-import { Container, NextButtonU } from '../../../components/utils/styles1';
 import { useNavigate } from 'react-router-dom';
 import imgOverlay from "../../../components/img/bed.png";
 import useTranslations from '../../../components/utils/useTranslations';
@@ -154,6 +153,42 @@ const SURVEY_QUESTIONS = {
   NIGHTS: 'NIGHTS',
 };
 
+/**
+ * @function HowManyNights
+ * @description A survey component that asks the user if they will stay overnight and, if so, for how many nights.
+ * It manages user input, validates the input, and submits the responses.
+ * It also controls navigation to the next step based on the user's answers.
+ *
+ * @returns {JSX.Element} The HowManyNights component.
+ *
+ * @example
+ * // Usage:
+ * <HowManyNights />
+ *
+ * @component
+ *
+ * @requires React
+ * @requires useNavigate
+ * @requires useState
+ * @requires useEffect
+ * @requires useContext
+ * @requires ./BodyPartial
+ * @requires ./GradientBackground
+ * @requires ./FormContainer
+ * @requires ./Question
+ * @requires ./RadioGroup
+ * @requires ./RadioOption
+ * @requires ./InputGroup
+ * @requires ./InputLabel
+ * @requires ./InputField
+ * @requires ../../../context/UnifiedContext
+ * @requires ../../../hooks/useCurrentStepIndex
+ * @requires ../../../hooks/useTranslations
+ * @requires ../../../api/submitSurveyResponses
+ * @requires ../../../utils/goToNextStep
+ * @requires ../../../assets/img/overlay.png
+ * @requires ../../../constants/SURVEY_QUESTIONS
+ */
 const HowManyNights = () => {
   const { routes } = useContext(UnifiedContext);
   const currentStepIndex = useCurrentStepIndex(routes);

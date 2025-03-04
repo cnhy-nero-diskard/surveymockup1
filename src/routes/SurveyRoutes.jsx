@@ -7,6 +7,14 @@ import { sroutes } from './surveyRoutesConfig';
 import { UnifiedContext, UnifiedProvider } from './UnifiedContext';
 import axios from 'axios';
 
+/**
+ * A component that sets up the routing structure for the survey application.
+ * Wraps the survey routes content with necessary providers for language and unified routing.
+ * 
+ * @component
+ * @returns {JSX.Element} A component wrapped with LanguageProvider and UnifiedProvider
+ * containing the survey routes content
+ */
 const SurveyRoutes = () => {
     return (
         <LanguageProvider>

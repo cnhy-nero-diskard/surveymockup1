@@ -1,3 +1,15 @@
+/**
+ * @typedef {object} Route
+ * @property {string} label - The label for the route.
+ * @property {string} path - The path for the route.
+ * @property {React.ComponentType} component - The React component to render for the route.
+ * @property {string} conditionalBlock - The conditional block identifier for the route.
+ */
+
+/**
+ * @type {Route[]}
+ * @description An array of route objects, each defining a survey route configuration.
+ */
 import LanguageSelector from '../pages/survey/languageselector/LanguageSelector';
 import Residence1 from '../pages/survey/residence1/Residence1';
 import MainPurpose from '../pages/survey/mainpurpose/MainPurpose';

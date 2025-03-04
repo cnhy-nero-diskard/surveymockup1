@@ -114,6 +114,23 @@ const ProgressText = styled.p`
 `;
 
 // GradientBackground Component
+/**
+ * @typedef {object} GradientBackgroundProps
+ * @property {React.ReactNode} children - The content to be rendered within the gradient background.
+ * @property {string} [overlayImage] - URL of the overlay image.
+ * @property {number} [opacity=0.3] - Opacity of the overlay image.
+ * @property {string} [blendMode='overlay'] - Blend mode for the overlay image.
+ * @property {function} handleNextClick - Function to handle the next button click.
+ * @property {string} [nextmsg=""] - Text to display on the next button. If empty, a default translation is used.
+ * @property {boolean} [buttonAppear=true] - Determines whether the next button is visible.
+ */
+
+/**
+ * A component that provides a gradient background with an optional overlay image and a next button.
+ *
+ * @param {GradientBackgroundProps} props - The props for the GradientBackground component.
+ * @returns {JSX.Element} A React element representing the gradient background.
+ */
 const GradientBackground = ({ children, overlayImage, opacity = 0.3, blendMode = 'overlay', handleNextClick, nextmsg = "", buttonAppear = true }) => {
   const { routes } = useContext(UnifiedContext);
   const [setCurrentStep] = useState();

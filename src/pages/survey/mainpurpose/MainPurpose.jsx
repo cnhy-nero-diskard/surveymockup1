@@ -1,3 +1,21 @@
+/**
+ * @file MainPurpose.jsx
+ * @description This component renders the main purpose survey question with multiple checkbox options.
+ * It allows users to select one or more purposes for their travel and submits the responses to the server.
+ *
+ * @requires react
+ * @requires styled-components
+ * @requires react-router-dom
+ * @requires ./../../../components/partials/BodyPartial
+ * @requires ./../../../components/partials/GradientBackground
+ * @requires ./../../../components/img/question.png
+ * @requires ./../../../components/utils/componentConstants
+ * @requires ./../../../components/utils/useTranslations
+ * @requires ./../../../components/utils/sendInputUtils
+ * @requires ./../../../routes/UnifiedContext
+ * @requires ./../../../components/utils/useCurrentIndex
+ * @requires ./../../../components/utils/navigationUtils
+ */
 import styled, { keyframes } from 'styled-components';
 import React, { useContext, useState } from 'react';
 import BodyPartial from '../../../components/partials/BodyPartial';
@@ -132,6 +150,19 @@ export const NextButton = styled.button`
   }
 `;
 
+/**
+ * @function MainPurpose
+ * @description A survey component that allows users to select the main purpose of their visit.
+ * It renders a form with several options, each represented by a checkbox.
+ * Upon submission, the selected purpose is sent to the server, and the user is navigated to the next step in the survey.
+ *
+ * @component
+ * @returns {JSX.Element} The MainPurpose component.
+ *
+ * @example
+ * // Usage:
+ * <MainPurpose />
+ */
 const MainPurpose = () => {
   const [selectedPurpose, setSelectedPurpose] = useState('');
   const [showOptions, setShowOptions] = useState(true);

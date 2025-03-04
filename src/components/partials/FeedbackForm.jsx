@@ -117,6 +117,21 @@ const WarningMessage = styled(animated.div)`
   border-radius: 8px;
 `;
 
+/**
+ * FeedbackForm component allows users to provide feedback on their satisfaction level.
+ *
+ * @param {Object} props - The component props.
+ * @param {string} props.title - The title of the feedback form.
+ * @param {Function} props.onNext - Callback function to handle the next action.
+ * @param {string} props.squestion_identifier - Identifier for the survey question.
+ * @param {Object} [props.satisfactionOptions] - Options for satisfaction levels with default values.
+ * @param {number} [props.satisfactionOptions.Dissatisfied=1] - Value for Dissatisfied option.
+ * @param {number} [props.satisfactionOptions.Neutral=2] - Value for Neutral option.
+ * @param {number} [props.satisfactionOptions.Satisfied=3] - Value for Satisfied option.
+ * @param {number} [props.satisfactionOptions.VerySatisfied=4] - Value for Very Satisfied option.
+ *
+ * @returns {JSX.Element} The rendered FeedbackForm component.
+ */
 const FeedbackForm = ({ title, onNext, squestion_identifier, satisfactionOptions = {
     Dissatisfied: 1,
     Neutral: 2,

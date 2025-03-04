@@ -153,20 +153,6 @@ const LanguageSelector = () => {
   const { activeBlocks, appendActiveBlocks, removeActiveBlocks, isBlockActive } = useContext(UnifiedContext);
 
   useEffect(() => {
-    const getParentPath = (path) => {
-      const segments = path.split("/");
-      return segments.slice(0, -1).join("/");
-    };
-
-    let parentPath = getParentPath(location.pathname);
-    // Add blocks based on parentPath
-    // if (location.pathname === "/survey" && !activeBlocks.includes("surveytpms")) {
-    //   console.log("LANGUAGE SELECTOR ADDING surveytpms")
-    //   appendActiveBlocks(["surveytpms"]);
-    // } else if (location.pathname === "/feedback" && !activeBlocks.includes("feedback")) {
-    //   appendActiveBlocks(["feedback"]);
-    // }
-
     const fetchProgress = async () => {
       try {
         const response = await axios.get(
@@ -204,12 +190,6 @@ const LanguageSelector = () => {
 
   const handleLanguageSelect = (code) => {
     setSelectedLanguageCode(code);
-    // if (location.pathname === "/survey" || getParentPath(location.pathname) == "/survey" && !activeBlocks.includes("surveytpms")) {
-    //   removeActiveBlocks(['feedback']);
-    // } else if (location.pathname === "/feedback" && !activeBlocks.includes("feedback")) {
-    //   removeActiveBlocks(['surveytpms']);
-    // };
-
   };
 
   const handleNextClick = () => {
