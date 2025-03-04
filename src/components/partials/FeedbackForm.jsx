@@ -16,13 +16,7 @@ const FeedbackFormContainer = styled(animated.div)`
   border-radius: 12px;
 `;
 
-const Title = styled.h2`
-  font-size: 1.8rem;
-  margin-bottom: 24px;
-  text-align: center;
-  color: #333;
-  font-weight: 600;
-`;
+
 
 const OptionsContainer = styled.div`
   display: flex;
@@ -51,7 +45,6 @@ const OptionButton = styled.button`
   }
 
   &:hover {
-    background-color: #f0f0f0;
     border-color: #4caf50;
   }
 

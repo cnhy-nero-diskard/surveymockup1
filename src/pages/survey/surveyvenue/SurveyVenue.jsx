@@ -11,6 +11,9 @@ import { useCurrentStepIndex } from '../../../components/utils/useCurrentIndex';
 import { UnifiedContext } from '../../../routes/UnifiedContext';
 import { goToNextStep } from '../../../components/utils/navigationUtils';
 
+/**
+ * Styled container for the survey venue selection component.
+ */
 const Container = styled(motion.div)`
   font-family: Arial, sans-serif;
   padding: 20px;
@@ -19,17 +22,26 @@ const Container = styled(motion.div)`
   margin: 0 auto;
 `;
 
+/**
+ * Styled title for the survey venue selection component.
+ */
 const Title = styled.h2`
   font-size: 1.5rem;
   color: #fff;
   margin-bottom: 20px;
 `;
 
+/**
+ * Styled list for venue options.
+ */
 const List = styled.ul`
   list-style: none;
   padding: 0;
 `;
 
+/**
+ * Styled list item for each venue option.
+ */
 const ListItem = styled(motion.li)`
   font-size: 1rem;
   color: #555;
@@ -47,6 +59,9 @@ const ListItem = styled(motion.li)`
   }
 `;
 
+/**
+ * Styled overlay for the popup.
+ */
 const PopupOverlay = styled.div`
   position: fixed;
   top: 0;
@@ -59,6 +74,9 @@ const PopupOverlay = styled.div`
   align-items: center;
 `;
 
+/**
+ * Styled content for the popup.
+ */
 const PopupContent = styled.div`
   background: white;
   padding: 20px;
@@ -67,12 +85,18 @@ const PopupContent = styled.div`
   width: 300px;
 `;
 
+/**
+ * Styled title for the popup.
+ */
 const PopupTitle = styled.h3`
   font-size: 1.2rem;
   color: #333;
   margin-bottom: 10px;
 `;
 
+/**
+ * Styled input for the popup.
+ */
 const PopupInput = styled.input`
   width: 100%;
   padding: 10px;
@@ -81,6 +105,9 @@ const PopupInput = styled.input`
   border-radius: 4px;
 `;
 
+/**
+ * Styled button for the popup.
+ */
 const PopupButton = styled.button`
   background-color: #007bff;
   color: white;
@@ -96,11 +123,13 @@ const PopupButton = styled.button`
   }
 `;
 
+/**
+ * SurveyVenue component for selecting the venue for the survey.
+ */
 const SurveyVenue = () => {
   const { routes } = useContext(UnifiedContext);
   const currentStepIndex = useCurrentStepIndex(routes);
   const { activeBlocks, appendActiveBlocks, removeActiveBlocks } = useContext(UnifiedContext);
-
 
   const [selectedVenue, setSelectedVenue] = useState(null);
   const [showPopup, setShowPopup] = useState(false);
@@ -109,6 +138,7 @@ const SurveyVenue = () => {
   const [language, setLanguage] = useState(localStorage.getItem('selectedLanguage'));
   const translations = useTranslations('SurveyVenue', language);
 
+  // List of venue options
   const venues = [
     translations.surveyVenueAccommodationEstablishment,
     translations.surveyVenueTouristAttraction,
@@ -118,6 +148,10 @@ const SurveyVenue = () => {
     translations.surveyVenueOthersSpecify,
   ];
 
+  /**
+   * Handles the selection of a venue.
+   * @param {string} venue - The selected venue.
+   */
   const handleVenueSelect = (venue) => {
     setSelectedVenue(venue);
     if (venue === translations.surveyVenueOthersSpecify) {
@@ -128,6 +162,9 @@ const SurveyVenue = () => {
     }
   };
 
+  /**
+   * Handles the submission of the popup form.
+   */
   const handlePopupSubmit = () => {
     if (otherVenue) {
       setSelectedVenue(otherVenue);
@@ -137,6 +174,10 @@ const SurveyVenue = () => {
     }
   };
 
+  /**
+   * Submits the survey response to the server.
+   * @param {string} responseValue - The response value to be submitted.
+   */
   const submitResponse = (responseValue) => {
     const surveyResponses = [{
       surveyquestion_ref: 'VENUE',

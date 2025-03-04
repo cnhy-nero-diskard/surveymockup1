@@ -61,16 +61,34 @@ const ChoiceButton = styled.button`
   }
 `;
 
+/**
+ * VisitCounterR component for capturing the visit frequency.
+ * @param {Object} props - Component props.
+ * @param {string} props.title - The title of the survey question.
+ * @param {string} props.surveyquestion_ref - Reference to the survey question.
+ * @param {Function} props.handNext - Callback function to handle the next step.
+ */
 const VisitCounterR = ({ title, surveyquestion_ref, handNext }) => {
+  // State to store the selected visit count
   const [visitCount, setVisitCount] = useState(null);
+  // State to track if the form is currently being submitted
   const [isSubmitting, setIsSubmitting] = useState(false);
+  // State to store the current language
   const [language, setLanguage] = useState(localStorage.getItem('selectedLanguage'));
 
+  /**
+   * Handles the selection of visit count.
+   * @param {string} value - The selected visit frequency option.
+   */
   const handleChoice = (value) => {
     const numericalValue = value === "1x" ? 1 : value === "2x" ? 2 : 3;
     setVisitCount(numericalValue);
   };
 
+  /**
+   * Handles the next button click.
+   * Validates the selection and submits the survey responses.
+   */
   const handleNextClick = async () => {
     if (visitCount === null) {
       alert('Please select an option before proceeding.');
@@ -96,17 +114,20 @@ const VisitCounterR = ({ title, surveyquestion_ref, handNext }) => {
     handNext();
   };
 
+  // Animation for the container
   const containerAnimation = useSpring({
     from: { opacity: 0, transform: 'translateY(-50px)' },
     to: { opacity: 1, transform: 'translateY(0)' },
     config: { duration: 600, tension: 300, friction: 20 },
   });
 
+  // Animation for the choice buttons
   const buttonAnimation = useSpring({
     transform: visitCount ? 'scale(1.1)' : 'scale(1)',
     config: { tension: 400, friction: 15 },
   });
 
+  // Fetch translations based on the current language
   const translations = useTranslations(VISITFREQUENCYFORM, language);
 
   return (
@@ -138,7 +159,6 @@ const VisitCounterR = ({ title, surveyquestion_ref, handNext }) => {
                 {translations.VisitFrequencyForm_Option3xOrMore || "3x or more"}
               </Option>
             </ButtonGroup>
-
           </AnimatedContainer>
       </GradientBackground>
     </>

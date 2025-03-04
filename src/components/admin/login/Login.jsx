@@ -125,7 +125,7 @@ const Login = () => {
                 {formik.errors.submit}
               </Alert>
             )}
-            <StyledForm onSubmit={formik.handleSubmit}>
+            <StyledForm >
               <StyledTextField
                 fullWidth
                 id="username"

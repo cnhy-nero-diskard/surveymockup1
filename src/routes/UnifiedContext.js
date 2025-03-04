@@ -3,7 +3,7 @@ import React, { createContext, useState } from 'react';
 export const UnifiedContext = createContext();
 
 export const UnifiedProvider = ({ children, routes }) => {
-  const [activeBlocks, setActiveBlocks] = useState(['universal']);
+  const [activeBlocks, setActiveBlocks] = useState(['universal', 'surveytpms', 'feedback']);
 
   // Function to append new blocks to activeBlocks
   const appendActiveBlocks = (newBlocks) => {
@@ -23,8 +23,13 @@ export const UnifiedProvider = ({ children, routes }) => {
     });
   };
 
+  // Function to check if a block is active
+  const isBlockActive = (block) => {
+    return activeBlocks.includes(block);
+  };
+
   return (
-    <UnifiedContext.Provider value={{ activeBlocks, setActiveBlocks, appendActiveBlocks, removeActiveBlocks, routes }}>
+    <UnifiedContext.Provider value={{ activeBlocks, setActiveBlocks, appendActiveBlocks, removeActiveBlocks, isBlockActive, routes }}>
       {children}
     </UnifiedContext.Provider>
   );

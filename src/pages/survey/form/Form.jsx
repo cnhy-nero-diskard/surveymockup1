@@ -112,7 +112,6 @@ const Form = () => {
     };
 
     const handleSubmit = async (e) => {
-        e.preventDefault();
 
         if (!isFormValid) {
             alert('Please fill out all fields correctly.');

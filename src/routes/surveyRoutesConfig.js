@@ -39,8 +39,6 @@ import HowManyNights from '../pages/survey/accomodation1/HowManyNights';
 import AccommodationForm from '../pages/survey/accomodation2/AccomodationForm';
 import BookingForm from '../pages/survey/accomodation3/BookingForm';
 import WhereStayArrival from '../pages/survey/accomodation4/WhereStay_arrival';
-import WhereStayDeparture from '../pages/survey/accomodation4/WhereStay_depart';
-import AccomodationOpen1 from '../pages/survey/accomodation5o/AccomodationOpen1';
 import AccomodationOpen2 from '../pages/survey/accomodation6o/AccomodationOpen2';
 import Transportation3 from '../pages/survey/transportation3/Transportation3';
 import Transportation1 from '../pages/survey/transportation1/Transportation1';

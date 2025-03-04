@@ -150,7 +150,7 @@ const LanguageSelector = () => {
   const { routes } = useContext(UnifiedContext);
   const [currentStep, setCurrentStep] = useState();
   const currentStepIndex = useCurrentStepIndex(routes);
-  const { activeBlocks, appendActiveBlocks } = useContext(UnifiedContext);
+  const { activeBlocks, appendActiveBlocks, removeActiveBlocks, isBlockActive } = useContext(UnifiedContext);
 
   useEffect(() => {
     const getParentPath = (path) => {
@@ -159,13 +159,13 @@ const LanguageSelector = () => {
     };
 
     let parentPath = getParentPath(location.pathname);
-
     // Add blocks based on parentPath
-    if (location.pathname === "/survey" && !activeBlocks.includes("surveytpms")) {
-      appendActiveBlocks(["surveytpms"]);
-    } else if (location.pathname === "/feedback" && !activeBlocks.includes("feedback")) {
-      appendActiveBlocks(["feedback"]);
-    }
+    // if (location.pathname === "/survey" && !activeBlocks.includes("surveytpms")) {
+    //   console.log("LANGUAGE SELECTOR ADDING surveytpms")
+    //   appendActiveBlocks(["surveytpms"]);
+    // } else if (location.pathname === "/feedback" && !activeBlocks.includes("feedback")) {
+    //   appendActiveBlocks(["feedback"]);
+    // }
 
     const fetchProgress = async () => {
       try {
@@ -196,10 +196,20 @@ const LanguageSelector = () => {
 
     fetchProgress();
     fetchLanguages();
-  }, [location.pathname, activeBlocks, appendActiveBlocks, navigate]);
+  }, [location.pathname, appendActiveBlocks, navigate]);
+  const getParentPath = (path) => {
+    const segments = path.split("/");
+    return segments.slice(0, -1).join("/");
+  };
 
   const handleLanguageSelect = (code) => {
     setSelectedLanguageCode(code);
+    // if (location.pathname === "/survey" || getParentPath(location.pathname) == "/survey" && !activeBlocks.includes("surveytpms")) {
+    //   removeActiveBlocks(['feedback']);
+    // } else if (location.pathname === "/feedback" && !activeBlocks.includes("feedback")) {
+    //   removeActiveBlocks(['surveytpms']);
+    // };
+
   };
 
   const handleNextClick = () => {

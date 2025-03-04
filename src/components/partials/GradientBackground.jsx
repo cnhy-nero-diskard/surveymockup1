@@ -5,6 +5,7 @@ import { UnifiedContext } from '../../routes/UnifiedContext';
 import { NextButtonU } from '../utils/styles1';
 import useTranslations from '../utils/useTranslations';
 import { keyframes } from 'styled-components';
+import { useLocation } from 'react-router-dom';
 
 // Styled-component for the background
 const BackgroundWrapper = styled.div`
@@ -116,18 +117,38 @@ const ProgressText = styled.p`
 const GradientBackground = ({ children, overlayImage, opacity = 0.3, blendMode = 'overlay', handleNextClick, nextmsg = "", buttonAppear = true }) => {
   const { routes } = useContext(UnifiedContext);
   const [setCurrentStep] = useState();
+  const location = useLocation();
   const currentStepIndex = useCurrentStepIndex(routes);
-  const { activeBlocks } = useContext(UnifiedContext);
+  const { activeBlocks, isBlockActive, removeActiveBlocks } = useContext(UnifiedContext);
   const [language, setLanguage] = useState(localStorage.getItem('selectedLanguage'));
-  const translations = useTranslations('residence1', language || 'en');
+  const translations = useTranslations('PackagePaid', language || 'en');
 
   const progress = ((currentStepIndex + 1) / routes.length) * 100;
+  const getParentPath = (path) => {
+    const segments = path.split("/");
+    return segments.slice(0, -1).join("/");
+  };
 
   // Use useEffect to trigger animation updates
   useEffect(() => {
-    console.log("Progress updated:", progress); // Debugging: Log progress updates
-  }, [progress]);
+    if (isBlockActive("feedback") && (getParentPath(location.pathname) === "/survey") || location.pathname === "/survey"){
+      console.log("GBACK feedback detected...removing");
+      removeActiveBlocks("feedback");
+    } else if (isBlockActive("surveytpms") && (getParentPath(location.pathname) === "/feedback") || location.pathname === "/feedback"){
+      removeActiveBlocks("surveytpms");
+    }
+    console.log (`GBACK -- ACTIVE BLOCKS -- ${JSON.stringify(activeBlocks)}`);
+  }, []);
 
+
+  const useNext = () => {
+    if (location.pathname === "/survey" && !activeBlocks.includes("surveytpms")) {
+      removeActiveBlocks(["feedback"]);
+    } else if (location.pathname === "/feedback" && !activeBlocks.includes("feedback")) {
+      removeActiveBlocks(["surveytpms"]);
+    };
+    handleNextClick();
+  };
   return (
     <>
       <ProgressText>
@@ -148,10 +169,10 @@ const GradientBackground = ({ children, overlayImage, opacity = 0.3, blendMode =
       </BackgroundWrapper>
       {buttonAppear && (
         <NextButtonU
-          onClick={handleNextClick}
+          onClick={useNext}
           style={{ display: buttonAppear ? 'block' : 'none' }}
         >
-          {nextmsg === "" ? translations.next : nextmsg}
+          {nextmsg === "" ? translations.packagePaidNextButton : nextmsg}
         </NextButtonU>)}
     </>
   );

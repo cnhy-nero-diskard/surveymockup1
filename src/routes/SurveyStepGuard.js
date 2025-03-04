@@ -7,7 +7,7 @@ import { UnifiedContext } from "./UnifiedContext";
 const SurveyStepGuard = ({ route, index, totalSteps }) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { activeBlocks, routes, appendActiveBlocks } = useContext(UnifiedContext);
+  const { activeBlocks, routes, appendActiveBlocks, removeActiveBlocks } = useContext(UnifiedContext);
   const [redirectCount, setRedirectCount] = useState(0);
   const isMounted = useRef(true);
 
@@ -30,10 +30,10 @@ const SurveyStepGuard = ({ route, index, totalSteps }) => {
         if (parentPath ===""){
           parentPath = location.pathname
         }
-        if (location.pathname === "/survey" ) {
-          appendActiveBlocks(["surveytpms"]);
+        if (location.pathname === "/survey" || getParentPath(location.pathname) == "/survey" && !activeBlocks.includes("surveytpms")) {
+          removeActiveBlocks(["feedback"]);
         } else if (location.pathname === "/feedback" && !activeBlocks.includes("feedback")) {
-          appendActiveBlocks(["feedback"]);
+          removeActiveBlocks(["surveytpms"]);
         }
         // Redirect to the first step if currentStep is 0 and the user is not on the first step
         if (currentStep === 0 && index !== 0) {
@@ -91,7 +91,7 @@ const SurveyStepGuard = ({ route, index, totalSteps }) => {
     return () => {
       isMounted.current = false; // Cleanup on unmount
     };
-  }, [navigate, location.pathname, index, route.path, activeBlocks, redirectCount, route.conditionalBlock]);
+  }, [navigate, location.pathname, index, route.path, redirectCount, route.conditionalBlock]);
 
   console.log('SSGUARD - VERIFIED');
   const StepComponent = route.component;

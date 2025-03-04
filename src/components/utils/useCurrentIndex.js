@@ -1,5 +1,5 @@
 // useCurrentStepIndex.js
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import SurveyRoutesContext from "../../routes/__SurveyRoutesContext";
 import { UnifiedContext } from "../../routes/UnifiedContext";
@@ -19,9 +19,15 @@ import { UnifiedContext } from "../../routes/UnifiedContext";
 export const useCurrentStepIndex = (__surveyRoutes = []) => {
   const location = useLocation();
   const currentPath = location.pathname;
-  const {appendActiveBlocks, activeBlocks, routes} = useContext(UnifiedContext);
-  console.log(`useCurrentindex.js - we are in current path ${currentPath}`);
+  const { removeActiveBlocks, activeBlocks, routes } = useContext(UnifiedContext);
+  console.log(`USECURRENTINDEX - we are in current path ${currentPath}`);
 
+  const getParentPath = (path) => {
+    const segments = path.split("/");
+    return segments.slice(0, -1).join("/");
+  };
+
+  console.log(`USECURRENTINDEX ACTIVE BLOCKS --> ${JSON.stringify(activeBlocks)}`);
 
   // Find the index of the current route in the surveyRoutes array
   const currentStepIndex = routes.findIndex((route) => {

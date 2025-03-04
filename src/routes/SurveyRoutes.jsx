@@ -20,11 +20,13 @@ const SurveyRoutes = () => {
 const SurveyRoutesContent = () => {
     const navigate = useNavigate();
     const location = useLocation();
-    const { routes } = useContext(UnifiedContext); // Access routes from the context
+    const { routes, removeActiveBlocks } = useContext(UnifiedContext); // Access routes from the context
 
     useEffect(() => {
         // Check if the current path is "/feedback"
         if (location.pathname === "/feedback") {
+
+            console.log('TPENT REMOVING `FEEDBACK`');
             console.log('TPENT Location:', location.pathname);
             // Get the query parameters from the URL
             const queryParams = new URLSearchParams(location.search);
