@@ -3,7 +3,7 @@ import { useSpring, animated } from 'react-spring';
 import styled from 'styled-components';
 import BodyPartial from '../../components/partials/BodyPartial';
 import GradientBackground from '../../components/partials/GradientBackground';
-import { Container } from '../utils/styles1';
+import { Container, Option } from '../utils/styles1';
 import imgOverlay from "../../components/img/city.png";
 import useTranslations from '../utils/useTranslations';
 import { VISITFREQUENCYFORM } from '../utils/componentConstants';
@@ -116,27 +116,27 @@ const VisitCounterR = ({ title, surveyquestion_ref, handNext }) => {
           <AnimatedContainer style={containerAnimation}>
             <Title>{title}</Title>
             <ButtonGroup>
-              <ChoiceButton
+              <Option
                 selected={visitCount === 1}
                 onClick={() => handleChoice("1x")}
                 aria-label="Once"
               >
                 {translations.VisitFrequencyForm_Option1x || "1x"}
-              </ChoiceButton>
-              <ChoiceButton
+              </Option>
+              <Option
                 selected={visitCount === 2}
                 onClick={() => handleChoice("2x")}
                 aria-label="Twice"
               >
                 {translations.VisitFrequencyForm_Option2x || "2x"}
-              </ChoiceButton>
-              <ChoiceButton
+              </Option>
+              <Option
                 selected={visitCount === 3}
                 onClick={() => handleChoice("3x or more")}
                 aria-label="Three times or more"
               >
                 {translations.VisitFrequencyForm_Option3xOrMore || "3x or more"}
-              </ChoiceButton>
+              </Option>
             </ButtonGroup>
 
           </AnimatedContainer>

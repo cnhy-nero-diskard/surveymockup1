@@ -110,3 +110,33 @@ export const NextButtonU = styled.button`
     transform: scale(0.95);
   }
 `;
+export const Option = styled.div`
+  display: flex;
+  align-items: center;
+  background: ${({ selected }) => (selected ? 'rgb(8, 65, 252)' : 'rgb(184, 201, 255)')};
+  padding: 15px 20px;
+  border-radius: 25px;
+  box-shadow: 0 4px 6px rgba(29, 43, 105, 0.69);
+  transition: all 0.3s ease-in-out;
+  cursor: pointer;
+
+  &:hover {
+    transform: translateY(-5px);
+    background: ${({ selected }) => (selected ? '#6a11cb' : '#2575fc')};
+    box-shadow: 0 6px 8px rgba(29, 43, 105, 0.8);
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+`;
+export const OptionsGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+  margin-bottom: 40px;
+
+  @media (max-width: 600px) {
+    grid-template-columns: 1fr;
+  }
+`;
