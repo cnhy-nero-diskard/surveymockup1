@@ -153,7 +153,7 @@ const SurveyTouchpoints = () => {
     const selectedKey = event.target.value;
     const selectedEstablishment = establishments.find((est) => est.key === selectedKey);
     setSelectedItem(selectedKey);
-    setQrValue(`${process.env.REACT_APP_SELF_URL}/feedback/${selectedEstablishment.key}`);
+    setQrValue(`${process.env.REACT_APP_SELF_URL}/feedback?idx=${selectedEstablishment.key}`);
   };
 
   /**

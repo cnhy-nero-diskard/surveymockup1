@@ -34,9 +34,10 @@ ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend)
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
 const AIToolsDashboard = () => {
-  const isActive = true; // Replace with your actual logic to determine if active
-  const createdAt = new Date(); // Replace with your actual "Created At" value
-  const isRecentlyCreated = (new Date() - new Date(createdAt)) < 5 * 60 * 1000; // Less than 5 minutes ago
+  const [openEndedResponses, setOpenEndedResponses] = useState([]);
+  const isActive = true; 
+  const createdAt = new Date();
+  const isRecentlyCreated = (new Date() - new Date(createdAt)) < 5 * 60 * 1000; 
 
   // State for API Configuration
   const [hfTokens, setHfTokens] = useState([]);
@@ -77,6 +78,7 @@ const AIToolsDashboard = () => {
     ],
   });
 
+
   useEffect(() => {
     const fetchHFTokens = async () => {
       try {
@@ -109,6 +111,34 @@ const AIToolsDashboard = () => {
     fetchApiUsage();
   }, []);
 
+  const handleScanOpenEndedResponses = async () => {
+    try {
+      const response = await axios.get(`${process.env.REACT_APP_API_HOST}/api/admin/survey-responses/open-ended`, {
+        withCredentials: true,
+      });
+      setOpenEndedResponses(response.data);
+      console.log('Open-ended responses:', response.data);
+  
+      // Filter all responses where is_analyzed is false
+      const unanalyzedResponses = response.data.filter(response => !response.is_analyzed);
+  
+      if (unanalyzedResponses.length > 0) {
+        // Concatenate all unanalyzed response_values into a single string
+        const combinedText = unanalyzedResponses
+          .map(response => response.response_value)
+          .join("\n\n"); // Add a newline between responses for readability
+  
+        // Set the combined text to both text fields
+        setSentimentText(combinedText);
+        setTopicText(combinedText);
+      } else {
+        console.log("All responses have been analyzed.");
+      }
+    } catch (error) {
+      console.error('Error fetching open-ended responses:', error);
+    }
+  };
+    
   const handleSentimentAnalysis = async () => {
     setIsSentimentAnalyzing(true);
     setSentimentError(null);
@@ -311,8 +341,17 @@ const AIToolsDashboard = () => {
             </Paper>
           </Slide>
         </Grid>
-
-        {/* Sentiment Analysis Section */}
+<Grid item xs={12}>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleScanOpenEndedResponses}
+            sx={{ textTransform: 'none', mt: 2 }}
+          >
+            SCAN FOR OPEN-ENDED RESPONSES
+          </Button>
+  
+</Grid>        {/* Sentiment Analysis Section */}
         <Grid item xs={12} md={6}>
           <Slide in direction="up" timeout={1200}>
             <Paper elevation={3} sx={{ p: 3, bgcolor: 'background.paper', borderRadius: 2 }}>

@@ -14,17 +14,18 @@ const AccomodationFeedback = () => {
 
   const navigate = useNavigate();
   const [language, setLanguage] = useState(localStorage.getItem('selectedLanguage'));
-  const translations = useTranslations('AccomodationOpen1', language); // Fetch translations for this component
+  const translations = useTranslations('estabFeedBack', language); // Fetch translations for this component
 
   const handleNext = (selectedOptionValue, feedback) => {
     // Handle the next action based on the selected option and feedback
     console.log('Selected Option:', selectedOptionValue, 'Feedback:', feedback);
     goToNextStep(currentStepIndex, navigate, routes, activeBlocks);
   };
+  console.log(JSON.stringify(translations));
 
   return (
     <FeedbackForm
-      title={translations.accomodationOpen1Title} // Use the translation variable
+      title={translations.estabFeedBackTitle} // Use the translation variable
       onNext={handleNext}
       squestion_identifier={"TPNTF"}
     />

@@ -14,7 +14,6 @@ const FeedbackFormContainer = styled(animated.div)`
   margin: 0 auto;
   padding: 20px;
   border-radius: 12px;
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
 `;
 
 const Title = styled.h2`
