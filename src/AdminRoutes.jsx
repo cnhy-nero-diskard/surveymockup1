@@ -21,6 +21,7 @@ import BarangaysDashboard from './components/admin/perbarangaydashboard/Barangay
 import MunicipalityDashboard from './components/admin/permunicipalitydashboard/MunicipalityDashboard';
 import AttractionDashboard from './components/admin/perattractiondashboard/AttractionDashboard';
 import LogStream from './components/admin/logstream/LogStream';
+import DataManager from './components/datamanager/DataManager';
 
 const AdminRoutes = () => {
   const { isAuthenticated, unauthorized, handleUnauthorized, login } = useAuth();
@@ -89,6 +90,7 @@ const AdminRoutes = () => {
           <Route path="barangaydashboard" element={<BarangaysDashboard />} />
           <Route path="attractiondashboard" element={<AttractionDashboard />} />
           <Route path="logstream" element={<LogStream />} />
+          <Route path="datamanager" element={<DataManager />} />
         </Route>
       </Routes>
     </>

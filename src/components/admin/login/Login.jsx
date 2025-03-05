@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
@@ -6,7 +6,6 @@ import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import styled from 'styled-components';
 import bgimage from './Designer.png';
-import globe from './global.png';
 import {
   Typography,
   TextField,
@@ -16,7 +15,10 @@ import {
   Grid,
   useTheme,
   useMediaQuery,
+  IconButton,
+  InputAdornment,
 } from '@mui/material';
+import { Visibility, VisibilityOff } from '@mui/icons-material';
 
 // Styled components
 const LoginContainer = styled.div`
@@ -27,7 +29,7 @@ const LoginContainer = styled.div`
   justify-content: center;
   background: ${({ isDesktop }) =>
     isDesktop
-      ? 'linear-gradient(to right,rgb(142, 149, 255) 50%,rgb(185, 204, 255) 50%)'
+      ? 'linear-gradient(to right, rgb(142, 149, 255) 50%, rgb(185, 204, 255) 50%)'
       : '#f5f5f5'};
 `;
 
@@ -36,24 +38,20 @@ const StyledPaper = styled(Paper)`
   width: 100%;
   border-radius: 20px;
   max-width: 400px;
-  background:rgb(255, 255, 255);
+  background: rgb(255, 255, 255);
 `;
 
 const StyledForm = styled.form`
   margin-bottom: 1.5rem;
-  
 `;
 
 const StyledTextField = styled(TextField)`
   margin-bottom: 1.5rem;
-
 `;
 
 const StyledButton = styled(Button)`
   padding: 0.75rem;
   border-radius: 20px;
-
-
 `;
 
 const ImageContainer = styled.div`
@@ -69,7 +67,8 @@ const Login = () => {
   const navigate = useNavigate();
   const { login } = useAuth();
   const theme = useTheme();
-  const isDesktop = useMediaQuery(theme.breakpoints.up('md')); // Check if screen is desktop size
+  const isDesktop = useMediaQuery(theme.breakpoints.up('md'));
+  const [showPassword, setShowPassword] = useState(false);
 
   // Formik setup with Yup validation
   const formik = useFormik({
@@ -88,13 +87,20 @@ const Login = () => {
           values,
           { withCredentials: true }
         );
-        console.log(response.status);
-
         login(); // Update authentication state
         navigate('/admin'); // Redirect to admin dashboard
       } catch (err) {
-        console.error('Error logging in:', err);
-        setErrors({ submit: 'Invalid username or password' });
+        if (err.response) {
+          if (err.response.status === 401) {
+            setErrors({ submit: 'Invalid username or password' });
+          } else {
+            setErrors({ submit: 'An unexpected error occurred.' });
+          }
+        } else if (err.request) {
+          setErrors({ submit: 'Network error. Please check your connection.' });
+        } else {
+          setErrors({ submit: 'An unexpected error occurred.' });
+        }
       } finally {
         setSubmitting(false);
       }
@@ -125,7 +131,7 @@ const Login = () => {
                 {formik.errors.submit}
               </Alert>
             )}
-            <StyledForm >
+            <StyledForm onSubmit={formik.handleSubmit}>
               <StyledTextField
                 fullWidth
                 id="username"
@@ -136,18 +142,33 @@ const Login = () => {
                 onBlur={formik.handleBlur}
                 error={formik.touched.username && Boolean(formik.errors.username)}
                 helperText={formik.touched.username && formik.errors.username}
+                disabled={formik.isSubmitting}
               />
               <StyledTextField
                 fullWidth
                 id="password"
                 name="password"
                 label="Password"
-                type="password"
+                type={showPassword ? 'text' : 'password'}
                 value={formik.values.password}
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
                 error={formik.touched.password && Boolean(formik.errors.password)}
                 helperText={formik.touched.password && formik.errors.password}
+                disabled={formik.isSubmitting}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        aria-label="toggle password visibility"
+                        onClick={() => setShowPassword(!showPassword)}
+                        edge="end"
+                      >
+                        {showPassword ? <VisibilityOff /> : <Visibility />}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
               />
               <StyledButton
                 fullWidth
@@ -155,9 +176,14 @@ const Login = () => {
                 type="submit"
                 disabled={formik.isSubmitting}
               >
-                Login
+                {formik.isSubmitting ? 'Logging in...' : 'Login'}
               </StyledButton>
             </StyledForm>
+            <Typography variant="body2" align="center" sx={{ mt: 2 }}>
+              <a href="/forgot-password" style={{ textDecoration: 'none' }}>
+                Forgot your password?
+              </a>
+            </Typography>
           </StyledPaper>
         </Grid>
 

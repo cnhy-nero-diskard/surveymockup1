@@ -1,0 +1,111 @@
+import React, { useState } from 'react';
+import LocalizationUI from './LocalizationUI';
+import EstablishmentsUI from './EstablishmentsUI';
+import { drawerWidth } from '../admin/maindashboard/MDashboardOutlet';
+const ModalMan = ({ isOpen, onClose, children }) => {
+  if (!isOpen) return null;
+
+  return (
+    <div style={{
+      position: 'fixed',
+      top: 0,
+      left: 0,
+      height: '100%',
+      // Make the modal container full width
+       backgroundColor: 'rgba(0, 0, 0, 0.5)',
+       display: 'flex',
+       justifyContent: 'center',
+       alignItems: 'center',
+       marginLeft: drawerWidth,
+       width: `calc(100vw - ${drawerWidth}px)`,
+         }}>
+       <div style={{
+         backgroundColor: 'transparent',
+         padding: '20px',
+         borderRadius: '5px',
+         width: '100%', // Make the modal content full width
+      }}>
+        <button onClick={onClose} style={{
+          position: 'absolute',
+          top: '10px',
+          right: '10px',
+          background: 'none',
+          border: 'none',
+          fontSize: '1.5rem',
+          cursor: 'pointer',
+        }}>&times;</button>
+        {children}
+      </div>
+    </div>
+  );
+};
+
+const DataManager = () => {
+  const [activeGroup, setActiveGroup] = useState('localization');
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const openModal = (group) => {
+    setActiveGroup(group);
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+  };
+
+  return (
+    <div style={{ padding: '20px', fontFamily: 'Arial, sans-serif', maxWidth: '1200px', margin: '0 auto' }}>
+      <h1 style={{ textAlign: 'center', marginBottom: '20px', color: '#333', fontSize: '2rem' }}>CRUD Management</h1>
+      
+      {/* Selection UI */}
+      <div style={{ display: 'flex', justifyContent: 'center', gap: '10px', marginBottom: '20px' }}>
+        <button
+          onClick={() => openModal('localization')}
+          style={{
+            padding: '10px 20px',
+            fontSize: '16px',
+            backgroundColor: activeGroup === 'localization' ? '#007BFF' : '#6C757D',
+            color: 'white',
+            border: 'none',
+            borderRadius: '5px',
+            cursor: 'pointer',
+            transition: 'background-color 0.3s ease',
+            boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+          }}
+          onMouseOver={(e) => e.target.style.backgroundColor = activeGroup === 'localization' ? '#0056b3' : '#5a6268'}
+          onMouseOut={(e) => e.target.style.backgroundColor = activeGroup === 'localization' ? '#007BFF' : '#6C757D'}
+          aria-pressed={activeGroup === 'localization'}
+        >
+          Localization
+        </button>
+        <button
+          onClick={() => openModal('establishments')}
+          style={{
+            padding: '10px 20px',
+            fontSize: '16px',
+            backgroundColor: activeGroup === 'establishments' ? '#007BFF' : '#6C757D',
+            color: 'white',
+            border: 'none',
+            borderRadius: '5px',
+            cursor: 'pointer',
+            transition: 'background-color 0.3s ease',
+            boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+          }}
+          onMouseOver={(e) => e.target.style.backgroundColor = activeGroup === 'establishments' ? '#0056b3' : '#5a6268'}
+          onMouseOut={(e) => e.target.style.backgroundColor = activeGroup === 'establishments' ? '#007BFF' : '#6C757D'}
+          aria-pressed={activeGroup === 'establishments'}
+        >
+          Establishments
+        </button>
+      </div>
+
+      {/* Modal */}
+      <ModalMan isOpen={isModalOpen} onClose={closeModal}>
+        {activeGroup === 'localization' && <LocalizationUI />}
+        {activeGroup === 'establishments' && <EstablishmentsUI />}
+      </ModalMan>
+    </div>
+  );
+};
+
+export default DataManager;

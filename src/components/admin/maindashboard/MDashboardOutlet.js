@@ -5,6 +5,9 @@ import { Box, Toolbar } from "@mui/material";
 import Sidebar from "./Sidebar";
 import { useAuth } from "../../context/AuthContext";
 import WarningMessage from "../../partials/WarningMessage";
+
+export const drawerWidth = 250; // Exportable global variable
+
 const Container = styled(Box)`
   display: flex;
 `;
@@ -14,13 +17,10 @@ const MainContent = styled(Box)`
   padding: 24px;
   background-color: rgba(0,0,0,0);
   min-height: 100vh;
-  margin-left: ${({ drawerWidth }) => `${drawerWidth}px`}; // Offset for the sidebar
 `;
 
 const DashboardOutlet = () => {
   const { isAuthenticated, unauthorized, handleUnauthorized, login } = useAuth(); // Correct usage
-
-  const drawerWidth = 250;
 
   return (
     <>
@@ -28,7 +28,7 @@ const DashboardOutlet = () => {
 
       <Container>
         <Sidebar drawerWidth={drawerWidth} />
-        <MainContent >
+        <MainContent drawerWidth={drawerWidth}>
           <Outlet /> {/* This will render the nested routes */}
         </MainContent>
       </Container>

@@ -29,6 +29,7 @@ import {
   ComputerOutlined as CompIcon,
   VerifiedUserOutlined as UserIcon,
   QrCode2Outlined as SurveyTouchpointsIcon,
+  StorageIcon as DBIcon,
 } from "@mui/icons-material";
 
 // Import Google Fonts (Poppins)
@@ -147,6 +148,11 @@ const Sidebar = ({ drawerWidth }) => {
               text: "AI Tools",
               icon: <AiToolsIcon />,
               to: "aitoolsdashboard",
+            },
+            {
+              text: "Data Manager",
+              icon: <CompIcon />,
+              to: "datamanager"
             },
             {
               text: "System Performance",
