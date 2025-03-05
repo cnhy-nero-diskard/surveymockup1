@@ -101,7 +101,7 @@ export const deleteEstablishment = async (id) => {
 };
 export const createTourismAttraction = async (attractionData) => {
   console.log('CRUDAPI - CREATING TOURISM ATTRACITON');
-  
+
   const response = await fetch(`${API_HOST}/api/admin/touattraction`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -140,6 +140,54 @@ export const deleteTourismAttraction = async (id) => {
     method: 'DELETE',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ id }),
+    credentials: 'include',
+  });
+  return response.json();
+};
+export const createSurveyResponse = async (anonymous_user_id, surveyquestion_ref, response_value) => {
+  const response = await fetch(`${API_HOST}/api/admin/survey-responses`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ anonymous_user_id, surveyquestion_ref, response_value }),
+    credentials: 'include',
+  });
+  return response.json();
+};
+
+export const fetchSurveyResponses = async () => {
+  const response = await fetch(`${API_HOST}/api/admin/survey-responses`, {
+    method: 'GET',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
+  });
+  return response.json();
+};
+
+export const updateSurveyResponse = async (response_id, response_value) => {
+  const response = await fetch(`${API_HOST}/api/admin/survey-responses`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ response_value }),
+    credentials: 'include',
+  });
+  return response.json();
+};
+
+export const deleteSurveyResponse = async (anonymous_user_id) => {
+  const response = await fetch(`${API_HOST}/api/admin/survey-responses`, {
+    method: 'DELETE',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ anonymous_user_id }),
+    credentials: 'include',
+  });
+  return response.json();
+};
+
+export const fetchResponsesByUserAndQuestion = async (anonymous_user_id, surveyquestion_ref) => {
+  const response = await fetch(`${API_HOST}/api/admin/survey-responses/user-question`, {
+    method: 'GET',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ anonymous_user_id, surveyquestion_ref }),
     credentials: 'include',
   });
   return response.json();

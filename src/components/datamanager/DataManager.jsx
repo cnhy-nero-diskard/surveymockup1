@@ -4,6 +4,8 @@ import EstablishmentsUI from './EstablishmentsUI';
 import TourismAttractionUI from './TourismAttractionUI';
 import { drawerWidth } from '../admin/maindashboard/MDashboardOutlet';
 import { Center } from '@chakra-ui/react';
+import SurveyResponsesUI from './SurveyResponsesUI';
+import AnonymousUsersHandler from './AnonymousUsersHandler';
 
 const ModalMan = ({ isOpen, onClose, children }) => {
   if (!isOpen) return null;
@@ -139,6 +141,25 @@ const DataManager = () => {
         >
           Tourism Attractions
         </button>
+        <button
+          onClick={() => openModal('anonhandler')}
+          style={{
+            padding: '10px 20px',
+            fontSize: '16px',
+            backgroundColor: activeGroup === 'anonhandler' ? '#007BFF' : '#6C757D',
+            color: 'white',
+            border: 'none',
+            borderRadius: '5px',
+            cursor: 'pointer',
+            transition: 'background-color 0.3s ease',
+            boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+          }}
+          onMouseOver={(e) => e.target.style.backgroundColor = activeGroup === 'anonhandler' ? '#0056b3' : '#5a6268'}
+          onMouseOut={(e) => e.target.style.backgroundColor = activeGroup === 'anonhandler' ? '#007BFF' : '#6C757D'}
+          aria-pressed={activeGroup === 'anonhandler'}
+        >
+          Anonymous Users
+        </button>
       </div>
 
       {/* Modal */}
@@ -146,7 +167,8 @@ const DataManager = () => {
         {activeGroup === 'localization' && <LocalizationUI />}
         {activeGroup === 'establishments' && <EstablishmentsUI />}
         {activeGroup === 'tourismAttractions' && <TourismAttractionUI />}
-        {activeGroup === 'surveyresponses' && <TourismAttractionUI />} 
+        {activeGroup === 'surveyresponses' && <SurveyResponsesUI />} 
+        {activeGroup === 'anonhandler' && <AnonymousUsersHandler />} 
       </ModalMan>
     </div>
   );
