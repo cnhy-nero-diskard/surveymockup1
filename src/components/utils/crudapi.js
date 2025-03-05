@@ -1,3 +1,4 @@
+
 // utils/api.js
 const API_HOST = process.env.REACT_APP_API_HOST;
 
@@ -40,16 +41,20 @@ export const deleteLocalization = async (id) => {
   return response.json();
 };
 
-// Establishments CRUD
-export const createEstablishment = async (
-  estName, type, cityMun, barangay, latitude, longitude,
-  english, korean, chinese, japanese, russian, french, spanish, hindi
-) => {
-  const response = await fetch(`${API_HOST}/api/admin/establishments`, {
+// establishment CRUD
+export const createEstablishment = async (formData) => {
+  const {
+    est_name, type, city_mun, barangay, latitude, longitude,
+    english, korean, chinese, japanese, russian, french, spanish, hindi
+  } = formData;
+
+  console.log(`ESTABLISHMENT NAME CREATE --> ${est_name}`);
+
+  const response = await fetch(`${API_HOST}/api/admin/establishment`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      estName, type, cityMun, barangay, latitude, longitude,
+      est_name, type, city_mun, barangay, latitude, longitude,
       english, korean, chinese, japanese, russian, french, spanish, hindi,
     }),
     credentials: 'include',
@@ -57,23 +62,27 @@ export const createEstablishment = async (
   return response.json();
 };
 
-export const fetchEstablishments = async (filters = {}) => {
-  const queryParams = new URLSearchParams(filters).toString();
-  const response = await fetch(`${API_HOST}/api/admin/establishments?${queryParams}`, {
+export const fetchEstablishment = async (filters = {}) => {
+  const response = await fetch(`${API_HOST}/api/admin/establishment`, {
+    method: 'GET',
+    headers: { 'Content-Type': 'application/json' },
     credentials: 'include',
   });
   return response.json();
 };
 
 export const updateEstablishment = async (
-  id, estName, type, cityMun, barangay, latitude, longitude,
-  english, korean, chinese, japanese, russian, french, spanish, hindi
-) => {
-  const response = await fetch(`${API_HOST}/api/admin/establishments/${id}`, {
+  id, formData) => {
+    const {
+      est_name, type, city_mun, barangay, latitude, longitude,
+      english, korean, chinese, japanese, russian, french, spanish, hindi
+    } = formData;
+  
+  const response = await fetch(`${API_HOST}/api/admin/establishment/`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      estName, type, cityMun, barangay, latitude, longitude,
+      id, est_name, type, city_mun, barangay, latitude, longitude,
       english, korean, chinese, japanese, russian, french, spanish, hindi,
     }),
     credentials: 'include',
@@ -82,9 +91,12 @@ export const updateEstablishment = async (
 };
 
 export const deleteEstablishment = async (id) => {
-  const response = await fetch(`${API_HOST}/api/admin/establishments/${id}`, {
-    method: 'DELETE',
-    credentials: 'include',
-  });
+  console.log(`DELETE ESTABLISHMENT WITH ID ${id}`);
+    const response = await fetch(`${API_HOST}/api/admin/establishment`, {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id }),
+      credentials: 'include',
+    });
   return response.json();
 };
