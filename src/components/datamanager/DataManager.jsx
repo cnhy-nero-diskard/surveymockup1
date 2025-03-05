@@ -2,6 +2,11 @@ import React, { useState } from 'react';
 import LocalizationUI from './LocalizationUI';
 import EstablishmentsUI from './EstablishmentsUI';
 import { drawerWidth } from '../admin/maindashboard/MDashboardOutlet';
+import { Center } from '@chakra-ui/react';
+
+
+
+
 const ModalMan = ({ isOpen, onClose, children }) => {
   if (!isOpen) return null;
 
@@ -26,10 +31,12 @@ const ModalMan = ({ isOpen, onClose, children }) => {
          width: '100%', // Make the modal content full width
       }}>
         <button onClick={onClose} style={{
-          position: 'absolute',
+          width: '75px',
+          justifyContent:'center',
+          alignContent:'center',
           top: '10px',
           right: '10px',
-          background: 'none',
+          background: 'red',
           border: 'none',
           fontSize: '1.5rem',
           cursor: 'pointer',

@@ -51,6 +51,7 @@ const Input = styled.input`
 `;
 
 const Button = styled.button`
+  width: fit-content;
   padding: 0.75rem 1.5rem;
   background-color: #3498db;
   color: white;
@@ -240,7 +241,15 @@ const LocalizationUI = () => {
 
   return (
     <Container>
-      <Title>Localization Management</Title>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '1rem', marginBottom: '1rem' }}>
+        <Button
+          onClick={() => fetchLocalizations().then(data => setLocalizations(data))}
+          style={{ flexShrink: 0 }}
+        >
+          🔄 Reload
+        </Button>
+        <Title style={{ margin: 0 }}>Localizations Management (Translations) </Title>
+      </div>
       <Form onSubmit={handleSubmit}>
         <Input
           type="text"
