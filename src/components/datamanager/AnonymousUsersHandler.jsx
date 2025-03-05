@@ -74,6 +74,22 @@ const ErrorMessage = styled.div`
   color: red;
 `;
 
+const PurgeButton = styled.button`
+  display: block;
+  margin: 1rem auto;
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+  color: white;
+  background-color: #e74c3c;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+
+  &:hover {
+    background-color: #c0392b;
+  }
+`;
+
 const AnonymousUsersHandler = () => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -89,10 +105,12 @@ const AnonymousUsersHandler = () => {
         // Fetch all survey responses
         const surveyResponsesResponse = await axios.get(`${process.env.REACT_APP_API_HOST}/api/admin/survey-responses`, { withCredentials: true });
         const allSurveyResponses = surveyResponsesResponse.data;
-
+        console.log(`ALL RESPONSES --> ${JSON.stringify(allSurveyResponses)}`);
         // Prepare to cross-check with survey responses
         const userSurveyStatus = anonymousUsers.map(user => {
-          const userResponses = allSurveyResponses.filter(response => response.anonid === user.anonymous_user_id);
+          console.log(`CHECKING FOR ANONYMOUS USER --> ${JSON.stringify(user)}`);
+            // Filter survey responses for the current anonymous user
+            const userResponses = allSurveyResponses.filter(response => response.anonymous_user_id === user.anonymous_user_id);
 
           // Prepare the user object with additional fields
           let surveyStatus = {
@@ -132,12 +150,22 @@ const AnonymousUsersHandler = () => {
     fetchAnonymousUsersAndSurveyResponses();
   }, []);
 
+  const handlePurge = async () => {
+    try {
+      await axios.delete(`${process.env.REACT_APP_API_HOST}/api/admin/all-anonymous-users`, { withCredentials: true });
+      setUsers([]); // Clear the users state
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
   if (loading) return <LoadingMessage>Loading...</LoadingMessage>;
   if (error) return <ErrorMessage>Error: {error}</ErrorMessage>;
 
   return (
     <Container>
       <Title>Anonymous Users and Survey Status</Title>
+      <PurgeButton onClick={handlePurge}>PURGE</PurgeButton>
       <TableContainer>
         <Table>
           <TableHeader>
