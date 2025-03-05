@@ -99,7 +99,7 @@ const ThankYouMessage = () => {
       console.log('Survey responses submitted successfully');
       
       const finishResponse = { surveyquestion_ref: 'FINISH', response_value: 'Survey Completed' };
-      await submitSurveyResponses([finishResponse]);
+      await submitSurveyResponses(finishResponse);
       
       console.log('Survey completion indicated');
       goToNextStep(currentStepIndex, navigate, routes, activeBlocks);

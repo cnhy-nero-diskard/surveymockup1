@@ -5,6 +5,8 @@ import useTranslations from '../../../components/utils/useTranslations';
 import { useCurrentStepIndex } from '../../../components/utils/useCurrentIndex';
 import { UnifiedContext } from '../../../routes/UnifiedContext';
 import { goToNextStep } from '../../../components/utils/navigationUtils';
+import { useFeedback } from '../../../routes/FeedbackContext';
+import axios from 'axios';
 
 /**
  * AccomodationFeedback Component
@@ -12,31 +14,42 @@ import { goToNextStep } from '../../../components/utils/navigationUtils';
  * It uses context to manage routing and active blocks, and translations for localization.
  */
 const AccomodationFeedback = () => {
-  // Access the routes from the UnifiedContext
   const { routes } = useContext(UnifiedContext);
-  
-  // Get the current step index based on the routes
   const currentStepIndex = useCurrentStepIndex(routes);
-  
-  // Access activeBlocks, appendActiveBlocks, and removeActiveBlocks from the UnifiedContext
   const { activeBlocks, appendActiveBlocks, removeActiveBlocks } = useContext(UnifiedContext);
-
-  // Hook to navigate between routes
   const navigate = useNavigate();
-  
-  // State to manage the selected language, defaulting to the value stored in localStorage
   const [language, setLanguage] = useState(localStorage.getItem('selectedLanguage'));
-  
-  // Fetch translations for the 'estabFeedBack' section in the selected language
   const translations = useTranslations('estabFeedBack', language);
+  const { feedback, setFeedback } = useFeedback();
 
-
-  const handleNext = (selectedOptionValue, feedback) => {
-    console.log('Selected Option:', selectedOptionValue, 'Feedback:', feedback);
+  const handleNext = async (selectedOptionValue, feedbackk) => {
+    console.log('Selected Option:', selectedOptionValue, 'Feedback:', feedbackk);
     
+    // Create the updated feedback object
+    const updatedFeedback = {
+        ...feedback, // Spread the previous feedback properties
+        rating: selectedOptionValue, // Update rating
+        review: feedbackk // Update review
+    };
+
+    // Set the feedback state
+    setFeedback(updatedFeedback);
+    
+    try {
+        console.log(`FEEDBACK ----> ${JSON.stringify(updatedFeedback)}`); // Log the updated feedback
+        // Send the updated feedback to the server
+        const response = await axios.post(`${process.env.REACT_APP_API_HOST}/api/survey/feedback`, updatedFeedback, {
+            withCredentials: true
+        });
+        console.log(`POST FEEDBACK --> ${JSON.stringify(response.data)}`);
+    } catch (error) {
+        console.error('Error posting feedback:', error);
+    }
+
     // Navigate to the next step
     goToNextStep(currentStepIndex, navigate, routes, activeBlocks);
-  };
+};
+
 
   // Log the translations object for debugging purposes
   console.log(JSON.stringify(translations));
