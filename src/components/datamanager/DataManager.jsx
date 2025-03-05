@@ -1,11 +1,9 @@
 import React, { useState } from 'react';
 import LocalizationUI from './LocalizationUI';
 import EstablishmentsUI from './EstablishmentsUI';
+import TourismAttractionUI from './TourismAttractionUI';
 import { drawerWidth } from '../admin/maindashboard/MDashboardOutlet';
 import { Center } from '@chakra-ui/react';
-
-
-
 
 const ModalMan = ({ isOpen, onClose, children }) => {
   if (!isOpen) return null;
@@ -16,24 +14,23 @@ const ModalMan = ({ isOpen, onClose, children }) => {
       top: 0,
       left: 0,
       height: '100%',
-      // Make the modal container full width
-       backgroundColor: 'rgba(0, 0, 0, 0.5)',
-       display: 'flex',
-       justifyContent: 'center',
-       alignItems: 'center',
-       marginLeft: drawerWidth,
-       width: `calc(100vw - ${drawerWidth}px)`,
-         }}>
-       <div style={{
-         backgroundColor: 'transparent',
-         padding: '20px',
-         borderRadius: '5px',
-         width: '100%', // Make the modal content full width
+      backgroundColor: 'rgba(0, 0, 0, 0.5)',
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginLeft: drawerWidth,
+      width: `calc(100vw - ${drawerWidth}px)`,
+    }}>
+      <div style={{
+        backgroundColor: 'transparent',
+        padding: '20px',
+        borderRadius: '5px',
+        width: '100%',
       }}>
         <button onClick={onClose} style={{
           width: '75px',
-          justifyContent:'center',
-          alignContent:'center',
+          justifyContent: 'center',
+          alignContent: 'center',
           top: '10px',
           right: '10px',
           background: 'red',
@@ -104,12 +101,52 @@ const DataManager = () => {
         >
           Establishments
         </button>
+        <button
+          onClick={() => openModal('tourismAttractions')}
+          style={{
+            padding: '10px 20px',
+            fontSize: '16px',
+            backgroundColor: activeGroup === 'tourismAttractions' ? '#007BFF' : '#6C757D',
+            color: 'white',
+            border: 'none',
+            borderRadius: '5px',
+            cursor: 'pointer',
+            transition: 'background-color 0.3s ease',
+            boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+          }}
+          onMouseOver={(e) => e.target.style.backgroundColor = activeGroup === 'tourismAttractions' ? '#0056b3' : '#5a6268'}
+          onMouseOut={(e) => e.target.style.backgroundColor = activeGroup === 'tourismAttractions' ? '#007BFF' : '#6C757D'}
+          aria-pressed={activeGroup === 'tourismAttractions'}
+        >
+          Tourism Attractions
+        </button>
+        <button
+          onClick={() => openModal('surveyresponses')}
+          style={{
+            padding: '10px 20px',
+            fontSize: '16px',
+            backgroundColor: activeGroup === 'surveyresponses' ? '#007BFF' : '#6C757D',
+            color: 'white',
+            border: 'none',
+            borderRadius: '5px',
+            cursor: 'pointer',
+            transition: 'background-color 0.3s ease',
+            boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+          }}
+          onMouseOver={(e) => e.target.style.backgroundColor = activeGroup === 'surveyresponses' ? '#0056b3' : '#5a6268'}
+          onMouseOut={(e) => e.target.style.backgroundColor = activeGroup === 'surveyresponses' ? '#007BFF' : '#6C757D'}
+          aria-pressed={activeGroup === 'surveyresponses'}
+        >
+          Tourism Attractions
+        </button>
       </div>
 
       {/* Modal */}
       <ModalMan isOpen={isModalOpen} onClose={closeModal}>
         {activeGroup === 'localization' && <LocalizationUI />}
         {activeGroup === 'establishments' && <EstablishmentsUI />}
+        {activeGroup === 'tourismAttractions' && <TourismAttractionUI />}
+        {activeGroup === 'surveyresponses' && <TourismAttractionUI />} 
       </ModalMan>
     </div>
   );
