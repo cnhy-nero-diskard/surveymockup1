@@ -13,7 +13,7 @@ import axios from 'axios';
  * This component renders a feedback form for accommodation experiences.
  * It uses context to manage routing and active blocks, and translations for localization.
  */
-const AccomodationFeedback = () => {
+const TouchpointFeedback = () => {
   const { routes } = useContext(UnifiedContext);
   const currentStepIndex = useCurrentStepIndex(routes);
   const { activeBlocks, appendActiveBlocks, removeActiveBlocks } = useContext(UnifiedContext);
@@ -69,4 +69,4 @@ const AccomodationFeedback = () => {
   );
 };
 
-export default AccomodationFeedback;
+export default TouchpointFeedback;

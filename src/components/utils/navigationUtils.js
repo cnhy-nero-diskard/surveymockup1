@@ -1,7 +1,9 @@
 // navigationUtils.js
 import axios from "axios";
+import { useContext, useState } from "react";
 export const goToNextStep = async (currentStepIndex, navigate, surveyRoutes, activeBlocks, increment = 1) => {
   console.log(`NAVUTILS - CURRENT STEP = ${currentStepIndex}`);
+  
   try {
     // Update progress on the backend
     let nextStepIndex = currentStepIndex + increment;
@@ -27,10 +29,17 @@ export const goToNextStep = async (currentStepIndex, navigate, surveyRoutes, act
     if (nextStep) {
       console.log(`NAVUTILS - TO NEXT ROUTE ${nextStep.path}`);
       // Navigate to the next step
-      navigate(`/survey/${nextStep.path}`);
+  
+      if (activeBlocks.includes("survey")) {
+        navigate(`/survey/${nextStep.path}`);
+      } else if (activeBlocks.includes("feedback")) {
+        navigate(`/feedback/${nextStep.path}`);
+      } else {
+        navigate(`/${nextStep.path}`);
+      }
     } else {
       // If there is no next step, navigate to a completion page or home
-      navigate("/survey-complete");
+      navigate("/");
     }
   } catch (err) {
     console.error("Error navigating to the next step:", err);

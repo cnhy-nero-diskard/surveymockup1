@@ -40,28 +40,45 @@ const SurveyRoutesContent = () => {
             const idx = queryParams.get('idx');
 
             if (idx) {
-                axios.post(`${process.env.REACT_APP_API_HOST}/api/survey/establishment`,
-                    { idx }, {
+                axios.get(`${process.env.REACT_APP_API_HOST}/api/surveytouchpoints`, {
                     withCredentials: true
                 })
                     .then(response => {
-                        console.log(`TPENT API response:, ${response.data}`);
+                        console.log('Touchpoints API response:', response.data);
 
-                        // Update the feedback object with the response value
-                        setFeedback(prevFeedback => ({
-                            ...prevFeedback,
-                            entity: response.data, 
-                        }));
-                        console.log(`FEEDBACK STATE ${JSON.stringify(feedback)}`);
+                        // Search through all categories in the response
+                        let foundEntity = null;
+                        let foundTouchpoint = null;
+
+                        // Iterate through each category in the response
+                        Object.keys(response.data).forEach(category => {
+                            response.data[category].forEach(item => {
+                                if (item.short_id === idx) {
+                                    foundEntity = item.name;
+                                    foundTouchpoint = category;
+                                }
+                            });
+                        });
+                        console.log(`FOUND TOUCHPOINT --> ${foundEntity} -- ${foundTouchpoint}`);
+                        if (foundEntity) {
+                            setFeedback(prevFeedback => ({
+                                ...prevFeedback,
+                                entity: foundEntity,
+                                touchpoint: foundTouchpoint
+                            }));
+                            console.log(`FEEDBACK STATE ${JSON.stringify(feedback)}`);
+                        } else {
+                            console.log('No matching touchpoint found for idx:', idx);
+                        }
                     })
                     .catch(error => {
                         console.error('Error making API request:', error);
                     });
             } else {
-                console.log('TPENT No "idx" query parameter found, skipping API request.');
+                console.log('No "idx" query parameter found, skipping API request.');
             }
         }
-    }, [location, setFeedback]);
+    }, [location, setFeedback]); // Re-run effect when location or setFeedback changes
 
     return (
         <>

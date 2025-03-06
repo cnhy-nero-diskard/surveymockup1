@@ -59,7 +59,8 @@ import PProfile2 from '../pages/survey/personalprofile2/PProfile2';
 import PProfile1 from '../pages/survey/personalprofile1/PProfile1';
 import ProponentLgu from '../pages/survey/proponentlgu/ProponentLgu';
 import OpenEndedTranspo from '../pages/survey/OpenEndedTransportation/OpenEndedTranspo';
-import AccomodationFeedback from '../pages/survey/accomodation5o/AccomodationFeedback';
+import TouchpointFeedback from '../pages/survey/accomodation5o/AccomodationFeedback';
+import ThankYouMessageF from '../pages/survey/thanku/ThankYouMessageF';
 
 
 export const sroutes = [
@@ -131,6 +132,7 @@ export const sroutes = [
     // { label: '(IGNORE)Where Stay Departure', path: 'wherestaydepart', component: },
     // { label: 'Survey Evaluation VERSION2', path: 'surveyevaluationb', component: },
     // { label: 'How Many Visits', path: 'howmanyvisits', component: HowManyVisits, conditionalBlock: 'evatt'},
-    { label: 'FEEDBACK QUICK (OPEN)', path: 'estopenfeedback', component: AccomodationFeedback, conditionalBlock: 'feedback'},
+    { label: 'FEEDBACK QUICK (OPEN)', path: 'estopenfeedback', component: TouchpointFeedback, conditionalBlock: 'feedback'},
+    { label: 'Thank You Message', path: 'feedback-complete', component: ThankYouMessageF, conditionalBlock: 'feedback'},
 
 ];

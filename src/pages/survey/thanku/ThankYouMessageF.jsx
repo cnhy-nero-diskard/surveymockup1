@@ -76,7 +76,7 @@ const FinishButton = styled.button`
   }
 `;
 
-const ThankYouMessage = () => {
+const ThankYouMessageF = () => {
   const { routes } = useContext(UnifiedContext);
   const currentStepIndex = useCurrentStepIndex(routes);
   const { activeBlocks, appendActiveBlocks, removeActiveBlocks } = useContext(UnifiedContext);
@@ -98,7 +98,7 @@ const ThankYouMessage = () => {
       await submitSurveyResponses(surveyResponses);
       console.log('Survey responses submitted successfully');
       
-      const finishResponse = { surveyquestion_ref: 'FINISH', response_value: 'Survey Completed' };
+      const finishResponse = { surveyquestion_ref: 'FINISHF', response_value: 'Survey Completed' };
       await submitSurveyResponses([finishResponse]);
       
       console.log('Survey completion indicated');
@@ -125,4 +125,4 @@ const ThankYouMessage = () => {
   );
 };
 
-export default ThankYouMessage;
+export default ThankYouMessageF;

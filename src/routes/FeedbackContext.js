@@ -9,6 +9,7 @@ export const FeedbackProvider = ({ children }) => {
         entity: null,
         rating: null,
         review: null,
+        touchpoint: null, 
     });
 
     return (

@@ -149,7 +149,7 @@ const LanguageSelector = () => {
 
   const { routes } = useContext(UnifiedContext);
   const [currentStep, setCurrentStep] = useState();
-  const currentStepIndex = useCurrentStepIndex(routes);
+  const currentStepIndex = 0;
   const { activeBlocks, appendActiveBlocks, removeActiveBlocks, isBlockActive } = useContext(UnifiedContext);
 
   useEffect(() => {

@@ -149,7 +149,7 @@ const GradientBackground = ({ children, overlayImage, opacity = 0.3, blendMode =
   // Use useEffect to trigger animation updates
   useEffect(() => {
     if (isBlockActive("feedback") && (getParentPath(location.pathname) === "/survey") || location.pathname === "/survey"){
-      console.log("GBACK feedback detected...removing");
+      console.log("GBACK feedback detected...removing surveytpms");
       removeActiveBlocks("feedback");
     } else if (isBlockActive("surveytpms") && (getParentPath(location.pathname) === "/feedback") || location.pathname === "/feedback"){
       removeActiveBlocks("surveytpms");

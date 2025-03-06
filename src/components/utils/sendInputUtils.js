@@ -24,7 +24,7 @@ export const submitSurveyResponses = async (surveyResponses) => {
         // Return all results (both successful and failed)
         return results;
     } catch (error) {
-        console.error('UTIL ----- Unexpected error while submitting survey responses:', error);
+        console.error(`UTIL  Unexpected error while submitting the ff responses: ${surveyResponses}, ${error}`);
         window.alert('Failed to submit survey responses. Please try again later.');
         throw error; // Re-throw the error to handle it in the component
     }
