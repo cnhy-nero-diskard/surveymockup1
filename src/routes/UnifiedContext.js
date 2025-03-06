@@ -4,6 +4,7 @@ export const UnifiedContext = createContext();
 
 export const UnifiedProvider = ({ children, routes }) => {
   const [activeBlocks, setActiveBlocks] = useState(['universal', 'surveytpms', 'feedback']);
+  const [headerText, setHeaderText] = useState(''); 
 
   // Function to append new blocks to activeBlocks
   const appendActiveBlocks = (newBlocks) => {
@@ -29,7 +30,7 @@ export const UnifiedProvider = ({ children, routes }) => {
   };
 
   return (
-    <UnifiedContext.Provider value={{ activeBlocks, setActiveBlocks, appendActiveBlocks, removeActiveBlocks, isBlockActive, routes }}>
+    <UnifiedContext.Provider value={{ activeBlocks, setActiveBlocks, appendActiveBlocks, removeActiveBlocks, isBlockActive, routes, headerText, setHeaderText }}>
       {children}
     </UnifiedContext.Provider>
   );

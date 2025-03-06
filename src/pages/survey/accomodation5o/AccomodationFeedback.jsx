@@ -14,7 +14,7 @@ import axios from 'axios';
  * It uses context to manage routing and active blocks, and translations for localization.
  */
 const TouchpointFeedback = () => {
-  const { routes } = useContext(UnifiedContext);
+  const { routes, setHeaderText } = useContext(UnifiedContext);
   const currentStepIndex = useCurrentStepIndex(routes);
   const { activeBlocks, appendActiveBlocks, removeActiveBlocks } = useContext(UnifiedContext);
   const navigate = useNavigate();
@@ -50,6 +50,31 @@ const TouchpointFeedback = () => {
     goToNextStep(currentStepIndex, navigate, routes, activeBlocks);
 };
 
+  // Add useEffect to fetch translated touchpoint when component mounts
+  useEffect(() => {
+    const fetchTouchpointTranslation = async () => {
+      try {
+        const response = await axios.post(
+          `${process.env.REACT_APP_API_HOST}/api/touchpointlocal`,
+          {
+            languagecode: language,
+            entityname: feedback.entity // Assuming 'entity' is stored in feedback context
+          },
+          {
+            withCredentials: true
+          }
+        );
+        
+        // Directly set the translated text to header
+        console.log(`LOCALIZED ENTITY ${response.data}`);
+        setHeaderText(response.data.translatedName || feedback.entity);
+      } catch (error) {
+        console.error('Error fetching touchpoint translation:', error);
+      }
+    };
+
+    fetchTouchpointTranslation();
+  }, [language, feedback.entity, setHeaderText]);
 
   // Log the translations object for debugging purposes
   console.log(JSON.stringify(translations));

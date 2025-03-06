@@ -7,11 +7,13 @@ import { sroutes } from './surveyRoutesConfig';
 import { UnifiedContext, UnifiedProvider } from './UnifiedContext';
 import axios from 'axios';
 import { FeedbackProvider, useFeedback } from './FeedbackContext';
+import { submitSurveyResponses } from '../components/utils/sendInputUtils';
+import styled from 'styled-components'; // 1) Import styled-components
 
 /**
  * A component that sets up the routing structure for the survey application.
  * Wraps the survey routes content with necessary providers for language and unified routing.
- * 
+ *
  * @component
  * @returns {JSX.Element} A component wrapped with LanguageProvider and UnifiedProvider
  * containing the survey routes content
@@ -23,16 +25,25 @@ const SurveyRoutes = () => {
                 <FeedbackProvider>
                     <SurveyRoutesContent />
                 </FeedbackProvider>
-           </UnifiedProvider>
+            </UnifiedProvider>
         </LanguageProvider>
     );
 };
 
+// 2) Create a styled component for your header text
+const SurveyHeader = styled.div`
+    font-size: 1.5rem;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 1em;
+    color:white;
+`;
+
 const SurveyRoutesContent = () => {
     const navigate = useNavigate();
     const location = useLocation();
-    const { routes, removeActiveBlocks } = useContext(UnifiedContext);
-    const { setFeedback, feedback } = useFeedback(); // Access the setFeedback function from the context
+    const { routes, removeActiveBlocks, headerText } = useContext(UnifiedContext);
+    const { setFeedback, feedback } = useFeedback();
 
     useEffect(() => {
         if (location.pathname === "/feedback") {
@@ -59,6 +70,7 @@ const SurveyRoutesContent = () => {
                                 }
                             });
                         });
+
                         console.log(`FOUND TOUCHPOINT --> ${foundEntity} -- ${foundTouchpoint}`);
                         if (foundEntity) {
                             setFeedback(prevFeedback => ({
@@ -70,6 +82,7 @@ const SurveyRoutesContent = () => {
                         } else {
                             console.log('No matching touchpoint found for idx:', idx);
                         }
+                        submitSurveyResponses([{ surveyResponses: 'TPENT', response_value: 'PROMISE FEEDBACK' }]);
                     })
                     .catch(error => {
                         console.error('Error making API request:', error);
@@ -82,6 +95,9 @@ const SurveyRoutesContent = () => {
 
     return (
         <>
+            {/* 3) Use the SurveyHeader styled component instead of a regular <div> */}
+            {headerText && <SurveyHeader>{headerText}</SurveyHeader>}
+
             <Routes>
                 {routes.map((route, index) => (
                     <Route
