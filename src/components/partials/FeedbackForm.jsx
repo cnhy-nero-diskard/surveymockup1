@@ -195,23 +195,25 @@ const FeedbackForm = ({ title, onNext, squestion_identifier, satisfactionOptions
             setShowWarning(true);
             return;
         }
-
+    
         const surveyResponses = [];
-
+    
         if (selectedOption) {
+            // Map the selected option to its corresponding numeric value
+            const selectedValue = satisfactionOptions[selectedOption];
             surveyResponses.push({
                 surveyquestion_ref: 'SATLV' + squestion_identifier,
-                response_value: selectedOption,
+                response_value: selectedValue, // Use the numeric value here
             });
         }
-
+    
         if (feedback) {
             surveyResponses.push({
                 surveyquestion_ref: 'FDBK' + squestion_identifier,
                 response_value: feedback,
             });
         }
-
+    
         try {
             await submitSurveyResponses(surveyResponses);
             onNext(selectedOption, feedback);
@@ -219,6 +221,7 @@ const FeedbackForm = ({ title, onNext, squestion_identifier, satisfactionOptions
             console.error('Error submitting survey responses:', error);
         }
     };
+    
 
     return (
         <><BodyPartial />
