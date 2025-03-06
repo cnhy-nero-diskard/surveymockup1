@@ -105,35 +105,37 @@ const SurveyTouchpoints = () => {
   const [selectedType, setSelectedType] = useState('');
   const [selectedItem, setSelectedItem] = useState('');
   const [qrValue, setQrValue] = useState('');
-  const [establishments, setEstablishments] = useState([]);
+  const [touchpointData, setTouchpointData] = useState({
+    muncity: [],
+    barangay: [],
+    transportation: [],
+    attractions: [],
+    establishments: []
+  });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  /**
-   * Effect hook to fetch establishments when the selected type is 'establishments'
-   */
+
   useEffect(() => {
-    if (selectedType === 'establishments') {
-      setLoading(true);
-      fetch(`${process.env.REACT_APP_API_HOST}/api/admin/establishments`, {
-        credentials: 'include',
+
+    setLoading(true);
+    fetch(`${process.env.REACT_APP_API_HOST}/api/surveytouchpoints`, {
+      credentials: 'include',
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        // console.log(`TOUCHPOINTS -- > ${JSON.stringify(data)}`);
+        console.log('KEY:', data.Establishments);
+
+        setTouchpointData(data);
+        setLoading(false);
       })
-        .then((response) => response.json())
-        .then((data) => {
-          const establishmentsData = data.map((item) => ({
-            key: item.id,
-            value: item.est_name,
-          }));
-          setEstablishments(establishmentsData);
-          setLoading(false);
-        })
-        .catch((error) => {
-          console.error('Error fetching establishments:', error);
-          setError('Failed to fetch data. Please try again later.');
-          setLoading(false);
-        });
-    }
-  }, [selectedType]);
+      .catch((error) => {
+        console.error('Error fetching touchpoints:', error);
+        setError('Failed to fetch data. Please try again later.');
+        setLoading(false);
+      });
+  }, []);
 
   /**
    * Handler for changing the selected type
@@ -151,10 +153,12 @@ const SurveyTouchpoints = () => {
    */
   const handleItemChange = (event) => {
     const selectedKey = event.target.value;
-    console.log(`ESTS --> ${JSON.stringify(establishments)}`);
-    const selectedEstablishment = establishments.find((est) => est.key === selectedKey);
+    const category = selectedType.toLowerCase();
+    const selectedTouchpoint = touchpointData[category].find(
+      (item) => item.short_id === selectedKey
+    );
     setSelectedItem(selectedKey);
-    setQrValue(`${process.env.REACT_APP_SELF_URL}/feedback?idx=${selectedEstablishment.value}`);
+    setQrValue(`${process.env.REACT_APP_SELF_URL}/feedback?idx=${selectedKey}`);
   };
 
   /**
@@ -202,6 +206,12 @@ const SurveyTouchpoints = () => {
     setSelectedType('');
     setSelectedItem('');
     setQrValue('');
+  };
+
+  const getTouchpointItems = () => {
+    if (!selectedType) return [];
+    const category = selectedType.toLowerCase();
+    return touchpointData[category] || [];
   };
 
   return (
@@ -253,10 +263,11 @@ const SurveyTouchpoints = () => {
                     <MenuItem value="" disabled>
                       Select Type
                     </MenuItem>
-                    <MenuItem value="establishments">Establishments</MenuItem>
+                    <MenuItem value="muncity">Municipality/City</MenuItem>
+                    <MenuItem value="barangay">Barangay</MenuItem>
+                    <MenuItem value="transportation">Transportation</MenuItem>
                     <MenuItem value="attractions">Attractions</MenuItem>
-                    <MenuItem value="transportationPoints">Transportation Points</MenuItem>
-                    <MenuItem value="barangays">Barangays</MenuItem>
+                    <MenuItem value="Establishments">Establishments</MenuItem>
                   </StyledSelect>
                 </Grid>
                 <Grid item xs={12} md={6}>
@@ -274,12 +285,11 @@ const SurveyTouchpoints = () => {
                       <MenuItem value="" disabled>
                         {`Select ${selectedType}`}
                       </MenuItem>
-                      {selectedType === 'establishments' &&
-                        establishments.map((item, index) => (
-                          <MenuItem key={index} value={item.key}>
-                            {item.value}
-                          </MenuItem>
-                        ))}
+                      {getTouchpointItems().map((item) => (
+                        <MenuItem key={item.short_id} value={item.short_id}>
+                          {item.name}
+                        </MenuItem>
+                      ))}
                     </StyledSelect>
                   )}
                 </Grid>
