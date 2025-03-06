@@ -201,7 +201,7 @@ const MainPurpose = () => {
       goToNextStep(currentStepIndex, navigate, routes, activeBlocks);
     } catch (error) {
       console.error('Error submitting survey responses:', error);
-      alert('Failed to submit survey responses. Please try again.');
+      // alert('Failed to submit survey responses. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
