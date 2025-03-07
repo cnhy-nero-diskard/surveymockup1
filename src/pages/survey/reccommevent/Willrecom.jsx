@@ -4,7 +4,7 @@ import GradientBackground from '../../../components/partials/GradientBackground'
 import BodyPartial from '../../../components/partials/BodyPartial';
 import { motion } from 'framer-motion';
 import imgoverlay from "../../../components/img/shutter.png";
-import { Container } from '../../../components/utils/styles1';
+import { Container, NextButtonU } from '../../../components/utils/styles1';
 import useTranslations from '../../../components/utils/useTranslations';
 import { submitSurveyResponses } from '../../../components/utils/sendInputUtils';
 import { goToNextStep } from '../../../components/utils/navigationUtils';
@@ -51,7 +51,7 @@ const Willrecom = () => {
   return (
     <>
       <BodyPartial />
-      <GradientBackground overlayImage={imgoverlay}>
+      <GradientBackground overlayImage={imgoverlay} buttonAppear={false}>
         <Container>
           <motion.div
             className="image-container"
@@ -68,22 +68,12 @@ const Willrecom = () => {
               {translations.willrecomQuestion}
             </motion.div>
             <div className="options">
-              <motion.button
-                className="option-button"
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
-                onClick={() => handleOptionClick('Yes')}
-              >
+              <NextButtonU style={{marginRight:10}} onClick={() => handleOptionClick('Yes')}>
                 {translations.willrecomOptionYes}
-              </motion.button>
-              <motion.button
-                className="option-button"
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
-                onClick={() => handleOptionClick('No')}
-              >
+              </NextButtonU>
+              <NextButtonU onClick={() => handleOptionClick('No')}>
                 {translations.willrecomOptionNo}
-              </motion.button>
+              </NextButtonU>
             </div>
           </motion.div>
         </Container>

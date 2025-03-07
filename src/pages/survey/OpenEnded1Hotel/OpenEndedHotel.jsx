@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import { motion } from 'framer-motion';
 import BodyPartial from '../../../components/partials/BodyPartial';
 import GradientBackground from '../../../components/partials/GradientBackground';
-import { Container, Title, Paragraph, Button, EmojiButton, TextField, NextButtonU } from '../../../components/utils/styles1';
+import { Container, Title, Paragraph, TextField, OptionButton } from '../../../components/utils/styles1';
 import imgoverlay from "../../../components/img/review.png";
 import { useNavigate } from 'react-router-dom';
 import useTranslations from '../../../components/utils/useTranslations';
@@ -59,7 +59,7 @@ const OpenEnded1Services = () => {
     return (
         <>
             <BodyPartial />
-            <GradientBackground overlayImage={imgoverlay} opacity={0.2} handleNextClick={handleNextClick} buttonAppear={buttonAppear} >
+            <GradientBackground overlayImage={imgoverlay} opacity={0.2} handleNextClick={handleNextClick} buttonAppear={buttonAppear}>
                 <Container
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -67,21 +67,21 @@ const OpenEnded1Services = () => {
                 >
                     <Title>{translations.openEnded1Title}</Title>
 
-                    <div>
                         {['Dissatisfied', 'Neutral', 'Satisfied', 'VerySatisfied'].map((option) => (
-                            <EmojiButton
-                                key={option}
+                            <OptionButton
+                                style={{marginBottom:5}}
+                                as={motion.button}
                                 whileHover={{ scale: 1.1 }}
                                 whileTap={{ scale: 0.9 }}
+                                key={option}
+                                className={selectedButton === option ? `selected ${option}` : ''}
                                 onClick={() => handleButtonClick(option)}
-                                selected={selectedButton === option}
                                 tabIndex={0}
                                 aria-label={option}
                             >
                                 {translations[`openEnded1${option}`]}
-                            </EmojiButton>
+                            </OptionButton>
                         ))}
-                    </div>
 
                     <Paragraph>{translations.openEnded1FeedbackRequest}</Paragraph>
                     <TextField 
@@ -89,8 +89,6 @@ const OpenEnded1Services = () => {
                         value={textFieldValue} 
                         onChange={(e) => setTextFieldValue(e.target.value)}
                     />
-
-
                 </Container>
             </GradientBackground>
         </>

@@ -4,7 +4,7 @@ import GradientBackground from '../../../components/partials/GradientBackground'
 import BodyPartial from '../../../components/partials/BodyPartial';
 import { useNavigate } from 'react-router-dom';
 import imgOverlay from "../../../components/img/soundwave.png";
-import { Container } from '../../../components/utils/styles1';
+import { Container, Option } from '../../../components/utils/styles1';
 import useTranslations from '../../../components/utils/useTranslations';
 import { submitSurveyResponses } from '../../../components/utils/sendInputUtils';
 import { useCurrentStepIndex } from '../../../components/utils/useCurrentIndex';
@@ -56,34 +56,34 @@ const WhereLearn = () => {
           <form>
             <div className="text-button-group">
               {/* Text Buttons */}
-              <button
+              <Option
                 type="button"
                 className={`text-button ${selectedSource === 'Friends,Family/Relatives' ? 'selected' : ''}`}
                 onClick={() => handleSourceSelection('Friends,Family/Relatives')}
               >
                 {translations.whereLearnOptionFriendsFamily}
-              </button>
-              <button
+              </Option>
+              <Option
                 type="button"
                 className={`text-button ${selectedSource === 'Books,Magazines,Articles' ? 'selected' : ''}`}
                 onClick={() => handleSourceSelection('Books,Magazines,Articles')}
               >
                 {translations.whereLearnOptionBooksMagazines}
-              </button>
-              <button
+              </Option>
+              <Option
                 type="button"
                 className={`text-button ${selectedSource === 'Online/Social Media' ? 'selected' : ''}`}
                 onClick={() => handleSourceSelection('Online/Social Media')}
               >
                 {translations.whereLearnOptionOnlineSocialMedia}
-              </button>
-              <button
+              </Option>
+              <Option
                 type="button"
                 className={`text-button ${selectedSource === 'Advertisements' ? 'selected' : ''}`}
                 onClick={() => handleSourceSelection('Advertisements')}
               >
                 {translations.whereLearnOptionAdvertisements}
-              </button>
+              </Option>
             </div>
           </form>
       </GradientBackground>

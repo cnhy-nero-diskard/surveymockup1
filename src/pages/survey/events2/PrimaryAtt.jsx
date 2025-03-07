@@ -10,23 +10,20 @@ import { submitSurveyResponses } from '../../../components/utils/sendInputUtils'
 import { useCurrentStepIndex } from '../../../components/utils/useCurrentIndex';
 import { UnifiedContext } from '../../../routes/UnifiedContext';
 import { goToNextStep } from '../../../components/utils/navigationUtils';
+import { Container, NextButtonU, QuestionText } from '../../../components/utils/styles1';
 
-const Container = styled(motion.div)`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-  border-radius: 10px;
-  max-width: 50vw;
-  margin: 0 auto;
-`;
+// const Container = styled(motion.div)`
+//   display: flex;
+//   flex-direction: column;
+//   align-items: center;
+//   justify-content: center;
+//   padding: 20px;
+//   border-radius: 10px;
+//   max-width: 50vw;
+//   margin: 0 auto;
+// `;
 
-const Title = styled.h2`
-  font-size: 1.5rem;
-  margin-bottom: 20px;
-  color: #fff;
-`;
+
 
 const Option = styled(motion.div)`
   display: flex;
@@ -104,21 +101,22 @@ const PrimaryAtt = () => {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.5 }}
                     >
-                        <Title>{translations.primaryAttQuestion}</Title>
-                        <Option
+                        <QuestionText>{translations.primaryAttQuestion}</QuestionText>
+                        <NextButtonU
                             onClick={() => handleOptionClick('YES')}
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
+                            style={{marginBottom:'10px'}}
                         >
                             {translations.primaryAttYesOption}
-                        </Option>
-                        <Option
+                        </NextButtonU>
+                        <NextButtonU
                             onClick={() => handleOptionClick('NO')}
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
                         >
                             {translations.primaryAttNoOption}
-                        </Option>
+                        </NextButtonU>
                     </Container>
                 )}
             </GradientBackground>

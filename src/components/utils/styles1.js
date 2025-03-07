@@ -105,7 +105,60 @@ const pulse = keyframes`
     box-shadow: 0 0 0px rgba(36, 17, 203, 0.4);
   }
 `;
+export const OptionButton = styled.button`
+  padding: 12px 24px;
+  border-radius: 25px;
+  border: 2px solid #ddd;
+  background-image: linear-gradient(135deg,rgba(2, 191, 248, 0.25) 0%, #e9ecef 100%);
+  background-color: #fff;
+  color: #333;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 
+  &:hover {
+    border-color: #4caf50;
+  }
+
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.3);
+  }
+
+  /* Default selected styling */
+  &.selected {
+    transform: scale(1.05);
+  }
+
+  /* Dissatisfied (red gradient) */
+  &.selected.Dissatisfied {
+    background-image: linear-gradient(45deg, #ef5350 0%, #f44336 100%);
+    color: #fff;
+    border-color: #f44336;
+  }
+
+  /* Neutral (yellow gradient) */
+  &.selected.Neutral {
+    background-image: linear-gradient(45deg,rgb(248, 204, 147) 0%, #ffeb3b 100%);
+    color: #000;
+    border-color: #ffeb3b;
+  }
+
+  /* Satisfied (yellow-green gradient) */
+  &.selected.Satisfied {
+    background-image: linear-gradient(45deg,rgb(207, 224, 50) 0%, #cddc39 100%);
+    color: #000;
+    border-color: #cddc39;
+  }
+
+  /* Very Satisfied (green gradient) */
+  &.selected.VerySatisfied {
+    background-image: linear-gradient(45deg,rgb(56, 172, 60) 0%, #45a049 100%);
+    color: #fff;
+    border-color: #4caf50;
+  }
+`;
 export const NextButtonU = styled.button`
   /* Main Gradient Background */
   background: linear-gradient(135deg, rgb(36, 17, 203), #2575fc);
@@ -165,6 +218,7 @@ const popInAnimation = keyframes`
 export const Option = styled.div`
   display: flex;
   align-items: center;
+  justify-content:center;
   background: ${({ selected }) =>
     selected
       ? 'linear-gradient(to right, rgba(126, 135, 255, 0.8), rgba(70, 143, 240, 0.88))'

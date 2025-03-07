@@ -7,9 +7,9 @@ import {
   Title,
   Paragraph,
   Button,
-  EmojiButton,
   TextField,
-  NextButtonU
+  NextButtonU,
+  OptionButton
 } from '../../../components/utils/styles1';
 import imgoverlay from "../../../components/img/review.png";
 import { useNavigate } from 'react-router-dom';
@@ -18,6 +18,12 @@ import { submitSurveyResponses } from '../../../components/utils/sendInputUtils'
 import { goToNextStep } from '../../../components/utils/navigationUtils';
 import { useCurrentStepIndex } from '../../../components/utils/useCurrentIndex';
 import { UnifiedContext } from '../../../routes/UnifiedContext';
+
+/* 
+  Make sure you import the OptionButton from the correct file location.
+  For instance:
+  import { OptionButton } from '../../../components/utils/OptionButton';
+*/
 
 const OpenEndedTranspo = () => {
   const { routes } = useContext(UnifiedContext);
@@ -91,22 +97,22 @@ const OpenEndedTranspo = () => {
           transition={{ duration: 0.5 }}
         >
           <Title>{translations.openEndedTranspoTitle}</Title>
-
-          <div>
+          
             {['Dissatisfied', 'Neutral', 'Satisfied', 'VerySatisfied'].map((option) => (
-              <EmojiButton
-                key={option}
+              <OptionButton
+                style={{marginBottom:5}}
+                as={motion.button}
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
+                key={option}
+                className={selectedButton === option ? `selected ${option}` : ''}
                 onClick={() => handleButtonClick(option)}
-                selected={selectedButton === option}
                 tabIndex={0}
                 aria-label={option}
               >
                 {translations[`openEnded1${option}`]}
-              </EmojiButton>
+              </OptionButton>
             ))}
-          </div>
 
           <Paragraph>{translations.openEnded1FeedbackRequest}</Paragraph>
           <TextField

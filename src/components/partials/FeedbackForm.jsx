@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 import BodyPartial from './BodyPartial';
 import GradientBackground from './GradientBackground';
-import imgOverlay from "../../components/img/ball.png";
+import imgOverlay from "../img/review.png";
 import useTranslations from '../utils/useTranslations';
 import { submitSurveyResponses } from '../utils/sendInputUtils';
 import { QuestionText } from '../utils/styles1';
@@ -30,7 +30,7 @@ const OptionButton = styled.button`
   padding: 12px 24px;
   border-radius: 25px;
   border: 2px solid #ddd;
-  background-image: linear-gradient(135deg,rgba(151, 151, 151, 0.73) 0%, #e9ecef 100%);
+  background-image: linear-gradient(135deg,rgba(2, 191, 248, 0.25) 0%, #e9ecef 100%);
   background-color: #fff;
   color: #333;
   font-size: 1rem;
@@ -61,21 +61,21 @@ const OptionButton = styled.button`
 
   /* Neutral (yellow gradient) */
   &.selected.Neutral {
-    background-image: linear-gradient(45deg, #f5e6d3 0%, #ffeb3b 100%);
+    background-image: linear-gradient(45deg,rgb(248, 204, 147) 0%, #ffeb3b 100%);
     color: #000;
     border-color: #ffeb3b;
   }
 
   /* Satisfied (yellow-green gradient) */
   &.selected.Satisfied {
-    background-image: linear-gradient(45deg, #e4eaaa 0%, #cddc39 100%);
+    background-image: linear-gradient(45deg,rgb(207, 224, 50) 0%, #cddc39 100%);
     color: #000;
     border-color: #cddc39;
   }
 
   /* Very Satisfied (green gradient) */
   &.selected.VerySatisfied {
-    background-image: linear-gradient(45deg, #4caf50 0%, #45a049 100%);
+    background-image: linear-gradient(45deg,rgb(56, 172, 60) 0%, #45a049 100%);
     color: #fff;
     border-color: #4caf50;
   }

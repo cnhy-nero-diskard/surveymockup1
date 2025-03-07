@@ -12,7 +12,7 @@ import useTranslations from '../utils/useTranslations';
 import { useEffect } from 'react';
 const SlidesContainer = styled.div`
   position: relative;
-  width: 100%;
+  max-width: 100%;
   height: 30vh;
   overflow: hidden;
 `;
@@ -212,40 +212,40 @@ const RatingSlider = ({ title, categories, onRatingComplete, surveyquestion_refs
     <>
       <BodyPartial />
       <GradientBackground overlayImage={imgOverlay} opacity={0.2} blendMode='screen' buttonAppear={false}>
-          <Title>{title}</Title>
-          <SlidesContainer>
-            {transitions((style, index) => (
-              <Slide style={style}>
-                <EmojiSlider>
-                  <Label>{categories[index]}</Label>
-                  <SliderContainer>
-                    <Slider
-                      type="range"
-                      min="1"
-                      max="4"
-                      step="1" // Snap to discrete steps
-                      value={sliderValue}
-                      onChange={handleSliderChange}
-                    />
-                    <SliderSteps>
-                      {[1, 2, 3, 4].map((step) => (
-                        <StepMarker key={step} active={step === sliderValue} />
-                      ))}
-                    </SliderSteps>
-                  </SliderContainer>
-                  <EmojiButtons>
-                    <NextButtonU onClick={() => handleRating(sliderValue)}>
-                      Submit
-                    </NextButtonU>
-                  </EmojiButtons>
-                </EmojiSlider>
-                <EmojiDisplay style={emojiSpring}>
-                  {emojis[sliderValue - 1]}
-                </EmojiDisplay>
-              </Slide>
-            ))}
-          </SlidesContainer>
-
+            <Title>{title}</Title>
+            <SlidesContainer>
+              {transitions((style, index) => (
+                <Slide style={style}>
+                  <EmojiSlider>
+                    <Label>{categories[index]}</Label>
+                    <SliderContainer>
+                      <Slider
+                        type="range"
+                        min="1"
+                        max="4"
+                        step="1" // Snap to discrete steps
+                        value={sliderValue}
+                        onChange={handleSliderChange}
+                      />
+                      <SliderSteps>
+                        {[1, 2, 3, 4].map((step) => (
+                          <StepMarker key={step} active={step === sliderValue} />
+                        ))}
+                      </SliderSteps>
+                    </SliderContainer>
+                    <EmojiButtons>
+                      <NextButtonU onClick={() => handleRating(sliderValue)}>
+                        Submit
+                      </NextButtonU>
+                    </EmojiButtons>
+                  </EmojiSlider>
+                  <EmojiDisplay style={emojiSpring}>
+                    {emojis[sliderValue - 1]}
+                  </EmojiDisplay>
+                </Slide>
+              ))}
+            </SlidesContainer>
+  
       </GradientBackground>
     </>
   );
