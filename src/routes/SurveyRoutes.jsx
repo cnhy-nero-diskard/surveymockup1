@@ -82,7 +82,7 @@ const SurveyRoutesContent = () => {
                         } else {
                             console.log('No matching touchpoint found for idx:', idx);
                         }
-                        submitSurveyResponses([{ surveyResponses: 'TPENT', response_value: 'PROMISE FEEDBACK' }]);
+                        submitSurveyResponses([{ surveyquestion_ref: 'TPENT', response_value: 'PROMISE FEEDBACK' }]);
                     })
                     .catch(error => {
                         console.error('Error making API request:', error);

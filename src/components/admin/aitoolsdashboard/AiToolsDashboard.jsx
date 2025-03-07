@@ -30,9 +30,6 @@ import axios from 'axios';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
-
-ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
-
 const AIToolsDashboard = () => {
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
@@ -77,7 +74,6 @@ const AIToolsDashboard = () => {
       },
     ],
   });
-
 
   useEffect(() => {
     const fetchHFTokens = async () => {
@@ -145,9 +141,6 @@ const AIToolsDashboard = () => {
     setSnackbarMessage("Just a heads-up, the first response might take a little longer, around 20-30 seconds. This is only if it's the first time you're using it in about 15 minutes, as the AI endpoint needs to initialize");
     setSnackbarSeverity("info");
     setSnackbarOpen(true);
-    function keyExists(obj, key) {
-      return obj.hasOwnProperty(key);
-    }
 
     try {
       const selectedToken = hfTokens.find((token) => token.id === selectedHFToken);
@@ -160,7 +153,8 @@ const AIToolsDashboard = () => {
         {
           text: sentimentText,
           tokenLabel: selectedToken.label,
-        }, { withCredentials: true }
+        }, 
+        { withCredentials: true }
       );
 
       if (response.data && Array.isArray(response.data)) {
@@ -180,11 +174,10 @@ const AIToolsDashboard = () => {
     } catch (error) {
       console.error('Error during sentiment analysis:', error);
       setSentimentError(error.message);
-
-
       setIsSentimentAnalyzing(false);
     }
   };
+
   const handleRetrieveOpenEndedResponsesForTopicModeling = async () => {
     try {
       // 1. Retrieve open-ended responses
@@ -194,9 +187,7 @@ const AIToolsDashboard = () => {
       );
       setOpenEndedResponses(response.data);
 
-      // 2. Filter by date range (startDate, endDate) and ensure they are open-ended
-      //    In your schema, "open-ended" is indicated by is_analyzed or by your own logic.
-      //    For demonstration, we skip is_analyzed check if you wish to simply gather raw text data.
+      // 2. Filter by date range (startDate, endDate) if provided
       const filteredResponses = response.data.filter((resp) => {
         if (!startDate || !endDate) return true; // If no dates selected, do not filter
         const createdDate = new Date(resp.created_at);
@@ -222,6 +213,7 @@ const AIToolsDashboard = () => {
       console.error('Error fetching open-ended responses:', error);
     }
   };
+
   const handleStoreSentimentResults = async () => {
     console.log(`sentiment results ${JSON.stringify(sentimentResults)}`);
     if (!sentimentResults) return;
@@ -238,18 +230,18 @@ const AIToolsDashboard = () => {
       const resultsToStore = sentimentResults.map((result) => {
         // Find the corresponding open-ended response
         const matchingResponse = openEndedResponses.find((response) => {
-          // Normalize both texts for comparison (e.g., trim whitespace, lowercase)
+          // Normalize both texts for comparison
           const normalizedResponseValue = response.response_value.trim().toLowerCase();
           const normalizedSentimentText = result.text.trim().toLowerCase();
 
-          // Check if the sentiment text is a substring of the response value or vice versa
+          // Check substring match
           return (
             normalizedResponseValue.includes(normalizedSentimentText) ||
             normalizedSentimentText.includes(normalizedResponseValue)
           );
         });
 
-        // If a matching response is found, use its surveyquestion_ref and anonymous_user_id
+        // If a matching response is found, store its references; otherwise use default placeholders
         const sqref = matchingResponse ? matchingResponse.surveyquestion_ref : "default_sqref";
         const userId = matchingResponse ? matchingResponse.anonymous_user_id : "default_user_id";
 
@@ -281,6 +273,30 @@ const AIToolsDashboard = () => {
         setSnackbarSeverity("error");
         setSnackbarOpen(true);
       }
+
+      // -----------------------------
+      // CREATE ARRAY OF USER IDs
+      // -----------------------------
+      const userIds = openEndedResponses
+        .map((r) => r.anonymous_user_id)
+        .filter((id) => !!id); // Filter out any falsy values
+
+      // CREATE A UNIQUE SET
+      const uniqueUserIds = [...new Set(userIds)];
+      console.log(`USERS ANALYZED: ${uniqueUserIds}`);
+
+      // PLACEHOLDER API REQUEST TO SUBMIT ARRAY OF anonymous_user_id
+      // Uncomment and adjust the API endpoint as needed
+      /*
+      await axios.post(
+        `${process.env.REACT_APP_API_HOST}/api/admin/anonymous-users`,
+        { userIds: uniqueUserIds },
+        { withCredentials: true }
+      );
+      */
+
+      console.log("Placeholder for sending user IDs to an external endpoint:", uniqueUserIds);
+
     } catch (error) {
       console.error('Error storing sentiment analysis results:', error);
       setSnackbarMessage("Error storing sentiment analysis results.");
@@ -327,7 +343,6 @@ const AIToolsDashboard = () => {
 
   const handleStoreTopicModelingResult = async () => {
     if (!topicModelingResult) return;
-    // Placeholder for storing topic modeling results to the database
     try {
       console.log(`RAW RESULT ${JSON.stringify(topicModelingResult[0])}`);
       let zeroidx = topicModelingResult[0];
@@ -385,9 +400,10 @@ const AIToolsDashboard = () => {
         {/* API Configuration Section - Full Width */}
         <Grid item xs={12}>
           <Slide in direction="up" timeout={1000}>
-            <Paper elevation={3} sx={{ p: 3, bgcolor: 'background.paper', borderRadius: 2 }}>              <Typography variant="h6" gutterBottom sx={{ fontWeight: 'medium', color: 'text.primary' }}>
-              API Configuration
-            </Typography>
+            <Paper elevation={3} sx={{ p: 3, bgcolor: 'background.paper', borderRadius: 2 }}>
+              <Typography variant="h6" gutterBottom sx={{ fontWeight: 'medium', color: 'text.primary' }}>
+                API Configuration
+              </Typography>
               <Box sx={{ mb: 3 }}>
                 <Typography variant="subtitle1" sx={{ color: 'text.secondary', mb: 1 }}>
                   API Token Manager
@@ -411,6 +427,7 @@ const AIToolsDashboard = () => {
             </Paper>
           </Slide>
         </Grid>
+
         <Grid item xs={12}>
           <Button
             variant="contained"
@@ -420,8 +437,8 @@ const AIToolsDashboard = () => {
           >
             SCAN FOR OPEN-ENDED RESPONSES
           </Button>
-
         </Grid>
+
         {/* Sentiment Analysis Section */}
         <Grid item xs={12} md={6}>
           <Slide in direction="up" timeout={1200}>
@@ -471,7 +488,7 @@ const AIToolsDashboard = () => {
                             label={result.sentiment.toUpperCase()}
                             color={
                               result.sentiment === 'positive' ? 'success' :
-                                result.sentiment === 'negative' ? 'error' : 'warning'
+                              result.sentiment === 'negative' ? 'error' : 'warning'
                             }
                             size="small"
                           />
@@ -559,6 +576,7 @@ const AIToolsDashboard = () => {
             </Paper>
           </Slide>
         </Grid>
+
         {/* Date Range Fields for Topic Modeling */}
         <Grid item xs={12} md={6}>
           <Paper elevation={2} sx={{ p: 3, bgcolor: 'background.paper', borderRadius: 2 }}>
@@ -593,104 +611,105 @@ const AIToolsDashboard = () => {
             </Button>
           </Paper>
         </Grid>
-                {/* Topic Modeling Section */}
-                <Grid item xs={12} md={6}>
-                    <Slide in direction="up" timeout={1400}>
-                        <Paper elevation={3} sx={{ p: 3, bgcolor: 'background.paper', borderRadius: 2 }}>
-                            <Typography variant="h6" gutterBottom sx={{ fontWeight: 'medium', color: 'text.primary' }}>
-                                Topic Modeling
-                            </Typography>
-                            <Box>
-                                <Typography variant="body1" sx={{ color: 'text.secondary', mb: 2 }}>
-                                    The text below is automatically populated from open-ended responses (filtered by date). You can also edit it manually.
-                                </Typography>
-                                <TextField
-                                    value={topicText}
-                                    onChange={(e) => setTopicText(e.target.value)}
-                                    multiline
-                                    rows={4}
-                                    fullWidth
-                                    variant="outlined"
-                                    sx={{ mb: 2 }}
-                                />
-                                <Button
-                                    variant="contained"
-                                    color="primary"
-                                    onClick={handleTopicModeling}
-                                    disabled={isTopicModeling || !topicText || !selectedHFToken}
-                                    sx={{ textTransform: 'none' }}
-                                >
-                                    {isTopicModeling ? <CircularProgress size={24} /> : 'Analyze Topics'}
-                                </Button>
-                                {isTopicModeling && <CircularProgress sx={{ ml: 2 }} />}
-                            </Box>
 
-                            {/* Display Topic Modeling Results */}
-                            {topicModelingResult && (
-                                <Box sx={{ mt: 2, maxHeight: '400px', overflowY: 'auto', pr: 2 }}>
-                                    <Typography variant="body1" sx={{ color: 'text.secondary' }}>
-                                        Topic Modeling Results:
-                                    </Typography>
-                                    <Box sx={{ mt: 1 }}>
-                                        {topicModelingResult.map((topic, index) => (
-                                            <Box key={index} sx={{ mb: 3 }}>
-                                                <Typography
-                                                    variant="body1"
-                                                    sx={{ color: 'text.secondary', fontWeight: 'bold', fontSize: '1.2rem' }}
-                                                >
-                                                    Topic {index + 1}: {topic.customLabel}
-                                                </Typography>
-                                                <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                                                    Probability: {(topic.probability * 100).toFixed(2)}%
-                                                </Typography>
-                                                <Box sx={{ mt: 1 }}>
-                                                    <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                                                        Top Words:
-                                                    </Typography>
-                                                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-                                                        {topic.top_words.map((word, wordIndex) => (
-                                                            <Chip key={wordIndex} label={word} variant="outlined" />
-                                                        ))}
-                                                    </Box>
-                                                </Box>
-                                                
-                                                <Box sx={{ mt: 1 }}>
-                                                    <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                                                        Contributions:
-                                                    </Typography>
-                                                    <List>
-                                                        {topic.contribution.map((contrib, contribIndex) => (
-                                                            <ListItem key={contribIndex}>
-                                                                <ListItemText
-                                                                    primary={`${contrib[1]}: ${contrib[2]}`}
-                                                                    secondary={`Topic ${contrib[0]}`}
-                                                                />
-                                                            </ListItem>
-                                                        ))}
-                                                    </List>
-                                                </Box>
-                                            </Box>
-                                        ))}
-                                    </Box>
-                                    <Button
-                                        variant="contained"
-                                        color="secondary"
-                                        onClick={handleStoreTopicModelingResult}
-                                        sx={{ mt: 2, textTransform: 'none' }}
-                                    >
-                                        Store Results to Database
-                                    </Button>
-                                </Box>
-                            )}
-                            {topicModelingError && (
-                                <Alert severity="error" sx={{ mt: 2 }}>
-                                    {topicModelingError}
-                                </Alert>
-                            )}
-                        </Paper>
-                    </Slide>
-                </Grid>
-            </Grid>
+        {/* Topic Modeling Section */}
+        <Grid item xs={12} md={6}>
+          <Slide in direction="up" timeout={1400}>
+            <Paper elevation={3} sx={{ p: 3, bgcolor: 'background.paper', borderRadius: 2 }}>
+              <Typography variant="h6" gutterBottom sx={{ fontWeight: 'medium', color: 'text.primary' }}>
+                Topic Modeling
+              </Typography>
+              <Box>
+                <Typography variant="body1" sx={{ color: 'text.secondary', mb: 2 }}>
+                  The text below is automatically populated from open-ended responses (filtered by date). You can also edit it manually.
+                </Typography>
+                <TextField
+                  value={topicText}
+                  onChange={(e) => setTopicText(e.target.value)}
+                  multiline
+                  rows={4}
+                  fullWidth
+                  variant="outlined"
+                  sx={{ mb: 2 }}
+                />
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={handleTopicModeling}
+                  disabled={isTopicModeling || !topicText || !selectedHFToken}
+                  sx={{ textTransform: 'none' }}
+                >
+                  {isTopicModeling ? <CircularProgress size={24} /> : 'Analyze Topics'}
+                </Button>
+                {isTopicModeling && <CircularProgress sx={{ ml: 2 }} />}
+              </Box>
+
+              {/* Display Topic Modeling Results */}
+              {topicModelingResult && (
+                <Box sx={{ mt: 2, maxHeight: '400px', overflowY: 'auto', pr: 2 }}>
+                  <Typography variant="body1" sx={{ color: 'text.secondary' }}>
+                    Topic Modeling Results:
+                  </Typography>
+                  <Box sx={{ mt: 1 }}>
+                    {topicModelingResult.map((topic, index) => (
+                      <Box key={index} sx={{ mb: 3 }}>
+                        <Typography
+                          variant="body1"
+                          sx={{ color: 'text.secondary', fontWeight: 'bold', fontSize: '1.2rem' }}
+                        >
+                          Topic {index + 1}: {topic.customLabel}
+                        </Typography>
+                        <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                          Probability: {(topic.probability * 100).toFixed(2)}%
+                        </Typography>
+                        <Box sx={{ mt: 1 }}>
+                          <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                            Top Words:
+                          </Typography>
+                          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+                            {topic.top_words.map((word, wordIndex) => (
+                              <Chip key={wordIndex} label={word} variant="outlined" />
+                            ))}
+                          </Box>
+                        </Box>
+                        
+                        <Box sx={{ mt: 1 }}>
+                          <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                            Contributions:
+                          </Typography>
+                          <List>
+                            {topic.contribution.map((contrib, contribIndex) => (
+                              <ListItem key={contribIndex}>
+                                <ListItemText
+                                  primary={`${contrib[1]}: ${contrib[2]}`}
+                                  secondary={`Topic ${contrib[0]}`}
+                                />
+                              </ListItem>
+                            ))}
+                          </List>
+                        </Box>
+                      </Box>
+                    ))}
+                  </Box>
+                  <Button
+                    variant="contained"
+                    color="secondary"
+                    onClick={handleStoreTopicModelingResult}
+                    sx={{ mt: 2, textTransform: 'none' }}
+                  >
+                    Store Results to Database
+                  </Button>
+                </Box>
+              )}
+              {topicModelingError && (
+                <Alert severity="error" sx={{ mt: 2 }}>
+                  {topicModelingError}
+                </Alert>
+              )}
+            </Paper>
+          </Slide>
+        </Grid>
+      </Grid>
 
       {/* Metrics Dialog */}
       <Dialog open={openMetricsDialog} onClose={handleCloseMetricsDialog}>
@@ -720,7 +739,7 @@ const AIToolsDashboard = () => {
         </DialogActions>
       </Dialog>
 
-      {/* Snackbar for Error Messages */}
+      {/* Snackbar for Messages */}
       <Snackbar
         open={snackbarOpen}
         autoHideDuration={6000}
@@ -734,7 +753,8 @@ const AIToolsDashboard = () => {
         >
           {snackbarMessage}
         </Alert>
-      </Snackbar>    </Container>
+      </Snackbar>
+    </Container>
   );
 };
 

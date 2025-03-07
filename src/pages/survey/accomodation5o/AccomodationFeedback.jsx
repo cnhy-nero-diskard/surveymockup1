@@ -29,7 +29,10 @@ const TouchpointFeedback = () => {
     const updatedFeedback = {
         ...feedback, // Spread the previous feedback properties
         rating: selectedOptionValue, // Update rating
-        review: feedbackk // Update review
+        review: feedbackk, // Update review
+        is_analyzed: false,
+        submitted_at: new Date().toLocaleString() // Add a date with the current timestamp
+
     };
 
     // Set the feedback state
@@ -37,7 +40,7 @@ const TouchpointFeedback = () => {
     
     try {
         console.log(`FEEDBACK ----> ${JSON.stringify(updatedFeedback)}`); // Log the updated feedback
-        // Send the updated feedback to the server
+        // Send the updated feedback to the server (CUSTOM HANDLER FOR JSONB[])
         const response = await axios.post(`${process.env.REACT_APP_API_HOST}/api/survey/feedback`, updatedFeedback, {
             withCredentials: true
         });

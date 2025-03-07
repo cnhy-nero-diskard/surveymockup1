@@ -10,6 +10,9 @@ export const FeedbackProvider = ({ children }) => {
         rating: null,
         review: null,
         touchpoint: null, 
+        is_analyzed:false,
+        submitted_at: null,
+
     });
 
     return (
