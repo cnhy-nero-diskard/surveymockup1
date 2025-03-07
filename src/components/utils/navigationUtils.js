@@ -30,7 +30,7 @@ export const goToNextStep = async (currentStepIndex, navigate, surveyRoutes, act
       console.log(`NAVUTILS - TO NEXT ROUTE ${nextStep.path}`);
       // Navigate to the next step
   
-      if (activeBlocks.includes("survey")) {
+      if (activeBlocks.includes("surveytpms")) {
         navigate(`/survey/${nextStep.path}`);
       } else if (activeBlocks.includes("feedback")) {
         navigate(`/feedback/${nextStep.path}`);

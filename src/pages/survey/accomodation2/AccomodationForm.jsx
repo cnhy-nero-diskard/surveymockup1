@@ -159,7 +159,7 @@ const AccommodationForm = () => {
   const handleRatingChange = (type, emoji) => {
     const rating = emojiToRating[emoji];
     setRatings((prevState) => ({ ...prevState, [type]: emoji }));
-    updateSurveyResponses(type, 'RATING', rating);
+    updateSurveyResponses(type, 'RTNG', rating);
   };
 
   const handleDurationChange = (type, duration) => {
@@ -167,34 +167,48 @@ const AccommodationForm = () => {
 
     if (duration === '' || duration === '0') {
       setRatings((prevState) => ({ ...prevState, [type]: '' }));
-      updateSurveyResponses(type, 'RATING', '');
+      updateSurveyResponses(type, 'RTNG', '');
     }
 
-    updateSurveyResponses(type, 'DURATION', duration);
+    updateSurveyResponses(type, 'DRTN', duration);
   };
 
   const updateSurveyResponses = (type, field, value) => {
+    // Helper function to transform type if it is 'Homestay'
+    const transformType = (t) => {
+      if (t === 'Homestay') {
+        // Remove first character and convert the rest to uppercase
+        return t.slice(1).toUpperCase();
+      }
+      // If not 'Homestay', return the original type
+      return t;
+    };
+  
     setSurveyResponses((prevResponses) => {
       const existingResponseIndex = prevResponses.findIndex(
-        (response) => response.surveyquestion_ref === `${type}_${field}`
+        (response) =>
+          response.surveyquestion_ref === `${transformType(type)}_${field}`
       );
-
+  
       if (existingResponseIndex !== -1) {
+        // Update existing response
         const updatedResponses = [...prevResponses];
         updatedResponses[existingResponseIndex].response_value = value;
         return updatedResponses;
       } else {
+        // Add new response
+        console.log (`TYPE SELECTED : ${type}`)
         return [
           ...prevResponses,
           {
-            surveyquestion_ref: `${type}_${field}`,
+            surveyquestion_ref: `${transformType(type)[0]}${field}`,
             response_value: value,
           },
         ];
       }
     });
   };
-
+  
   const handleCommercialResponse = (responseValue) => {
     setSurveyResponses((prevResponses) => {
       const commercialResponseIndex = prevResponses.findIndex(
@@ -243,7 +257,7 @@ const AccommodationForm = () => {
     if (surveyResponses.length > 0) {
       const updatedRatings = { ...ratings };
       surveyResponses.forEach(response => {
-        if (response.surveyquestion_ref.endsWith('_RATING')) {
+        if (response.surveyquestion_ref.endsWith('RTNG')) {
           const type = response.surveyquestion_ref.split('_')[0];
           const ratingValue = parseInt(response.response_value);
           updatedRatings[type] = ratingToEmoji[ratingValue] || '';
