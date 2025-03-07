@@ -28,6 +28,7 @@ import { submitSurveyResponses } from '../../../components/utils/sendInputUtils'
 import { UnifiedContext } from '../../../routes/UnifiedContext';
 import { useCurrentStepIndex } from '../../../components/utils/useCurrentIndex';
 import { goToNextStep } from '../../../components/utils/navigationUtils';
+import { Option, QuestionText } from '../../../components/utils/styles1';
 
 // Keyframes for animations
 const fadeIn = keyframes`
@@ -80,33 +81,8 @@ export const OptionsGrid = styled.div`
 `;
 
 
-export const Option = styled.div`
-  display: flex;
-  align-items: center;
-  background: ${({ selected }) => (selected ? 'rgb(8, 65, 252)' : 'rgb(184, 201, 255)')};
-  padding: 15px 20px;
-  border-radius: 25px;
-  box-shadow: 0 4px 6px rgba(29, 43, 105, 0.69);
-  transition: all 0.3s ease-in-out;
-  cursor: pointer;
-
-  &:hover {
-    transform: translateY(-5px);
-    background: ${({ selected }) => (selected ? '#6a11cb' : '#2575fc')};
-    box-shadow: 0 6px 8px rgba(29, 43, 105, 0.8);
-  }
-
-  &:active {
-    transform: scale(0.95);
-  }
-      &:focus-within {
-    outline: 2px solid #6a11cb;
-    outline-offset: 2px;
-  }
-`;
 
 export const CustomCheckbox = styled.input.attrs({ type: 'checkbox' })`
-  margin-right: 15px;
   cursor: pointer;
   opacity: 0;
   position: absolute;
@@ -212,7 +188,7 @@ const MainPurpose = () => {
       <BodyPartial />
       <GradientBackground overlayImage={imgoverlay} handleNextClick={handleNextClick} buttonAppear={selectedPurpose !== ''}>
         <Container>
-          <Header>{translations.MainPurposeHeader}</Header>
+          <QuestionText>{translations.MainPurposeHeader}</QuestionText>
           <form>
             {showOptions && (
               <OptionsGrid>

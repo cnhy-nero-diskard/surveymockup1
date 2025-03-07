@@ -9,7 +9,7 @@ import axios from 'axios';
 import { FeedbackProvider, useFeedback } from './FeedbackContext';
 import { submitSurveyResponses } from '../components/utils/sendInputUtils';
 import styled from 'styled-components'; // 1) Import styled-components
-
+import { useCurrentStepIndex } from '../components/utils/useCurrentIndex';
 /**
  * A component that sets up the routing structure for the survey application.
  * Wraps the survey routes content with necessary providers for language and unified routing.
@@ -40,10 +40,10 @@ const SurveyHeader = styled.div`
 `;
 
 const SurveyRoutesContent = () => {
-    const navigate = useNavigate();
     const location = useLocation();
     const { routes, removeActiveBlocks, headerText } = useContext(UnifiedContext);
     const { setFeedback, feedback } = useFeedback();
+    const currentStepIndex = useCurrentStepIndex(routes);
 
     useEffect(() => {
         if (location.pathname === "/feedback") {
@@ -98,22 +98,23 @@ const SurveyRoutesContent = () => {
             {/* 3) Use the SurveyHeader styled component instead of a regular <div> */}
             {headerText && <SurveyHeader>{headerText}</SurveyHeader>}
 
-            <Routes>
-                {routes.map((route, index) => (
-                    <Route
-                        key={route.path}
-                        path={route.path}
-                        element={
-                            <SurveyStepGuard
-                                route={route}
-                                index={index}
-                                totalSteps={routes.length}
+                    <Routes>
+                        {routes.map((route, index) => (
+                            <Route
+                                key={route.path}
+                                path={route.path}
+                                element={
+                                    <SurveyStepGuard
+                                        route={route}
+                                        index={index}
+                                        totalSteps={routes.length}
+                                    />
+                                }
                             />
-                        }
-                    />
-                ))}
-                <Route path="*" element={<NotFound />} />
-            </Routes>
+                        ))}
+                        <Route path="*" element={<NotFound />} />
+                    </Routes>
+
         </>
     );
 };

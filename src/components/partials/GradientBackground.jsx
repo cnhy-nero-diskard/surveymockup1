@@ -2,10 +2,11 @@ import React, { useContext, useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { useCurrentStepIndex } from '../utils/useCurrentIndex';
 import { UnifiedContext } from '../../routes/UnifiedContext';
-import { NextButtonU } from '../utils/styles1';
+import { AnimatedContainer, NextButtonU } from '../utils/styles1';
 import useTranslations from '../utils/useTranslations';
 import { keyframes } from 'styled-components';
 import { useLocation } from 'react-router-dom';
+import { animated, useSpring } from 'react-spring';
 
 // Styled-component for the background
 const BackgroundWrapper = styled.div`
@@ -131,6 +132,9 @@ const ProgressText = styled.p`
  * @param {GradientBackgroundProps} props - The props for the GradientBackground component.
  * @returns {JSX.Element} A React element representing the gradient background.
  */
+
+
+
 const GradientBackground = ({ children, overlayImage, opacity = 0.3, blendMode = 'overlay', handleNextClick, nextmsg = "", buttonAppear = true }) => {
   const { routes } = useContext(UnifiedContext);
   const [setCurrentStep] = useState();
@@ -148,13 +152,13 @@ const GradientBackground = ({ children, overlayImage, opacity = 0.3, blendMode =
 
   // Use useEffect to trigger animation updates
   useEffect(() => {
-    if (isBlockActive("feedback") && (getParentPath(location.pathname) === "/survey") || location.pathname === "/survey"){
+    if (isBlockActive("feedback") && (getParentPath(location.pathname) === "/survey") || location.pathname === "/survey") {
       console.log("GBACK feedback detected...removing surveytpms");
       removeActiveBlocks("feedback");
-    } else if (isBlockActive("surveytpms") && (getParentPath(location.pathname) === "/feedback") || location.pathname === "/feedback"){
+    } else if (isBlockActive("surveytpms") && (getParentPath(location.pathname) === "/feedback") || location.pathname === "/feedback") {
       removeActiveBlocks("surveytpms");
     }
-    console.log (`GBACK -- ACTIVE BLOCKS -- ${JSON.stringify(activeBlocks)}`);
+    console.log(`GBACK -- ACTIVE BLOCKS -- ${JSON.stringify(activeBlocks)}`);
   }, []);
 
 
@@ -166,6 +170,12 @@ const GradientBackground = ({ children, overlayImage, opacity = 0.3, blendMode =
     };
     handleNextClick();
   };
+  const containerAnimation = useSpring({
+    from: { opacity: 0, transform: 'translateY(20px)' },
+    to: { opacity: 1, transform: 'translateY(0)' },
+    config: { tension: 180, friction: 14 },
+  });
+
   return (
     <>
       <ProgressText>
@@ -173,18 +183,20 @@ const GradientBackground = ({ children, overlayImage, opacity = 0.3, blendMode =
       <ProgressBarContainer>
         <ProgressBar progress={progress} />
       </ProgressBarContainer>
-      <BackgroundWrapper>
-        {overlayImage && (
-          <OverlayImage
-            src={overlayImage}
-            alt="Overlay"
-            opacity={opacity}
-            blendMode={blendMode}
-          />
-        )}
-        {children}
-      </BackgroundWrapper>
-      {buttonAppear && (
+      <AnimatedContainer style={containerAnimation}>
+        <BackgroundWrapper>
+          {overlayImage && (
+            <OverlayImage
+              src={overlayImage}
+              alt="Overlay"
+              opacity={opacity}
+              blendMode={blendMode}
+            />
+          )}
+          {children}
+        </BackgroundWrapper>
+
+      </AnimatedContainer>      {buttonAppear && (
         <NextButtonU
           onClick={useNext}
           style={{ display: buttonAppear ? 'block' : 'none' }}

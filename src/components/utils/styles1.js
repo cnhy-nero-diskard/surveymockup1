@@ -1,7 +1,7 @@
 // components/shared/styles1.js
 import styled, {keyframes} from 'styled-components';
 import { motion } from 'framer-motion';
-
+import { useSpring, animated } from 'react-spring';
 export const fontColorU = 'white';
 
 
@@ -301,5 +301,71 @@ export const CloseSuggestions = styled.button`
   background: transparent;
   &:hover {
     color: #666;
+  }
+`;
+
+  // // Animation props for container
+  // export const containerAnimation = useSpring({
+  //   from: { opacity: 0, transform: 'translateY(20px)' },
+  //   to: { opacity: 1, transform: 'translateY(0)' },
+  //   config: { tension: 180, friction: 14 },
+  // });
+
+  // // Animation props for button
+  // export const buttonProps = useSpring({
+  //   from: { opacity: 0, transform: 'scale(0.9)' },
+  //   to: { opacity: 1, transform: 'scale(1)' },
+  //   config: { tension: 200, friction: 12 },
+  // });
+
+  export const AnimatedButton = styled(animated.button)`
+  padding: 1rem 2rem;
+  font-size: 1rem;
+  color: #fff;
+  background-color: #007bff;
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  background: 'linear-gradient(135deg, #95b1ed, #3abde9)';
+
+  &:hover {
+    background-color: #0056b3;
+  }
+`;
+export const AnimatedContainer = animated(styled.div`
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: 2rem auto;
+`);
+
+export const NormOption = styled(motion.div)`
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 20px;
+  margin: 5px 0;
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+  background-color: rgba(0, 123, 255, 0.78);
+  transition: background-color 0.3s ease;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+
+  &:hover {
+    background-color: rgb(18, 166, 224);
+  }
+
+  @media (max-width: 768px) {
+    padding: 14px;
+    margin: 3px 0;
+  }
+
+  @media (max-width: 480px) {
+    font-size: 1.2rem;
+    padding: 10px;
   }
 `;

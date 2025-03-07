@@ -10,6 +10,7 @@ import { submitSurveyResponses } from '../../../components/utils/sendInputUtils'
 import { UnifiedContext } from '../../../routes/UnifiedContext';
 import { useCurrentStepIndex } from '../../../components/utils/useCurrentIndex';
 import { goToNextStep } from '../../../components/utils/navigationUtils';
+import { NormOption, Option, QuestionText } from '../../../components/utils/styles1';
 
 const Container = styled(motion.div)`
   display: flex;
@@ -47,35 +48,6 @@ const Title = styled.h2`
   }
 `;
 
-const Option = styled(motion.div)`
-  color: #fff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  padding: 20px;
-  margin: 5px 0;
-  border: none;
-  border-radius: 10px;
-  cursor: pointer;
-  background-color: rgba(0, 123, 255, 0.78);
-  transition: background-color 0.3s ease;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-
-  &:hover {
-    background-color: rgb(18, 166, 224);
-  }
-
-  @media (max-width: 768px) {
-    padding: 14px;
-    margin: 3px 0;
-  }
-
-  @media (max-width: 480px) {
-    font-size: 1.2rem;
-    padding: 10px;
-  }
-`;
 
 const Transportation2 = () => {
     const navigate = useNavigate();
@@ -111,32 +83,29 @@ const Transportation2 = () => {
             <BodyPartial />
             <GradientBackground overlayImage={imgoverlay} opacity={0.3} blendMode="darken" buttonAppear={false}>
                 <Container
-                    initial={{ opacity: 0, y: -20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5 }}
                 >
-                    <Title>{translations.transportation2Title}</Title>
-                    <Option
+                    <QuestionText>{translations.transportation2Title}</QuestionText>
+                    <NormOption
                         onClick={() => handleOptionClick(translations.transportation2Option1)}
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                     >
                         {translations.transportation2Option1}
-                    </Option>
-                    <Option
+                    </NormOption>
+                    <NormOption
                         onClick={() => handleOptionClick(translations.transportation2Option2)}
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                     >
                         {translations.transportation2Option2}
-                    </Option>
-                    <Option
+                    </NormOption>
+                    <NormOption
                         onClick={() => handleOptionClick(translations.transportation2Option3)}
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                     >
                         {translations.transportation2Option3}
-                    </Option>
+                    </NormOption>
                 </Container>
             </GradientBackground>
         </>

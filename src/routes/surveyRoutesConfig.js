@@ -15,7 +15,7 @@ import Residence1 from '../pages/survey/residence1/Residence1';
 import MainPurpose from '../pages/survey/mainpurpose/MainPurpose';
 import VisitFrequencyForm from '../pages/survey/visitfrequencyform/VisitFrequencyForm';
 import SurveyConsent from '../pages/survey/surveyconsent/SurveyConsent';
-import Form from '../pages/survey/form/Form';
+import PrelimForm from '../pages/survey/form/Form';
 import Greetings from '../pages/survey/greetings/Greetings';
 import BranchingSelect from '../pages/survey/branchingselect/BranchingSelect';
 import Page1 from '../pages/survey/page1/Page1';
@@ -67,7 +67,7 @@ export const sroutes = [
     { label: 'Language', path: '', component: LanguageSelector, conditionalBlock: 'universal'},
     { label: 'Page 1', path: 'page1', component: Page1, conditionalBlock: 'surveytpms'},
     { label: 'Survey Consent', path: 'surveyconsent', component: SurveyConsent, conditionalBlock: 'surveytpms'},
-    { label: 'Gmail Form', path: 'form', component: Form, conditionalBlock: 'surveytpms'},
+    { label: 'Gmail Form', path: 'form', component: PrelimForm, conditionalBlock: 'surveytpms'},
     { label: 'Residence 1', path: 'residence1', component: Residence1, conditionalBlock: 'surveytpms'},
     { label: 'Greetings', path: 'greetings', component: Greetings, conditionalBlock: 'surveytpms'},
     { label: 'Transportation 1', path: 'transportation1', component: Transportation1, conditionalBlock: 'oprovblock'},

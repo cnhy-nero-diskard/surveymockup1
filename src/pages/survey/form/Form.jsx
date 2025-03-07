@@ -5,7 +5,7 @@ import BodyPartial from '../../../components/partials/BodyPartial';
 import { useNavigate } from 'react-router-dom';
 import { FORM } from '../../../components/utils/componentConstants';
 import useTranslations from '../../../components/utils/useTranslations';
-import { NextButtonU } from '../../../components/utils/styles1';
+import { NextButtonU, QuestionText } from '../../../components/utils/styles1';
 import { submitSurveyResponses } from '../../../components/utils/sendInputUtils';
 import GradientBackground from '../../../components/partials/GradientBackground';
 import { useCurrentStepIndex } from '../../../components/utils/useCurrentIndex';
@@ -41,12 +41,6 @@ const FormContainer = styled(animated.div)`
     background: transparent;
     border-radius: ${({ theme }) => theme.borderRadius};
     text-align: center;
-`;
-
-const FormTitle = styled.h2`
-    font-family: ${({ theme }) => theme.fonts.primary};
-    color: ${({ theme }) => theme.colors.text};
-    margin-bottom: ${({ theme }) => theme.spacing.medium};
 `;
 
 const InputField = styled.input`
@@ -145,10 +139,10 @@ const Form = () => {
             <BodyPartial />
             <GradientBackground handleNextClick={handleSubmit} buttonAppear={isFormValid}>
                 <FormContainer style={formAnimation}>
-                    <FormTitle>
+                    <QuestionText>
                         <span>{translations.formWelcomeTourists}</span>
                         <span>{translations.formFillOutForm}</span>
-                    </FormTitle>
+                    </QuestionText>
                     <form onSubmit={handleSubmit}>
                         <InputField
                             type="text"

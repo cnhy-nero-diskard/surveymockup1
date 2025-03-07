@@ -14,15 +14,6 @@ import { useCurrentStepIndex } from '../../../components/utils/useCurrentIndex';
 import { goToNextStep } from '../../../components/utils/navigationUtils';
 import { UnifiedContext } from '../../../routes/UnifiedContext';
 
-const Container = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 2rem;
-  max-width: 600px;
-  margin: 2rem auto;
-`;
 
 const Title = styled.h1`
   font-size: 2rem;
@@ -45,6 +36,7 @@ const Paragraph = styled.p`
   text-align: justify;
 `;
 
+// Existing animated button
 const Button = styled(animated.button)`
   padding: 1rem 2rem;
   font-size: 1rem;
@@ -66,11 +58,14 @@ const Greetings = () => {
   const translations = useTranslations(GREETINGS, language);
   const navigate = useNavigate();
 
-  const {routes} = useContext(UnifiedContext);
+  const { routes } = useContext(UnifiedContext);
   const [currentStep, setCurrentStep] = useState();
   const currentStepIndex = useCurrentStepIndex(routes);
-  const {activeBlocks, setActiveBlocks} = useContext(UnifiedContext);
+  const { activeBlocks, setActiveBlocks } = useContext(UnifiedContext);
 
+  // Animation props for container
+
+  // Animation props for button
   const buttonProps = useSpring({
     from: { opacity: 0, transform: 'scale(0.9)' },
     to: { opacity: 1, transform: 'scale(1)' },
@@ -86,7 +81,7 @@ const Greetings = () => {
       },
     ];
 
-    // Submit survey responses using the axios util function
+    // Submit survey responses
     submitSurveyResponses(surveyResponses)
       .then(() => {
         console.log('Survey responses submitted successfully');
@@ -94,23 +89,20 @@ const Greetings = () => {
       .catch((error) => {
         console.error('Error submitting survey responses:', error);
       });
-    goToNextStep(currentStepIndex, navigate, routes, activeBlocks )
+
+    goToNextStep(currentStepIndex, navigate, routes, activeBlocks);
   };
 
   return (
     <>
       <BodyPartial />
       <GradientBackground overlayImage={imgoverlay} handleNextClick={handleStartSurvey} nextmsg={translations.greetingsStartSurvey}>
-        <Container >
+        {/* AnimatedContainer uses the containerAnimation styles */}
           <Title>{translations.greetingsTitle}</Title>
           <Subtitle>{translations.greetingsInvitation}</Subtitle>
           <Subtitle>{translations.greetingsDOTSurvey}</Subtitle>
           <Paragraph>{translations.greetingsSurveyPurpose}</Paragraph>
           <Paragraph>{translations.greetingsDataPrivacy}</Paragraph>
-          {/* <NextButtonU style={buttonProps} onClick={handleStartSurvey}>
-            {translations.greetingsStartSurvey}
-          </NextButtonU> */}
-        </Container>
       </GradientBackground>
     </>
   );
