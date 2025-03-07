@@ -140,7 +140,9 @@ const Transportation1 = () => {
           bottom: 0,
           zIndex: -1,
           objectFit: 'cover'
+
         }}
+        buttonAppear={false}
       >
         <Container
           initial={{ opacity: 0, y: -20 }}

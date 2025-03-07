@@ -77,37 +77,72 @@ export const TextField = styled.textarea`
   resize: none;
 `;
 
+// const pulse = keyframes`
+//   0% {
+//     transform: scale(1);
+//   }
+//   50% {
+//     transform: scale(1.05);
+//   }
+//   100% {
+//     transform: scale(1);
+//   }
+// `;
+
+
+// Example pulse animation:
 const pulse = keyframes`
   0% {
     transform: scale(1);
+    box-shadow: 0 0 0px rgba(36, 17, 203, 0.4);
   }
   50% {
-    transform: scale(1.05);
+    transform: scale(1.02);
+    box-shadow: 0 0 8px rgba(36, 17, 203, 0.6);
   }
   100% {
     transform: scale(1);
+    box-shadow: 0 0 0px rgba(36, 17, 203, 0.4);
   }
 `;
 
-
 export const NextButtonU = styled.button`
-  background: linear-gradient(135deg,rgb(36, 17, 203), #2575fc);
-  color: white;
+  /* Main Gradient Background */
+  background: linear-gradient(135deg, rgb(36, 17, 203), #2575fc);
+  color: #ffffff;
   border: none;
+  border-radius: 30px;
   padding: 15px 30px;
   font-size: 1.2rem;
-  border-radius: 30px;
   cursor: pointer;
-  transition: background 0.3s ease-in-out, transform 0.2s ease-in-out;
+
+  /* Shadows and transitions for a smoother experience */
+  box-shadow: 0 4px 10px rgba(36, 17, 203, 0.3);
+  transition: 
+    background 0.3s ease-in-out, 
+    transform 0.2s ease-in-out,
+    box-shadow 0.3s ease-in-out;
+
+  /* Pulse animation for continuous subtle movement */
   animation: ${pulse} 2s infinite;
 
   &:hover {
-    background: linear-gradient(135deg, #2575fc, #6a11cb);
+    /* Change the gradient with reversed colors for a dynamic look */
+    background: linear-gradient(135deg,rgb(131, 38, 184), #6a11cb);
     transform: scale(1.05);
+    box-shadow: 0 60px 15px rgb(223, 178, 31);
   }
 
   &:active {
     transform: scale(0.95);
+    /* Intensify shadow on click for a pressed effect */
+    box-shadow: 0 2px 5px rgba(36, 17, 203, 0.7);
+  }
+
+  /* Focus style for accessibility */
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(36, 17, 203, 0.3);
   }
 `;
 export const Option = styled.div`
@@ -138,5 +173,133 @@ export const OptionsGrid = styled.div`
 
   @media (max-width: 600px) {
     grid-template-columns: 1fr;
+  }
+`;
+export const GlowingCheckbox = styled.input.attrs({ type: 'checkbox' })`
+  /* Remove default checkbox appearance */
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  
+  /* Basic sizing and shape */
+  width: 1.25rem;
+  height: 1.25rem;
+  margin-right: 10px;
+  border: 2px solid #007bff;
+  border-radius: 50%;
+  cursor: pointer;
+  
+  /* Smooth transitions for hover and active states */
+  transition: background-color 0.3s ease, 
+              border-color 0.3s ease, 
+              box-shadow 0.3s ease;
+  
+  /* Glow on hover */
+  &:hover {
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+  }
+  
+  /* Appearance when the checkbox is checked */
+  &:checked {
+    background-color: #007bff;
+    border-color: #007bff;
+    box-shadow: 0 0 6px rgba(0, 123, 255, 0.8);
+  }
+
+  /* Optional focus state for better accessibility */
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 8px rgba(0, 123, 255, 0.7);
+  }`
+export const CheckboxInput = styled.input.attrs({ type: 'checkbox' })`
+  /* Remove default checkbox appearance */
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  
+  /* Basic sizing */
+  width: 1.25rem;
+  height: 1.25rem;
+  cursor: pointer;
+  margin-right: 10px;
+
+  /* Add a border and a circular shape */
+  border: 2px solid #007bff;
+  border-radius: 50%;
+  outline: none;
+
+  /* Use transitions for smoother interactions */
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+
+  /* Style for when the checkbox is checked */
+  &:checked {
+    background-color: #007bff;
+    border-color: #007bff;
+  }
+
+  /* Optional hover effect */
+  &:hover {
+    border-color: #0056b3;
+  }`
+
+  export const Input = styled.input`
+  /* Basic size and spacing */
+  width: 100%;
+  padding: 0.75rem 2.5rem 0.75rem 0.75rem;
+  border-radius: 30px;
+  font-size: 1rem;
+  transition: 
+    border-color 0.3s ease,
+    box-shadow 0.3s ease,
+    background-color 0.3s ease;
+  
+  /* Subtle gradient background */
+  background: linear-gradient(120deg, #f3f3f3 0%, #ffffff 100%);
+  border: 1px solid #ccc;
+
+  /* Soft inner shadow for a "pressed" look */
+  box-shadow: inset 0 1px 4px rgba(0,0,0,0.08);
+  
+  /* Placeholder styling, if needed */
+  &::placeholder {
+    color: #aaa;
+    font-style: italic;
+  }
+
+  /* Hover effect: slightly darker border, more pronounced inner shadow */
+  &:hover {
+    border-color: #999;
+    box-shadow: inset 0 1px 4px rgba(0,0,0,0.15);
+  }
+
+  /* Focus state: highlight the border and show a glow ring */
+  &:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow:
+      0 0 0 4px rgba(0,123,255,0.25),
+      inset 0 1px 4px rgba(0,0,0,0.08);
+  }
+
+  /* Disabled state */
+  &:disabled {
+    background-color: #f9f9f9;
+    border-color: #e0e0e0;
+    cursor: not-allowed;
+  }
+`;
+export const CloseSuggestions = styled.button`
+  position: absolute;
+
+  width: 10px;
+  top: 8px;
+  right: 8px;
+  border: none;
+  cursor: pointer;
+  font-size: 0.8rem;  /* reduce size if desired */
+  color: #aaa;
+  background: transparent;
+  &:hover {
+    color: #666;
   }
 `;
