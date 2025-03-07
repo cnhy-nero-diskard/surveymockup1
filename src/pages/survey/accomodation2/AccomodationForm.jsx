@@ -12,96 +12,185 @@ import { UnifiedContext } from '../../../routes/UnifiedContext';
 import { goToNextStep } from '../../../components/utils/navigationUtils';
 import { NextButtonU } from '../../../components/utils/styles1';
 
+// ---------- Styled Components ---------- //
+
 const FormContainer = styled(motion.div)`
   font-family: Arial, sans-serif;
   margin: 0 auto;
-  padding: 20px;
+  max-width: 800px;
 `;
 
 const Question = styled.p`
   font-size: 18px;
   margin-bottom: 20px;
+  line-height: 1.4;
 `;
 
 const ButtonGroup = styled.div`
   display: flex;
-  justify-content: space-around;
+  justify-content: center;
+  gap: 15px;
   margin-bottom: 20px;
 `;
 
 const Button = styled(motion.button)`
   background-color: #007bff;
-  color: white;
-  padding: 10px 20px;
+  color: #fff;
+  padding: 12px 22px;
   border: none;
-  border-radius: 4px;
-  cursor: pointer;
+  border-radius: 6px;
   font-size: 16px;
-  width: 100px;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.2s, box-shadow 0.2s;
+  box-shadow: 0 3px 6px rgba(0, 123, 255, 0.2);
 
   &:hover {
     background-color: #0056b3;
+  }
+
+  &:focus {
+    outline: 2px solid #ffa726;
+    outline-offset: 2px;
+  }
+`;
+
+const TableWrapper = styled.div`
+  // This container allows horizontal scrolling on extremely small screens
+  width: 100%;
+  overflow-x: auto;
+  margin-bottom: 20px;
+
+  @media (max-width: 600px) {
+    padding-bottom: 10px;
   }
 `;
 
 const Table = styled.table`
   width: 100%;
   border-collapse: collapse;
-  margin-bottom: 20px;
+  background-color: rgb(0,0,0,0);
+  border: 1px solid #ddd;
+
+  @media (max-width: 600px) {
+    display: block;
+    thead {
+      display: none;
+    }
+  }
 `;
 
 const TableHeader = styled.th`
-  padding: 10px;
-  border: 1px solid #ccc;
+  padding: 12px;
+  border: 1px solid blue;
+  background-color: rgb(25, 105, 255);
   text-align: left;
+  font-weight: bold;
 `;
 
 const TableRow = styled.tr`
+  border: 1px solid rgb(25, 105, 255);
+
   text-align: left;
+
+  &:hover {
+    background-color: rgba(0,0,0,0);
+  }
+
+  @media (max-width: 600px) {
+    border: none;
+    display: block;
+    margin-bottom: 15px;
+    background-color: rgb(0,0,0,0);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.4);
+    border-radius: 6px;
+  }
 `;
 
 const TableCell = styled.td`
-  padding: 10px;
-  border: 1px solid #ccc;
+  padding: 12px;
+
+  vertical-align: middle;
+
+  @media (max-width: 600px) {
+    border: none;
+    display: block;
+    padding: 10px 20px;
+  }
 `;
 
-const RatingCell = styled.td`
+const TableCellLabel = styled.div`
+  font-weight: bold;
+  margin-bottom: 5px;
+
+  @media (min-width: 601px) {
+    display: none;
+  }
+`;
+
+const RatingCell = styled(TableCell)`
   display: flex;
-  gap: 6px;
-  padding: 5px;
+  align-items: center;
+  gap: 10px;
+
+  @media (max-width: 600px) {
+    flex-wrap: wrap;
+  }
 `;
 
 const RatingButton = styled.button`
   background: none;
   border-radius: 50%;
-  width: 30px;
-  height: 30px;
+  width: 36px;
+  height: 36px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   font-size: 16px;
-  padding: 5px;
+  transition: background-color 0.2s, transform 0.2s;
+  border: 1px solid transparent;
 
   &.selected {
     background-color: #007bff;
-    color: white;
+    color: #fff;
+  }
+
+  &:hover:not(:disabled) {
+    transform: scale(1.06);
+    background-color: #0056b3;
+    color: #fff;
+  }
+
+  &:focus {
+    outline: 2px solid #ffa726;
+    outline-offset: 2px;
   }
 
   &:disabled {
     cursor: not-allowed;
-    opacity: 0.5;
+    opacity: 0.4;
   }
 `;
 
 const DurationInput = styled.input`
-  width: 80px;
-  padding: 5px;
+  width: 90px;
+  padding: 8px;
   border: 1px solid #ccc;
   border-radius: 4px;
-  margin-top: 10px;
+  margin-top: 6px;
+  font-size: 16px;
+
+  &:focus {
+    outline: 2px solid #ffa726;
+    outline-offset: 2px;
+  }
+
+  @media (max-width: 600px) {
+    margin-top: 0;
+  }
 `;
 
+// ---------- Helper Dictionaries ---------- //
 
 const emojiToRating = { '☹️': 1, '😐': 2, '🙂': 3, '😄': 4 };
 const ratingToEmoji = { 1: '☹️', 2: '😐', 3: '🙂', 4: '😄' };
@@ -109,9 +198,9 @@ const ratingToEmoji = { 1: '☹️', 2: '😐', 3: '🙂', 4: '😄' };
 const AccommodationForm = () => {
   const { routes } = useContext(UnifiedContext);
   const currentStepIndex = useCurrentStepIndex(routes);
-  const { activeBlocks, appendActiveBlocks, removeActiveBlocks } = useContext(UnifiedContext);
+  const { activeBlocks } = useContext(UnifiedContext);
 
-  
+  // ---------- State ---------- //
   const [isCommercial, setIsCommercial] = useState(null);
   const [ratings, setRatings] = useState({
     Hotel: '',
@@ -145,6 +234,7 @@ const AccommodationForm = () => {
   const [language, setLanguage] = useState(localStorage.getItem('selectedLanguage'));
   const translations = useTranslations('AccommodationForm', language);
 
+  // ---------- Handlers ---------- //
   const handleRatingChange = (type, emoji) => {
     const rating = emojiToRating[emoji];
     setRatings((prevState) => ({ ...prevState, [type]: emoji }));
@@ -163,30 +253,23 @@ const AccommodationForm = () => {
   };
 
   const updateSurveyResponses = (type, field, value) => {
-    // Helper function to transform type if it is 'Homestay'
     const transformType = (t) => {
       if (t === 'Homestay') {
-        // Remove first character and convert the rest to uppercase
-        return t.slice(1).toUpperCase();
+        return t.slice(1).toUpperCase(); // Example transform
       }
-      // If not 'Homestay', return the original type
       return t;
     };
-  
+
     setSurveyResponses((prevResponses) => {
       const existingResponseIndex = prevResponses.findIndex(
-        (response) =>
-          response.surveyquestion_ref === `${transformType(type)}_${field}`
+        (response) => response.surveyquestion_ref === `${transformType(type)}_${field}`
       );
-  
+
       if (existingResponseIndex !== -1) {
-        // Update existing response
         const updatedResponses = [...prevResponses];
         updatedResponses[existingResponseIndex].response_value = value;
         return updatedResponses;
       } else {
-        // Add new response
-        console.log (`TYPE SELECTED : ${type}`)
         return [
           ...prevResponses,
           {
@@ -197,7 +280,7 @@ const AccommodationForm = () => {
       }
     });
   };
-  
+
   const handleCommercialResponse = (responseValue) => {
     setSurveyResponses((prevResponses) => {
       const commercialResponseIndex = prevResponses.findIndex(
@@ -236,16 +319,17 @@ const AccommodationForm = () => {
     goToNextStep(currentStepIndex, navigate, routes, activeBlocks);
   };
 
-  // Function to check if any row has a value
   const hasFilledValues = () => {
-    return Object.values(durations).some(duration => duration !== '' && duration !== '0') ||
-           Object.values(ratings).some(rating => rating !== '');
+    return (
+      Object.values(durations).some((duration) => duration !== '' && duration !== '0') ||
+      Object.values(ratings).some((rating) => rating !== '')
+    );
   };
 
   useEffect(() => {
     if (surveyResponses.length > 0) {
       const updatedRatings = { ...ratings };
-      surveyResponses.forEach(response => {
+      surveyResponses.forEach((response) => {
         if (response.surveyquestion_ref.endsWith('RTNG')) {
           const type = response.surveyquestion_ref.split('_')[0];
           const ratingValue = parseInt(response.response_value);
@@ -256,15 +340,16 @@ const AccommodationForm = () => {
     }
   }, [surveyResponses]);
 
+  // ---------- Render ---------- //
   return (
     <>
       <BodyPartial />
-      <GradientBackground 
-        overlayImage={imgoverlay} 
-        opacity={0.2} 
-        blendMode="multiply" 
-        handleNextClick={handleNextClick} 
-        buttonAppear={hasFilledValues()} // Update this line
+      <GradientBackground
+        overlayImage={imgoverlay}
+        opacity={0.2}
+        blendMode="multiply"
+        handleNextClick={handleNextClick}
+        buttonAppear={hasFilledValues()}
       >
         <FormContainer
           initial={{ opacity: 0, y: -20 }}
@@ -291,45 +376,67 @@ const AccommodationForm = () => {
               {translations.accommodationFormNoButton}
             </Button>
           </ButtonGroup>
+
           {isCommercial !== null && isCommercial && (
             <>
               <Question>{translations.accommodationFormTypesAndLengthQuestion}</Question>
-              <Table>
-                <thead>
-                  <tr>
-                    <TableHeader>{translations.accommodationFormNameHeader}</TableHeader>
-                    <TableHeader>{translations.accommodationFormRatingHeader}</TableHeader>
-                    <TableHeader>{translations.accommodationFormDurationHeader}</TableHeader>
-                  </tr>
-                </thead>
-                <tbody>
-                  {accommodationTypes.map((type) => (
-                    <TableRow key={type}>
-                      <TableCell>{translations[`accommodationFormType${type.replace(/ /g, '')}`]}</TableCell>
-                      <RatingCell>
-                        {emoj.map((emoji) => (
-                          <RatingButton
-                            key={emoji}
-                            className={ratings[type] === emoji ? 'selected' : ''}
-                            onClick={() => handleRatingChange(type, emoji)}
-                            disabled={durations[type] === '' || durations[type] === '0'}
-                          >
-                            {emoji}
-                          </RatingButton>
-                        ))}
-                      </RatingCell>
-                      <TableCell>
-                        <DurationInput
-                          type="number"
-                          value={durations[type]}
-                          onChange={(e) => handleDurationChange(type, e.target.value)}
-                          placeholder={translations.accommodationFormDaysPlaceholder}
-                        />
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </tbody>
-              </Table>
+              <TableWrapper>
+                <Table>
+                  <thead>
+                    <tr>
+                      <TableHeader>{translations.accommodationFormNameHeader}</TableHeader>
+                      <TableHeader>{translations.accommodationFormRatingHeader}</TableHeader>
+                      <TableHeader>{translations.accommodationFormDurationHeader}</TableHeader>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {accommodationTypes.map((type) => (
+                      <TableRow key={type}>
+                        <TableCell>
+                          {/* Mobile label (hidden on desktop) */}
+                          <TableCellLabel>
+                            {translations.accommodationFormNameHeader}
+                          </TableCellLabel>
+                          {translations[`accommodationFormType${type.replace(/ /g, '')}`]}
+                        </TableCell>
+
+                        <RatingCell>
+                          {/* Mobile label (hidden on desktop) */}
+                          <TableCellLabel>
+                            {translations.accommodationFormRatingHeader}
+                          </TableCellLabel>
+                          {emoj.map((emoji) => (
+                            <RatingButton
+                              key={emoji}
+                              onClick={() => handleRatingChange(type, emoji)}
+                              className={ratings[type] === emoji ? 'selected' : ''}
+                              disabled={durations[type] === '' || durations[type] === '0'}
+                              aria-label={`Rate ${type} as ${emoji}`}
+                            >
+                              {emoji}
+                            </RatingButton>
+                          ))}
+                        </RatingCell>
+
+                        <TableCell>
+                          {/* Mobile label (hidden on desktop) */}
+                          <TableCellLabel>
+                            {translations.accommodationFormDurationHeader}
+                          </TableCellLabel>
+                          <DurationInput
+                            type="number"
+                            value={durations[type]}
+                            onChange={(e) => handleDurationChange(type, e.target.value)}
+                            placeholder={translations.accommodationFormDaysPlaceholder}
+                            min="0"
+                            aria-label={`Enter the number of days for ${type}`}
+                          />
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </tbody>
+                </Table>
+              </TableWrapper>
             </>
           )}
         </FormContainer>
