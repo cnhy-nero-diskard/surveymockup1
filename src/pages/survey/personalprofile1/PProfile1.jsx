@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
 import BodyPartial from '../../../components/partials/BodyPartial';
@@ -7,8 +7,8 @@ import Select from 'react-select';
 import { useNavigate } from 'react-router-dom';
 import imgoverlay from '../../../components/img/profile.png';
 import useTranslations from '../../../components/utils/useTranslations';
-import { submitSurveyResponses } from '../../../components/utils/sendInputUtils'; // Import axios submission function
-import { NextButtonU } from '../../../components/utils/styles1';
+import { submitSurveyResponses } from '../../../components/utils/sendInputUtils';
+import { Input, NextButtonU } from '../../../components/utils/styles1';
 import { useCurrentStepIndex } from '../../../components/utils/useCurrentIndex';
 import { UnifiedContext } from '../../../routes/UnifiedContext';
 import { goToNextStep } from '../../../components/utils/navigationUtils';
@@ -35,34 +35,12 @@ const Label = styled.label`
     font-size: 0.8rem;
   }
 `;
-const Input = styled.input`
-  margin-bottom: 16px;
-  padding: 8px 12px;
-  padding-right: 30px;
-  border: 2.5px solid rgb(0, 123, 255);
-  border-radius: 14px;
-  width: 100%;
-  box-sizing: border-box;
-  font-size: 0.9rem;
-  @media (max-width: 480px) {
-    padding: 6px 10px;
-    font-size: 0.8rem;
-  }
-`;
-const Button = styled(motion.button)`
-  padding: 10px 20px;
-  background-color: #007bff;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-`;
 
 const customSelectStyles = {
   control: (provided) => ({
     ...provided,
-    backgroundColor: 'rgb(0, 102, 211)', // Darker background
-    color: '#fff', // White text color
+    backgroundColor: 'rgb(0, 102, 211)',
+    color: '#fff',
     borderRadius: '15px',
     marginBottom: '16px',
     width: '100%',
@@ -70,18 +48,19 @@ const customSelectStyles = {
   }),
   singleValue: (provided) => ({
     ...provided,
-    color: '#fff', // White text color
+    color: '#fff',
   }),
   menu: (provided) => ({
     ...provided,
-    backgroundColor: '#333', // Darker background for dropdown menu
+    backgroundColor: 'rgb(0,0,0,0.5)',
   }),
   option: (provided, state) => ({
     ...provided,
-    backgroundColor: state.isFocused ? '#555' : '#333', // Highlight on focus
-    color: '#fff', // White text color
+    backgroundColor: state.isFocused ? '#555' : '#333',
+    color: '#fff',
   }),
 };
+
 const ResponsiveContainer = styled.div`
   width: 100%;
   box-sizing: border-box;
@@ -94,7 +73,6 @@ const PProfile1 = () => {
   const { routes } = useContext(UnifiedContext);
   const currentStepIndex = useCurrentStepIndex(routes);
   const { activeBlocks, appendActiveBlocks, removeActiveBlocks } = useContext(UnifiedContext);
-
 
   const [language, setLanguage] = useState(localStorage.getItem('selectedLanguage'));
   const translations = useTranslations('PProfile1', language);
@@ -109,6 +87,22 @@ const PProfile1 = () => {
     { id: 'currency', value: 'PHP', surveyquestion_ref: 'CUR01' },
   ]);
 
+  const [nationalities, setNationalities] = useState([]);
+
+  useEffect(() => {
+    // Fetch nationalities from REST Countries API
+    fetch('https://restcountries.com/v3.1/all')
+      .then(response => response.json())
+      .then(data => {
+        const nationalityOptions = data.map(country => ({
+          value: country.cca2,
+          label: country.name.nativeName,
+        }));
+        setNationalities(nationalityOptions);
+      })
+      .catch(error => console.error('Error fetching nationalities:', error));
+  }, []);
+
   const conversionRates = {
     USD: 56,
     EUR: 60,
@@ -121,20 +115,6 @@ const PProfile1 = () => {
     FRF: 60,
     ESP: 60,
   };
-
-  const nationalities = [
-    { value: 'US', label: "AMERICAN" },
-    { value: 'PH', label: "FILIPINO" },
-    { value: 'CN', label: "中国国籍 " },
-    { value: 'JA', label: "国籍 " },
-    { value: 'IN', label: "भारतीय नागरिकता" },
-    { value: 'RU', label: "Гражданин России" },
-    { value: 'KR', label: "대한민국 국민 " },
-    { value: 'FR', label: "Français" },
-    { value: 'ES', label: "Español" },
-    { value: '  ', label: translations.nationalityOther },
-  ];
-
 
   const currencies = Object.keys(conversionRates).map((key) => ({
     value: key,
@@ -153,7 +133,9 @@ const PProfile1 = () => {
     { value: 'widowed', label: translations.civilStatusWidowed },
     { value: 'separated', label: translations.civilStatusSeparated },
   ];
-const isFormComplete = inputs.every(input => input.value !== null && input.value !== '');
+
+  const isFormComplete = inputs.every(input => input.value !== null && input.value !== '');
+
   const handleInputChange = (id, value) => {
     setInputs((prevInputs) =>
       prevInputs.map((input) =>
@@ -201,27 +183,32 @@ const isFormComplete = inputs.every(input => input.value !== null && input.value
             <Label htmlFor="nationality">{translations.nationalityLabel}</Label>
             <Select
               options={nationalities}
-              value={nationalities.find(option => option.value === inputs.find(input => input.id === 'nationality').value)} // Find the selected option
-              onChange={(option) => handleInputChange('nationality', option.value)} // Pass the selected value
+              value={nationalities.find(option => option.value === inputs.find(input => input.id === 'nationality').value)}
+              onChange={(option) => handleInputChange('nationality', option.value)}
               placeholder={translations.nationalityPlaceholder}
               styles={customSelectStyles}
+              isSearchable
             />
+
             <Label htmlFor="sex">{translations.sexLabel}</Label>
             <Select
               options={sexOptions}
-              value={sexOptions.find(option => option.value === inputs.find(input => input.id === 'sex').value)} // Find the selected option
-              onChange={(option) => handleInputChange('sex', option.value)} // Pass the selected value
+              value={sexOptions.find(option => option.value === inputs.find(input => input.id === 'sex').value)}
+              onChange={(option) => handleInputChange('sex', option.value)}
               placeholder={translations.sexPlaceholder}
               styles={customSelectStyles}
             />
+
             <Label htmlFor="civilStatus">{translations.civilStatusLabel}</Label>
             <Select
               options={civilStatusOptions}
-              value={civilStatusOptions.find(option => option.value === inputs.find(input => input.id === 'civilStatus').value)} // Find the selected option
-              onChange={(option) => handleInputChange('civilStatus', option.value)} // Pass the selected value
+              value={civilStatusOptions.find(option => option.value === inputs.find(input => input.id === 'civilStatus').value)}
+              onChange={(option) => handleInputChange('civilStatus', option.value)}
               placeholder={translations.civilStatusPlaceholder}
               styles={customSelectStyles}
-            />          <Label htmlFor="occupation">{translations.occupationLabel}</Label>
+            />
+
+            <Label htmlFor="occupation">{translations.occupationLabel}</Label>
             <Input
               type="text"
               id="occupation"
@@ -242,13 +229,15 @@ const isFormComplete = inputs.every(input => input.value !== null && input.value
             <Label htmlFor="currency">{translations.currencyLabel}</Label>
             <Select
               options={currencies}
-              value={currencies.find(option => option.value === inputs.find(input => input.id === 'currency').value)} // Find the selected option
-              onChange={(option) => handleInputChange('currency', option.value)} // Pass the selected value
+              value={currencies.find(option => option.value === inputs.find(input => input.id === 'currency').value)}
+              onChange={(option) => handleInputChange('currency', option.value)}
               styles={customSelectStyles}
-            />          <Label>{translations.convertedIncomeLabel} {convertIncome()}</Label>
+            />
 
+            <Label>{translations.convertedIncomeLabel} {convertIncome()}</Label>
           </Container>
-        </ResponsiveContainer>      </GradientBackground>
+        </ResponsiveContainer>
+      </GradientBackground>
     </>
   );
 };

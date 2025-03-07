@@ -7,7 +7,7 @@ import imgoverlay from "../../../components/img/commentsbg.png";
 import { submitSurveyResponses } from '../../../components/utils/sendInputUtils';
 import useTranslations from '../../../components/utils/useTranslations';
 import { GREETINGS } from '../../../components/utils/componentConstants';
-import { NextButtonU } from '../../../components/utils/styles1';
+import { Container, NextButtonU } from '../../../components/utils/styles1';
 import SurveyRoutesContext from '../../../routes/__SurveyRoutesContext';
 import { useNavigate } from 'react-router-dom';
 import { useCurrentStepIndex } from '../../../components/utils/useCurrentIndex';
@@ -97,13 +97,15 @@ const Greetings = () => {
     <>
       <BodyPartial />
       <GradientBackground overlayImage={imgoverlay} handleNextClick={handleStartSurvey} nextmsg={translations.greetingsStartSurvey}>
-        {/* AnimatedContainer uses the containerAnimation styles */}
-          <Title>{translations.greetingsTitle}</Title>
-          <Subtitle>{translations.greetingsInvitation}</Subtitle>
-          <Subtitle>{translations.greetingsDOTSurvey}</Subtitle>
-          <Paragraph>{translations.greetingsSurveyPurpose}</Paragraph>
-          <Paragraph>{translations.greetingsDataPrivacy}</Paragraph>
-      </GradientBackground>
+<Container style={{maxWidth: '600px'}}>
+          {/* Animatmax-width=''edContainer uses the containerAnimation styles */}
+            <Title>{translations.greetingsTitle}</Title>
+            <Subtitle>{translations.greetingsInvitation}</Subtitle>
+            <Subtitle>{translations.greetingsDOTSurvey}</Subtitle>
+            <Paragraph>{translations.greetingsSurveyPurpose}</Paragraph>
+            <Paragraph>{translations.greetingsDataPrivacy}</Paragraph>
+  
+</Container>      </GradientBackground>
     </>
   );
 };

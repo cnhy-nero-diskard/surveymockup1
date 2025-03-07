@@ -37,13 +37,6 @@ const OptionButton = styled.button`
   transition: all 0.3s ease;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 
-  &.selected {
-    background-color: #4caf50;
-    color: white;
-    border-color: #4caf50;
-    transform: scale(1.05);
-  }
-
   &:hover {
     border-color: #4caf50;
   }
@@ -51,6 +44,39 @@ const OptionButton = styled.button`
   &:focus {
     outline: none;
     box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.3);
+  }
+
+  /* Default selected styling */
+  &.selected {
+    transform: scale(1.05);
+  }
+
+  /* Dissatisfied (red) */
+  &.selected.Dissatisfied {
+    background-color: #f44336;
+    color: #fff;
+    border-color: #f44336;
+  }
+
+  /* Neutral (yellow) */
+  &.selected.Neutral {
+    background-color: #ffeb3b;
+    color: #000;
+    border-color: #ffeb3b;
+  }
+
+  /* Satisfied (yellow-green) */
+  &.selected.Satisfied {
+    background-color: #cddc39;
+    color: #000;
+    border-color: #cddc39;
+  }
+
+  /* Very Satisfied (green) */
+  &.selected.VerySatisfied {
+    background-color: #4caf50;
+    color: #fff;
+    border-color: #4caf50;
   }
 `;
 
@@ -235,17 +261,22 @@ const FeedbackForm = ({ title, onNext, squestion_identifier, satisfactionOptions
                 <FeedbackFormContainer style={animation}>
                     <QuestionText>{title || translations.feedbackFormTitle}</QuestionText>
                     <OptionsContainer>
-                        {Object.keys(satisfactionOptions).map((option) => (
-                            <OptionButton
-                                key={option}
-                                className={selectedOption === option ? 'selected' : ''}
-                                onClick={() => handleOptionClick(option)}
-                                aria-pressed={selectedOption === option}
-                            >
-                                {translations[`feedbackFormOption${option}`]}
-                            </OptionButton>
-                        ))}
-                    </OptionsContainer>
+  {Object.keys(satisfactionOptions).map((option) => (
+    <OptionButton
+      key={option}
+      className={
+        selectedOption === option 
+          ? `selected ${option}` 
+          : ''
+      }
+      onClick={() => handleOptionClick(option)}
+      aria-pressed={selectedOption === option}
+    >
+      {translations[`feedbackFormOption${option}`]}
+    </OptionButton>
+  ))}
+</OptionsContainer>
+
                     <FeedbackTextarea
                         placeholder={placeholderText}
                         value={feedback}

@@ -14,7 +14,6 @@ import { NextButtonU } from '../../../components/utils/styles1';
 
 const FormContainer = styled(motion.div)`
   font-family: Arial, sans-serif;
-  max-width: 600px;
   margin: 0 auto;
   padding: 20px;
 `;
@@ -103,16 +102,6 @@ const DurationInput = styled.input`
   margin-top: 10px;
 `;
 
-const NextButton = styled(motion.button)`
-  background-color: #28a745;
-  color: white;
-  padding: 10px 20px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 16px;
-  margin-top: 20px;
-`;
 
 const emojiToRating = { '☹️': 1, '😐': 2, '🙂': 3, '😄': 4 };
 const ratingToEmoji = { 1: '☹️', 2: '😐', 3: '🙂', 4: '😄' };

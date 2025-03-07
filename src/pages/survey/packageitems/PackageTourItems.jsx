@@ -11,6 +11,17 @@ import { useCurrentStepIndex } from '../../../components/utils/useCurrentIndex';
 import { UnifiedContext } from '../../../routes/UnifiedContext';
 import { goToNextStep } from '../../../components/utils/navigationUtils';
 
+// Motion Variants
+const itemVariants = {
+  hidden: { opacity: 0, x: 20 },
+  visible: {
+    opacity: 1,
+    x: 0,
+    transition: { duration: 0.3 },
+  },
+};
+
+// Styled Components
 const ChecklistContainer = styled(motion.div)`
   display: flex;
   flex-direction: column;
@@ -28,22 +39,24 @@ const ChecklistTitle = styled.h2`
   width: 100%;
 `;
 
-const ChecklistItem = styled.label`
+// Convert label to a motion component
+const ChecklistItem = styled(motion.label)`
   display: flex;
   align-items: center;
   padding: 10px;
   margin-bottom: 10px;
   width: 100%;
-  border-radius:15px;
+  border-radius: 15px;
   cursor: pointer;
   font-size: 1rem;
-  color:white;
-  background-color:rgb(3, 112, 207);
+  color: white;
+  background-color: ${(props) =>
+    props.isSelected ? 'rgb(46, 145, 231)' : 'rgb(16, 136, 241)'};
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  transition: all 0.3s ease;
+  transition: background-color 0.3s ease;
 
   &:hover {
-    background-color:rgb(46, 145, 231);
+    background-color: rgb(46, 145, 231);
     border-color: #007bff;
   }
 `;
@@ -77,27 +90,6 @@ const Checkbox = styled.input.attrs({ type: 'checkbox' })`
   }
 `;
 
-const NextButton = styled(motion.button)`
-  margin-top: 20px;
-  padding: 12px 24px;
-  background-color: #007bff;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 1rem;
-  transition: all 0.3s ease;
-  width: 100%;
-
-  &:hover {
-    background-color: #0056b3;
-  }
-
-  &:active {
-    background-color: #003f88;
-  }
-`;
-
 const LoadingSpinner = styled.div`
   border: 4px solid rgba(255, 255, 255, 0.3);
   border-top: 4px solid #007bff;
@@ -113,10 +105,19 @@ const LoadingSpinner = styled.div`
   }
 `;
 
+const ProgressIndicator = styled.div`
+  font-size: 0.9rem;
+  color: white;
+  margin-bottom: 20px;
+  text-align: center;
+  width: 100%;
+`;
+
+// Main Component
 const PackageTourItems = () => {
   const { routes } = useContext(UnifiedContext);
   const currentStepIndex = useCurrentStepIndex(routes);
-  const { activeBlocks, appendActiveBlocks, removeActiveBlocks } = useContext(UnifiedContext);
+  const { activeBlocks } = useContext(UnifiedContext);
 
   const [selectedItems, setSelectedItems] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -138,7 +139,7 @@ const PackageTourItems = () => {
   const handleCheckboxChange = (item) => {
     const englishValue = englishValues[item];
     const surveyResponse = {
-      surveyquestion_ref: 'PKGITEMS', // Example 5-char ref, can be dynamic if needed
+      surveyquestion_ref: 'PKGITEMS',
       response_value: englishValue,
     };
 
@@ -152,7 +153,7 @@ const PackageTourItems = () => {
   const navigate = useNavigate();
 
   const handleNextClick = async () => {
-    if (isLoading) return;
+    if (isLoading || selectedItems.length === 0) return;
     setIsLoading(true);
     console.log('Selected Items:', selectedItems);
 
@@ -164,7 +165,6 @@ const PackageTourItems = () => {
       console.error('Error submitting survey responses:', error);
       setIsLoading(false);
     }
-
   };
 
   const checklistItems = [
@@ -181,15 +181,29 @@ const PackageTourItems = () => {
   return (
     <>
       <BodyPartial />
-      <GradientBackground overlayImage={imgoverlay} opacity={0.1} blendMode="normal" handleNextClick={handleNextClick} buttonAppear={selectedItems.length > 0}>
+      <GradientBackground
+        overlayImage={imgoverlay}
+        opacity={0.1}
+        blendMode="normal"
+        handleNextClick={handleNextClick}
+        buttonAppear={selectedItems.length > 0}
+      >
         <ChecklistContainer
           initial={{ opacity: 0, y: -50 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
           <ChecklistTitle>{translations.packageTourItemsTitle}</ChecklistTitle>
-          {checklistItems.map((item) => (
-            <ChecklistItem key={item}>
+          {checklistItems.map((item, index) => (
+            <ChecklistItem
+              key={item}
+              isSelected={selectedItems.some((i) => i.response_value === englishValues[item])}
+              variants={itemVariants}
+              initial="hidden"
+              animate="visible"
+              whileHover={{ scale: 1.05 }}
+              transition={{ delay: index * 0.1 }}
+            >
               <Checkbox
                 checked={selectedItems.some((i) => i.response_value === englishValues[item])}
                 onChange={() => handleCheckboxChange(item)}
@@ -197,7 +211,6 @@ const PackageTourItems = () => {
               {item}
             </ChecklistItem>
           ))}
-
         </ChecklistContainer>
       </GradientBackground>
     </>

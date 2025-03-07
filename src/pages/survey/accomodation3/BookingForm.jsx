@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { useSpring, animated } from 'react-spring';
 import BodyPartial from '../../../components/partials/BodyPartial';
 import GradientBackground from '../../../components/partials/GradientBackground';
-import { NextButtonU } from '../../../components/utils/styles1';
+import { Input, NextButtonU } from '../../../components/utils/styles1';
 import { useNavigate } from 'react-router-dom';
 import imgoverlay from '../../../components/img/bed.png';
 import useTranslations from '../../../components/utils/useTranslations';
@@ -29,12 +29,12 @@ const Label = styled.label`
   font-weight: bold;
 `;
 
-const Input = styled.input`
-  width: 100%;
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-`;
+// const Input = styled.input`
+//   width: 100%;
+//   padding: 10px;
+//   border: 1px solid #ccc;
+//   border-radius: 4px;
+// `;
 
 const Dropdown = styled.select`
   width: 100%;
@@ -60,126 +60,169 @@ const Button = styled.button`
 `;
 
 const BookingForm = () => {
-    const { routes } = useContext(UnifiedContext);
-    const currentStepIndex = useCurrentStepIndex(routes);
-    const { activeBlocks, appendActiveBlocks, removeActiveBlocks } = useContext(UnifiedContext);
+  const { routes } = useContext(UnifiedContext);
+  const currentStepIndex = useCurrentStepIndex(routes);
+  const { activeBlocks } = useContext(UnifiedContext);
 
-    const [bookingMethod, setBookingMethod] = useState('');
-    const [bookingPlatform, setBookingPlatform] = useState('');
-    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-    const [language, setLanguage] = useState(localStorage.getItem('selectedLanguage'));
-    const [responses, setResponses] = useState([]);
+  const [bookingMethod, setBookingMethod] = useState('');
+  const [bookingPlatform, setBookingPlatform] = useState('');
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [language, setLanguage] = useState(localStorage.getItem('selectedLanguage'));
+  const [responses, setResponses] = useState([]);
 
-    const translations = useTranslations('BookingForm', language);
+  const navigate = useNavigate();
+  const translations = useTranslations('BookingForm', language);
 
-    const dropdownAnimation = useSpring({
-        opacity: isDropdownOpen ? 1 : 0,
-        transform: isDropdownOpen ? 'scaleY(1)' : 'scaleY(0)',
-        config: { tension: 200, friction: 20 },
-    });
+  // Define booking methods with label/value
+  const bookingMethods = [
+    { label: translations.bookingMethodWalkIn, value: 'Walk-in' },
+    { label: translations.bookingMethodTourOperator, value: 'Your Operator' },
+    { label: translations.bookingMethodInternet, value: 'Internet' },
+    { label: translations.bookingMethodOthers, value: 'Others (specify)' }
+  ];
 
-    const bookingMethods = ['Walk-in', 'Your Operator', 'Internet', 'Others (specify)'];
-    const bookingPlatforms = {
-        'Walk-in': ['Direct', 'Counter'],
-        'Your Operator': ['Operator A', 'Operator B'],
-        'Internet': ['Booking.com', 'Expedia', 'Airbnb'],
-        'Others (specify)': [],
-    };
+  // Define booking platforms keyed by the *value*, each array is label/value
+  const bookingPlatforms = {
+    'Walk-in': [
+      { label: translations.bookingPlatformDirect, value: 'Direct' },
+      { label: translations.bookingPlatformCounter, value: 'Counter' }
+    ],
+    'Internet': [
+      { label: translations.bookingPlatformBookingCom, value: 'Booking.com' },
+      { label: translations.bookingPlatformExpedia, value: 'Expedia' },
+      { label: translations.bookingPlatformAirbnb, value: 'Airbnb' }
+    ],
+    'Others (specify)': []
+  };
 
-    const handleBookingMethodChange = (e) => {
-        const method = e.target.value;
-        setBookingMethod(method);
-        setBookingPlatform('');
-        setIsDropdownOpen(method !== 'Others (specify)');
+  const dropdownAnimation = useSpring({
+    opacity: isDropdownOpen ? 1 : 0,
+    transform: isDropdownOpen ? 'scaleY(1)' : 'scaleY(0)',
+    config: { tension: 200, friction: 20 },
+  });
 
-        // Update responses array
-        setResponses((prevResponses) => [
-            ...prevResponses.filter((response) => response.surveyquestion_ref !== 'METHOD'),
-            { surveyquestion_ref: 'BMETHOD', response_value: method },
-        ]);
-    };
+  const handleBookingMethodChange = (e) => {
+    const method = e.target.value;
+    setBookingMethod(method);
+    setBookingPlatform('');
+    setIsDropdownOpen(method !== 'Others (specify)' && method !== 'Your Operator');
 
-    const handleBookingPlatformChange = (e) => {
-        const platform = e.target.value;
-        setBookingPlatform(platform);
+    // Update responses array (store the English value)
+    setResponses((prevResponses) => [
+      ...prevResponses.filter((response) => response.surveyquestion_ref !== 'BMETHOD'),
+      { surveyquestion_ref: 'BMETHOD', response_value: method },
+    ]);
+  };
 
-        // Update responses array
-        setResponses((prevResponses) => [
-            ...prevResponses.filter((response) => response.surveyquestion_ref !== 'PLATF'),
-            { surveyquestion_ref: 'PLATF', response_value: platform },
-        ]);
-    };
+  const handleBookingPlatformChange = (e) => {
+    const platform = e.target.value;
+    setBookingPlatform(platform);
 
-    const handleOthersSpecifyChange = (e) => {
-        const value = e.target.value;
-        setBookingPlatform(value);
+    // Update responses array (store the English value)
+    setResponses((prevResponses) => [
+      ...prevResponses.filter((response) => response.surveyquestion_ref !== 'PLATF'),
+      { surveyquestion_ref: 'PLATF', response_value: platform },
+    ]);
+  };
 
-        // Update responses array
-        setResponses((prevResponses) => [
-            ...prevResponses.filter((response) => response.surveyquestion_ref !== 'OTHER'),
-            { surveyquestion_ref: 'OTHER', response_value: value },
-        ]);
-    };
+  const handleOthersSpecifyChange = (e) => {
+    const value = e.target.value;
+    setBookingPlatform(value);
 
-    const navigate = useNavigate();
+    // Update responses array (store the user's typed text, which may be in any language)
+    setResponses((prevResponses) => [
+      ...prevResponses.filter((response) => response.surveyquestion_ref !== 'OTHER'),
+      { surveyquestion_ref: 'OTHER', response_value: value },
+    ]);
+  };
 
-    const handleNextClick = async () => {
-        try {
-            await submitSurveyResponses(responses);
-            goToNextStep(currentStepIndex, navigate, routes, activeBlocks);
-        } catch (error) {
-            console.error('Failed to submit survey responses:', error);
-        }
-    };
+  const handleNextClick = async () => {
+    try {
+      await submitSurveyResponses(responses);
+      goToNextStep(currentStepIndex, navigate, routes, activeBlocks);
+    } catch (error) {
+      console.error('Failed to submit survey responses:', error);
+    }
+  };
 
-    const isNextDisabled =
-        !bookingMethod || (bookingMethod !== 'Others (specify)' && !bookingPlatform) || (bookingMethod === 'Others (specify)' && !bookingPlatform.trim());
+  const isNextDisabled =
+    !bookingMethod ||
+    (bookingMethod !== 'Others (specify)' && bookingMethod !== 'Your Operator' && !bookingPlatform) ||
+    (bookingMethod === 'Others (specify)' && !bookingPlatform.trim()) ||
+    (bookingMethod === 'Your Operator' && !bookingPlatform.trim());
 
-    return (
-        <>
-            <BodyPartial />
-            <GradientBackground overlayImage={imgoverlay} opacity={0.2} blendMode="multiply" handleNextClick={handleNextClick} buttonAppear={!isNextDisabled}>
-                <Container>
-                    <FormGroup>
-                        <Label>{translations.bookingFormBookingMethodLabel}</Label>
-                        <Dropdown value={bookingMethod} onChange={handleBookingMethodChange}>
-                            <Option value="">{translations.bookingFormSelectBookingMethod}</Option>
-                            {bookingMethods.map((method) => (
-                                <Option key={method} value={method}>
-                                    {method}
-                                </Option>
-                            ))}
-                        </Dropdown>
-                    </FormGroup>
+  return (
+    <>
+      <BodyPartial />
+      <GradientBackground
+        overlayImage={imgoverlay}
+        opacity={0.2}
+        blendMode="multiply"
+        handleNextClick={handleNextClick}
+        buttonAppear={!isNextDisabled}
+      >
+        <Container>
+          <FormGroup>
+            <Label>{translations.bookingFormBookingMethodLabel}</Label>
+            <Dropdown value={bookingMethod} onChange={handleBookingMethodChange}>
+              <Option value="">
+                {translations.bookingFormSelectBookingMethod}
+              </Option>
+              {bookingMethods.map((method) => (
+                <Option key={method.value} value={method.value}>
+                  {method.label}
+                </Option>
+              ))}
+            </Dropdown>
+          </FormGroup>
 
-                    {bookingMethod && bookingMethod !== 'Others (specify)' && (
-                        <FormGroup>
-                            <Label>{translations.bookingFormBookingPlatformLabel}</Label>
-                            <animated.div style={dropdownAnimation}>
-                                <Dropdown value={bookingPlatform} onChange={handleBookingPlatformChange}>
-                                    <Option value="">{translations.bookingFormSelectBookingPlatform}</Option>
-                                    {bookingPlatforms[bookingMethod].map((platform) => (
-                                        <Option key={platform} value={platform}>
-                                            {platform}
-                                        </Option>
-                                    ))}
-                                </Dropdown>
-                            </animated.div>
-                        </FormGroup>
-                    )}
+          {bookingMethod && bookingMethod !== 'Others (specify)' && bookingMethod !== 'Your Operator' && (
+            <FormGroup>
+              <Label>{translations.bookingFormBookingPlatformLabel}</Label>
+              <animated.div style={dropdownAnimation}>
+                <Dropdown
+                  value={bookingPlatform}
+                  onChange={handleBookingPlatformChange}
+                >
+                  <Option value="">
+                    {translations.bookingFormSelectBookingPlatform}
+                  </Option>
+                  {bookingPlatforms[bookingMethod]?.map((platform) => (
+                    <Option key={platform.value} value={platform.value}>
+                      {platform.label}
+                    </Option>
+                  ))}
+                </Dropdown>
+              </animated.div>
+            </FormGroup>
+          )}
 
-                    {bookingMethod === 'Others (specify)' && (
-                        <FormGroup>
-                            <Label>{translations.bookingFormOthersSpecifyLabel}</Label>
-                            <Input type="text" value={bookingPlatform} onChange={handleOthersSpecifyChange} />
-                        </FormGroup>
-                    )}
+          {bookingMethod === 'Others (specify)' && (
+            <FormGroup>
+              <Label>{translations.bookingFormOthersSpecifyLabel}</Label>
+              <Input
+                type="text"
+                value={bookingPlatform}
+                onChange={handleOthersSpecifyChange}
+              />
+            </FormGroup>
+          )}
 
-                </Container>
-            </GradientBackground>
-        </>
-    );
-
+          {bookingMethod === 'Your Operator' && (
+            <FormGroup>
+              <Label>{translations.bookingFormTourOperatorLabel}</Label>
+              <Input
+                type="text"
+                value={bookingPlatform}
+                onChange={handleOthersSpecifyChange}
+                placeholder={translations.bookingFormTourOperatorPlaceholder}
+              />
+            </FormGroup>
+          )}
+        </Container>
+      </GradientBackground>
+    </>
+  );
 };
 
 export default BookingForm;

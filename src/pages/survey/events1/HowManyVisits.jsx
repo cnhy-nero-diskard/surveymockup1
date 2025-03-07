@@ -83,9 +83,6 @@ const VisitCounter = () => {
   const currentStepIndex = useCurrentStepIndex(routes);
   const { activeBlocks } = useContext(UnifiedContext);
   const navigate = useNavigate();
-
-
-
   const [selectedOption, setSelectedOption] = useState(null);
   const [language, setLanguage] = useState(localStorage.getItem('selectedLanguage'));
   const translations = useTranslations('VisitCounter', language);

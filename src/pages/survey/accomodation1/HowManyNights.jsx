@@ -9,6 +9,7 @@ import GradientBackground from '../../../components/partials/GradientBackground'
 import { useCurrentStepIndex } from '../../../components/utils/useCurrentIndex';
 import { UnifiedContext } from '../../../routes/UnifiedContext';
 import { goToNextStep } from '../../../components/utils/navigationUtils';
+import { RadioLabel } from '../../../components/utils/styles1';
 
 const fadeIn = keyframes`
   from {
@@ -53,24 +54,24 @@ const RadioGroup = styled.div`
   justify-content: center;
 `;
 
-const RadioLabel = styled.label`
-  display: flex;
-  align-items: center;
-  cursor: pointer;
-  font-size: 18px;
-  font-weight: 500;
-  padding: 12px 24px;
-  border: 2px solid #007bff;
-  border-radius: 8px;
-  transition: all 0.3s ease;
-  background-color: ${props => (props.checked ? '#007bff' : 'transparent')};
-  color: ${props => (props.checked ? 'white' : '#007bff')};
+// const RadioLabel = styled.label`
+//   display: flex;
+//   align-items: center;
+//   cursor: pointer;
+//   font-size: 18px;
+//   font-weight: 500;
+//   padding: 12px 24px;
+//   border: 2px solid #007bff;
+//   border-radius: 25px;
+//   transition: all 0.3s ease;
+//   background-color: ${props => (props.checked ? '#007bff' : 'transparent')};
+//   color: ${props => (props.checked ? 'white' : '#007bff')};
 
-  &:hover {
-    background-color: #007bff;
-    color: white;
-  }
-`;
+//   &:hover {
+//     background-color: #007bff;
+//     color: white;
+//   }
+// `;
 
 const RadioInput = styled.input`
   margin-right: 12px;
@@ -97,26 +98,7 @@ const InputField = styled.input`
   border-radius: 4px;
 `;
 
-const NextButton = styled.button`
-  padding: 12px 24px;
-  font-size: 16px;
-  font-weight: 500;
-  color: white;
-  background-color: #007bff;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
 
-  &:hover {
-    background-color: #0056b3;
-  }
-
-  &:disabled {
-    background-color: #cccccc;
-    cursor: not-allowed;
-  }
-`;
 
 const ProgressBar = styled.div`
   width: 100%;

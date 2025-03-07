@@ -6,7 +6,7 @@ import GradientBackground from '../../../components/partials/GradientBackground'
 import imgoverlay from "../../../components/img/persons.png";
 import { useNavigate } from 'react-router-dom';
 import useTranslations from '../../../components/utils/useTranslations';
-import { Container, NextButtonU } from '../../../components/utils/styles1';
+import { Container, Input, NextButtonU } from '../../../components/utils/styles1';
 import { submitSurveyResponses } from '../../../components/utils/sendInputUtils';
 import { useCurrentStepIndex } from '../../../components/utils/useCurrentIndex';
 import { UnifiedContext } from '../../../routes/UnifiedContext';
@@ -55,19 +55,7 @@ const InputContainer = styled.div`
   }
 `;
 
-const Input = styled.input`
-  padding: 12px;
-  font-size: 1.2rem;
-  border: 2px solid #ccc;
-  border-radius: 8px;
-  margin-right: 10px;
-  transition: border-color 0.3s ease;
 
-  &:focus {
-    border-color: #007bff;
-    outline: none;
-  }
-`;
 
 const ErrorText = styled.p`
   color: #ff4d4f;
@@ -134,7 +122,6 @@ const TravelQuestion = () => {
     <>
       <BodyPartial />
       <GradientBackground overlayImage={imgoverlay} opacity={0.1} handleNextClick={handleNextClick} blendMode="multiply">
-        <Container>
           <QuestionContainer>
             <QuestionText>{translations.travelQuestionPersonCountText}</QuestionText>
             <HelperText>{translations.travelQuestionHelperText}</HelperText>
@@ -151,7 +138,6 @@ const TravelQuestion = () => {
               {error && <ErrorText>{error}</ErrorText>}
             </InputContainer>
           </QuestionContainer>
-        </Container>
       </GradientBackground>
     </>
   );

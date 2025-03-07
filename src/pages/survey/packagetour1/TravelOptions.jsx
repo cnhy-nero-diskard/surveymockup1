@@ -31,22 +31,6 @@ const OptionsContainer = styled.div`
   gap: 20px;
 `;
 
-const Option = styled(animated.div)`
-  padding: 15px 30px;
-  border: 2px solid ${(props) => (props.selected ? '#007bff' : '#ccc')};
-  border-radius: 20px;
-  cursor: pointer;
-  font-size: 18px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  color: ${(props) => (props.selected ? '#fff' : '#007bff')};
-  background-color: ${(props) => (props.selected ? '#007bff' : '#fff')};
-  transition: background-color 0.3s, color 0.3s, border 0.3s;
-
-  &:hover {
-    background-color: #007bff;
-    color: #fff;
-  }
-`;
 
 const TravelOptions = () => {
     const [selectedOption, setSelectedOption] = useState(null);

@@ -12,7 +12,7 @@ export const Container = styled(motion.div)`
   justify-content: center;
   padding: 10px;
   border-radius: 10px;
-  height: 80vh;
+  height: 100%;
   
 `;
 
@@ -145,27 +145,57 @@ export const NextButtonU = styled.button`
     box-shadow: 0 0 0 3px rgba(36, 17, 203, 0.3);
   }
 `;
+// A subtle "bounce" or "pop-in" animation
+const popInAnimation = keyframes`
+  0% {
+    transform: scale(0.95);
+    opacity: 0.8;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+`;
+
+
 export const Option = styled.div`
   display: flex;
   align-items: center;
-  background: ${({ selected }) => (selected ? 'rgb(8, 65, 252)' : 'rgb(184, 201, 255)')};
+  background: ${({ selected }) =>
+    selected
+      ? 'linear-gradient(to right, rgba(126, 135, 255, 0.8), rgba(70, 143, 240, 0.88))'
+      : 'linear-gradient(to right, rgb(0, 181, 253), srgba(11, 129, 240, 0.48))'};
   padding: 15px 20px;
   border-radius: 25px;
   box-shadow: 0 4px 6px rgba(29, 43, 105, 0.69);
   transition: all 0.3s ease-in-out;
   cursor: pointer;
+  color: rgb(49, 49, 49);
+
+  /* Apply the pop-in animation on mount or if selected changes to "true" */
+  animation: ${({ selected }) => (selected ? popInAnimation : null)} 0.4s ease-out;
 
   &:hover {
     transform: translateY(-5px);
-    background: ${({ selected }) => (selected ? '#6a11cb' : '#2575fc')};
+    background: ${({ selected }) =>
+      selected
+        ? 'linear-gradient(to right, #6a11cb, #2575fc)'
+        : 'linear-gradient(to right, #2575fc, #6a11cb)'};
     box-shadow: 0 6px 8px rgba(29, 43, 105, 0.8);
+    color: white;
   }
 
   &:active {
     transform: scale(0.95);
   }
 `;
-export const OptionsGrid = styled.div`
+
+
+export const ssGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 20px;
@@ -367,5 +397,23 @@ export const NormOption = styled(motion.div)`
   @media (max-width: 480px) {
     font-size: 1.2rem;
     padding: 10px;
+  }
+`;
+export const RadioLabel = styled.label`
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  font-size: 18px;
+  font-weight: 500;
+  padding: 12px 24px;
+  border: 2px solid #007bff;
+  border-radius: 25px;
+  transition: all 0.3s ease;
+  background-color: ${props => (props.checked ? '#007bff' : 'rgba(124, 186, 253, 0.57)')};
+  color: ${props => (props.checked ? 'white' : '#007bff')};
+
+  &:hover {
+    background-color: #007bff;
+    color: white;
   }
 `;

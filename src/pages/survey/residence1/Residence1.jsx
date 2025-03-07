@@ -6,7 +6,6 @@ import BodyPartial from '../../../components/partials/BodyPartial';
 import GradientBackground from '../../../components/partials/GradientBackground';
 import { useNavigate } from 'react-router-dom';
 import useTranslations from '../../../components/utils/useTranslations';
-import { RESIDENCE1 as COMPONENT } from '../../../components/utils/componentConstants';
 import { submitSurveyResponses } from '../../../components/utils/sendInputUtils';
 import { countries } from 'countries-list';
 import { Container, GlowingCheckbox, Input, NextButtonU, QuestionText, fontColorU } from '../../../components/utils/styles1';
@@ -358,161 +357,163 @@ const Residence1 = () => {
 
 
       <GradientBackground handleNextClick={handleNextClick}>
-        <QuestionText>{translations.title}</QuestionText>
-        <Paragraph>{translations.note}</Paragraph>
-        {error && <ErrorMessage>{error}</ErrorMessage>}
-
-        <Option>
-          <GlowingCheckbox
-            type="checkbox"
-            name="inCity"
-            id="in-city"
-            checked={location.inCity}
-            onChange={handleLocationChange}
-          />
-          <CustomCheckbox htmlFor="in-city">{translations.inCity}</CustomCheckbox>
-        </Option>
-
-        <Option>
-          <GlowingCheckbox
-            type="checkbox"
-            name="outsideCity"
-            id="outside-city"
-            checked={location.outsideCity}
-            onChange={handleLocationChange}
-          />
-          <CustomCheckbox htmlFor="outside-city">
-            {translations.outsideCity}
-          </CustomCheckbox>
-        </Option>
-
-        <FadeTransition
-          in={location.outsideCity}
-          timeout={300}
-          classNames="fade"
-          nodeRef={provinceRef}
-          unmountOnExit
-        >
-          <InputGroup ref={provinceRef}>
-            <Label htmlFor="province">{translations.province}</Label>
-            <Input
-              type="text"
-              id="province"
-              name="province"
-              value={provinceInput}
-              onChange={handleProvinceInputChange}
-              placeholder="Enter your province…"
-              aria-label="Province Input"
+<Container>
+          <QuestionText>{translations.title}</QuestionText>
+          <Paragraph>{translations.note}</Paragraph>
+          {error && <ErrorMessage>{error}</ErrorMessage>}
+  
+          <Option>
+            <GlowingCheckbox
+              type="checkbox"
+              name="inCity"
+              id="in-city"
+              checked={location.inCity}
+              onChange={handleLocationChange}
             />
-            {showProvinceSuggestions && provinceSuggestions.length > 0 && (
-              <Suggestions show={showProvinceSuggestions}>
-                <CloseSuggestions onClick={handleCloseSuggestions}>
-                  ×
-                </CloseSuggestions>
-                {provinceSuggestions.map((suggestion, index) => (
-                  <SuggestionItem
-                    key={index}
-                    onClick={() => handleSuggestionClick(setProvinceInput, suggestion)}
-                  >
-                    {suggestion}
-                  </SuggestionItem>
-                ))}
-              </Suggestions>
-            )}
-          </InputGroup>
-        </FadeTransition>
-
-        <FadeTransition
-          in={location.outsideCity && provinceInput}
-          timeout={300}
-          classNames="fade"
-          nodeRef={cityMunRef}
-          unmountOnExit
-        >
-          <InputGroup ref={cityMunRef}>
-            <Label htmlFor="city-mun">{translations.cityMun}</Label>
-            <Input
-              type="text"
-              id="city-mun"
-              name="city-mun"
-              value={cityMunInput}
-              onChange={handleCityMunInputChange}
-              disabled={!provinceInput}
-              placeholder="Enter your city or municipality…"
-              aria-label="City/Municipality Input"
+            <CustomCheckbox htmlFor="in-city">{translations.inCity}</CustomCheckbox>
+          </Option>
+  
+          <Option>
+            <GlowingCheckbox
+              type="checkbox"
+              name="outsideCity"
+              id="outside-city"
+              checked={location.outsideCity}
+              onChange={handleLocationChange}
             />
-            {showCityMunSuggestions && cityMunSuggestions.length > 0 && (
-              <Suggestions show={showCityMunSuggestions}>
-                <CloseSuggestions onClick={handleCloseSuggestions}>
-                  ×
-                </CloseSuggestions>
-                {cityMunSuggestions.map((suggestion, index) => (
-                  <SuggestionItem
-                    key={index}
-                    onClick={() => handleSuggestionClick(setCityMunInput, suggestion)}
-                  >
-                    {suggestion}
-                  </SuggestionItem>
-                ))}
-              </Suggestions>
-            )}
-          </InputGroup>
-        </FadeTransition>
-
-        <Option>
-          <GlowingCheckbox
-            type="checkbox"
-            name="foreignCountry"
-            id="foreign-country"
-            checked={location.foreignCountry}
-            onChange={handleLocationChange}
-          />
-          <CustomCheckbox htmlFor="foreign-country">
-            {translations.foreignCountry}
-          </CustomCheckbox>
-        </Option>
-
-        <FadeTransition
-          in={location.foreignCountry}
-          timeout={300}
-          classNames="fade"
-          nodeRef={specifyRef}
-          unmountOnExit
-        >
-          <InputGroup ref={specifyRef}>
-            <Label htmlFor="specify">{translations.specify}</Label>
-            <Input
-              type="text"
-              id="specify"
-              name="specify"
-              value={specifyInput}
-              onChange={handleSpecifyInputChange}
-              placeholder="Enter your country…"
-              aria-label="Country Input"
+            <CustomCheckbox htmlFor="outside-city">
+              {translations.outsideCity}
+            </CustomCheckbox>
+          </Option>
+  
+          <FadeTransition
+            in={location.outsideCity}
+            timeout={300}
+            classNames="fade"
+            nodeRef={provinceRef}
+            unmountOnExit
+          >
+            <InputGroup ref={provinceRef}>
+              <Label htmlFor="province">{translations.province}</Label>
+              <Input
+                type="text"
+                id="province"
+                name="province"
+                value={provinceInput}
+                onChange={handleProvinceInputChange}
+                placeholder="Enter your province…"
+                aria-label="Province Input"
+              />
+              {showProvinceSuggestions && provinceSuggestions.length > 0 && (
+                <Suggestions show={showProvinceSuggestions}>
+                  <CloseSuggestions onClick={handleCloseSuggestions}>
+                    ×
+                  </CloseSuggestions>
+                  {provinceSuggestions.map((suggestion, index) => (
+                    <SuggestionItem
+                      key={index}
+                      onClick={() => handleSuggestionClick(setProvinceInput, suggestion)}
+                    >
+                      {suggestion}
+                    </SuggestionItem>
+                  ))}
+                </Suggestions>
+              )}
+            </InputGroup>
+          </FadeTransition>
+  
+          <FadeTransition
+            in={location.outsideCity && provinceInput}
+            timeout={300}
+            classNames="fade"
+            nodeRef={cityMunRef}
+            unmountOnExit
+          >
+            <InputGroup ref={cityMunRef}>
+              <Label htmlFor="city-mun">{translations.cityMun}</Label>
+              <Input
+                type="text"
+                id="city-mun"
+                name="city-mun"
+                value={cityMunInput}
+                onChange={handleCityMunInputChange}
+                disabled={!provinceInput}
+                placeholder="Enter your city or municipality…"
+                aria-label="City/Municipality Input"
+              />
+              {showCityMunSuggestions && cityMunSuggestions.length > 0 && (
+                <Suggestions show={showCityMunSuggestions}>
+                  <CloseSuggestions onClick={handleCloseSuggestions}>
+                    ×
+                  </CloseSuggestions>
+                  {cityMunSuggestions.map((suggestion, index) => (
+                    <SuggestionItem
+                      key={index}
+                      onClick={() => handleSuggestionClick(setCityMunInput, suggestion)}
+                    >
+                      {suggestion}
+                    </SuggestionItem>
+                  ))}
+                </Suggestions>
+              )}
+            </InputGroup>
+          </FadeTransition>
+  
+          <Option>
+            <GlowingCheckbox
+              type="checkbox"
+              name="foreignCountry"
+              id="foreign-country"
+              checked={location.foreignCountry}
+              onChange={handleLocationChange}
             />
-            {showSpecifySuggestions && specifySuggestions.length > 0 && (
-              <Suggestions show={showSpecifySuggestions}>
-                <CloseSuggestions onClick={handleCloseSuggestions}>
-                  ×
-                </CloseSuggestions>
-                {specifySuggestions.map((countryCode, index) => (
-                  <SuggestionItem
-                    key={index}
-                    onClick={() =>
-                      handleSuggestionClick(
-                        setSpecifyInput,
-                        countries[countryCode].native
-                      )
-                    }
-                  >
-                    {countries[countryCode].native}
-                  </SuggestionItem>
-                ))}
-              </Suggestions>
-            )}
-          </InputGroup>
-        </FadeTransition>
-      </GradientBackground>
+            <CustomCheckbox htmlFor="foreign-country">
+              {translations.foreignCountry}
+            </CustomCheckbox>
+          </Option>
+  
+          <FadeTransition
+            in={location.foreignCountry}
+            timeout={300}
+            classNames="fade"
+            nodeRef={specifyRef}
+            unmountOnExit
+          >
+            <InputGroup ref={specifyRef}>
+              <Label htmlFor="specify">{translations.specify}</Label>
+              <Input
+                type="text"
+                id="specify"
+                name="specify"
+                value={specifyInput}
+                onChange={handleSpecifyInputChange}
+                placeholder="Enter your country…"
+                aria-label="Country Input"
+              />
+              {showSpecifySuggestions && specifySuggestions.length > 0 && (
+                <Suggestions show={showSpecifySuggestions}>
+                  <CloseSuggestions onClick={handleCloseSuggestions}>
+                    ×
+                  </CloseSuggestions>
+                  {specifySuggestions.map((countryCode, index) => (
+                    <SuggestionItem
+                      key={index}
+                      onClick={() =>
+                        handleSuggestionClick(
+                          setSpecifyInput,
+                          countries[countryCode].native
+                        )
+                      }
+                    >
+                      {countries[countryCode].native}
+                    </SuggestionItem>
+                  ))}
+                </Suggestions>
+              )}
+            </InputGroup>
+          </FadeTransition>
+  
+</Container>      </GradientBackground>
     </>
   );
 };

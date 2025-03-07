@@ -6,7 +6,7 @@ import GradientBackground from '../../../components/partials/GradientBackground'
 import imgoverlay from "../../../components/img/persons.png";
 import { useNavigate } from 'react-router-dom';
 import useTranslations from '../../../components/utils/useTranslations';
-import { NextButtonU, QuestionText } from '../../../components/utils/styles1';
+import { NextButtonU, Option, QuestionText } from '../../../components/utils/styles1';
 import { submitSurveyResponses } from '../../../components/utils/sendInputUtils';
 import { useCurrentStepIndex } from '../../../components/utils/useCurrentIndex';
 import { UnifiedContext } from '../../../routes/UnifiedContext';
@@ -38,27 +38,27 @@ const OptionsContainer = styled.div`
   margin-bottom: 20px;
 `;
 
-const Option = styled(motion.div)`
-  padding: 15px;
-  text-align: center;
-  border-radius: 25px;
-  cursor: pointer;
-  font-size: 1.1rem;
-  color: #333;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  transition: background-color 0.3s ease, transform 0.2s ease;
-  background-color: ${props => (props.selected ? 'blue' : '#f0f0f0')};
-  color: ${props => (props.selected ? '#fff' : '#333')};
+// const Option = styled(motion.div)`
+//   padding: 15px;
+//   text-align: center;
+//   border-radius: 25px;
+//   cursor: pointer;
+//   font-size: 1.1rem;
+//   color: #333;
+//   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+//   transition: background-color 0.3s ease, transform 0.2s ease;
+//   background-color: ${props => (props.selected ? 'blue' : '#f0f0f0')};
+//   color: ${props => (props.selected ? '#fff' : '#333')};
 
-  &:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-  }
+//   &:hover {
+//     transform: translateY(-3px);
+//     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+//   }
 
-  &:active {
-    transform: translateY(0);
-  }
-`;
+//   &:active {
+//     transform: translateY(0);
+//   }
+// `;
 
 const ErrorMessage = styled.div`
   color: #e74c3c;

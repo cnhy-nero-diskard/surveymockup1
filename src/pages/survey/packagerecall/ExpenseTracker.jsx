@@ -9,6 +9,7 @@ import { submitSurveyResponses } from '../../../components/utils/sendInputUtils'
 import { goToNextStep } from '../../../components/utils/navigationUtils';
 import { useCurrentStepIndex } from '../../../components/utils/useCurrentIndex';
 import { UnifiedContext } from '../../../routes/UnifiedContext';
+import { NormOption } from '../../../components/utils/styles1';
 
 const Container = styled.div`
   font-family: Arial, sans-serif;
@@ -69,16 +70,10 @@ const CurrencySelect = styled.select`
   border-radius: 4px;
 `;
 
-const NextButton = styled(animated.button)`
-  margin-top: 20px;
-  padding: 10px;
-  // ... rest of your styles
-`;
 
 const ForgetButton = styled(animated.button)`
   margin-top: 10px;
   padding: 10px;
-  // ... rest of your styles
 `;
 
 const ExpenseTracker = () => {
@@ -203,7 +198,7 @@ const ExpenseTracker = () => {
                         <SummaryValue>{translations.expenseTrackerTotalInCurrency} {selectedCurrency}: {totalExpenses.toFixed(2)}</SummaryValue>
                         <SummaryValue><br />{translations.expenseTrackerTotalInPHP}: ₱{convertedTotal.toFixed(2)}</SummaryValue>
                     </Summary>
-                    <ForgetButton style={buttonAnimation} onClick={handleForgetButtonClick}>{translations.expenseTrackerForgetButton}</ForgetButton>
+                    <NormOption style={buttonAnimation} onClick={handleForgetButtonClick}>{translations.expenseTrackerForgetButton}</NormOption>
                 </Container>
             </GradientBackground>
         </>

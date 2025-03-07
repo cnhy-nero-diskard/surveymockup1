@@ -23,6 +23,7 @@ const Option = styled(animated.div)`
   border-color: transparent;
   transition: background-color 0.3s ease;
   background-color: rgb(47, 134, 206);
+    box-shadow: inset 0 1px 4px rgba(0,0,0,0.15);
 
   &:hover {
     background-color: rgb(4, 110, 197);
@@ -31,7 +32,7 @@ const Option = styled(animated.div)`
   ${({ selected }) =>
     selected &&
     `
-    background-color: rgb(18, 177, 31);
+    background-color: rgb(2, 189, 49);
     color: white;
   `}
 `;
@@ -151,7 +152,7 @@ const BranchingSelect = () => {
           >
             {translations.branchingSelectServices}
           </Option>
-          {selectedOptions.length > 0 && (
+          {/* {selectedOptions.length > 0 && (
             <animated.div style={springProps} className="selected-option">
               {translations.branchingSelectSelectedOptions}:{' '}
               {selectedOptions.map((option) => {
@@ -169,7 +170,7 @@ const BranchingSelect = () => {
                 }
               }).join(', ')}
             </animated.div>
-          )}
+          )} */}
         </animated.div>
       </GradientBackground>
     </>

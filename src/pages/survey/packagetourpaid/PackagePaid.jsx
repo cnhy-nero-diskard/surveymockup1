@@ -40,7 +40,7 @@ const InputContainer = styled.div`
 const InputLabel = styled.label`
   font-size: 18px;
   font-weight: 600;
-  color: #555;
+  color: white;
 `;
 
 const CurrencyInput = styled.input`
@@ -174,11 +174,11 @@ const PackagePaid = () => {
         <Container>
           <QuestionText style={questionAnimation}>{translations.packagePaidQuestion}</QuestionText>
           <InputContainer>
-            <InputLabel>{translations.packagePaidInputLabel}</InputLabel>
+            <InputLabel>({translations.packagePaidInputLabel})</InputLabel>
             <CurrencyInput
               type="number"
               name="price"
-              placeholder="Enter amount"
+              placeholder="..."
               value={responses.price}
               onChange={handleInputChange}
               aria-label="Enter package price"
