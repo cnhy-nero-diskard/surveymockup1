@@ -8,11 +8,12 @@ import { useNavigate } from 'react-router-dom';
 import imgoverlay from '../../../components/img/profile.png';
 import useTranslations from '../../../components/utils/useTranslations';
 import { submitSurveyResponses } from '../../../components/utils/sendInputUtils';
-import { Input, NextButtonU } from '../../../components/utils/styles1';
+import { Input } from '../../../components/utils/styles1';
 import { useCurrentStepIndex } from '../../../components/utils/useCurrentIndex';
 import { UnifiedContext } from '../../../routes/UnifiedContext';
 import { goToNextStep } from '../../../components/utils/navigationUtils';
 
+/** --- Styled Components --- **/
 const Container = styled(motion.div)`
   display: flex;
   flex-direction: column;
@@ -21,6 +22,7 @@ const Container = styled(motion.div)`
   max-width: 600px;
   margin: 0 auto;
   border-radius: 15px;
+
   @media (max-width: 768px) {
     padding: 15px;
   }
@@ -31,6 +33,7 @@ const Label = styled.label`
   font-weight: bold;
   color: white;
   font-size: 0.9rem;
+
   @media (max-width: 480px) {
     font-size: 0.8rem;
   }
@@ -52,13 +55,13 @@ const customSelectStyles = {
   }),
   menu: (provided) => ({
     ...provided,
-    backgroundColor: 'rgb(0,0,0,0.5)',
-    zIndex: 9999, 
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    zIndex: 9999,
   }),
   menuList: (provided) => ({
     ...provided,
-    maxHeight: 200, 
-    overflowY: 'auto', 
+    maxHeight: 200,
+    overflowY: 'auto',
   }),
   option: (provided, state) => ({
     ...provided,
@@ -70,12 +73,12 @@ const customSelectStyles = {
 const ResponsiveContainer = styled.div`
   width: 100%;
   box-sizing: border-box;
+
   @media (max-width: 768px) {
     padding: 10px;
   }
 `;
 
-/* Horizontal checklist container for civil status */
 const HorizontalChecklistContainer = styled.div`
   display: flex;
   flex-wrap: wrap;
@@ -86,6 +89,7 @@ const HorizontalChecklistContainer = styled.div`
 const ChecklistOption = styled.div`
   display: flex;
   align-items: center;
+
   input[type='radio'] {
     margin-right: 0.5rem;
   }
@@ -99,6 +103,7 @@ const PProfile1 = () => {
   const [language, setLanguage] = useState(localStorage.getItem('selectedLanguage'));
   const translations = useTranslations('PProfile1', language);
 
+  // All the fields we collect.
   const [inputs, setInputs] = useState([
     { id: 'age', value: '', surveyquestion_ref: 'AGE01' },
     { id: 'nationality', value: null, surveyquestion_ref: 'NAT01' },
@@ -106,85 +111,179 @@ const PProfile1 = () => {
     { id: 'civilStatus', value: null, surveyquestion_ref: 'CIV01' },
     { id: 'occupation', value: '', surveyquestion_ref: 'OCC01' },
     { id: 'income', value: '', surveyquestion_ref: 'INC01' },
-    { id: 'currency', value: 'PHP', surveyquestion_ref: 'CUR01' },
-    { id: 'convertedIncome', value: '', surveyquestion_ref: 'CONV01' }, // Added converted income field
+    { id: 'currency', value: 'PHP', surveyquestion_ref: 'CUR01' },   // We store the currency ISO code here, e.g. "USD"
+    { id: 'convertedIncome', value: '', surveyquestion_ref: 'CONV01' },
   ]);
 
+  // We’ll store the dropdown options for nationality/currency and the conversion rates.
   const [nationalities, setNationalities] = useState([]);
   const [currencies, setCurrencies] = useState([]);
   const [conversionRates, setConversionRates] = useState({});
 
-  // Fetch nationalities and currencies from REST Countries API
+  /**
+   * Fetch nationality and currency info from the RESTCountries API
+   * *Important:* We'll gather ISO currency codes from "Object.keys(country.currencies)" 
+   * so that we can match them with "conversionRates" from the exchange-rate API.
+   */
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchCountries = async () => {
       try {
         const response = await fetch('https://restcountries.com/v3.1/all');
         const data = await response.json();
 
-        // Fetch nationalities
-        const nationalityOptions = data.map(country => {
-          const nationality = country.demonyms?.eng?.m || "Unknown";
+        // Build nationality options (sorted by demonym label).
+        const nationalityOptions = data.map((country) => {
+          const nationality = country.demonyms?.eng?.m || 'Unknown';
           return {
-            value: country.cca2, 
+            value: country.cca2,
             label: nationality,
           };
         });
-
-        // Sort nationalities alphabetically
         nationalityOptions.sort((a, b) => a.label.localeCompare(b.label));
         setNationalities(nationalityOptions);
 
-        // Fetch currencies
-        const currencyOptions = data
-          .flatMap(country => Object.values(country.currencies || {}))
-          .filter((currency, index, self) => 
-            self.findIndex(c => c.name === currency.name) === index
-          )
-          .map(currency => ({
-            value: currency.name,
-            label: `${currency.name} (${currency.symbol})`,
-          }));
+        // Build currency options using ISO codes (e.g. "USD", "PHP").
+        // We'll use the code as "value" and add a label that includes both the code and symbol or name.
+        const allCurrencies = [];
+        data.forEach((country) => {
+          if (country.currencies) {
+            Object.entries(country.currencies).forEach(([code, info]) => {
+              allCurrencies.push({
+                code,
+                name: info.name,
+                symbol: info.symbol,
+              });
+            });
+          }
+        });
 
-        // Sort currencies alphabetically
-        currencyOptions.sort((a, b) => a.label.localeCompare(b.label));
+        // De-duplicate the array by code since multiple countries can share the same currency code.
+        const uniqueCurrencies = Array.from(
+          new Map(allCurrencies.map((curr) => [curr.code, curr])).values()
+        );
+
+        // Create dropdown options, sorted by code or name as you prefer
+        const currencyOptions = uniqueCurrencies
+          .map((curr) => ({
+            value: curr.code, // This is critical, e.g., "USD"
+            label: `${curr.code} – ${curr.name}${curr.symbol ? ' (' + curr.symbol + ')' : ''}`,
+          }))
+          .sort((a, b) => a.label.localeCompare(b.label));
+
         setCurrencies(currencyOptions);
       } catch (error) {
         console.error('Error fetching data:', error);
       }
     };
 
-    fetchData();
+    fetchCountries();
   }, []);
 
-  // Fetch conversion rates from an external API
+  /**
+   * Fetch exchange rates with the base set to PHP,
+   * so that "rates.USD" means "1 PHP = X USD".
+   */
   useEffect(() => {
     const fetchConversionRates = async () => {
       try {
-        const response = await fetch('https://api.exchangerate-api.com/v4/latest/PHP'); // Base currency is PHP
+        const response = await fetch('https://api.exchangerate-api.com/v4/latest/PHP');
         const data = await response.json();
         setConversionRates(data.rates);
       } catch (error) {
         console.error('Error fetching conversion rates:', error);
       }
     };
-
     fetchConversionRates();
   }, []);
 
-  // Convert income whenever income or currency changes
+  /**
+   * Convert to PHP as soon as either "income" or "currency" changes
+   */
   useEffect(() => {
-    const income = inputs.find((input) => input.id === 'income').value;
-    const currency = inputs.find((input) => input.id === 'currency').value;
+    const incomeInput = inputs.find((input) => input.id === 'income');
+    const currencyInput = inputs.find((input) => input.id === 'currency');
 
-    if (!income || isNaN(income)) return;
+    const income = parseFloat(incomeInput.value || '0');
+    const currencyCode = currencyInput.value; // ISO code, e.g. "USD"
 
-    const rate = conversionRates[currency] || 1; // Default to 1 if rate is not found
-    const convertedIncome = (income / rate).toFixed(2); // Convert to PHP
+    // If there's no input or it's invalid, or <=0, just set 0.00
+    if (isNaN(income) || income <= 0) {
+      handleInputChange('convertedIncome', '0.00');
+      return;
+    }
 
-    // Update the converted income field
+    // If the user is already in PHP, one "unit" is 1:1
+    if (currencyCode === 'PHP') {
+      handleInputChange('convertedIncome', income.toFixed(2));
+      return;
+    }
+
+    // If we do have the conversion rate from the currency to *one* PHP, 
+    // we want to compute how many PHP per 1 currency. 
+    // Because "conversionRates" from 'api.exchangerate-api.com/v4/latest/PHP' 
+    // typically means: 1 PHP = X currencyCode. 
+    // So if 1 PHP = 0.018 USD, then 1 USD = 1 / 0.018 PHP = ~55.56 PHP 
+    // But let's confirm the direction carefully:
+    // 
+    // According to "exchangerate-api" docs, if you request base=PHP:
+    // data.rates.USD => how many USD in 1 PHP
+    // 
+    // So if data.rates.USD = 0.018, that means 1 PHP = 0.018 USD
+    // Then 1 USD = 1 / 0.018 = 55.55 PHP
+    //
+    // If the user typed 100 income in USD, we want to find out how many PHP that is.
+    // => 100 USD = 100 * (1 / data.rates.USD) PHP
+    //
+    // Summarily: 
+    //   userIncomeInCurrency => userIncomeInPHP:
+    //   userIncomeInCurrency * (1 / data.rates.USD)
+
+    const rateAgainstPHP = conversionRates[currencyCode];
+
+    if (!rateAgainstPHP) {
+      // If for some reason we don't have the rate for that currency, fallback
+      handleInputChange('convertedIncome', income.toFixed(2));
+      return;
+    }
+
+    // Calculate how many PHP the given income is
+    const convertedIncome = (income * (1 / rateAgainstPHP)).toFixed(2);
     handleInputChange('convertedIncome', convertedIncome);
-  }, [inputs.find((input) => input.id === 'income').value, inputs.find((input) => input.id === 'currency').value, conversionRates]);
 
+  }, [
+    inputs.find((input) => input.id === 'income').value,
+    inputs.find((input) => input.id === 'currency').value,
+    conversionRates,
+  ]);
+
+  /**
+   * Helper for updating any input by ID
+   */
+  const handleInputChange = (id, value) => {
+    setInputs((prevInputs) =>
+      prevInputs.map((input) => (input.id === id ? { ...input, value } : input))
+    );
+  };
+
+  /**
+   * Submission logic
+   */
+  const navigate = useNavigate();
+  const isFormComplete = inputs.every((input) => input.value !== null && input.value !== '');
+
+  const handleNextClick = () => {
+    const surveyResponses = inputs.map((input) => ({
+      surveyquestion_ref: input.surveyquestion_ref,
+      response_value: input.value.toString(),
+    }));
+
+    submitSurveyResponses(surveyResponses);
+    goToNextStep(currentStepIndex, navigate, routes, activeBlocks);
+  };
+
+  /**
+   * Sex and civil status options
+   */
   const sexOptions = [
     { value: 'male', label: translations.sexMale },
     { value: 'female', label: translations.sexFemale },
@@ -198,34 +297,14 @@ const PProfile1 = () => {
     { value: 'separated', label: translations.civilStatusSeparated },
   ];
 
-  const isFormComplete = inputs.every(input => input.value !== null && input.value !== '');
-
-  const handleInputChange = (id, value) => {
-    setInputs((prevInputs) =>
-      prevInputs.map((input) =>
-        input.id === id ? { ...input, value } : input
-      )
-    );
-  };
-
-  const navigate = useNavigate();
-  const handleNextClick = () => {
-    const surveyResponses = inputs.map(input => ({
-      surveyquestion_ref: input.surveyquestion_ref,
-      response_value: input.value.toString()
-    }));
-    submitSurveyResponses(surveyResponses);
-    goToNextStep(currentStepIndex, navigate, routes, activeBlocks);
-  };
-
   return (
     <>
       <BodyPartial />
-      <GradientBackground 
-        overlayImage={imgoverlay} 
-        opacity={0.2} 
-        blendMode="darken" 
-        handleNextClick={handleNextClick} 
+      <GradientBackground
+        overlayImage={imgoverlay}
+        opacity={0.2}
+        blendMode="darken"
+        handleNextClick={handleNextClick}
         buttonAppear={isFormComplete}
       >
         <ResponsiveContainer>
@@ -234,6 +313,7 @@ const PProfile1 = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
           >
+            {/* Age */}
             <Label htmlFor="age">{translations.ageLabel}</Label>
             <Input
               type="number"
@@ -243,26 +323,33 @@ const PProfile1 = () => {
               onChange={(e) => handleInputChange('age', e.target.value)}
             />
 
+            {/* Nationality */}
             <Label htmlFor="nationality">{translations.nationalityLabel}</Label>
             <Select
               options={nationalities}
-              value={nationalities.find(option => option.value === inputs.find(input => input.id === 'nationality').value)}
+              value={nationalities.find(
+                (option) =>
+                  option.value === inputs.find((input) => input.id === 'nationality').value
+              )}
               onChange={(option) => handleInputChange('nationality', option.value)}
               placeholder={translations.nationalityPlaceholder}
               styles={customSelectStyles}
               isSearchable
             />
 
+            {/* Sex */}
             <Label htmlFor="sex">{translations.sexLabel}</Label>
             <Select
               options={sexOptions}
-              value={sexOptions.find(option => option.value === inputs.find(input => input.id === 'sex').value)}
+              value={sexOptions.find(
+                (option) => option.value === inputs.find((input) => input.id === 'sex').value
+              )}
               onChange={(option) => handleInputChange('sex', option.value)}
               placeholder={translations.sexPlaceholder}
               styles={customSelectStyles}
             />
 
-            {/* Civil Status presented as a horizontal checklist */}
+            {/* Civil Status */}
             <Label htmlFor="civilStatus">{translations.civilStatusLabel}</Label>
             <HorizontalChecklistContainer id="civilStatus">
               {civilStatusOptions.map((option) => (
@@ -272,7 +359,9 @@ const PProfile1 = () => {
                     id={option.value}
                     name="civilStatus"
                     value={option.value}
-                    checked={inputs.find((input) => input.id === 'civilStatus').value === option.value}
+                    checked={
+                      inputs.find((input) => input.id === 'civilStatus').value === option.value
+                    }
                     onChange={() => handleInputChange('civilStatus', option.value)}
                   />
                   <label htmlFor={option.value}>{option.label}</label>
@@ -280,6 +369,7 @@ const PProfile1 = () => {
               ))}
             </HorizontalChecklistContainer>
 
+            {/* Occupation */}
             <Label htmlFor="occupation">{translations.occupationLabel}</Label>
             <Input
               type="text"
@@ -289,6 +379,7 @@ const PProfile1 = () => {
               onChange={(e) => handleInputChange('occupation', e.target.value)}
             />
 
+            {/* Income */}
             <Label htmlFor="income">{translations.incomeLabel}</Label>
             <Input
               type="number"
@@ -298,16 +389,23 @@ const PProfile1 = () => {
               onChange={(e) => handleInputChange('income', e.target.value)}
             />
 
+            {/* Currency Selection (Store currency code!) */}
             <Label htmlFor="currency">{translations.currencyLabel}</Label>
             <Select
               options={currencies}
-              value={currencies.find(option => option.value === inputs.find(input => input.id === 'currency').value)}
+              value={currencies.find(
+                (option) =>
+                  option.value === inputs.find((input) => input.id === 'currency').value
+              )}
               onChange={(option) => handleInputChange('currency', option.value)}
               styles={customSelectStyles}
+              isSearchable
             />
 
+            {/* Converted Income (read-only display) */}
             <Label>
-              {translations.convertedIncomeLabel} {inputs.find((input) => input.id === 'convertedIncome').value}
+              {translations.convertedIncomeLabel}{' '}
+              {inputs.find((input) => input.id === 'convertedIncome').value}
             </Label>
           </Container>
         </ResponsiveContainer>

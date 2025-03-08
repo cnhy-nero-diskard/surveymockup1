@@ -9,7 +9,7 @@ import { submitSurveyResponses } from '../../../components/utils/sendInputUtils'
 import { goToNextStep } from '../../../components/utils/navigationUtils';
 import { useCurrentStepIndex } from '../../../components/utils/useCurrentIndex';
 import { UnifiedContext } from '../../../routes/UnifiedContext';
-import { NormOption } from '../../../components/utils/styles1';
+import { NormOption, QuestionText } from '../../../components/utils/styles1';
 
 const Container = styled.div`
   font-family: Arial, sans-serif;
@@ -175,7 +175,7 @@ const ExpenseTracker = () => {
             <BodyPartial />
             <GradientBackground buttonAppear={hasAtLeastOneExpense} handleNextClick={handleNextClick} >
                 <Container>
-                    <Title>{translations.expenseTrackerTitle}</Title>
+                    <QuestionText>{translations.expenseTrackerTitle}</QuestionText>
                     <CurrencySelect value={selectedCurrency} onChange={handleCurrencyChange}>
                         {Object.keys(conversionRates).map((currency) => (
                             <option key={currency} value={currency}>

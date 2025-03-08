@@ -61,7 +61,7 @@ const NextButton = styled(animated.button)`
 const PProfile2 = () => {
   const { routes } = useContext(UnifiedContext);
   const currentStepIndex = useCurrentStepIndex(routes);
-  const { activeBlocks, appendActiveBlocks, removeActiveBlocks } = useContext(UnifiedContext);
+  const { activeBlocks } = useContext(UnifiedContext);
 
   const navigate = useNavigate();
   const [responses, setResponses] = useState([
@@ -86,7 +86,9 @@ const PProfile2 = () => {
   });
 
   const handleInputChange = (index, date) => {
-    setResponses((prev) => prev.map((item, i) => (i === index ? { ...item, value: date } : item)));
+    setResponses((prev) =>
+      prev.map((item, i) => (i === index ? { ...item, value: date } : item))
+    );
   };
 
   const handleNextClick = async () => {
@@ -100,15 +102,16 @@ const PProfile2 = () => {
   };
 
   const areAllFieldsFilled = () => {
-    return responses.every(item => item.value !== null && item.value !== '');
+    return responses.every((item) => item.value !== null && item.value !== '');
   };
 
   useEffect(() => {
-    // This ensures the component re-renders when responses change
+    // Trigger re-render when responses change if needed
   }, [responses]);
 
   return (
-    <><BodyPartial />
+    <>
+      <BodyPartial />
       <GradientBackground
         overlayImage={imgoverlay}
         opacity={0.2}
@@ -124,17 +127,20 @@ const PProfile2 = () => {
               <DatePicker
                 selected={item.value}
                 onChange={(date) => handleInputChange(index, date)}
-                dateFormat="MM/dd/yyyy"
                 disabled={item.ref === 'ACCMP'}
+                dateFormat="MM/dd/yyyy"
                 popperPlacement="bottom"
+                /* Only use a native date input for ARRDT and DEPDT to avoid keyboard on mobile */
+                {...((item.ref === 'ARRDT' || item.ref === 'DEPDT') && {
+                  customInput: <input type="date" />,
+                })}
               />
             </FormField>
           ))}
         </FormContainer>
       </GradientBackground>
-    </>);
+    </>
+  );
 };
-
-
 
 export default PProfile2;
