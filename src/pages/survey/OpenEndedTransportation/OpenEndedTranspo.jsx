@@ -1,130 +1,33 @@
-import React, { useState, useEffect, useContext } from 'react';
-import { motion } from 'framer-motion';
-import BodyPartial from '../../../components/partials/BodyPartial';
-import GradientBackground from '../../../components/partials/GradientBackground';
-import {
-  Container,
-  Title,
-  Paragraph,
-  Button,
-  TextField,
-  NextButtonU,
-  OptionButton
-} from '../../../components/utils/styles1';
-import imgoverlay from "../../../components/img/review.png";
-import { useNavigate } from 'react-router-dom';
+import React from 'react';
 import useTranslations from '../../../components/utils/useTranslations';
-import { submitSurveyResponses } from '../../../components/utils/sendInputUtils';
-import { goToNextStep } from '../../../components/utils/navigationUtils';
-import { useCurrentStepIndex } from '../../../components/utils/useCurrentIndex';
-import { UnifiedContext } from '../../../routes/UnifiedContext';
-
-/* 
-  Make sure you import the OptionButton from the correct file location.
-  For instance:
-  import { OptionButton } from '../../../components/utils/OptionButton';
-*/
+import imgoverlay from "../../../components/img/review.png";
+import OpenFormat2 from '../../OpenEndedFormat2/OpenFormat2';
 
 const OpenEndedTranspo = () => {
-  const { routes } = useContext(UnifiedContext);
-  const currentStepIndex = useCurrentStepIndex(routes);
-  const { activeBlocks } = useContext(UnifiedContext);
+    const language = localStorage.getItem('selectedLanguage');
+    const translations = useTranslations('OpenEnded1', language);
 
-  const [selectedButton, setSelectedButton] = useState(null);
-  const [textFieldValue, setTextFieldValue] = useState('');
-  const [language, setLanguage] = useState(localStorage.getItem('selectedLanguage'));
-  const translations = useTranslations('OpenEnded1', language);
+    const surveyRefs = {
+        satisfaction: 'SATLVTRN',
+        feedback: 'FDBKTRN'
+    };
 
-  const navigate = useNavigate();
-
-  // Map user’s string response to corresponding number
-  const getSatisfactionCode = (option) => {
-    switch (option) {
-      case 'Dissatisfied':
-        return 1;
-      case 'Neutral':
-        return 2;
-      case 'Satisfied':
-        return 3;
-      case 'VerySatisfied':
-        return 4;
-      default:
-        return null;
-    }
-  };
-
-  const handleButtonClick = (button) => {
-    setSelectedButton(button);
-    console.log(`Selected: ${button}`);
-  };
-
-  const handleNextClick = async () => {
-    // Convert selectedButton to an integer code before sending
-    const satisfactionCode = getSatisfactionCode(selectedButton);
-
-    const surveyResponses = [
-      { surveyquestion_ref: 'SATLVTRN', response_value: satisfactionCode },
-      { surveyquestion_ref: 'FDBKTRN', response_value: textFieldValue}
-    ];
-    console.log("textFieldValue length:", textFieldValue.length);
-    try {
-      await submitSurveyResponses(surveyResponses);
-      goToNextStep(currentStepIndex, navigate, routes, activeBlocks);
-    } catch (error) {
-      console.error('Error submitting responses:', error);
-    }
-  };
-
-  useEffect(() => {
-    setLanguage(localStorage.getItem('selectedLanguage'));
-  }, [localStorage.getItem('selectedLanguage')]);
-
-  // Condition to check if all inputs are valid
-  const isFormValid = selectedButton !== null && textFieldValue.trim().length > 10;
-
-  return (
-    <>
-      <BodyPartial />
-      <GradientBackground
-        overlayImage={imgoverlay}
-        opacity={0.2}
-        handleNextClick={handleNextClick}
-        buttonAppear={isFormValid} // Set buttonAppear based on form validity
-      >
-        <Container
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-        >
-          <Title>{translations.openEndedTranspoTitle}</Title>
-          
-            {['Dissatisfied', 'Neutral', 'Satisfied', 'VerySatisfied'].map((option) => (
-              <OptionButton
-                style={{marginBottom:5}}
-                as={motion.button}
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
-                key={option}
-                className={selectedButton === option ? `selected ${option}` : ''}
-                onClick={() => handleButtonClick(option)}
-                tabIndex={0}
-                aria-label={option}
-              >
-                {translations[`openEnded1${option}`]}
-              </OptionButton>
-            ))}
-
-          <Paragraph>{translations.openEnded1FeedbackRequest}</Paragraph>
-          <TextField
-            placeholder={translations.openEnded1TextFieldPlaceholder}
-            value={textFieldValue}
-            onChange={(e) => setTextFieldValue(e.target.value)}
-            minLength={11} // Optional: Enforce minimum length in the input field
-          />
-        </Container>
-      </GradientBackground>
-    </>
-  );
+    return (
+        <OpenFormat2
+            translations={{
+                title: translations.openEndedTranspoTitle,
+                Dissatisfied: translations.openEnded1Dissatisfied,
+                Neutral: translations.openEnded1Neutral,
+                Satisfied: translations.openEnded1Satisfied,
+                VerySatisfied: translations.openEnded1VerySatisfied,
+                feedbackRequest: translations.openEnded1FeedbackRequest,
+                textFieldPlaceholder: translations.openEnded1TextFieldPlaceholder
+            }}
+            surveyRefs={surveyRefs}
+            minFeedbackLength={11}
+            overlayImage={imgoverlay}
+        />
+    );
 };
 
 export default OpenEndedTranspo;

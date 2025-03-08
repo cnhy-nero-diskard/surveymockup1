@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
-import FeedbackForm from '../../../components/partials/FeedbackForm';
+import OpenFormat1 from '../../../components/partials/FeedbackForm';
 import BodyPartial from '../../../components/partials/BodyPartial';
 import useTranslations from '../../../components/utils/useTranslations';
 import { useNavigate } from 'react-router-dom';
@@ -28,7 +28,7 @@ const AttractionsFeedback = ({ }) => {
   return (
     <>
       <BodyPartial />
-      <FeedbackForm
+      <OpenFormat1
         title={translations.attractionsFeedbackTitle}
         onNext={handleNext}
         squestion_identifier={'ATT'}

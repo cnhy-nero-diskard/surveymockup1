@@ -180,7 +180,7 @@ const Snackbar = styled.div`
 
 const LocalizationUI = () => {
   const [localizations, setLocalizations] = useState([]);
-  const [formData, setFormData] = useState({ key: '', languagecode: '', textcontent: '', component: '' });
+  const [formData, setFormData] = useState({ key: '', language_code: '', textcontent: '', component: '' });
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [editMode, setEditMode] = useState(null);
@@ -194,22 +194,22 @@ const LocalizationUI = () => {
     e.preventDefault();
 
     try {
-      const { key, languagecode, textcontent, component } = formData;
+      const { key, language_code, textcontent, component } = formData;
 
       if (editMode) {
         // Update localization
-        const updatedLocalization = await updateLocalization(editMode, key, languagecode, textcontent, component);
+        const updatedLocalization = await updateLocalization(editMode, key, language_code, textcontent, component);
         setLocalizations(localizations.map((loc) => (loc.id === editMode ? updatedLocalization : loc)));
         setEditMode(null);
       } else {
         // Create new localization
-        // const { key, languagecode: languagecode, textcontent, component } = formData;
-        const newLocalization = await createLocalization(key, languagecode, textcontent, component);
+        // const { key, language_code: language_code, textcontent, component } = formData;
+        const newLocalization = await createLocalization(key, language_code, textcontent, component);
         setLocalizations([...localizations, newLocalization]);
       }
 
       // Reset the form
-      setFormData({ key: '', languagecode: '', textcontent: '', component: '' });
+      setFormData({ key: '', language_code: '', textcontent: '', component: '' });
 
       // Show snackbar
       setShowSnackbar(true);
@@ -261,8 +261,8 @@ const LocalizationUI = () => {
         <Input
           type="text"
           placeholder="Language Code"
-          value={formData.languagecode}
-          onChange={(e) => setFormData({ ...formData, languagecode: e.target.value })}
+          value={formData.language_code}
+          onChange={(e) => setFormData({ ...formData, language_code: e.target.value })}
           required
         />
         <Input

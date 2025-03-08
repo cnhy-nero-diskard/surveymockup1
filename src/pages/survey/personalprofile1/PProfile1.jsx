@@ -53,6 +53,12 @@ const customSelectStyles = {
   menu: (provided) => ({
     ...provided,
     backgroundColor: 'rgb(0,0,0,0.5)',
+    zIndex: 9999, 
+  }),
+  menuList: (provided) => ({
+    ...provided,
+    maxHeight: 200, 
+    overflowY: 'auto', 
   }),
   option: (provided, state) => ({
     ...provided,
@@ -69,10 +75,26 @@ const ResponsiveContainer = styled.div`
   }
 `;
 
+/* Horizontal checklist container for civil status */
+const HorizontalChecklistContainer = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 16px;
+`;
+
+const ChecklistOption = styled.div`
+  display: flex;
+  align-items: center;
+  input[type='radio'] {
+    margin-right: 0.5rem;
+  }
+`;
+
 const PProfile1 = () => {
   const { routes } = useContext(UnifiedContext);
   const currentStepIndex = useCurrentStepIndex(routes);
-  const { activeBlocks, appendActiveBlocks, removeActiveBlocks } = useContext(UnifiedContext);
+  const { activeBlocks } = useContext(UnifiedContext);
 
   const [language, setLanguage] = useState(localStorage.getItem('selectedLanguage'));
   const translations = useTranslations('PProfile1', language);
@@ -85,41 +107,83 @@ const PProfile1 = () => {
     { id: 'occupation', value: '', surveyquestion_ref: 'OCC01' },
     { id: 'income', value: '', surveyquestion_ref: 'INC01' },
     { id: 'currency', value: 'PHP', surveyquestion_ref: 'CUR01' },
+    { id: 'convertedIncome', value: '', surveyquestion_ref: 'CONV01' }, // Added converted income field
   ]);
 
   const [nationalities, setNationalities] = useState([]);
+  const [currencies, setCurrencies] = useState([]);
+  const [conversionRates, setConversionRates] = useState({});
 
+  // Fetch nationalities and currencies from REST Countries API
   useEffect(() => {
-    // Fetch nationalities from REST Countries API
-    fetch('https://restcountries.com/v3.1/all')
-      .then(response => response.json())
-      .then(data => {
-        const nationalityOptions = data.map(country => ({
-          value: country.cca2,
-          label: country.name.nativeName,
-        }));
+    const fetchData = async () => {
+      try {
+        const response = await fetch('https://restcountries.com/v3.1/all');
+        const data = await response.json();
+
+        // Fetch nationalities
+        const nationalityOptions = data.map(country => {
+          const nationality = country.demonyms?.eng?.m || "Unknown";
+          return {
+            value: country.cca2, 
+            label: nationality,
+          };
+        });
+
+        // Sort nationalities alphabetically
+        nationalityOptions.sort((a, b) => a.label.localeCompare(b.label));
         setNationalities(nationalityOptions);
-      })
-      .catch(error => console.error('Error fetching nationalities:', error));
+
+        // Fetch currencies
+        const currencyOptions = data
+          .flatMap(country => Object.values(country.currencies || {}))
+          .filter((currency, index, self) => 
+            self.findIndex(c => c.name === currency.name) === index
+          )
+          .map(currency => ({
+            value: currency.name,
+            label: `${currency.name} (${currency.symbol})`,
+          }));
+
+        // Sort currencies alphabetically
+        currencyOptions.sort((a, b) => a.label.localeCompare(b.label));
+        setCurrencies(currencyOptions);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+
+    fetchData();
   }, []);
 
-  const conversionRates = {
-    USD: 56,
-    EUR: 60,
-    JPY: 0.4,
-    PHP: 1,
-    CNY: 8,
-    INR: 0.7,
-    RUB: 0.75,
-    KRW: 0.04,
-    FRF: 60,
-    ESP: 60,
-  };
+  // Fetch conversion rates from an external API
+  useEffect(() => {
+    const fetchConversionRates = async () => {
+      try {
+        const response = await fetch('https://api.exchangerate-api.com/v4/latest/PHP'); // Base currency is PHP
+        const data = await response.json();
+        setConversionRates(data.rates);
+      } catch (error) {
+        console.error('Error fetching conversion rates:', error);
+      }
+    };
 
-  const currencies = Object.keys(conversionRates).map((key) => ({
-    value: key,
-    label: key,
-  }));
+    fetchConversionRates();
+  }, []);
+
+  // Convert income whenever income or currency changes
+  useEffect(() => {
+    const income = inputs.find((input) => input.id === 'income').value;
+    const currency = inputs.find((input) => input.id === 'currency').value;
+
+    if (!income || isNaN(income)) return;
+
+    const rate = conversionRates[currency] || 1; // Default to 1 if rate is not found
+    const convertedIncome = (income / rate).toFixed(2); // Convert to PHP
+
+    // Update the converted income field
+    handleInputChange('convertedIncome', convertedIncome);
+  }, [inputs.find((input) => input.id === 'income').value, inputs.find((input) => input.id === 'currency').value, conversionRates]);
 
   const sexOptions = [
     { value: 'male', label: translations.sexMale },
@@ -144,13 +208,6 @@ const PProfile1 = () => {
     );
   };
 
-  const convertIncome = () => {
-    const income = inputs.find((input) => input.id === 'income').value;
-    if (!income || isNaN(income)) return translations.invalidIncome;
-    const rate = conversionRates[inputs.find((input) => input.id === 'currency').value];
-    return (income * rate).toFixed(2);
-  };
-
   const navigate = useNavigate();
   const handleNextClick = () => {
     const surveyResponses = inputs.map(input => ({
@@ -164,7 +221,13 @@ const PProfile1 = () => {
   return (
     <>
       <BodyPartial />
-      <GradientBackground overlayImage={imgoverlay} opacity={0.2} blendMode="darken" handleNextClick={handleNextClick} buttonAppear={isFormComplete}>
+      <GradientBackground 
+        overlayImage={imgoverlay} 
+        opacity={0.2} 
+        blendMode="darken" 
+        handleNextClick={handleNextClick} 
+        buttonAppear={isFormComplete}
+      >
         <ResponsiveContainer>
           <Container
             initial={{ opacity: 0, y: -50 }}
@@ -199,14 +262,23 @@ const PProfile1 = () => {
               styles={customSelectStyles}
             />
 
+            {/* Civil Status presented as a horizontal checklist */}
             <Label htmlFor="civilStatus">{translations.civilStatusLabel}</Label>
-            <Select
-              options={civilStatusOptions}
-              value={civilStatusOptions.find(option => option.value === inputs.find(input => input.id === 'civilStatus').value)}
-              onChange={(option) => handleInputChange('civilStatus', option.value)}
-              placeholder={translations.civilStatusPlaceholder}
-              styles={customSelectStyles}
-            />
+            <HorizontalChecklistContainer id="civilStatus">
+              {civilStatusOptions.map((option) => (
+                <ChecklistOption key={option.value}>
+                  <input
+                    type="radio"
+                    id={option.value}
+                    name="civilStatus"
+                    value={option.value}
+                    checked={inputs.find((input) => input.id === 'civilStatus').value === option.value}
+                    onChange={() => handleInputChange('civilStatus', option.value)}
+                  />
+                  <label htmlFor={option.value}>{option.label}</label>
+                </ChecklistOption>
+              ))}
+            </HorizontalChecklistContainer>
 
             <Label htmlFor="occupation">{translations.occupationLabel}</Label>
             <Input
@@ -234,7 +306,9 @@ const PProfile1 = () => {
               styles={customSelectStyles}
             />
 
-            <Label>{translations.convertedIncomeLabel} {convertIncome()}</Label>
+            <Label>
+              {translations.convertedIncomeLabel} {inputs.find((input) => input.id === 'convertedIncome').value}
+            </Label>
           </Container>
         </ResponsiveContainer>
       </GradientBackground>

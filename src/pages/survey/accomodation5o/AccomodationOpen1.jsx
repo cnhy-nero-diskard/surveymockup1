@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
-import FeedbackForm from '../../../components/partials/FeedbackForm';
+import OpenFormat1 from '../../../components/partials/FeedbackForm';
 import { useNavigate } from 'react-router-dom';
 import useTranslations from '../../../components/utils/useTranslations';
 import { useCurrentStepIndex } from '../../../components/utils/useCurrentIndex';
@@ -22,7 +22,7 @@ const AccomodationOpen1 = () => {
   };
 
   return (
-    <FeedbackForm
+    <OpenFormat1
       title={translations.accomodationOpen1Title} // Use the translation variable
       onNext={handleNext}
       squestion_identifier={"ACC1"}

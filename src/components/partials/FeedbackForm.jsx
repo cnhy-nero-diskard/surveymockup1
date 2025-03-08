@@ -7,7 +7,7 @@ import GradientBackground from './GradientBackground';
 import imgOverlay from "../img/review.png";
 import useTranslations from '../utils/useTranslations';
 import { submitSurveyResponses } from '../utils/sendInputUtils';
-import { QuestionText } from '../utils/styles1';
+import { Paragraph, QuestionText } from '../utils/styles1';
 
 const FeedbackFormContainer = styled(animated.div)`
   max-width: 600px;
@@ -132,140 +132,142 @@ const WarningMessage = styled(animated.div)`
  *
  * @returns {JSX.Element} The rendered FeedbackForm component.
  */
-const FeedbackForm = ({ title, onNext, squestion_identifier, satisfactionOptions = {
-    Dissatisfied: 1,
-    Neutral: 2,
-    Satisfied: 3,
-    VerySatisfied: 4,
+const OpenFormat1 = ({ title, onNext, squestion_identifier, satisfactionOptions = {
+  Dissatisfied: 1,
+  Neutral: 2,
+  Satisfied: 3,
+  VerySatisfied: 4,
 } }) => {
-    const [feedback, setFeedback] = useState('');
-    const [selectedOption, setSelectedOption] = useState(null);
-    const [placeholderText, setPlaceholderText] = useState('');
-    const [language, setLanguage] = useState(localStorage.getItem('selectedLanguage'));
-    const [isFormValid, setIsFormValid] = useState(false);
-    const [showWarning, setShowWarning] = useState(false);
+  const [feedback, setFeedback] = useState('');
+  const [selectedOption, setSelectedOption] = useState(null);
+  const [placeholderText, setPlaceholderText] = useState('');
+  const [language, setLanguage] = useState(localStorage.getItem('selectedLanguage'));
+  const [isFormValid, setIsFormValid] = useState(false);
+  const [showWarning, setShowWarning] = useState(false);
 
-    const translations = useTranslations('FeedbackForm', language);
+  const translations = useTranslations('FeedbackForm', language);
+  const translationsborrow = useTranslations('OpenEnded1', language);
+  console.log(`borrows == > ${JSON.stringify(translationsborrow)}`);
 
-    useEffect(() => {
+  useEffect(() => {
+    setPlaceholderText(translations.feedbackFormPlaceholderDefault);
+  }, [language, translations]);
+
+  useEffect(() => {
+    setIsFormValid(selectedOption !== null && feedback.trim().length >= 20);
+  }, [selectedOption, feedback]);
+
+  const handleOptionClick = (option) => {
+    setSelectedOption(option);
+
+    switch (option) {
+      case 'Dissatisfied':
+        setPlaceholderText(translations.feedbackFormPlaceholderDissatisfied);
+        break;
+      case 'Neutral':
+        setPlaceholderText(translations.feedbackFormPlaceholderNeutral);
+        break;
+      case 'Satisfied':
+        setPlaceholderText(translations.feedbackFormPlaceholderSatisfied);
+        break;
+      case 'VerySatisfied':
+        setPlaceholderText(translations.feedbackFormPlaceholderVerySatisfied);
+        break;
+      default:
         setPlaceholderText(translations.feedbackFormPlaceholderDefault);
-    }, [language, translations]);
+    }
+  };
 
-    useEffect(() => {
-        setIsFormValid(selectedOption !== null && feedback.trim().length >= 20);
-    }, [selectedOption, feedback]);
+  const animation = useSpring({
+    opacity: 1,
+    from: { opacity: 0 },
+    config: { duration: 1000 },
+  });
 
-    const handleOptionClick = (option) => {
-        setSelectedOption(option);
+  const warningAnimation = useSpring({
+    opacity: showWarning ? 1 : 0,
+    transform: showWarning ? 'translateY(0)' : 'translateY(-10px)',
+    config: { tension: 300, friction: 20 },
+  });
 
-        switch (option) {
-            case 'Dissatisfied':
-                setPlaceholderText(translations.feedbackFormPlaceholderDissatisfied);
-                break;
-            case 'Neutral':
-                setPlaceholderText(translations.feedbackFormPlaceholderNeutral);
-                break;
-            case 'Satisfied':
-                setPlaceholderText(translations.feedbackFormPlaceholderSatisfied);
-                break;
-            case 'VerySatisfied':
-                setPlaceholderText(translations.feedbackFormPlaceholderVerySatisfied);
-                break;
-            default:
-                setPlaceholderText(translations.feedbackFormPlaceholderDefault);
-        }
-    };
+  const navigate = useNavigate();
 
-    const animation = useSpring({
-        opacity: 1,
-        from: { opacity: 0 },
-        config: { duration: 1000 },
-    });
+  const handleNextClick = async () => {
+    if (!isFormValid) {
+      setShowWarning(true);
+      return;
+    }
 
-    const warningAnimation = useSpring({
-        opacity: showWarning ? 1 : 0,
-        transform: showWarning ? 'translateY(0)' : 'translateY(-10px)',
-        config: { tension: 300, friction: 20 },
-    });
+    const surveyResponses = [];
 
-    const navigate = useNavigate();
+    const selectedValue = satisfactionOptions[selectedOption];
+    if (selectedOption) {
+      // Map the selected option to its corresponding numeric value
+      surveyResponses.push({
+        surveyquestion_ref: 'SATLV' + squestion_identifier,
+        response_value: selectedValue, // Use the numeric value here
+      });
+    }
 
-    const handleNextClick = async () => {
-        if (!isFormValid) {
-            setShowWarning(true);
-            return;
-        }
-    
-        const surveyResponses = [];
-    
-        const selectedValue = satisfactionOptions[selectedOption];
-        if (selectedOption) {
-            // Map the selected option to its corresponding numeric value
-            surveyResponses.push({
-                surveyquestion_ref: 'SATLV' + squestion_identifier,
-                response_value: selectedValue, // Use the numeric value here
-            });
-        }
-    
-        if (feedback) {
-            surveyResponses.push({
-                surveyquestion_ref: 'FDBK' + squestion_identifier,
-                response_value: feedback,
-            });
-        }
-    
-        try {
-            await submitSurveyResponses(surveyResponses);
-            onNext(selectedValue, feedback);
-        } catch (error) {
-            console.error('Error submitting survey responses:', error);
-        }
-    };
-    
+    if (feedback) {
+      surveyResponses.push({
+        surveyquestion_ref: 'FDBK' + squestion_identifier,
+        response_value: feedback,
+      });
+    }
 
-    return (
-        <><BodyPartial />
-            <GradientBackground overlayImage={imgOverlay}
-                opacity={0.15}
-                blendMode='screen'
-                buttonAppear={isFormValid}
-                handleNextClick={handleNextClick}
+    try {
+      await submitSurveyResponses(surveyResponses);
+      onNext(selectedValue, feedback);
+    } catch (error) {
+      console.error('Error submitting survey responses:', error);
+    }
+  };
 
-            >
-                <FeedbackFormContainer style={animation}>
-                    <QuestionText>{title || translations.feedbackFormTitle}</QuestionText>
-                    <OptionsContainer>
-  {Object.keys(satisfactionOptions).map((option) => (
-    <OptionButton
-      key={option}
-      className={
-        selectedOption === option 
-          ? `selected ${option}` 
-          : ''
-      }
-      onClick={() => handleOptionClick(option)}
-      aria-pressed={selectedOption === option}
-    >
-      {translations[`feedbackFormOption${option}`]}
-    </OptionButton>
-  ))}
-</OptionsContainer>
 
-                    <FeedbackTextarea
-                        placeholder={placeholderText}
-                        value={feedback}
-                        onChange={(e) => setFeedback(e.target.value)}
-                        aria-label="Feedback textarea"
-                    />
-                    {showWarning && (
-                        <WarningMessage style={warningAnimation}>
-                            {translations.feedbackFormWarning}
-                        </WarningMessage>
-                    )}
-                </FeedbackFormContainer>
-            </GradientBackground>
-        </>
-    );
+  return (
+    <><BodyPartial />
+      <GradientBackground overlayImage={imgOverlay}
+        opacity={0.15}
+        blendMode='screen'
+        buttonAppear={isFormValid}
+        handleNextClick={handleNextClick}
+
+      >
+        <FeedbackFormContainer style={animation}>
+          <QuestionText>{title || translations.feedbackFormTitle}</QuestionText>
+          <OptionsContainer>
+            {Object.keys(satisfactionOptions).map((option) => (
+              <OptionButton
+                key={option}
+                className={
+                  selectedOption === option
+                    ? `selected ${option}`
+                    : ''
+                }
+                onClick={() => handleOptionClick(option)}
+                aria-pressed={selectedOption === option}
+              >
+                {translations[`feedbackFormOption${option}`]}
+              </OptionButton>
+            ))}
+          </OptionsContainer>
+<Paragraph style={{fontSize:'0.75rem'}}>{translationsborrow.openEnded1FeedbackRequest}</Paragraph>
+          <FeedbackTextarea
+            placeholder={placeholderText}
+            value={feedback}
+            onChange={(e) => setFeedback(e.target.value)}
+            aria-label="Feedback textarea"
+          />
+          {showWarning && (
+            <WarningMessage style={warningAnimation}>
+              {translations.feedbackFormWarning}
+            </WarningMessage>
+          )}
+        </FeedbackFormContainer>
+      </GradientBackground>
+    </>
+  );
 };
 
-export default FeedbackForm;
+export default OpenFormat1;

@@ -1,6 +1,6 @@
 // EventsOpen1.jsx
 import React, { useContext, useEffect, useState } from 'react';
-import FeedbackForm from '../../../components/partials/FeedbackForm';
+import OpenFormat1 from '../../../components/partials/FeedbackForm';
 import useTranslations from '../../../components/utils/useTranslations';
 import { useNavigate } from 'react-router-dom';
 import { useCurrentStepIndex } from '../../../components/utils/useCurrentIndex';
@@ -31,7 +31,7 @@ const EventsOpen1 = () => {
   };
 
   return (
-    <FeedbackForm
+    <OpenFormat1
       title={translations.eventsOpen1AttractionsExpectations}
       squestion_identifier={'EV'}
       onNext={handleNext}

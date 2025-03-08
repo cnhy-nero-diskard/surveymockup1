@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
-import FeedbackForm from '../../../components/partials/FeedbackForm';
+import OpenFormat1 from '../../../components/partials/FeedbackForm';
 import useTranslations from '../../../components/utils/useTranslations';
 import { useNavigate } from 'react-router-dom';
 import { useCurrentStepIndex } from '../../../components/utils/useCurrentIndex';
@@ -29,7 +29,7 @@ const PackageTourFeedback = ({  }) => {
   };
 
   return (
-    <FeedbackForm
+    <OpenFormat1
       title={translations.packageTourFeedbackTitle}
       onNext={handleNext}
       squestion_identifier={'PKG'}

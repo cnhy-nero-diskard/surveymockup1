@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
-import FeedbackForm from '../../../components/partials/FeedbackForm';
+import OpenFormat1 from '../../../components/partials/FeedbackForm';
 import { useNavigate } from 'react-router-dom';
 import useTranslations from '../../../components/utils/useTranslations';
 import { useCurrentStepIndex } from '../../../components/utils/useCurrentIndex';
@@ -89,7 +89,7 @@ const TouchpointFeedback = () => {
    * - squestion_identifier: A unique identifier for the feedback form.
    */
   return (
-    <FeedbackForm
+    <OpenFormat1
       title={translations.estabFeedBackTitle} // Use the translation variable for the title
       onNext={handleNext} // Pass the handleNext function to the FeedbackForm
       squestion_identifier={"TPNTF"} // Unique identifier for the feedback form
