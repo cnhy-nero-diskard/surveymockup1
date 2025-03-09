@@ -7,7 +7,7 @@ const ItemList = () => {
   useEffect(() => {
     const fetchItems = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/municipalities', 
+        const response = await axios.get(`${process.env.REACT_APP_API_HOST}/api/municipalities`, 
         {withCredentials: true});
         setItems(response.data);
       } catch (err) {

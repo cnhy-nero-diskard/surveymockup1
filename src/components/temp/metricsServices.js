@@ -1,4 +1,7 @@
-const API_URL = 'http://localhost:5000/metrics'; 
+
+
+
+const API_URL = `${process.env.REACT_APP_API_HOST}/metrics`; 
 export const fetchMetrics = async () => {
   try {
     const response = await fetch(API_URL, {
