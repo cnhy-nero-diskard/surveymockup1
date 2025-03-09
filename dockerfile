@@ -6,6 +6,8 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm install
 
+ENV REACT_APP_API_HOST=https://backend-surveysys-96818552136.us-central1.run.app
+ENV REACT_APP_SELF_URL=https://frontend-surveysys-96818552136.us-central1.run.app
 COPY . .
 RUN npm run build
 

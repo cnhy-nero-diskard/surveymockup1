@@ -26,7 +26,7 @@ export const useCurrentStepIndex = (__surveyRoutes = []) => {
     const segments = path.split("/");
     return segments.slice(0, -1).join("/");
   };
-  console.log(`Acknowledge backend api ${process.env.REACT_APP_API_HOST}`);
+  console.log(`!!!!!!!!!!! Acknowledge backend api ${process.env.REACT_APP_API_HOST}`);
 
 
   console.log(`USECURRENTINDEX ACTIVE BLOCKS --> ${JSON.stringify(activeBlocks)}`);
