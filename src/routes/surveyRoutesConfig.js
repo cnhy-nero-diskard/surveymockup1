@@ -96,7 +96,6 @@ export const sroutes = [
     { label: 'Accommodation Form', path: 'accommodationform', component: AccommodationForm, conditionalBlock: 'yesaccom'},
     { label: 'Where Stay Departure', path: 'wherestayarrival', component: WhereStayArrival, conditionalBlock: 'noaccom'},
     { label: 'Booking Form', path: 'bookingform', component: BookingForm, conditionalBlock: 'yesaccom'},
-    // { label: 'Accommodation Open 1', path: 'accomodationopen1', component: AccomodationOpen1, conditionalBlock: 'accom'},
     { label: 'Accommodation Open 2 (GENERAL) ', path: 'accomodationopen2', component: AccomodationOpen2, conditionalBlock: 'accom'},
     
     
@@ -108,7 +107,7 @@ export const sroutes = [
     { label: 'Where Learn', path: 'wherelearn', component: WhereLearn, conditionalBlock: 'evatt'},
     { label: 'Events Open 1', path: 'eventsopen1', component: EventsOpen1, conditionalBlock: 'evatt'},
     { label: 'Attractions Feedback', path: 'attractionsfeedback', component: AttractionsFeedback, conditionalBlock: 'evatt'},
-
+    
     
     
     { label: 'Pack Transpo', path: 'packtranspo', component: PackTranspo, conditionalBlock: 'transp'},
@@ -134,7 +133,10 @@ export const sroutes = [
     // { label: '(IGNORE)Where Stay Departure', path: 'wherestaydepart', component: },
     // { label: 'Survey Evaluation VERSION2', path: 'surveyevaluationb', component: },
     // { label: 'How Many Visits', path: 'howmanyvisits', component: HowManyVisits, conditionalBlock: 'evatt'},
+    // { label: 'Accommodation Open 1', path: 'accomodationopen1', component: AccomodationOpen1, conditionalBlock: 'accom'},
+ 
+ 
     { label: 'FEEDBACK QUICK (OPEN)', path: 'estopenfeedback', component: TouchpointFeedback, conditionalBlock: 'feedback'},
     { label: 'Thank You Message', path: 'feedback-complete', component: ThankYouMessageF, conditionalBlock: 'feedback'},
-
+    
 ];

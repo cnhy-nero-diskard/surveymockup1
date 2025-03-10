@@ -4,9 +4,10 @@ import axios from 'axios';
 
 export const submitSurveyResponses = async (surveyResponses) => {
     try {
+        console.log(`SUBMIT array : ${JSON.stringify(surveyResponses)}`);
         // Ensure surveyResponses is an array
         if (!Array.isArray(surveyResponses)) {
-            console.log('Survey responses was not an array - converting to array');
+            console.log('SUBMIT Survey responses was not an array - converting to array');
             surveyResponses = [surveyResponses];
         }
 
@@ -19,10 +20,10 @@ export const submitSurveyResponses = async (surveyResponses) => {
             }
         );
 
-        console.log('Survey responses submitted successfully:', response.data);
+        console.log('SUBMIT Survey responses submitted successfully:', response.data);
         return response.data;
     } catch (error) {
-        console.error('Unexpected error while submitting survey responses:', error);
+        console.error('SUBMIT Unexpected error while submitting survey responses:', error);
         throw error; // Re-throw the error to handle it in the component
     }
 };
