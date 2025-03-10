@@ -213,7 +213,7 @@ const LanguageSelector = () => {
       console.log(`LANGPERF: ${selectedLanguageCode}`);
       await axios.post(
         `${process.env.REACT_APP_API_HOST}/api/survey/submit`,
-        postData,
+        {surveyResponses: [postData]},
         { withCredentials: true }
       );
       goToNextStep(currentStepIndex, navigate, routes, activeBlocks);

@@ -1,15 +1,24 @@
-
 // apiUtils.js
 import axios from 'axios';
 
-export const submitSurveyResponses = async (surveyResponses) => {
+export const submitSurveyResponses = async (
+    surveyResponses,
+    touchpoint = "TPMS"  // Default value for touchpoint
+) => {
     try {
         console.log(`SUBMIT array : ${JSON.stringify(surveyResponses)}`);
+        
         // Ensure surveyResponses is an array
         if (!Array.isArray(surveyResponses)) {
             console.log('SUBMIT Survey responses was not an array - converting to array');
             surveyResponses = [surveyResponses];
         }
+        
+        // Add the touchpoint property to each response object
+        surveyResponses = surveyResponses.map((response) => ({
+            ...response,
+            touchpoint,
+        }));
 
         // Send all responses in a single request
         const response = await axios.post(

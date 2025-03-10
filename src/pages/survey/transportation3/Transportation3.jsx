@@ -10,7 +10,7 @@ import { useContext } from 'react';
 const Transportation3 = () => {
   const [language, setLanguage] = useState(localStorage.getItem('selectedLanguage'));
   const translations = useTranslations('Transportation3', language);
-  const entranslations = useTranslations('Transportation3', language);
+  const entranslations = useTranslations('Transportation3', 'en');
 
   const { routes } = useContext(UnifiedContext);
   const currentStepIndex = useCurrentStepIndex(routes);

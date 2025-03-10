@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Box, Typography, Card, CardContent, Grid, useTheme, ThemeProvider, Modal, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button } from '@mui/material';
+import { Box, Typography, Card, CardContent, Grid, useTheme, Modal, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button } from '@mui/material';
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
@@ -86,10 +86,6 @@ const SurveyMetrics = () => {
         value,
     }));
 
-    const surveyResponsesByDeviceData = Object.entries(dummyData.surveyResponsesByDevice).map(([key, value]) => ({
-        name: key,
-        value,
-    }));
 
     const surveyResponsesByRegionData = Object.entries(dummyData.surveyResponsesByRegion).map(([key, value]) => ({
         name: key,
@@ -157,8 +153,6 @@ const SurveyMetrics = () => {
         XLSX.utils.book_append_sheet(workbook, distributionSheet, 'Survey Distribution');
     
         // Add survey responses by device data
-        const deviceSheet = createStyledSheet(surveyResponsesByDeviceData, 'Responses by Device', ['Device', 'Responses']);
-        XLSX.utils.book_append_sheet(workbook, deviceSheet, 'Responses by Device');
     
         // Add survey responses by region data
         const regionSheet = createStyledSheet(surveyResponsesByRegionData, 'Responses by Region', ['Region', 'Responses']);
@@ -291,23 +285,7 @@ const SurveyMetrics = () => {
                         </StyledCardContent>
                     </Grid>
 
-                    {/* Survey Responses by Device */}
-                    <Grid item xs={12} md={6} lg={3}>
-                        <StyledCardContent>
-                            <StyledTypography variant="h6" sx={{ textAlign: 'center', mb: 2 }}>
-                                Responses by Device
-                            </StyledTypography>
-                            <ResponsiveContainer width="100%" height={200}>
-                                <BarChart data={surveyResponsesByDeviceData}>
-                                    <XAxis dataKey="name" />
-                                    <YAxis />
-                                    <Tooltip />
-                                    <Legend />
-                                    <Bar dataKey="value" fill="#8884d8" />
-                                </BarChart>
-                            </ResponsiveContainer>
-                        </StyledCardContent>
-                    </Grid>
+
 
                     {/* Survey Responses by Nationality */}
                     <Grid item xs={12} md={6} lg={3}>

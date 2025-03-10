@@ -31,7 +31,7 @@ const TouchpointFeedback = () => {
         rating: selectedOptionValue, // Update rating
         review: feedbackk, // Update review
         is_analyzed: false,
-        submitted_at: new Date().toLocaleString() // Add a date with the current timestamp
+        submitted_at: new Date().toLocaleString(),
 
     };
 

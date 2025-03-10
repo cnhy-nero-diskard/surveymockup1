@@ -12,11 +12,7 @@ export const  dummyData = {
         Transportation: 22,
         Barangay: 23
     },
-    surveyResponsesByDevice: {
-        desktop: 60,
-        mobile: 50,
-        tablet: 10,
-    },
+
     surveyResponsesByRegion: {
         Korean: 70,
         Chinese: 30,
