@@ -12,6 +12,8 @@ import { useCurrentStepIndex } from '../../../components/utils/useCurrentIndex';
 import { UnifiedContext } from '../../../routes/UnifiedContext';
 import { goToNextStep } from '../../../components/utils/navigationUtils';
 
+
+//NTH LAST PAGE OF THE SURVEY (WOULD YOU LIKE TO RECEIVE THE OVERALL RESULTS OF THE SURVEY)
 const SurveyEvaluation05 = () => {
   const { routes } = useContext(UnifiedContext);
   const currentStepIndex = useCurrentStepIndex(routes);
@@ -155,23 +157,15 @@ const SurveyEvaluation05 = () => {
                 <input
                   type="radio"
                   name="preference"
-                  value="like"
+                  value="1"
                   onChange={handlePreferenceChange}
-                /> {translations.surveyEvaluation05OptionLike}
+                /> {translations.surveyEvaluation05OptionDontLike}
               </label>
               <label>
                 <input
                   type="radio"
                   name="preference"
-                  value="expect"
-                  onChange={handlePreferenceChange}
-                /> {translations.surveyEvaluation05OptionExpect}
-              </label>
-              <label>
-                <input
-                  type="radio"
-                  name="preference"
-                  value="dontCare"
+                  value="2"
                   onChange={handlePreferenceChange}
                 /> {translations.surveyEvaluation05OptionDontCare}
               </label>
@@ -179,9 +173,17 @@ const SurveyEvaluation05 = () => {
                 <input
                   type="radio"
                   name="preference"
-                  value="dontLike"
+                  value="3"
                   onChange={handlePreferenceChange}
-                /> {translations.surveyEvaluation05OptionDontLike}
+                /> {translations.surveyEvaluation05OptionExpect}
+              </label>
+              <label>
+                <input
+                  type="radio"
+                  name="preference"
+                  value="4"
+                  onChange={handlePreferenceChange}
+                /> {translations.surveyEvaluation05OptionLike}
               </label>
             </div>
           </motion.div>

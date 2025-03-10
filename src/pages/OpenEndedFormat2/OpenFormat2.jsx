@@ -27,11 +27,21 @@ const OpenFormat2 = ({ translations, surveyRefs, minFeedbackLength, overlayImage
     };
 
     const handleNextClick = async () => {
+        // Map the selected button to a numeric value
+        const satisfactionMapping = {
+            Dissatisfied: 1,
+            Neutral: 2,
+            Satisfied: 3,
+            VerySatisfied: 4,
+        };
+    
+        const numericValue = satisfactionMapping[selectedButton];
+    
         const surveyResponses = [
-            { surveyquestion_ref: surveyRefs.satisfaction, response_value: selectedButton },
+            { surveyquestion_ref: surveyRefs.satisfaction, response_value: numericValue },
             { surveyquestion_ref: surveyRefs.feedback, response_value: textFieldValue }
         ];
-
+    
         try {
             await submitSurveyResponses(surveyResponses);
             goToNextStep(currentStepIndex, navigate, routes, activeBlocks);

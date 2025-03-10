@@ -88,7 +88,7 @@ const BranchingSelect = () => {
     setSelectedOptions((prevOptions) => {
       if (prevOptions.includes(option)) {
         // If the option is already selected, remove it
-        removeActiveBlocks([optionToBlockMap[option]]); // Remove the corresponding block
+        removeActiveBlocks(optionToBlockMap[option]); // Remove the corresponding block
         return prevOptions.filter((opt) => opt !== option);
       } else {
         // If the option is not selected, add it

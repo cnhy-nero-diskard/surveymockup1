@@ -68,8 +68,8 @@ export const sroutes = [
     { label: 'Page 1', path: 'page1', component: Page1, conditionalBlock: 'surveytpms'},
     { label: 'Survey Consent', path: 'surveyconsent', component: SurveyConsent, conditionalBlock: 'surveytpms'},
     { label: 'Gmail Form', path: 'form', component: PrelimForm, conditionalBlock: 'surveytpms'},
-    { label: 'Residence 1', path: 'residence1', component: Residence1, conditionalBlock: 'surveytpms'},
     { label: 'Greetings', path: 'greetings', component: Greetings, conditionalBlock: 'surveytpms'},
+    { label: 'Residence 1', path: 'residence1', component: Residence1, conditionalBlock: 'surveytpms'},
     { label: 'Transportation 1', path: 'transportation1', component: Transportation1, conditionalBlock: 'oprovblock'},
     { label: 'Transportation 2', path: 'transportation2', component: Transportation2, conditionalBlock: 'iprovblock'},
     { label: 'Main Purpose', path: 'mainpurpose', component: MainPurpose, conditionalBlock: 'surveytpms'},
@@ -87,6 +87,8 @@ export const sroutes = [
     { label: 'Expense Companions', path: 'expensecompanions', component: ExpenseCompanions, conditionalBlock: 'surveytpms'},
     
     //ACCOMODATION: 'accom', TRANSPORTATION; 'transp', 'EVENT/ACTIVITIES': 'evatt', 'SERVICES': 'serv'
+    
+    //                  !!!!!!!!!!!!!!!!!!!!!!   BRANCHING SELECT !!!!!!!!!!!!!!!!!!!!!!
     { label: 'Branching Select', path: 'branchingselect', component: BranchingSelect, conditionalBlock: 'surveytpms'},
     
     
