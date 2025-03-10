@@ -122,8 +122,7 @@ const WhereStayArrival = () => {
 
   const navigate = useNavigate();
 
-  const handleNextClick = async (e) => {
-    e.preventDefault();
+  const handleNextClick = async () => {
 
     // Validation
     if (!selectedOption) {
