@@ -1,31 +1,28 @@
+
 // apiUtils.js
 import axios from 'axios';
 
 export const submitSurveyResponses = async (surveyResponses) => {
     try {
-        console.log(`ATTEMPTING TO SEND ${JSON.stringify(surveyResponses)} `);
-        const requests = surveyResponses.map(response =>
-            axios.post(`${process.env.REACT_APP_API_HOST}/api/survey/submit`, response, {
+        // Ensure surveyResponses is an array
+        if (!Array.isArray(surveyResponses)) {
+            console.log('Survey responses was not an array - converting to array');
+            surveyResponses = [surveyResponses];
+        }
+
+        // Send all responses in a single request
+        const response = await axios.post(
+            `${process.env.REACT_APP_API_HOST}/api/survey/submit`,
+            { surveyResponses },
+            {
                 withCredentials: true,
-            })
+            }
         );
 
-        const results = await Promise.allSettled(requests);
-
-        // Log results
-        results.forEach((result, index) => {
-            if (result.status === 'fulfilled') {
-                console.log(`Response ${index + 1} submitted successfully:`, result.value.data);
-            } else {
-                console.error(`Response ${index + 1} failed to submit:`, result.reason);
-            }
-        });
-
-        // Return all results (both successful and failed)
-        return results;
+        console.log('Survey responses submitted successfully:', response.data);
+        return response.data;
     } catch (error) {
-        console.error(`UTIL  Unexpected error while submitting the ff responses: ${surveyResponses}, ${error}`);
-        window.alert('Failed to submit survey responses. Please try again later.');
+        console.error('Unexpected error while submitting survey responses:', error);
         throw error; // Re-throw the error to handle it in the component
     }
 };
