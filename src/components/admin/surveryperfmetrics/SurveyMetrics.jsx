@@ -165,6 +165,7 @@ const SurveyMetrics = () => {
         // Add survey responses by month data
         const monthSheet = createStyledSheet(surveyResponsesByMonthData, 'Responses by Month', ['Month', 'Responses']);
         XLSX.utils.book_append_sheet(workbook, monthSheet, 'Responses by Month');
+
     
         // Save the workbook
         XLSX.writeFile(workbook, 'SurveyMetrics.xlsx');
@@ -245,16 +246,6 @@ const SurveyMetrics = () => {
                         </StyledCardContent>
                     </Grid>
 
-                    {/* Response Rate */}
-                    <Grid item xs={12} md={6} lg={3}>
-                        <StyledCardContent>
-                            <StyledIcon as={InsertChartIcon} color={theme.palette.info.main} />
-                            <StyledTypography variant="h6">Response Rate</StyledTypography>
-                            <Typography variant="h4" sx={{ color: theme.palette.info.main }}>
-                                {dummyData.responseRate}%
-                            </Typography>
-                        </StyledCardContent>
-                    </Grid>
 
                     {/* Survey Distribution */}
                     <Grid item xs={12} md={6} lg={3}>
