@@ -357,11 +357,11 @@ const Residence1 = () => {
 
 
       <GradientBackground handleNextClick={handleNextClick}>
-<Container>
+        <Container>
           <QuestionText>{translations.title}</QuestionText>
           <Paragraph>{translations.note}</Paragraph>
           {error && <ErrorMessage>{error}</ErrorMessage>}
-  
+
           <Option>
             <GlowingCheckbox
               type="checkbox"
@@ -372,7 +372,7 @@ const Residence1 = () => {
             />
             <CustomCheckbox htmlFor="in-city">{translations.inCity}</CustomCheckbox>
           </Option>
-  
+
           <Option>
             <GlowingCheckbox
               type="checkbox"
@@ -385,7 +385,7 @@ const Residence1 = () => {
               {translations.outsideCity}
             </CustomCheckbox>
           </Option>
-  
+
           <FadeTransition
             in={location.outsideCity}
             timeout={300}
@@ -421,7 +421,7 @@ const Residence1 = () => {
               )}
             </InputGroup>
           </FadeTransition>
-  
+
           <FadeTransition
             in={location.outsideCity && provinceInput}
             timeout={300}
@@ -458,7 +458,7 @@ const Residence1 = () => {
               )}
             </InputGroup>
           </FadeTransition>
-  
+
           <Option>
             <GlowingCheckbox
               type="checkbox"
@@ -471,7 +471,7 @@ const Residence1 = () => {
               {translations.foreignCountry}
             </CustomCheckbox>
           </Option>
-  
+
           <FadeTransition
             in={location.foreignCountry}
             timeout={300}
@@ -512,8 +512,8 @@ const Residence1 = () => {
               )}
             </InputGroup>
           </FadeTransition>
-  
-</Container>      </GradientBackground>
+
+        </Container>      </GradientBackground>
     </>
   );
 };

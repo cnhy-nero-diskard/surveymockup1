@@ -97,7 +97,10 @@ const menuItems = [
 
 const Sidebar = ({ drawerWidth }) => {
   const location = useLocation();
-
+  function getBasename(pathname) {
+    const parts = pathname.split('/').filter(Boolean);
+    return parts.length > 0 ? parts[parts.length - 1] : '/';
+  }
   // State for storing the search term
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -165,18 +168,18 @@ const Sidebar = ({ drawerWidth }) => {
               key={index}
               sx={{
                 backgroundColor:
-                  location.pathname === item.to ? "#0077b6" : "inherit",
-                color: location.pathname === item.to ? "white" : "inherit",
+                getBasename(location.pathname) === item.to ? "#0077b6" : "inherit",
+                color: getBasename(location.pathname) === item.to ? "white" : "inherit",
                 "&:hover": {
                   backgroundColor:
-                    location.pathname === item.to ? "#005f8a" : "#f0f0f0",
+                  getBasename(location.pathname) === item.to ? "#005f8a" : "#f0f0f0",
                 },
               }}
             >
               <ListItemIcon
                 sx={{
                   color:
-                    location.pathname === item.to ? "white" : "inherit",
+                  getBasename(location.pathname) === item.to ? "white" : "inherit",
                 }}
               >
                 {item.icon}

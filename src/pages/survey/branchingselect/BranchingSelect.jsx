@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { useSpring, animated } from 'react-spring';
 import styled from 'styled-components';
 import './BranchingSelect.css';
@@ -61,19 +61,18 @@ const BranchingSelect = () => {
   const { routes } = useContext(UnifiedContext);
   const currentStepIndex = useCurrentStepIndex(routes);
   const { activeBlocks, appendActiveBlocks, removeActiveBlocks } = useContext(UnifiedContext);
-
+  useEffect (() => {
+    removeActiveBlocks(optionToBlockMap.ACCOMODATION);
+    removeActiveBlocks(optionToBlockMap.TRANSPORTATION);
+    removeActiveBlocks(optionToBlockMap['EVENT/ACTIVITIES']);
+    removeActiveBlocks(optionToBlockMap.SERVICES);
+  }, []);
   // Intro Animation
   const introAnimation = useSpring({
     from: { opacity: 0, transform: 'scale(0.8)' },
     to: { opacity: 1, transform: 'scale(1)' },
     config: { tension: 200, friction: 20 },
     delay: 300,
-  });
-
-  // Next Button Animation
-  const springProps = useSpring({
-    opacity: selectedOptions.length > 0 ? 1 : 0,
-    transform: selectedOptions.length > 0 ? 'scale(1)' : 'scale(0.95)',
   });
 
   // Map options to their respective strings for activeBlocks

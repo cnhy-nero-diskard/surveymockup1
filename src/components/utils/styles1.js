@@ -24,6 +24,7 @@ export const Title = styled.h2`
   padding: 10px;
   justify-content: center;
   text-align: center;
+  max-width:500px;
 `;
 
 export const Paragraph = styled.p`

@@ -214,7 +214,7 @@ const RatingSlider = ({ title, categories, onRatingComplete, surveyquestion_refs
       <GradientBackground overlayImage={imgOverlay} opacity={0.2} blendMode='screen' buttonAppear={false}>
             <Title>{title}</Title>
             <Title style={{fontSize:'1rem'}}>{choosetoskip}</Title>
-
+            
             <SlidesContainer>
               {transitions((style, index) => (
                 <Slide style={style}>

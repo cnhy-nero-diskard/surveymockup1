@@ -6,7 +6,7 @@ import Sidebar from "./Sidebar";
 import { useAuth } from "../../context/AuthContext";
 import WarningMessage from "../../partials/WarningMessage";
 
-export const drawerWidth = 250; // Exportable global variable
+export const drawerWidth = 300; // Exportable global variable
 
 const Container = styled(Box)`
   display: flex;
