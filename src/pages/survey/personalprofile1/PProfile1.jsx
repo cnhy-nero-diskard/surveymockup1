@@ -135,7 +135,7 @@ const PProfile1 = () => {
         const nationalityOptions = data.map((country) => {
           const nationality = country.demonyms?.eng?.m || 'Unknown';
           return {
-            value: country.cca2,
+            value: nationality,
             label: nationality,
           };
         });
@@ -316,12 +316,20 @@ const PProfile1 = () => {
             {/* Age */}
             <Label htmlFor="age">{translations.ageLabel}</Label>
             <Input
-              type="number"
-              id="age"
-              name="age"
-              value={inputs.find((input) => input.id === 'age').value}
-              onChange={(e) => handleInputChange('age', e.target.value)}
-            />
+  type="number"
+  id="age"
+  name="age"
+  value={inputs.find((input) => input.id === 'age').value}
+  onChange={(e) => {
+    const enteredAge = parseInt(e.target.value, 10);
+    if (enteredAge > 100) {
+      handleInputChange('age', '100');
+    } else {
+      handleInputChange('age', e.target.value);
+    }
+  }}
+/>
+
 
             {/* Nationality */}
             <Label htmlFor="nationality">{translations.nationalityLabel}</Label>
@@ -332,7 +340,7 @@ const PProfile1 = () => {
                   option.value === inputs.find((input) => input.id === 'nationality').value
               )}
               onChange={(option) => handleInputChange('nationality', option.value)}
-              placeholder={translations.nationalityPlaceholder}
+              placeholder={'.........'}
               styles={customSelectStyles}
               isSearchable
             />
@@ -345,7 +353,7 @@ const PProfile1 = () => {
                 (option) => option.value === inputs.find((input) => input.id === 'sex').value
               )}
               onChange={(option) => handleInputChange('sex', option.value)}
-              placeholder={translations.sexPlaceholder}
+              placeholder={'.........'}
               styles={customSelectStyles}
             />
 

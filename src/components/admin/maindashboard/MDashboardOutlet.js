@@ -1,12 +1,12 @@
-import React from "react";
-import { Outlet } from "react-router-dom"; // Outlet for nested routes
+import React, { useEffect } from "react";
+import { Outlet, useNavigate } from "react-router-dom";
 import styled from "styled-components";
-import { Box, Toolbar } from "@mui/material";
+import { Box, useMediaQuery } from "@mui/material";
 import Sidebar from "./Sidebar";
 import { useAuth } from "../../context/AuthContext";
 import WarningMessage from "../../partials/WarningMessage";
 
-export const drawerWidth = 300; // Exportable global variable
+export const drawerWidth = 300;
 
 const Container = styled(Box)`
   display: flex;
@@ -20,7 +20,25 @@ const MainContent = styled(Box)`
 `;
 
 const DashboardOutlet = () => {
-  const { isAuthenticated, unauthorized, handleUnauthorized, login } = useAuth(); // Correct usage
+  const { isAuthenticated, unauthorized, handleUnauthorized, login } = useAuth();
+  const isMobile = useMediaQuery("(max-width:600px)");
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (isMobile) {
+      const userChoice = window.confirm(
+        "YOU MUST VIEW THIS PAGE IN YOUR DESKTOP FOR THE OPTIMAL VIEWING EXPERIENCE. Press 'OK' to go back."
+      );
+      if (userChoice) {
+        // User clicked "OK"
+        navigate("/");
+      } else {
+        navigate("/");
+
+        console.log("User canceled navigation to home.");
+      }
+    }
+  }, [isMobile, navigate]);
 
   return (
     <>
@@ -29,7 +47,7 @@ const DashboardOutlet = () => {
       <Container>
         <Sidebar drawerWidth={drawerWidth} />
         <MainContent drawerWidth={drawerWidth}>
-          <Outlet /> {/* This will render the nested routes */}
+          <Outlet />
         </MainContent>
       </Container>
     </>

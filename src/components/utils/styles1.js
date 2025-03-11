@@ -24,7 +24,7 @@ export const Title = styled.h2`
   padding: 10px;
   justify-content: center;
   text-align: center;
-  max-width:500px;
+  max-width:600px;
 `;
 
 export const Paragraph = styled.p`
@@ -330,6 +330,7 @@ export const CheckboxInput = styled.input.attrs({ type: 'checkbox' })`
   export const Input = styled.input`
   /* Basic size and spacing */
   width: 100%;
+  margin-bottom:5px;
   padding: 0.75rem 2.5rem 0.75rem 0.75rem;
   border-radius: 30px;
   font-size: 1rem;
