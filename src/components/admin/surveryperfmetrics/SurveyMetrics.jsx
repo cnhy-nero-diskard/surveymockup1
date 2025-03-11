@@ -79,6 +79,10 @@ const SurveyMetrics = () => {
     const [open, setOpen] = useState(false);
     const [openDistributionModal, setOpenDistributionModal] = useState(false);
 
+    // New state for Nationality (Region) Modal
+    const [openNationalityModal, setOpenNationalityModal] = useState(false);
+    const [openCountryModal, setOpenCountryModal] = useState(false);
+
     // Fetch data from server
     useEffect(() => {
         axios
@@ -99,6 +103,16 @@ const SurveyMetrics = () => {
     const handleDistributionOpen = () => setOpenDistributionModal(true);
     const handleDistributionClose = () => setOpenDistributionModal(false);
 
+    // Handlers for the Nationality modal
+    const handleNationalityOpen = () => setOpenNationalityModal(true);
+    const handleCountryOpen = () => setOpenCountryModal(true);
+    const handleNationalityClose = () => setOpenNationalityModal(false);
+    const handleCountryClose = () => setOpenCountryModal(false);
+    const [openAgeGroupModal, setOpenAgeGroupModal] = useState(false);
+    const handleAgeGroupOpen = () => setOpenAgeGroupModal(true);
+    const handleAgeGroupClose = () => setOpenAgeGroupModal(false);
+
+
     // Function to get current time in a readable format
     const getCurrentTime = () => {
         const now = new Date();
@@ -106,10 +120,14 @@ const SurveyMetrics = () => {
     };
 
     // Function to get the current month
+
     const getCurrentMonth = () => {
         const now = new Date();
-        return now.toLocaleString('default', { month: 'long' }).toLowerCase();
+        const month = now.toLocaleString('default', { month: 'long' }).toLowerCase();
+        const year = now.getFullYear().toString();
+        return `${month} ${year}`;
     };
+    
 
     // Function to capitalize the first letter of a string
     const capitalizeFirstLetter = (string) => {
@@ -125,7 +143,7 @@ const SurveyMetrics = () => {
         );
     }
 
-    // Prepare data from the API response (assuming similar structure as dummyData)
+    // Prepare data from the API response
     const completionRateData = [
         { name: 'Completed', value: surveyMetrics.surveyCompletionRate },
         { name: 'Not Completed', value: surveyMetrics.dropOffRate }
@@ -144,11 +162,23 @@ const SurveyMetrics = () => {
         name: key,
         value
     }));
+    const sortedRegions = [...surveyResponsesByRegionData].sort((a, b) => b.value - a.value);
+    const topThreeRegions = sortedRegions.slice(0, 3);
+
+    const surveyResponsesByCountryData = Object.entries(surveyMetrics.surveyResponsesByCountry).map(([key, value]) => ({
+        name: key,
+        value
+    }));
+    const sortedResidence = [...surveyResponsesByCountryData].sort((a, b) => b.value - a.value);
+    const topThreeResidence = sortedResidence.slice(0, 3);
 
     const surveyResponsesByAgeGroupData = Object.entries(surveyMetrics.surveyResponsesByAgeGroup).map(([key, value]) => ({
         name: key,
         value
     }));
+
+    const sortedAgeGroup = [...surveyResponsesByAgeGroupData].sort((a, b) => b.value - a.value);
+    const topThreeAgeGroup = sortedAgeGroup.slice(0, 3);
 
     const surveyResponsesByMonthData = Object.entries(surveyMetrics.surveyResponsesByMonth).map(([key, value]) => ({
         name: capitalizeFirstLetter(key),
@@ -278,7 +308,7 @@ const SurveyMetrics = () => {
                                             index,
                                         }) => {
                                             const RADIAN = Math.PI / 180;
-                                            const radius = innerRadius + (outerRadius - innerRadius) * 1.5; // Move labels further out
+                                            const radius = innerRadius + (outerRadius - innerRadius) * 1.5;
                                             const x = cx + radius * Math.cos(-midAngle * RADIAN);
                                             const y = cy + radius * Math.sin(-midAngle * RADIAN);
 
@@ -368,39 +398,114 @@ const SurveyMetrics = () => {
 
                     {/* Survey Responses by Nationality */}
                     <Grid item xs={12} md={6} lg={3}>
-                        <StyledCardContent>
+                        <StyledCardContent
+                            onClick={handleNationalityOpen}
+                            style={{ cursor: 'pointer' }}
+                        >
                             <StyledTypography variant="h6" sx={{ textAlign: 'center', mb: 2 }}>
                                 Responses by Nationality
                             </StyledTypography>
-                            <ResponsiveContainer width="100%" height={200}>
-                                <BarChart data={surveyResponsesByRegionData}>
-                                    <XAxis dataKey="name" />
-                                    <YAxis />
-                                    <Tooltip />
-                                    <Legend />
-                                    <Bar dataKey="value" fill="#82ca9d" />
-                                </BarChart>
-                            </ResponsiveContainer>
+
+                            {/* Display Top 3 Nationalities */}
+                            {topThreeRegions.length > 0 && (
+                                <Box sx={{ mb: 2 }}>
+                                    <Typography variant="h4" sx={{ fontWeight: 'bold', color: theme.palette.success.main, textAlign: 'center' }}>
+                                        {topThreeRegions[0].name}: {topThreeRegions[0].value}
+                                    </Typography>
+                                </Box>
+                            )}
+
+                            {topThreeRegions.length > 1 && (
+                                <Box  sx={{ mb: 1 }}>
+                                    <Typography style={{ color: "grey" }} variant="subtitle1" sx={{ textAlign: 'center' }}>
+                                        {topThreeRegions[1].name}: {topThreeRegions[1].value}
+                                    </Typography>
+                                </Box>
+                            )}
+
+                            {topThreeRegions.length > 2 && (
+                                <Box>
+                                    <Typography style={{ color: "grey" }} variant="subtitle1" sx={{ textAlign: 'center' }}>
+                                        {topThreeRegions[2].name}: {topThreeRegions[2].value}
+                                    </Typography>
+                                </Box>
+                            )}
+                        </StyledCardContent>
+                    </Grid>
+                    {/* Survey Responses by Country of Residence */}
+                    <Grid item xs={12} md={6} lg={3}>
+                        <StyledCardContent
+                            onClick={handleCountryOpen}
+                            style={{ cursor: 'pointer' }}
+                        >
+                            <StyledTypography variant="h6" sx={{ textAlign: 'center', mb: 2 }}>
+                                Responses by Country of Residence
+                            </StyledTypography>
+
+                            {/* Display Top 3 Country of Residence */}
+                            {topThreeResidence.length > 0 && (
+                                <Box sx={{ mb: 2 }}>
+                                    <Typography variant="h4" sx={{ fontWeight: 'bold', color: theme.palette.success.main, textAlign: 'center' }}>
+                                        {topThreeResidence[0].name}: {topThreeResidence[0].value}
+                                    </Typography>
+                                </Box>
+                            )}
+
+                            {topThreeResidence.length > 1 && (
+                                <Box sx={{ mb: 1 }}>
+                                    <Typography  style={{color:"grey"}} variant="subtitle1" sx={{ textAlign: 'center' }}>
+                                        {topThreeResidence[1].name}: {topThreeResidence[1].value}
+                                    </Typography>
+                                </Box>
+                            )}
+
+                            {topThreeResidence.length > 2 && (
+                                <Box>
+                                    <Typography style={{color:"grey"}} variant="subtitle1" sx={{ textAlign: 'center' }}>
+                                        {topThreeResidence[2].name}: {topThreeResidence[2].value}
+                                    </Typography>
+                                </Box>
+                            )}
                         </StyledCardContent>
                     </Grid>
 
                     {/* Survey Responses by Age Group */}
                     <Grid item xs={12} md={6} lg={3}>
-                        <StyledCardContent>
+                        <StyledCardContent
+                            onClick={handleAgeGroupOpen}
+                            style={{ cursor: 'pointer' }}
+                        >
                             <StyledTypography variant="h6" sx={{ textAlign: 'center', mb: 2 }}>
                                 Responses by Age Group
                             </StyledTypography>
-                            <ResponsiveContainer width="100%" height={200}>
-                                <BarChart data={surveyResponsesByAgeGroupData}>
-                                    <XAxis dataKey="name" />
-                                    <YAxis />
-                                    <Tooltip />
-                                    <Legend />
-                                    <Bar dataKey="value" fill="#ffc658" />
-                                </BarChart>
-                            </ResponsiveContainer>
+
+                            {/* Display Top 3 Country of Residence */}
+                            {topThreeAgeGroup.length > 0 && (
+                                <Box sx={{ mb: 2 }}>
+                                    <Typography variant="h4" sx={{ fontWeight: 'bold', color: theme.palette.success.main, textAlign: 'center' }}>
+                                        {topThreeAgeGroup[0].name}: {topThreeAgeGroup[0].value}
+                                    </Typography>
+                                </Box>
+                            )}
+
+                            {topThreeAgeGroup.length > 1 && (
+                                <Box sx={{ mb: 1 }}>
+                                    <Typography  style={{color:"grey"}} variant="subtitle1" sx={{ textAlign: 'center' }}>
+                                        {topThreeAgeGroup[1].name}: {topThreeAgeGroup[1].value}
+                                    </Typography>
+                                </Box>
+                            )}
+
+                            {topThreeAgeGroup.length > 2 && (
+                                <Box>
+                                    <Typography style={{color:"grey"}} variant="subtitle1" sx={{ textAlign: 'center' }}>
+                                        {topThreeAgeGroup[2].name}: {topThreeAgeGroup[2].value}
+                                    </Typography>
+                                </Box>
+                            )}
                         </StyledCardContent>
                     </Grid>
+
 
                     {/* Survey Responses by Month */}
                     <Grid item xs={12} md={6} lg={3}>
@@ -408,9 +513,12 @@ const SurveyMetrics = () => {
                             <StyledIcon as={InsertChartIcon} color={theme.palette.info.main} />
                             <StyledTypography variant="h6">Responses by Month</StyledTypography>
                             <Typography variant="h4" sx={{ color: theme.palette.info.main }}>
-                                {capitalizeFirstLetter(getCurrentMonth())}: {
-                                    surveyMetrics.surveyResponsesByMonth[getCurrentMonth()]
-                                }
+                                {capitalizeFirstLetter(getCurrentMonth())}: 
+                              <Typography variant="h5" sx={{ color: "rgb(5, 66, 136)" }}>
+                                    {
+                                        surveyMetrics.surveyResponsesByMonth[capitalizeFirstLetter(getCurrentMonth())]
+                                    } surveys
+                              </Typography>
                             </Typography>
                         </StyledCardContent>
                     </Grid>
@@ -551,6 +659,204 @@ const SurveyMetrics = () => {
                         </Box>
                     </Box>
                 </Modal>
+
+                {/* Popup for Survey Responses by Nationality */}
+                <Modal
+                    open={openNationalityModal}
+                    onClose={handleNationalityClose}
+                    aria-labelledby="modal-nationality-title"
+                    aria-describedby="modal-nationality-description"
+                >
+                    <Box
+                        sx={{
+                            position: 'absolute',
+                            top: '50%',
+                            left: '50%',
+                            transform: 'translate(-50%, -50%)',
+                            width: '80%',
+                            maxHeight: '80vh',
+                            bgcolor: 'background.paper',
+                            boxShadow: 24,
+                            p: 4,
+                            display: 'flex',
+                            gap: 4,
+                            overflowY: 'auto', // Enables vertical scrolling
+                        }}
+                    >
+                        {/* Bar Chart */}
+                        <Box sx={{ flex: 1 }}>
+                            <Typography variant="h6" sx={{ mb: 2 }} id="modal-nationality-title">
+                                Responses by Nationality
+                            </Typography>
+                            <ResponsiveContainer width="100%" height={400}>
+                                <BarChart data={surveyResponsesByRegionData}>
+                                    <XAxis dataKey="name" />
+                                    <YAxis />
+                                    <Tooltip />
+                                    <Legend formatter={(label) => `Nationality`} />
+                                    <Bar dataKey="value" fill="#82ca9d" />
+                                </BarChart>
+                            </ResponsiveContainer>
+                        </Box>
+
+                        {/* Table */}
+                        <Box sx={{ flex: 1 }}>
+                            <Typography variant="h6" sx={{ mb: 2 }} id="modal-nationality-description">
+                                Nationality Breakdown
+                            </Typography>
+                            <TableContainer component={Paper}>
+                                <Table>
+                                    <TableHead>
+                                        <TableRow>
+                                            <TableCell>Nationality</TableCell>
+                                            <TableCell align="right">Count</TableCell>
+                                        </TableRow>
+                                    </TableHead>
+                                    <TableBody>
+                                        {surveyResponsesByRegionData.map((row) => (
+                                            <TableRow key={row.name}>
+                                                <TableCell component="th" scope="row">
+                                                    {row.name}
+                                                </TableCell>
+                                                <TableCell align="right">{row.value}</TableCell>
+                                            </TableRow>
+                                        ))}
+                                    </TableBody>
+                                </Table>
+                            </TableContainer>
+                        </Box>
+                    </Box>
+                </Modal>
+
+                {/* Popup for Survey Responses by Country of residence */}
+                <Modal
+                    open={openCountryModal}
+                    onClose={handleCountryClose}
+                    aria-labelledby="modal-country-title"
+                    aria-describedby="modal-country-description"
+                >
+                    <Box
+                        sx={{
+                            position: 'absolute',
+                            top: '50%',
+                            left: '50%',
+                            transform: 'translate(-50%, -50%)',
+                            width: '80%',
+                            maxHeight: '80vh',
+                            bgcolor: 'background.paper',
+                            boxShadow: 24,
+                            p: 4,
+                            display: 'flex',
+                            gap: 4,
+                            overflowY: 'auto', // Enables vertical scrolling
+                        }}
+                    >
+                        {/* Bar Chart by country of residence*/}
+                        <Box sx={{ flex: 1 }}>
+                            <Typography variant="h6" sx={{ mb: 2 }} id="modal-country-title">
+                                Responses by Nationality
+                            </Typography>
+                            <ResponsiveContainer width="100%" height={400}>
+                                <BarChart data={surveyResponsesByCountryData}>
+                                    <XAxis dataKey="name" />
+                                    <YAxis />
+                                    <Tooltip />
+                                    <Legend formatter={(label) => `Country`} />
+                                    <Bar dataKey="value" fill="rgb(204, 45, 191)" />
+                                </BarChart>
+                            </ResponsiveContainer>
+                        </Box>
+
+                        {/* Table by country of residence*/}
+                        <Box sx={{ flex: 1 }}>
+                            <Typography variant="h6" sx={{ mb: 2 }} id="modal-nationality-description">
+                                Nationality Breakdown
+                            </Typography>
+                            <TableContainer component={Paper}>
+                                <Table>
+                                    <TableHead>
+                                        <TableRow>
+                                            <TableCell>Nationality</TableCell>
+                                            <TableCell align="right">Count</TableCell>
+                                        </TableRow>
+                                    </TableHead>
+                                    <TableBody>
+                                        {surveyResponsesByCountryData.map((row) => (
+                                            <TableRow key={row.name}>
+                                                <TableCell component="th" scope="row">
+                                                    {row.name}
+                                                </TableCell>
+                                                <TableCell align="right">{row.value}</TableCell>
+                                            </TableRow>
+                                        ))}
+                                    </TableBody>
+                                </Table>
+                            </TableContainer>
+                        </Box>
+                    </Box>
+                </Modal>
+
+                <Modal open={openAgeGroupModal} onClose={handleAgeGroupClose}>
+                    <Box
+                        sx={{
+                            position: 'absolute',
+                            top: '50%',
+                            left: '50%',
+                            transform: 'translate(-50%, -50%)',
+                            width: 1000,
+                            bgcolor: 'background.paper',
+                            boxShadow: 24,
+                            p: 4,
+                            display: 'flex',
+                            gap: 4
+                        }}
+                    >
+                        {/* Bar Chart age group */}
+                        <Box sx={{ flex: 1 }}>
+                            <Typography variant="h6" sx={{ mb: 2 }}>
+                                Responses by Age Group
+                            </Typography>
+                            <ResponsiveContainer width="100%" height={400}>
+                                <BarChart data={surveyResponsesByAgeGroupData}>
+                                    <XAxis dataKey="name" />
+                                    <YAxis />
+                                    <Tooltip />
+                                    <Legend formatter={(label) => `Age group`} />
+                                    <Bar dataKey="value" fill="#ffc658" />
+                                </BarChart>
+                            </ResponsiveContainer>
+                        </Box>
+
+                        {/* Table by age group */}
+                        <Box sx={{ flex: 1 }}>
+                            <Typography variant="h6" sx={{ mb: 2 }}>
+                                Age Group Breakdown
+                            </Typography>
+                            <TableContainer component={Paper}>
+                                <Table>
+                                    <TableHead>
+                                        <TableRow>
+                                            <TableCell>Age Group</TableCell>
+                                            <TableCell align="right">Responses</TableCell>
+                                        </TableRow>
+                                    </TableHead>
+                                    <TableBody>
+                                        {surveyResponsesByAgeGroupData.map((row) => (
+                                            <TableRow key={row.name}>
+                                                <TableCell component="th" scope="row">
+                                                    {row.name}
+                                                </TableCell>
+                                                <TableCell align="right">{row.value}</TableCell>
+                                            </TableRow>
+                                        ))}
+                                    </TableBody>
+                                </Table>
+                            </TableContainer>
+                        </Box>
+                    </Box>
+                </Modal>
+
+
             </Box>
         </StyledThemeProvider>
     );

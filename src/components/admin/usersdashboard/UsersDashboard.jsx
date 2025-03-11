@@ -117,7 +117,7 @@ const UsersDashboard = () => {
       <Grid container spacing={3} sx={{ flexGrow: 1 }}>
         {/* Active Admins Section */}
         <Grid item xs={12} md={6}>
-          <Card sx={{ height: "100%", display: "flex", flexDirection: "column" }}>
+          <Card sx={{ height: "100%", width: '100%', display: "flex", flexDirection: "column" }}>
             <CardContent>
               <Typography variant="h6" gutterBottom>
                 Active Admins
@@ -140,34 +140,9 @@ const UsersDashboard = () => {
             </CardContent>
           </Card>
         </Grid>
+ 
+  
 
-        {/* Geographic Distribution Section */}
-        <Grid item xs={12} md={6}>
-          <Card sx={{ height: "100%" }}>
-            <CardContent>
-              <Typography variant="h6" gutterBottom>
-                Geographic Distribution
-              </Typography>
-              <Box sx={{ height: "300px" }}>
-                <Bar data={geographicData} options={{ maintainAspectRatio: false }} />
-              </Box>
-            </CardContent>
-          </Card>
-        </Grid>
-
-        {/* Language Preferences Section */}
-        <Grid item xs={12} md={6}>
-          <Card sx={{ height: "100%" }}>
-            <CardContent>
-              <Typography variant="h6" gutterBottom>
-                Language Preferences
-              </Typography>
-              <Box sx={{ height: "300px" }}>
-                <Pie data={languageData} options={{ maintainAspectRatio: false }} />
-              </Box>
-            </CardContent>
-          </Card>
-        </Grid>
       </Grid>
 
       {/* Modal for All Users */}

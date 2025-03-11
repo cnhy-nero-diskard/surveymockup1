@@ -22,10 +22,17 @@ import {
   ListItem,
   ListItemText,
   Chip,
-  colors,
 } from '@mui/material';
 import { Bar } from 'react-chartjs-2';
-import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend,
+} from 'chart.js';
 import axios from 'axios';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
@@ -52,6 +59,7 @@ const AIToolsDashboard = () => {
   const [isSentimentAnalyzing, setIsSentimentAnalyzing] = useState(false);
   const [sentimentResults, setSentimentResults] = useState(null);
   const [sentimentError, setSentimentError] = useState(null);
+
   // State for Dialogs
   const [openMetricsDialog, setOpenMetricsDialog] = useState(false);
   const [selectedMetrics, setSelectedMetrics] = useState(null);
@@ -61,14 +69,22 @@ const AIToolsDashboard = () => {
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [snackbarSeverity, setSnackbarSeverity] = useState("info");
 
+  const [selectedEntities, setSelectedEntities] = useState([]); // Store selected entities
+  const uniqueEntities = [
+    ...new Set(openEndedResponses.flatMap((response) => response.entity || [])),
+  ];
+
   // State for API Usage Data
   const [apiUsageData, setApiUsageData] = useState({
     labels: ['Sentiment Analysis', 'Topic Modeling'],
     datasets: [
       {
         label: 'API Calls',
-        data: [0, 0], // Initialize with 0
-        backgroundColor: ['rgba(75, 192, 192, 0.2)', 'rgba(153, 102, 255, 0.2)'],
+        data: [0, 0],
+        backgroundColor: [
+          'rgba(75, 192, 192, 0.2)',
+          'rgba(153, 102, 255, 0.2)',
+        ],
         borderColor: ['rgba(75, 192, 192, 1)', 'rgba(153, 102, 255, 1)'],
         borderWidth: 1,
       },
@@ -78,7 +94,10 @@ const AIToolsDashboard = () => {
   useEffect(() => {
     const fetchHFTokens = async () => {
       try {
-        const response = await axios.get(`${process.env.REACT_APP_API_HOST}/api/hf-tokens`, { withCredentials: true });
+        const response = await axios.get(
+          `${process.env.REACT_APP_API_HOST}/api/hf-tokens`,
+          { withCredentials: true }
+        );
         setHfTokens(response.data);
       } catch (error) {
         console.error('Error fetching HF tokens:', error);
@@ -87,42 +106,27 @@ const AIToolsDashboard = () => {
     fetchHFTokens();
   }, []);
 
-  // useEffect(() => {
-  //   const fetchApiUsage = async () => {
-  //     try {
-  //       const response = await axios.get(`${process.env.REACT_APP_API_HOST}/api/usage`, { withCredentials: true });
-  //       setApiUsageData((prevData) => ({
-  //         ...prevData,
-  //         datasets: [
-  //           {
-  //             ...prevData.datasets[0],
-  //             data: [response.data.sentiment, response.data.topicModeling],
-  //           },
-  //         ],
-  //       }));
-  //     } catch (error) {
-  //       console.error('Error fetching API usage:', error);
-  //     }
-  //   };
-  //   fetchApiUsage();
-  // }, []);
-
   const handleScanOpenEndedResponses = async () => {
     try {
-      const response = await axios.get(`${process.env.REACT_APP_API_HOST}/api/admin/survey-responses/open-ended`, {
-        withCredentials: true,
-      });
+      const response = await axios.get(
+        `${process.env.REACT_APP_API_HOST}/api/admin/survey-responses/open-ended`,
+        {
+          withCredentials: true,
+        }
+      );
       setOpenEndedResponses(response.data);
       console.log('Open-ended responses:', response.data);
 
       // Filter all responses where is_analyzed is false
-      const unanalyzedResponses = response.data.filter(response => !response.is_analyzed);
+      const unanalyzedResponses = response.data.filter(
+        (r) => !r.is_analyzed
+      );
 
       if (unanalyzedResponses.length > 0) {
         // Concatenate all unanalyzed response_values into a single string
         const combinedText = unanalyzedResponses
-          .map(response => response.response_value)
-          .join("\n\n"); // Add a newline between responses for readability
+          .map((r) => r.response_value)
+          .join("\n\n");
 
         // Set the combined text to both text fields
         setSentimentText(combinedText);
@@ -138,12 +142,16 @@ const AIToolsDashboard = () => {
   const handleSentimentAnalysis = async () => {
     setIsSentimentAnalyzing(true);
     setSentimentError(null);
-    setSnackbarMessage("Just a heads-up, the first response might take a little longer, around 20-30 seconds. This is only if it's the first time you're using it in about 15 minutes, as the AI endpoint needs to initialize");
+    setSnackbarMessage(
+      "Just a heads-up, the first response might take a little longer, around 20-30 seconds. This is only if it's the first time you're using it in about 15 minutes, as the AI endpoint needs to initialize"
+    );
     setSnackbarSeverity("info");
     setSnackbarOpen(true);
 
     try {
-      const selectedToken = hfTokens.find((token) => token.id === selectedHFToken);
+      const selectedToken = hfTokens.find(
+        (token) => token.id === selectedHFToken
+      );
       if (!selectedToken) {
         throw new Error('No token selected');
       }
@@ -153,7 +161,7 @@ const AIToolsDashboard = () => {
         {
           text: sentimentText,
           tokenLabel: selectedToken.label,
-        }, 
+        },
         { withCredentials: true }
       );
 
@@ -180,34 +188,42 @@ const AIToolsDashboard = () => {
 
   const handleRetrieveOpenEndedResponsesForTopicModeling = async () => {
     try {
-      // 1. Retrieve open-ended responses
       const response = await axios.get(
         `${process.env.REACT_APP_API_HOST}/api/admin/survey-responses/open-ended`,
         { withCredentials: true }
       );
       setOpenEndedResponses(response.data);
 
-      // 2. Filter by date range (startDate, endDate) if provided
+      // Filter by date range and selected entities
       const filteredResponses = response.data.filter((resp) => {
-        if (!startDate || !endDate) return true; // If no dates selected, do not filter
-        const createdDate = new Date(resp.created_at);
-        return (
-          createdDate >= new Date(startDate) &&
-          createdDate <= new Date(endDate)
-        );
+        // Date filtering
+        const dateFilter =
+          !startDate ||
+          !endDate ||
+          (new Date(resp.created_at) >= new Date(startDate) &&
+            new Date(resp.created_at) <= new Date(endDate));
+
+        // Entity filtering
+        const entityFilter =
+          selectedEntities.length === 0 ||
+          selectedEntities.some((entity) =>
+            (resp.entity || []).includes(entity)
+          );
+
+        return dateFilter && entityFilter;
       });
 
-      // 3. Concatenate all filtered responses
+      // Concatenate all filtered responses
       const combinedText = filteredResponses
         .map((resp) => resp.response_value)
         .join("\n\n");
 
-      // 4. Update the text area for topic modeling
+      // Update the text area for topic modeling
       if (combinedText) {
         setTopicText(combinedText);
       } else {
         setTopicText("");
-        console.log("No open-ended responses found for the selected date range.");
+        console.log("No open-ended responses found for the selected filters.");
       }
     } catch (error) {
       console.error('Error fetching open-ended responses:', error);
@@ -226,26 +242,24 @@ const AIToolsDashboard = () => {
       );
       const openEndedResponses = openEndedResponsesResponse.data;
 
-      // Map sentiment results to the required fields, linking to survey_responses
+      // Map sentiment results to the required fields
       const resultsToStore = sentimentResults.map((result) => {
-        // Find the corresponding open-ended response
+        // Find the corresponding open-ended response (if it exists)
         const matchingResponse = openEndedResponses.find((response) => {
           // Normalize both texts for comparison
           const normalizedResponseValue = response.response_value.trim().toLowerCase();
           const normalizedSentimentText = result.text.trim().toLowerCase();
-
-          // Check substring match
+          // Check if one string is included in the other
           return (
             normalizedResponseValue.includes(normalizedSentimentText) ||
             normalizedSentimentText.includes(normalizedResponseValue)
           );
         });
 
-        // If a matching response is found, store its references; otherwise use default placeholders
-        // const sqref = matchingResponse ? matchingResponse.surveyquestion_ref : "TPENT";
-
-        const sqref ="TPENT";
-        const userId = matchingResponse ? matchingResponse.anonymous_user_id : "default_user_id";
+        const sqref = "TPENT";
+        const userId = matchingResponse
+          ? matchingResponse.anonymous_user_id
+          : "default_user_id";
 
         const now = new Date();
         const timeString = `${now.getHours()}:${now.getMinutes()}:${now.getSeconds()}`;
@@ -259,7 +273,6 @@ const AIToolsDashboard = () => {
         };
       });
 
-      // Make the API call to store sentiment results
       const response = await axios.post(
         `${process.env.REACT_APP_API_HOST}/api/admin/sentiment_results`,
         { results: resultsToStore },
@@ -287,8 +300,8 @@ const AIToolsDashboard = () => {
       const uniqueUserIds = [...new Set(userIds)];
       console.log(`USERS ANALYZED: ${uniqueUserIds}`);
 
-      // PLACEHOLDER API REQUEST TO SUBMIT ARRAY OF anonymous_user_id
-      // Uncomment and adjust the API endpoint as needed
+      // PLACEHOLDER for sending user IDs to external endpoint
+      // If needed, uncomment and adjust:
       /*
       await axios.post(
         `${process.env.REACT_APP_API_HOST}/api/admin/anonymous-users`,
@@ -298,7 +311,6 @@ const AIToolsDashboard = () => {
       */
 
       console.log("Placeholder for sending user IDs to an external endpoint:", uniqueUserIds);
-
     } catch (error) {
       console.error('Error storing sentiment analysis results:', error);
       setSnackbarMessage("Error storing sentiment analysis results.");
@@ -311,12 +323,16 @@ const AIToolsDashboard = () => {
     setIsTopicModeling(true);
     setTopicModelingError(null);
 
-    setSnackbarMessage("Starting Topic Modeling. This may take a moment if the endpoint is initializing.");
+    setSnackbarMessage(
+      "Starting Topic Modeling. This may take a moment if the endpoint is initializing."
+    );
     setSnackbarSeverity("info");
     setSnackbarOpen(true);
 
     try {
-      const selectedToken = hfTokens.find((token) => token.id === selectedHFToken);
+      const selectedToken = hfTokens.find(
+        (token) => token.id === selectedHFToken
+      );
       if (!selectedToken) {
         throw new Error('No token selected');
       }
@@ -328,8 +344,9 @@ const AIToolsDashboard = () => {
         },
         { withCredentials: true }
       );
+
       setTopicModelingResult(response.data);
-      
+
       if (response.data.hasOwnProperty("error")) {
         setSnackbarMessage("THE AI ENDPOINT IS CURRENTLY UNAVAILABLE. PLEASE TRY AGAIN LATER");
         setSnackbarSeverity("error");
@@ -351,7 +368,7 @@ const AIToolsDashboard = () => {
       zeroidx = {
         ...zeroidx,
         startDate: startDate || '2020-01-01',
-        endDate: endDate || new Date().toISOString().split('T')[0]
+        endDate: endDate || new Date().toISOString().split('T')[0],
       };
 
       const response = await axios.post(
@@ -391,9 +408,17 @@ const AIToolsDashboard = () => {
   };
 
   return (
-    <Container style={{height:'100vh'}} maxWidth="lg" sx={{ mt: 4, mb: 4, backgroundColor: 'rgba(0, 0, 0, 0)' }}>
+    <Container
+      style={{ minHeight: '100vh' }}
+      maxWidth="lg"
+      sx={{ mt: 4, mb: 4, backgroundColor: 'rgba(0, 0, 0, 0)' }}
+    >
       <Fade in timeout={1000}>
-        <Typography variant="h4" gutterBottom sx={{ fontWeight: 'bold', color: 'primary.main' }}>
+        <Typography
+          variant="h4"
+          gutterBottom
+          sx={{ fontWeight: 'bold', color: 'primary.main' }}
+        >
           AI Tools Dashboard
         </Typography>
       </Fade>
@@ -402,12 +427,27 @@ const AIToolsDashboard = () => {
         {/* API Configuration Section - Full Width */}
         <Grid item xs={12}>
           <Slide in direction="up" timeout={1000}>
-            <Paper elevation={3} sx={{ p: 3, bgcolor: 'background.paper', borderRadius: 2 }}>
-              <Typography variant="h6" gutterBottom sx={{ fontWeight: 'medium', color: 'text.primary' }}>
+            <Paper
+              elevation={3}
+              sx={{
+                p: 3,
+                bgcolor: 'background.paper',
+                borderRadius: 2,
+                boxShadow: 1,
+              }}
+            >
+              <Typography
+                variant="h6"
+                gutterBottom
+                sx={{ fontWeight: 'medium', color: 'text.primary' }}
+              >
                 API Configuration
               </Typography>
               <Box sx={{ mb: 3 }}>
-                <Typography variant="subtitle1" sx={{ color: 'text.secondary', mb: 1 }}>
+                <Typography
+                  variant="subtitle1"
+                  sx={{ color: 'text.secondary', mb: 1 }}
+                >
                   API Token Manager
                 </Typography>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
@@ -444,8 +484,20 @@ const AIToolsDashboard = () => {
         {/* Sentiment Analysis Section */}
         <Grid item xs={12} md={6}>
           <Slide in direction="up" timeout={1200}>
-            <Paper elevation={3} sx={{ p: 3, bgcolor: 'background.paper', borderRadius: 2 }}>
-              <Typography variant="h6" gutterBottom sx={{ fontWeight: 'medium', color: 'text.primary' }}>
+            <Paper
+              elevation={3}
+              sx={{
+                p: 3,
+                bgcolor: 'background.paper',
+                borderRadius: 2,
+                boxShadow: 2,
+              }}
+            >
+              <Typography
+                variant="h6"
+                gutterBottom
+                sx={{ fontWeight: 'medium', color: 'text.primary' }}
+              >
                 Sentiment Analysis
               </Typography>
               <Box>
@@ -465,48 +517,86 @@ const AIToolsDashboard = () => {
                   variant="contained"
                   color="primary"
                   onClick={handleSentimentAnalysis}
-                  disabled={isSentimentAnalyzing || !sentimentText || !selectedHFToken}
+                  disabled={
+                    isSentimentAnalyzing || !sentimentText || !selectedHFToken
+                  }
                   sx={{ textTransform: 'none' }}
                 >
-                  {isSentimentAnalyzing ? <CircularProgress size={24} /> : 'ANALYZE SENTIMENT'}
+                  {isSentimentAnalyzing ? (
+                    <CircularProgress size={24} />
+                  ) : (
+                    'ANALYZE SENTIMENT'
+                  )}
                 </Button>
                 {isSentimentAnalyzing && <CircularProgress sx={{ ml: 2 }} />}
               </Box>
               {sentimentResults && (
-                <Box sx={{ mt: 2, maxHeight: '400px', overflowY: 'auto', pr: 2 }}>
-                  <Typography variant="body1" sx={{ color: 'text.secondary', fontWeight: 'bold', mb: 2 }}>
+                <Box
+                  sx={{
+                    mt: 2,
+                    maxHeight: '400px',
+                    overflowY: 'auto',
+                    pr: 2,
+                  }}
+                >
+                  <Typography
+                    variant="body1"
+                    sx={{ color: 'text.secondary', fontWeight: 'bold', mb: 2 }}
+                  >
                     Sentiment Analysis Results:
                   </Typography>
 
-                  {/* Enhanced Results Display */}
                   <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                     {sentimentResults.map((result, index) => (
-                      <Paper key={index} elevation={2} sx={{ p: 2, borderRadius: 2, bgcolor: 'background.paper' }}>
-                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                          <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 'medium' }}>
+                      <Paper
+                        key={index}
+                        elevation={2}
+                        sx={{
+                          p: 2,
+                          borderRadius: 2,
+                          bgcolor: 'background.paper',
+                        }}
+                      >
+                        <Box
+                          sx={{
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                          }}
+                        >
+                          <Typography
+                            variant="body2"
+                            sx={{ color: 'text.secondary', fontWeight: 'medium' }}
+                          >
                             {result.text}
                           </Typography>
                           <Chip
                             label={result.sentiment.toUpperCase()}
                             color={
-                              result.sentiment === 'positive' ? 'success' :
-                              result.sentiment === 'negative' ? 'error' : 'warning'
+                              result.sentiment === 'positive'
+                                ? 'success'
+                                : result.sentiment === 'negative'
+                                ? 'error'
+                                : 'warning'
                             }
                             size="small"
                           />
                         </Box>
                         <Box sx={{ mt: 1 }}>
                           <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                            Confidence: <strong>{(result.confidence).toFixed(2)}%</strong>
+                            Confidence:{' '}
+                            <strong>{result.confidence.toFixed(2)}%</strong>
                           </Typography>
                         </Box>
                       </Paper>
                     ))}
                   </Box>
 
-                  {/* Sentiment Count and Average Section */}
                   <Box sx={{ mt: 3 }}>
-                    <Typography variant="body1" sx={{ color: 'text.secondary', fontWeight: 'bold', mb: 1 }}>
+                    <Typography
+                      variant="body1"
+                      sx={{ color: 'text.secondary', fontWeight: 'bold', mb: 1 }}
+                    >
                       Sentiment Summary:
                     </Typography>
                     {(() => {
@@ -528,7 +618,10 @@ const AIToolsDashboard = () => {
                       let averageSentiment = "neutral";
                       if (positiveRatio > negativeRatio && positiveRatio > neutralRatio) {
                         averageSentiment = "positive";
-                      } else if (negativeRatio > positiveRatio && negativeRatio > neutralRatio) {
+                      } else if (
+                        negativeRatio > positiveRatio &&
+                        negativeRatio > neutralRatio
+                      ) {
                         averageSentiment = "negative";
                       }
 
@@ -552,14 +645,13 @@ const AIToolsDashboard = () => {
                             />
                           </Box>
                           <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                            Average Sentiment: <strong>{averageSentiment.toUpperCase()}</strong>
+                            Average Sentiment:{' '}
+                            <strong>{averageSentiment.toUpperCase()}</strong>
                           </Typography>
                         </>
                       );
                     })()}
                   </Box>
-
-                  {/* Store Results to Database Button */}
                   <Button
                     variant="contained"
                     color="secondary"
@@ -579,51 +671,116 @@ const AIToolsDashboard = () => {
           </Slide>
         </Grid>
 
-        {/* Date Range Fields for Topic Modeling */}
-        <Grid item xs={12} md={6}>
-          <Paper elevation={2} sx={{ p: 3, bgcolor: 'background.paper', borderRadius: 2 }}>
-            <Typography variant="h6" gutterBottom sx={{ fontWeight: 'medium', color: 'text.primary' }}>
-              Select Date Range for Topic Modeling
-            </Typography>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
-              <TextField
-                label="Start Date"
-                type="date"
-                value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
-                InputLabelProps={{ shrink: true }}
-                sx={{ width: '50%' }}
-              />
-              <TextField
-                label="End Date"
-                type="date"
-                value={endDate}
-                onChange={(e) => setEndDate(e.target.value)}
-                InputLabelProps={{ shrink: true }}
-                sx={{ width: '50%' }}
-              />
-            </Box>
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={handleRetrieveOpenEndedResponsesForTopicModeling}
-              sx={{ textTransform: 'none' }}
-            >
-              Retrieve & Filter Responses
-            </Button>
-          </Paper>
-        </Grid>
-
-        {/* Topic Modeling Section */}
+        {/* Combined Topic Modeling Section (Date Filters + Topic Box) */}
         <Grid item xs={12} md={6}>
           <Slide in direction="up" timeout={1400}>
-            <Paper elevation={3} sx={{ p: 3, bgcolor: 'background.paper', borderRadius: 2 }}>
-              <Typography variant="h6" gutterBottom sx={{ fontWeight: 'medium', color: 'text.primary' }}>
+            <Paper
+              elevation={3}
+              sx={{
+                p: 3,
+                bgcolor: 'background.paper',
+                borderRadius: 2,
+                boxShadow: 2,
+                background:
+                  'linear-gradient(to right, #f0f0f0, #fafafa)',
+              }}
+            >
+              <Typography
+                variant="h6"
+                gutterBottom
+                sx={{
+                  fontWeight: 'medium',
+                  color: 'text.primary',
+                  mb: 2,
+                }}
+              >
                 Topic Modeling
               </Typography>
+
+              {/* Filter Section */}
+              <Paper
+                variant="outlined"
+                sx={{
+                  p: 2,
+                  mb: 3,
+                  borderRadius: 2,
+                  backgroundColor: '#fff',
+                }}
+              >
+                <Typography
+                  variant="subtitle1"
+                  sx={{
+                    color: 'text.secondary',
+                    fontWeight: 'bold',
+                    mb: 2,
+                  }}
+                >
+                  Date Range & Entity Filters
+                </Typography>
+                <Box
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 2,
+                    mb: 2,
+                  }}
+                >
+                  <TextField
+                    label="Start Date"
+                    type="date"
+                    value={startDate}
+                    onChange={(e) => setStartDate(e.target.value)}
+                    InputLabelProps={{ shrink: true }}
+                    sx={{ width: '50%' }}
+                  />
+                  <TextField
+                    label="End Date"
+                    type="date"
+                    value={endDate}
+                    onChange={(e) => setEndDate(e.target.value)}
+                    InputLabelProps={{ shrink: true }}
+                    sx={{ width: '50%' }}
+                  />
+                </Box>
+                <Box sx={{ mb: 2 }}>
+                  <Typography
+                    variant="subtitle2"
+                    sx={{ color: 'text.secondary', mb: 1 }}
+                  >
+                    Filter by Entity
+                  </Typography>
+                  <Select
+                    fullWidth
+                    multiple
+                    value={selectedEntities}
+                    onChange={(e) => setSelectedEntities(e.target.value)}
+                    renderValue={(selected) => selected.join(', ')}
+                  >
+                    {uniqueEntities.map((entity) => (
+                      <MenuItem key={entity} value={entity}>
+                        {entity}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </Box>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={handleRetrieveOpenEndedResponsesForTopicModeling}
+                  sx={{ textTransform: 'none' }}
+                >
+                  Retrieve & Filter Responses
+                </Button>
+              </Paper>
+
+              {/* Topic Modeling Section */}
               <Box>
-                <Typography variant="body1" sx={{ color: 'text.secondary', mb: 2 }}>
-                  The text below is automatically populated from open-ended responses (filtered by date). You can also edit it manually.
+                <Typography
+                  variant="body1"
+                  sx={{ color: 'text.secondary', mb: 2 }}
+                >
+                  Below is the auto-populated text from filtered open-ended
+                  responses. Feel free to edit it before analysis.
                 </Typography>
                 <TextField
                   value={topicText}
@@ -641,14 +798,19 @@ const AIToolsDashboard = () => {
                   disabled={isTopicModeling || !topicText || !selectedHFToken}
                   sx={{ textTransform: 'none' }}
                 >
-                  {isTopicModeling ? <CircularProgress size={24} /> : 'Analyze Topics'}
+                  {isTopicModeling ? (
+                    <CircularProgress size={24} />
+                  ) : (
+                    'Analyze Topics'
+                  )}
                 </Button>
                 {isTopicModeling && <CircularProgress sx={{ ml: 2 }} />}
               </Box>
 
-              {/* Display Topic Modeling Results */}
               {topicModelingResult && (
-                <Box sx={{ mt: 2, maxHeight: '400px', overflowY: 'auto', pr: 2 }}>
+                <Box
+                  sx={{ mt: 2, maxHeight: '400px', overflowY: 'auto', pr: 2 }}
+                >
                   <Typography variant="body1" sx={{ color: 'text.secondary' }}>
                     Topic Modeling Results:
                   </Typography>
@@ -657,7 +819,11 @@ const AIToolsDashboard = () => {
                       <Box key={index} sx={{ mb: 3 }}>
                         <Typography
                           variant="body1"
-                          sx={{ color: 'text.secondary', fontWeight: 'bold', fontSize: '1.2rem' }}
+                          sx={{
+                            color: 'text.secondary',
+                            fontWeight: 'bold',
+                            fontSize: '1.2rem',
+                          }}
                         >
                           Topic {index + 1}: {topic.customLabel}
                         </Typography>
@@ -674,7 +840,7 @@ const AIToolsDashboard = () => {
                             ))}
                           </Box>
                         </Box>
-                        
+
                         <Box sx={{ mt: 1 }}>
                           <Typography variant="body2" sx={{ color: 'text.secondary' }}>
                             Contributions:
@@ -724,9 +890,18 @@ const AIToolsDashboard = () => {
                 datasets: [
                   {
                     label: 'API Calls',
-                    data: [selectedMetrics.sentiment, selectedMetrics.topicModeling],
-                    backgroundColor: ['rgba(75, 192, 192, 0.2)', 'rgba(153, 102, 255, 0.2)'],
-                    borderColor: ['rgba(75, 192, 192, 1)', 'rgba(153, 102, 255, 1)'],
+                    data: [
+                      selectedMetrics.sentiment,
+                      selectedMetrics.topicModeling,
+                    ],
+                    backgroundColor: [
+                      'rgba(75, 192, 192, 0.2)',
+                      'rgba(153, 102, 255, 0.2)',
+                    ],
+                    borderColor: [
+                      'rgba(75, 192, 192, 1)',
+                      'rgba(153, 102, 255, 1)',
+                    ],
                     borderWidth: 1,
                   },
                 ],
