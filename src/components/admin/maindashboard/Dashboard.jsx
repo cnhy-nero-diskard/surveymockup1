@@ -5,7 +5,7 @@ import OverallMun from './nestedcomponents/OverallMun';
 import OverallBarangay from './nestedcomponents/OverallBarangay';
 import OverallSurveyTopic from './nestedcomponents/OverallSurveyTopic';
 import OverallEstablishment from './nestedcomponents/OverallEstablishment'; // Assuming you have this component
-import { fontFamily, fontSize, fontWeight } from '../../../config/fontConfig';
+import { fcolor, fontFamily, fontSize, fontWeight } from '../../../config/fontConfig';
 
 // Global styles to disable scrolling
 const GlobalStyle = createGlobalStyle`
@@ -29,11 +29,8 @@ const MainContent = styled(Box)`
 `;
 
 const CardContainer = styled(Box)`
-  background: linear-gradient(
-    135deg,
-    rgba(135, 191, 255, 0.93),
-    rgba(26, 86, 175, 0.73)
-  );
+  background: linear-gradient(135deg, rgba(214, 214, 214, 0.74), rgba(242, 250, 255, 0.97)); // Gradient background
+
   padding: 16px;
   border-radius: 8px;
   box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
@@ -54,6 +51,7 @@ const ContentBox = styled(Box)`
 const CustomTypography = styled(Typography)`
   font-family: ${fontFamily};
   padding-top: 16px;
+  color:black;
 `;
 
 const Dashboard = () => {
@@ -97,6 +95,7 @@ const Dashboard = () => {
                   fontFamily: fontFamily,
                   fontSize: fontSize + 5,
                   fontWeight: fontWeight,
+                  color:fcolor
                 }}
               >
                 Overall Municipality
@@ -115,6 +114,7 @@ const Dashboard = () => {
                   fontFamily: fontFamily,
                   fontSize: fontSize + 5,
                   fontWeight: fontWeight,
+                  color:fcolor
                 }}
               >
                 Barangay Data
@@ -135,6 +135,7 @@ const Dashboard = () => {
                   fontFamily: fontFamily,
                   fontSize: fontSize + 5,
                   fontWeight: fontWeight,
+                  color:fcolor
                 }}
               >
                 Overall Topic
@@ -153,6 +154,7 @@ const Dashboard = () => {
                   fontFamily: fontFamily,
                   fontSize: fontSize + 5,
                   fontWeight: fontWeight,
+                  color:fcolor
                 }}
               >
                 Overall Establishment

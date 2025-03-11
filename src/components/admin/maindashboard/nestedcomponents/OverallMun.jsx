@@ -7,11 +7,7 @@ import { ChartContainer, MainContent, ChartContainer as PieChartContainer } from
 import { ChartWrapper, LegendContainer, LegendItem, ColorIndicator } from "../../shared/charts/ChartWrapper";
 
 
-const Footer = styled(Box)`
-  margin-top: 40px;
-  display: flex;
-  justify-content: flex-end;
-`;
+
 
 const OverallMun = () => {
   const pieData = [

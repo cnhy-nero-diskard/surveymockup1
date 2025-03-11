@@ -3,6 +3,7 @@ import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip, Legend } fro
 import { Grid, Paper, Typography, MenuItem, Select, FormControl, InputLabel, Box } from '@mui/material';
 import styled from 'styled-components';
 import { useState } from 'react';
+import { fontFamily, fontSize, fontWeight } from '../../../config/fontConfig';
 
 // Color palette for charts
 const COLORS = ['#0088FE', '#FF8042', '#00C49F', '#FFBB28', '#8884D8'];
@@ -38,7 +39,14 @@ const StyledFormControl = styled(FormControl)`
  */
 const StyledGridContainer = styled(Grid)`
   padding: 24px;
-  background-color: rgba(0,0,0,0)  
+  height:100vh;
+  overflow:visible;
+  background-color: rgba(0,0,0,0) ;
+
+    font-family: ${fontFamily};
+    font-size: ${fontSize};
+    font-weight: ${fontWeight};
+  
 `;
 
 /**
