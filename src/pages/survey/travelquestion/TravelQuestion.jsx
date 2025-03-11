@@ -73,7 +73,7 @@ const TravelQuestion = () => {
 
   const { routes } = useContext(UnifiedContext);
   const currentStepIndex = useCurrentStepIndex(routes);
-  const { activeBlocks } = useContext(UnifiedContext);
+  const { activeBlocks, setTouristAlone, removeActiveBlocks, appendActiveBlocks } = useContext(UnifiedContext);
 
   const inputAnimation = useSpring({
     opacity: 1,
@@ -93,6 +93,11 @@ const TravelQuestion = () => {
     if (!value || isNaN(value) || value <= 0) {
       setError(translations.travelQuestionErrorText);
       return;
+    }
+    if (value != 1){
+      removeActiveBlocks('isalone');
+    } else {
+      appendActiveBlocks(['isalone']);
     }
 
     setIsLoading(true);

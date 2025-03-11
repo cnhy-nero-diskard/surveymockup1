@@ -3,8 +3,9 @@ import React, { createContext, useState } from 'react';
 export const UnifiedContext = createContext();
 
 export const UnifiedProvider = ({ children, routes }) => {
-  const [activeBlocks, setActiveBlocks] = useState(['universal', 'surveytpms', 'feedback']);
+  const [activeBlocks, setActiveBlocks] = useState(['universal', 'surveytpms', 'feedback', 'isalone']);
   const [headerText, setHeaderText] = useState(''); 
+  const [touristAlone, setTouristAlone] = useState(''); 
 
   // Function to append new blocks to activeBlocks
   const appendActiveBlocks = (newBlocks) => {
@@ -30,7 +31,9 @@ export const UnifiedProvider = ({ children, routes }) => {
   };
 
   return (
-    <UnifiedContext.Provider value={{ activeBlocks, setActiveBlocks, appendActiveBlocks, removeActiveBlocks, isBlockActive, routes, headerText, setHeaderText }}>
+    <UnifiedContext.Provider value={{ activeBlocks, setActiveBlocks, appendActiveBlocks,
+     removeActiveBlocks, isBlockActive, routes, headerText, setHeaderText, touristAlone,
+      setTouristAlone }}>
       {children}
     </UnifiedContext.Provider>
   );

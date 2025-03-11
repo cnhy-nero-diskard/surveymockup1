@@ -59,19 +59,20 @@ const NextButton = styled(animated.button)`
 const ExpenseCompanions = () => {
   const { routes } = useContext(UnifiedContext);
   const currentStepIndex = useCurrentStepIndex(routes);
-  const { activeBlocks, appendActiveBlocks, removeActiveBlocks } = useContext(UnifiedContext);
+  const { activeBlocks, appendActiveBlocks, removeActiveBlocks, isBlockActive } = useContext(UnifiedContext);
 
   const [inputs, setInputs] = useState([
     { key: 'EXPC', value: '' }, // Example key, you can add more fields as needed
   ]);
   const [language, setLanguage] = useState(localStorage.getItem('selectedLanguage'));
   const translations = useTranslations('ExpenseCompanions', language);
-
-  const buttonAnimation = useSpring({
-    transform: 'scale(1)',
-    from: { transform: 'scale(0)' },
-    config: { tension: 200, friction: 12 },
-  });
+    useEffect (() => {
+        if (isBlockActive('isalone')){
+            console.log('COUNTER IS ALONE FOR ENUMERATION');
+            submitSurveyResponses({ surveyquestion_ref: "EXPC", response_value: "1" })
+            goToNextStep(currentStepIndex, navigate, routes, activeBlocks);
+        }
+    }, []);
 
   const navigate = useNavigate();
 

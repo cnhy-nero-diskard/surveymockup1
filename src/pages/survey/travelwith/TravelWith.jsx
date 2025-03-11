@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
 import BodyPartial from '../../../components/partials/BodyPartial';
@@ -75,8 +75,15 @@ const TravelWith = () => {
 
     const { routes } = useContext(UnifiedContext);
     const currentStepIndex = useCurrentStepIndex(routes);
-    const { activeBlocks, appendActiveBlocks, removeActiveBlocks } = useContext(UnifiedContext);
+    const { activeBlocks, appendActiveBlocks, removeActiveBlocks, isBlockActive } = useContext(UnifiedContext);
 
+    useEffect (() => {
+        if (isBlockActive('isalone')){
+            console.log('COUNTER IS ALONE FOR ENUMERATION');
+            submitSurveyResponses({ surveyquestion_ref: "TRWTH", response_value: "Alone" })
+            goToNextStep(currentStepIndex, navigate, routes, activeBlocks);
+        }
+    }, []);
     const handleOptionClick = (option) => {
         const optionObject = { surveyquestion_ref: "TRWTH", response_value: option };
 

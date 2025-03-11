@@ -90,7 +90,8 @@ const BookingForm = () => {
     'Internet': [
       { label: translations.bookingPlatformBookingCom, value: 'Booking.com' },
       { label: translations.bookingPlatformExpedia, value: 'Expedia' },
-      { label: translations.bookingPlatformAirbnb, value: 'Airbnb' }
+      { label: translations.bookingPlatformAirbnb, value: 'Airbnb' },
+      { label: translations.bookingPlatformAgoda, value: 'Agoda' }
     ],
     'Others (specify)': []
   };

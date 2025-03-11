@@ -64,6 +64,7 @@ const PProfile2 = () => {
   const { activeBlocks } = useContext(UnifiedContext);
 
   const navigate = useNavigate();
+
   const [responses, setResponses] = useState([
     { ref: 'ARRDT', value: null, label: 'pprofile2ArrivalDateLabel' },
     { ref: 'DEPDT', value: null, label: 'pprofile2DepartureDateLabel' },
@@ -73,24 +74,28 @@ const PProfile2 = () => {
   const language = localStorage.getItem('selectedLanguage');
   const translations = useTranslations('PProfile2', language);
 
+  // A simple fade-in/slide-down animation for the form
   const formAnimation = useSpring({
     from: { opacity: 0, transform: 'translateY(-50px)' },
     to: { opacity: 1, transform: 'translateY(0)' },
     config: { duration: 500 },
   });
 
+  // A simple fade-in/scale-up animation for the Next button
   const buttonAnimation = useSpring({
     from: { opacity: 0, transform: 'scale(0.9)' },
     to: { opacity: 1, transform: 'scale(1)' },
     config: { duration: 300, delay: 500 },
   });
 
+  // Update the date in the state array whenever the user picks a date
   const handleInputChange = (index, date) => {
     setResponses((prev) =>
       prev.map((item, i) => (i === index ? { ...item, value: date } : item))
     );
   };
 
+  // On Next click, we submit the date values, then navigate
   const handleNextClick = async () => {
     const surveyResponses = responses.map(({ ref, value }) => ({
       surveyquestion_ref: ref,
@@ -101,12 +106,13 @@ const PProfile2 = () => {
     goToNextStep(currentStepIndex, navigate, routes, activeBlocks);
   };
 
+  // Check if all fields have a valid date
   const areAllFieldsFilled = () => {
     return responses.every((item) => item.value !== null && item.value !== '');
   };
 
   useEffect(() => {
-    // Trigger re-render when responses change if needed
+    // If you need to do something each time responses update, add it here
   }, [responses]);
 
   return (
@@ -121,19 +127,27 @@ const PProfile2 = () => {
       >
         <FormContainer style={formAnimation}>
           <FormTitle>{translations.pprofile2FormTitle}</FormTitle>
+          
           {responses.map((item, index) => (
             <FormField key={item.ref}>
               <Label>{translations[item.label]}</Label>
               <DatePicker
+                // Bind the chosen date from state
                 selected={item.value}
+                // Update that date in state whenever the user picks a new one
                 onChange={(date) => handleInputChange(index, date)}
+                
+                // If you want to disable the 'ACCMP' field
                 disabled={item.ref === 'ACCMP'}
+
+                // This is how the chosen date will appear in the text field
                 dateFormat="MM/dd/yyyy"
+
+                // You can remove or change this placeholder if it’s confusing
+                placeholderText="mm/dd/yyyy"
+
+                // This stops the date picker from popping in the 'wrong' place on small screens
                 popperPlacement="bottom"
-                /* Only use a native date input for ARRDT and DEPDT to avoid keyboard on mobile */
-                {...((item.ref === 'ARRDT' || item.ref === 'DEPDT') && {
-                  customInput: <input type="date" />,
-                })}
               />
             </FormField>
           ))}

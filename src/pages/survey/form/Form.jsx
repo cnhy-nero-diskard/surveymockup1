@@ -88,7 +88,7 @@ const Form = () => {
         // Check if all fields are filled and the email is valid
         const isFullNameValid = formData.fullName.trim() !== '';
         const isEmailValid = /^[a-zA-Z0-9._%+-]+@gmail\.com$/.test(formData.email);
-        setIsFormValid(isFullNameValid && isEmailValid);
+        setIsFormValid(isFullNameValid);
     }, [formData]);
 
     const formAnimation = useSpring({

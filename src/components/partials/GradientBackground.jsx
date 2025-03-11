@@ -144,7 +144,7 @@ const GradientBackground = ({ children, overlayImage, opacity = 0.3, blendMode =
   const [language, setLanguage] = useState(localStorage.getItem('selectedLanguage'));
   const translations = useTranslations('PackagePaid', language || 'en');
 
-  const progress = ((currentStepIndex + 1) / routes.length) * 100;
+  const progress = (((currentStepIndex) / routes.length) * 100)+6;
   const getParentPath = (path) => {
     const segments = path.split("/");
     return segments.slice(0, -1).join("/");
