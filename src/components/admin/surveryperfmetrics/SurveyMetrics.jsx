@@ -1,6 +1,33 @@
-import React, { useState } from 'react';
-import { Box, Typography, Card, CardContent, Grid, useTheme, Modal, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button } from '@mui/material';
-import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import {
+    Box,
+    Typography,
+    CardContent,
+    Grid,
+    useTheme,
+    Modal,
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow,
+    Paper,
+    Button
+} from '@mui/material';
+import {
+    PieChart,
+    Pie,
+    Cell,
+    BarChart,
+    Bar,
+    XAxis,
+    YAxis,
+    Tooltip,
+    Legend,
+    ResponsiveContainer
+} from 'recharts';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import CancelIcon from '@mui/icons-material/Cancel';
@@ -8,7 +35,6 @@ import InsertChartIcon from '@mui/icons-material/InsertChart';
 import { sentimentColors } from '../../../config/sentimentConfig';
 import styled, { ThemeProvider as StyledThemeProvider } from 'styled-components';
 import { fontFamily, fontSize, fontWeight } from '../../../config/fontConfig';
-import { dummyData } from './dummydata';
 import * as XLSX from 'xlsx';
 
 // Styled components
@@ -45,19 +71,38 @@ const StyledIcon = styled.div`
 
 const SurveyMetrics = () => {
     const theme = useTheme();
+
+    // State to hold survey metrics fetched from server
+    const [surveyMetrics, setSurveyMetrics] = useState(null);
+
+    // State control for modals
     const [open, setOpen] = useState(false);
     const [openDistributionModal, setOpenDistributionModal] = useState(false);
 
+    // Fetch data from server
+    useEffect(() => {
+        axios
+            .get(`${process.env.REACT_APP_API_HOST}/api/admin/getsurveymetrics`, { withCredentials: true })
+            .then((response) => {
+                setSurveyMetrics(response.data.data);
+                console.log(`METRICS -- > ${JSON.stringify(response.data.data)}`);
+            })
+            .catch((error) => {
+                console.error('Error fetching Survey Metrics:', error);
+            });
+    }, []);
+
+    // Open & close modals
     const handleOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);
 
     const handleDistributionOpen = () => setOpenDistributionModal(true);
     const handleDistributionClose = () => setOpenDistributionModal(false);
 
-    // Function to get the current time in a readable format
+    // Function to get current time in a readable format
     const getCurrentTime = () => {
         const now = new Date();
-        return now.toLocaleString(); // Adjust the format as needed
+        return now.toLocaleString();
     };
 
     // Function to get the current month
@@ -66,107 +111,113 @@ const SurveyMetrics = () => {
         return now.toLocaleString('default', { month: 'long' }).toLowerCase();
     };
 
-    // Function to capitalize the first letter of the month
+    // Function to capitalize the first letter of a string
     const capitalizeFirstLetter = (string) => {
         return string.charAt(0).toUpperCase() + string.slice(1);
     };
 
-    // Data for charts
+    // Guard condition if data isn't loaded yet
+    if (!surveyMetrics) {
+        return (
+            <Box sx={{ padding: 4 }}>
+                <Typography variant="h6">Loading Survey Metrics...</Typography>
+            </Box>
+        );
+    }
+
+    // Prepare data from the API response (assuming similar structure as dummyData)
     const completionRateData = [
-        { name: 'Completed', value: dummyData.surveyCompletionRate },
-        { name: 'Not Completed', value: 100 - dummyData.surveyCompletionRate },
+        { name: 'Completed', value: surveyMetrics.surveyCompletionRate },
+        { name: 'Not Completed', value: surveyMetrics.dropOffRate }
     ];
 
     const satisfactionData = [
-        { name: 'Satisfaction Score', value: dummyData.surveySatisfactionScore },
+        { name: 'Satisfaction Score', value: surveyMetrics.surveySatisfactionScore }
     ];
 
-    const surveyDistributionData = Object.entries(dummyData.surveyDistribution).map(([key, value]) => ({
+    const surveyDistributionData = Object.entries(surveyMetrics.surveyDistribution).map(([key, value]) => ({
         name: key,
-        value,
+        value
     }));
 
-
-    const surveyResponsesByRegionData = Object.entries(dummyData.surveyResponsesByRegion).map(([key, value]) => ({
+    const surveyResponsesByRegionData = Object.entries(surveyMetrics.surveyResponsesByRegion).map(([key, value]) => ({
         name: key,
-        value,
+        value
     }));
 
-    const surveyResponsesByAgeGroupData = Object.entries(dummyData.surveyResponsesByAgeGroup).map(([key, value]) => ({
+    const surveyResponsesByAgeGroupData = Object.entries(surveyMetrics.surveyResponsesByAgeGroup).map(([key, value]) => ({
         name: key,
-        value,
+        value
     }));
 
-    const surveyResponsesByMonthData = Object.entries(dummyData.surveyResponsesByMonth).map(([key, value]) => ({
-        name: capitalizeFirstLetter(key), // Capitalize month names
-        value,
+    const surveyResponsesByMonthData = Object.entries(surveyMetrics.surveyResponsesByMonth).map(([key, value]) => ({
+        name: capitalizeFirstLetter(key),
+        value
     }));
 
-    const colors = [sentimentColors.positive, sentimentColors.negative]; // Colors for charts
-
-    // Unique colors for survey distribution pie chart
+    const colors = [sentimentColors.positive, sentimentColors.negative];
     const distributionColors = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#AF19FF', '#FF1919'];
 
-    // Function to export dummyData to Excel
+    // Function to export fetched data to Excel
     const exportToExcel = () => {
-        // Create a new workbook
         const workbook = XLSX.utils.book_new();
-    
-        // Add metadata sheet with all dummyData
-        const metadata = Object.entries(dummyData).map(([key, value]) => {
+
+        // Convert all key-value pairs to an array for the "Metadata" sheet
+        const metadata = Object.entries(surveyMetrics).map(([key, value]) => {
             if (typeof value === 'object' && !Array.isArray(value)) {
-                // Handle nested objects (e.g., surveyDistribution, surveyResponsesByDevice)
                 return [key, JSON.stringify(value)];
             }
             return [key, value];
         });
-    
-        // Add header row
-        metadata.unshift(['Key', 'Value']);
-    
+        metadata.unshift(['Key', 'Value']); // Add header row
+
         // Create metadata sheet
         const metadataSheet = XLSX.utils.aoa_to_sheet(metadata);
-    
-        // Style metadata sheet
-        metadataSheet['!cols'] = [{ width: 30 }, { width: 50 }]; // Set column widths
-        metadataSheet['A1'].s = { font: { bold: true }, fill: { fgColor: { rgb: "D3D3D3" } } }; // Header styling
-        metadataSheet['B1'].s = { font: { bold: true }, fill: { fgColor: { rgb: "D3D3D3" } } }; // Header styling
-    
+        metadataSheet['!cols'] = [{ width: 30 }, { width: 50 }];
+        metadataSheet['A1'].s = { font: { bold: true }, fill: { fgColor: { rgb: 'D3D3D3' } } };
+        metadataSheet['B1'].s = { font: { bold: true }, fill: { fgColor: { rgb: 'D3D3D3' } } };
         XLSX.utils.book_append_sheet(workbook, metadataSheet, 'Metadata');
-    
+
         // Helper function to create a styled sheet
         const createStyledSheet = (data, sheetName, headers) => {
             const sheet = XLSX.utils.json_to_sheet(data, { header: headers });
-            sheet['!cols'] = headers.map(() => ({ width: 20 })); // Set column widths
-    
+            sheet['!cols'] = headers.map(() => ({ width: 20 }));
             // Style headers
             headers.forEach((header, index) => {
                 const cellAddress = XLSX.utils.encode_cell({ r: 0, c: index });
-                sheet[cellAddress].s = { font: { bold: true }, fill: { fgColor: { rgb: "E0E0E0" } } }; // Bold and gray background
+                sheet[cellAddress].s = {
+                    font: { bold: true },
+                    fill: { fgColor: { rgb: 'E0E0E0' } }
+                };
             });
-    
             return sheet;
         };
-    
-        // Add survey distribution data
-        const distributionSheet = createStyledSheet(surveyDistributionData, 'Survey Distribution', ['Entrypoint', 'Responses']);
+
+        // Create sheets for each data set
+        const distributionSheet = createStyledSheet(surveyDistributionData, 'Survey Distribution', [
+            'Entrypoint',
+            'Responses'
+        ]);
         XLSX.utils.book_append_sheet(workbook, distributionSheet, 'Survey Distribution');
-    
-        // Add survey responses by device data
-    
-        // Add survey responses by region data
-        const regionSheet = createStyledSheet(surveyResponsesByRegionData, 'Responses by Region', ['Region', 'Responses']);
+
+        const regionSheet = createStyledSheet(surveyResponsesByRegionData, 'Responses by Region', [
+            'Region',
+            'Responses'
+        ]);
         XLSX.utils.book_append_sheet(workbook, regionSheet, 'Responses by Region');
-    
-        // Add survey responses by age group data
-        const ageGroupSheet = createStyledSheet(surveyResponsesByAgeGroupData, 'Responses by Age Group', ['Age Group', 'Responses']);
+
+        const ageGroupSheet = createStyledSheet(surveyResponsesByAgeGroupData, 'Responses by Age Group', [
+            'Age Group',
+            'Responses'
+        ]);
         XLSX.utils.book_append_sheet(workbook, ageGroupSheet, 'Responses by Age Group');
-    
-        // Add survey responses by month data
-        const monthSheet = createStyledSheet(surveyResponsesByMonthData, 'Responses by Month', ['Month', 'Responses']);
+
+        const monthSheet = createStyledSheet(surveyResponsesByMonthData, 'Responses by Month', [
+            'Month',
+            'Responses'
+        ]);
         XLSX.utils.book_append_sheet(workbook, monthSheet, 'Responses by Month');
 
-    
         // Save the workbook
         XLSX.writeFile(workbook, 'SurveyMetrics.xlsx');
     };
@@ -174,12 +225,18 @@ const SurveyMetrics = () => {
     return (
         <StyledThemeProvider theme={theme}>
             <Box sx={{ padding: 4 }}>
-                <Typography variant="h4" gutterBottom sx={{ fontWeight: 'bold', color: theme.palette.primary.main }}>
+                <Typography
+                    variant="h4"
+                    gutterBottom
+                    sx={{ fontWeight: 'bold', color: theme.palette.primary.main }}
+                >
                     Survey Performance Metrics
                 </Typography>
+
                 <Button variant="contained" color="primary" onClick={exportToExcel} sx={{ mb: 4 }}>
                     Export to Excel
                 </Button>
+
                 <Grid container spacing={4}>
                     {/* Total Surveys Completed */}
                     <Grid item xs={12} md={6} lg={3}>
@@ -187,7 +244,7 @@ const SurveyMetrics = () => {
                             <StyledIcon as={CheckCircleIcon} color={theme.palette.success.main} />
                             <StyledTypography variant="h6">Total Surveys Completed</StyledTypography>
                             <Typography variant="h4" sx={{ color: theme.palette.success.main }}>
-                                {dummyData.totalSurveysCompleted}
+                                {surveyMetrics.totalSurveysCompleted}
                             </Typography>
                             <Typography variant="subtitle2" sx={{ color: theme.palette.text.secondary }}>
                                 As of {getCurrentTime()}
@@ -211,10 +268,38 @@ const SurveyMetrics = () => {
                                         outerRadius={70}
                                         fill="#8884d8"
                                         dataKey="value"
-                                        label
+                                        label={({
+                                            cx,
+                                            cy,
+                                            midAngle,
+                                            innerRadius,
+                                            outerRadius,
+                                            percent,
+                                            index,
+                                        }) => {
+                                            const RADIAN = Math.PI / 180;
+                                            const radius = innerRadius + (outerRadius - innerRadius) * 1.5; // Move labels further out
+                                            const x = cx + radius * Math.cos(-midAngle * RADIAN);
+                                            const y = cy + radius * Math.sin(-midAngle * RADIAN);
+
+                                            return (
+                                                <text
+                                                    x={x}
+                                                    y={y}
+                                                    fill={colors[index % colors.length]}
+                                                    textAnchor={x > cx ? 'start' : 'end'}
+                                                    dominantBaseline="central"
+                                                >
+                                                    {`${(percent * 100).toFixed(0)}%`}
+                                                </text>
+                                            );
+                                        }}
                                     >
                                         {completionRateData.map((entry, index) => (
-                                            <Cell key={`cell-${index}`} fill={colors[index % colors.length]} />
+                                            <Cell
+                                                key={`cell-${index}`}
+                                                fill={colors[index % colors.length]}
+                                            />
                                         ))}
                                     </Pie>
                                     <Tooltip />
@@ -230,7 +315,7 @@ const SurveyMetrics = () => {
                             <StyledIcon as={AccessTimeIcon} color={theme.palette.warning.main} />
                             <StyledTypography variant="h6">Average Time to Complete</StyledTypography>
                             <Typography variant="h4" sx={{ color: theme.palette.warning.main }}>
-                                {dummyData.averageTimeToComplete}
+                                {surveyMetrics.averageTimeToComplete}
                             </Typography>
                         </StyledCardContent>
                     </Grid>
@@ -241,15 +326,17 @@ const SurveyMetrics = () => {
                             <StyledIcon as={CancelIcon} color={theme.palette.error.main} />
                             <StyledTypography variant="h6">Drop-off Rate</StyledTypography>
                             <Typography variant="h4" sx={{ color: theme.palette.error.main }}>
-                                {dummyData.dropOffRate}%
+                                {surveyMetrics.dropOffRate}%
                             </Typography>
                         </StyledCardContent>
                     </Grid>
 
-
                     {/* Survey Distribution */}
                     <Grid item xs={12} md={6} lg={3}>
-                        <StyledCardContent onClick={handleDistributionOpen} style={{ cursor: 'pointer' }}>
+                        <StyledCardContent
+                            onClick={handleDistributionOpen}
+                            style={{ cursor: 'pointer' }}
+                        >
                             <StyledTypography variant="h6" sx={{ textAlign: 'center', mb: 2 }}>
                                 Survey Distribution
                             </StyledTypography>
@@ -266,7 +353,10 @@ const SurveyMetrics = () => {
                                         label
                                     >
                                         {surveyDistributionData.map((entry, index) => (
-                                            <Cell key={`cell-${index}`} fill={distributionColors[index % distributionColors.length]} />
+                                            <Cell
+                                                key={`cell-${index}`}
+                                                fill={distributionColors[index % distributionColors.length]}
+                                            />
                                         ))}
                                     </Pie>
                                     <Tooltip />
@@ -275,8 +365,6 @@ const SurveyMetrics = () => {
                             </ResponsiveContainer>
                         </StyledCardContent>
                     </Grid>
-
-
 
                     {/* Survey Responses by Nationality */}
                     <Grid item xs={12} md={6} lg={3}>
@@ -320,7 +408,9 @@ const SurveyMetrics = () => {
                             <StyledIcon as={InsertChartIcon} color={theme.palette.info.main} />
                             <StyledTypography variant="h6">Responses by Month</StyledTypography>
                             <Typography variant="h4" sx={{ color: theme.palette.info.main }}>
-                                {capitalizeFirstLetter(getCurrentMonth())}: {dummyData.surveyResponsesByMonth[getCurrentMonth()]}
+                                {capitalizeFirstLetter(getCurrentMonth())}: {
+                                    surveyMetrics.surveyResponsesByMonth[getCurrentMonth()]
+                                }
                             </Typography>
                         </StyledCardContent>
                     </Grid>
@@ -328,10 +418,25 @@ const SurveyMetrics = () => {
 
                 {/* Popup for Survey Responses by Month */}
                 <Modal open={open} onClose={handleClose}>
-                    <Box sx={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: 1000, bgcolor: 'background.paper', boxShadow: 24, p: 4, display: 'flex', gap: 4 }}>
-                        {/* Graph Section */}
+                    <Box
+                        sx={{
+                            position: 'absolute',
+                            top: '50%',
+                            left: '50%',
+                            transform: 'translate(-50%, -50%)',
+                            width: 1000,
+                            bgcolor: 'background.paper',
+                            boxShadow: 24,
+                            p: 4,
+                            display: 'flex',
+                            gap: 4
+                        }}
+                    >
+                        {/* Bar Chart */}
                         <Box sx={{ flex: 1 }}>
-                            <Typography variant="h6" sx={{ mb: 2 }}>Survey Responses by Month</Typography>
+                            <Typography variant="h6" sx={{ mb: 2 }}>
+                                Survey Responses by Month
+                            </Typography>
                             <ResponsiveContainer width="100%" height={400}>
                                 <BarChart data={surveyResponsesByMonthData}>
                                     <XAxis dataKey="name" />
@@ -343,9 +448,11 @@ const SurveyMetrics = () => {
                             </ResponsiveContainer>
                         </Box>
 
-                        {/* Table Section */}
+                        {/* Table */}
                         <Box sx={{ flex: 1 }}>
-                            <Typography variant="h6" sx={{ mb: 2 }}>Monthly Responses</Typography>
+                            <Typography variant="h6" sx={{ mb: 2 }}>
+                                Monthly Responses
+                            </Typography>
                             <TableContainer component={Paper}>
                                 <Table>
                                     <TableHead>
@@ -372,10 +479,25 @@ const SurveyMetrics = () => {
 
                 {/* Popup for Survey Distribution */}
                 <Modal open={openDistributionModal} onClose={handleDistributionClose}>
-                    <Box sx={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: 1000, bgcolor: 'background.paper', boxShadow: 24, p: 4, display: 'flex', gap: 4 }}>
-                        {/* Graph Section */}
+                    <Box
+                        sx={{
+                            position: 'absolute',
+                            top: '50%',
+                            left: '50%',
+                            transform: 'translate(-50%, -50%)',
+                            width: 1000,
+                            bgcolor: 'background.paper',
+                            boxShadow: 24,
+                            p: 4,
+                            display: 'flex',
+                            gap: 4
+                        }}
+                    >
+                        {/* Pie Chart */}
                         <Box sx={{ flex: 1 }}>
-                            <Typography variant="h6" sx={{ mb: 2 }}>Survey Distribution</Typography>
+                            <Typography variant="h6" sx={{ mb: 2 }}>
+                                Survey Distribution
+                            </Typography>
                             <ResponsiveContainer width="100%" height={400}>
                                 <PieChart>
                                     <Pie
@@ -389,7 +511,10 @@ const SurveyMetrics = () => {
                                         label
                                     >
                                         {surveyDistributionData.map((entry, index) => (
-                                            <Cell key={`cell-${index}`} fill={distributionColors[index % distributionColors.length]} />
+                                            <Cell
+                                                key={`cell-${index}`}
+                                                fill={distributionColors[index % distributionColors.length]}
+                                            />
                                         ))}
                                     </Pie>
                                     <Tooltip />
@@ -398,9 +523,11 @@ const SurveyMetrics = () => {
                             </ResponsiveContainer>
                         </Box>
 
-                        {/* Table Section */}
+                        {/* Table */}
                         <Box sx={{ flex: 1 }}>
-                            <Typography variant="h6" sx={{ mb: 2 }}>Survey Distribution Data</Typography>
+                            <Typography variant="h6" sx={{ mb: 2 }}>
+                                Survey Distribution Data
+                            </Typography>
                             <TableContainer component={Paper}>
                                 <Table>
                                     <TableHead>

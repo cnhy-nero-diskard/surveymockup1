@@ -391,7 +391,7 @@ const AIToolsDashboard = () => {
   };
 
   return (
-    <Container maxWidth="lg" sx={{ mt: 4, mb: 4, backgroundColor: 'rgba(0, 0, 0, 0)' }}>
+    <Container style={{height:'100vh'}} maxWidth="lg" sx={{ mt: 4, mb: 4, backgroundColor: 'rgba(0, 0, 0, 0)' }}>
       <Fade in timeout={1000}>
         <Typography variant="h4" gutterBottom sx={{ fontWeight: 'bold', color: 'primary.main' }}>
           AI Tools Dashboard
