@@ -67,7 +67,7 @@ export const sroutes = [
     { label: 'Language', path: '', component: LanguageSelector, conditionalBlock: 'universal'},
     { label: 'Page 1', path: 'page1', component: Page1, conditionalBlock: 'surveytpms'},
     { label: 'Survey Consent', path: 'surveyconsent', component: SurveyConsent, conditionalBlock: 'surveytpms'},
-    { label: 'Gmail Form', path: 'form', component: PrelimForm, conditionalBlock: 'surveytpms'},
+    { label: 'Gmail Form', path: 'prelimform', component: PrelimForm, conditionalBlock: 'surveytpms'},
     { label: 'Greetings', path: 'greetings', component: Greetings, conditionalBlock: 'surveytpms'},
     { label: 'Residence 1', path: 'residence1', component: Residence1, conditionalBlock: 'surveytpms'},
     { label: 'Transportation 1', path: 'transportation1', component: Transportation1, conditionalBlock: 'oprovblock'},

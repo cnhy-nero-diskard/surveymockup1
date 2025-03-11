@@ -127,7 +127,7 @@ const SurveyMetrics = () => {
         const year = now.getFullYear().toString();
         return `${month} ${year}`;
     };
-    
+
 
     // Function to capitalize the first letter of a string
     const capitalizeFirstLetter = (string) => {
@@ -416,7 +416,7 @@ const SurveyMetrics = () => {
                             )}
 
                             {topThreeRegions.length > 1 && (
-                                <Box  sx={{ mb: 1 }}>
+                                <Box sx={{ mb: 1 }}>
                                     <Typography style={{ color: "grey" }} variant="subtitle1" sx={{ textAlign: 'center' }}>
                                         {topThreeRegions[1].name}: {topThreeRegions[1].value}
                                     </Typography>
@@ -453,7 +453,7 @@ const SurveyMetrics = () => {
 
                             {topThreeResidence.length > 1 && (
                                 <Box sx={{ mb: 1 }}>
-                                    <Typography  style={{color:"grey"}} variant="subtitle1" sx={{ textAlign: 'center' }}>
+                                    <Typography style={{ color: "grey" }} variant="subtitle1" sx={{ textAlign: 'center' }}>
                                         {topThreeResidence[1].name}: {topThreeResidence[1].value}
                                     </Typography>
                                 </Box>
@@ -461,7 +461,7 @@ const SurveyMetrics = () => {
 
                             {topThreeResidence.length > 2 && (
                                 <Box>
-                                    <Typography style={{color:"grey"}} variant="subtitle1" sx={{ textAlign: 'center' }}>
+                                    <Typography style={{ color: "grey" }} variant="subtitle1" sx={{ textAlign: 'center' }}>
                                         {topThreeResidence[2].name}: {topThreeResidence[2].value}
                                     </Typography>
                                 </Box>
@@ -483,23 +483,26 @@ const SurveyMetrics = () => {
                             {topThreeAgeGroup.length > 0 && (
                                 <Box sx={{ mb: 2 }}>
                                     <Typography variant="h4" sx={{ fontWeight: 'bold', color: theme.palette.success.main, textAlign: 'center' }}>
-                                        {topThreeAgeGroup[0].name}: {topThreeAgeGroup[0].value}
+                                        {topThreeAgeGroup[0].name} yrs old:
+                                        <Typography style={{ color: 'rgb(59, 221, 113)' }} variant="h5" sx={{ fontWeight: 'bold', color: theme.palette.success.main, textAlign: 'center' }}> 
+                                            ({topThreeAgeGroup[0].value} respondents)
+                                        </Typography>
                                     </Typography>
                                 </Box>
                             )}
 
                             {topThreeAgeGroup.length > 1 && (
                                 <Box sx={{ mb: 1 }}>
-                                    <Typography  style={{color:"grey"}} variant="subtitle1" sx={{ textAlign: 'center' }}>
-                                        {topThreeAgeGroup[1].name}: {topThreeAgeGroup[1].value}
+                                    <Typography style={{ color: "grey" }} variant="subtitle1" sx={{ textAlign: 'center' }}>
+                                        {topThreeAgeGroup[1].name}: {topThreeAgeGroup[1].value} respondents
                                     </Typography>
                                 </Box>
                             )}
 
                             {topThreeAgeGroup.length > 2 && (
                                 <Box>
-                                    <Typography style={{color:"grey"}} variant="subtitle1" sx={{ textAlign: 'center' }}>
-                                        {topThreeAgeGroup[2].name}: {topThreeAgeGroup[2].value}
+                                    <Typography style={{ color: "grey" }} variant="subtitle1" sx={{ textAlign: 'center' }}>
+                                        {topThreeAgeGroup[2].name}: {topThreeAgeGroup[2].value} respondents
                                     </Typography>
                                 </Box>
                             )}
@@ -513,12 +516,12 @@ const SurveyMetrics = () => {
                             <StyledIcon as={InsertChartIcon} color={theme.palette.info.main} />
                             <StyledTypography variant="h6">Responses by Month</StyledTypography>
                             <Typography variant="h4" sx={{ color: theme.palette.info.main }}>
-                                {capitalizeFirstLetter(getCurrentMonth())}: 
-                              <Typography variant="h5" sx={{ color: "rgb(5, 66, 136)" }}>
+                                {capitalizeFirstLetter(getCurrentMonth())}:
+                                <Typography variant="h5" sx={{ color: "rgb(5, 66, 136)" }}>
                                     {
                                         surveyMetrics.surveyResponsesByMonth[capitalizeFirstLetter(getCurrentMonth())]
                                     } surveys
-                              </Typography>
+                                </Typography>
                             </Typography>
                         </StyledCardContent>
                     </Grid>

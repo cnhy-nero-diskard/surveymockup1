@@ -63,7 +63,7 @@ const Form = () => {
         fullName: '',
         email: '',
     });
-    const [isFormValid, setIsFormValid] = useState(false);
+    // const [isFormValid, setIsFormValid] = useState(false);
     const [language] = useState(localStorage.getItem('selectedLanguage') || 'en');
     const translations = useTranslations(FORM, language);
     const { routes } = useContext(UnifiedContext);
@@ -84,12 +84,12 @@ const Form = () => {
         fetchProgress();
     }, [navigate]);
 
-    useEffect(() => {
-        // Check if all fields are filled and the email is valid
-        const isFullNameValid = formData.fullName.trim() !== '';
-        const isEmailValid = /^[a-zA-Z0-9._%+-]+@gmail\.com$/.test(formData.email);
-        setIsFormValid(isFullNameValid);
-    }, [formData]);
+    // useEffect(() => {
+    //     // Check if all fields are filled and the email is valid
+    //     const isFullNameValid = formData.fullName.trim() !== '';
+    //     const isEmailValid = /^[a-zA-Z0-9._%+-]+@gmail\.com$/.test(formData.email);
+    //     setIsFormValid(isFullNameValid);
+    // }, [formData]);
 
     const formAnimation = useSpring({
         from: { opacity: 0, transform: 'translateY(-50px)' },
@@ -107,10 +107,10 @@ const Form = () => {
 
     const handleSubmit = async (e) => {
 
-        if (!isFormValid) {
-            alert('Please fill out all fields correctly.');
-            return;
-        }
+        // if (!isFormValid) {
+        //     alert('Please fill out all fields correctly.');
+        //     return;
+        // }
 
         const surveyResponses = [
             {
@@ -137,7 +137,7 @@ const Form = () => {
     return (
         <ThemeProvider theme={theme}>
             <BodyPartial />
-            <GradientBackground handleNextClick={handleSubmit} buttonAppear={isFormValid}>
+            <GradientBackground handleNextClick={handleSubmit} >
                 <FormContainer style={formAnimation}>
                     <QuestionText>
                         <span>{translations.formWelcomeTourists}</span>
