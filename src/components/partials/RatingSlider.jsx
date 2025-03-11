@@ -141,7 +141,7 @@ const RatingSlider = ({ title, categories, onRatingComplete, surveyquestion_refs
   const [currentSlide, setCurrentSlide] = useState(0);
   const [sliderValue, setSliderValue] = useState(2); // Default to neutral
   const [responses, setResponses] = useState([]); // Array to store responses
-  const navigate = useNavigate();
+  const choosetoskip = useTranslations('RATINGSLIDER', localStorage.getItem('selectedLanguage')).chooseToSkipText
 
   const emojis = ['☹️', '😐', '🙂', '😄'];
 
@@ -213,6 +213,8 @@ const RatingSlider = ({ title, categories, onRatingComplete, surveyquestion_refs
       <BodyPartial />
       <GradientBackground overlayImage={imgOverlay} opacity={0.2} blendMode='screen' buttonAppear={false}>
             <Title>{title}</Title>
+            <Title style={{fontSize:'1rem'}}>{choosetoskip}</Title>
+
             <SlidesContainer>
               {transitions((style, index) => (
                 <Slide style={style}>

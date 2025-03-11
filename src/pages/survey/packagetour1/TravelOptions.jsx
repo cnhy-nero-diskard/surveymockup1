@@ -46,7 +46,7 @@ const TravelOptions = () => {
         console.log(`Option selected: ${option}`); // Debugging line
         setSelectedOption(option);
         setNextStep(true);
-        removeActiveBlocks(['pkgtour']);
+        removeActiveBlocks('pkgtour');
 
         if (option !== 'Independent Traveler/s') {
             appendActiveBlocks(['pkgtour']);

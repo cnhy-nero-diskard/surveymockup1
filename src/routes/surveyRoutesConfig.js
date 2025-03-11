@@ -94,7 +94,7 @@ export const sroutes = [
     
     { label: 'How Many Nights', path: 'howmanynights', component: HowManyNights, conditionalBlock: 'accom'},
     { label: 'Accommodation Form', path: 'accommodationform', component: AccommodationForm, conditionalBlock: 'yesaccom'},
-    { label: 'Where Stay Departure', path: 'wherestayarrival', component: WhereStayArrival, conditionalBlock: 'noaccom'},
+    { label: 'Where Stay Departure', path: 'wherestayed', component: WhereStayArrival, conditionalBlock: 'noaccom'},
     { label: 'Booking Form', path: 'bookingform', component: BookingForm, conditionalBlock: 'yesaccom'},
     { label: 'Accommodation Open 2 (GENERAL) ', path: 'accomodationopen2', component: AccomodationOpen2, conditionalBlock: 'accom'},
     
@@ -115,7 +115,7 @@ export const sroutes = [
     { label: 'Open Ended Transportation', path: 'opentranspo', component: OpenEndedTranspo, conditionalBlock: 'transp'},
     
     
-    { label: 'Services 2', path: 'services2', component: Services2, conditionalBlock: 'serv'},
+    { label: 'rateservicesf', path: 'services2', component: Services2, conditionalBlock: 'serv'},
     { label: 'Destination Shopping List', path: 'destshlist', component: DestinationShoppingList, conditionalBlock: 'serv'},
     { label: 'Open Ended 1', path: 'openendedservice', component: OpenEnded1Services, conditionalBlock: 'serv'},
     { label: 'Open Ended Lifestyle', path: 'openendedlifestyle', component: OpenEnded2,conditionalBlock: 'serv'},
@@ -123,7 +123,7 @@ export const sroutes = [
     
     
     
-    { label: 'Services 1', path: 'services1', component: Services1, conditionalBlock: 'surveytpms'},
+    { label: 'Services 1', path: 'rategeneralpricing', component: Services1, conditionalBlock: 'surveytpms'},
     { label: 'Personal Profile 1', path: 'pprofile1', component: PProfile1, conditionalBlock: 'surveytpms'},
     { label: 'Personal Profile 2', path: 'pprofile2', component: PProfile2, conditionalBlock: 'surveytpms'},
     { label: 'Survey Venue', path: 'surveyvenue', component: SurveyVenue, conditionalBlock: 'surveytpms'},

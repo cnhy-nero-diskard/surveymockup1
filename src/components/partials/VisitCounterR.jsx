@@ -81,7 +81,7 @@ const VisitCounterR = ({ title, surveyquestion_ref, handNext }) => {
    * @param {string} value - The selected visit frequency option.
    */
   const handleChoice = (value) => {
-    const numericalValue = value === "1x" ? 1 : value === "2x" ? 2 : 3;
+    const numericalValue = value === "0" ? 0: value === "1x" ? 1 : value === "2x" ? 2 : 3;
     setVisitCount(numericalValue);
   };
 
@@ -137,6 +137,13 @@ const VisitCounterR = ({ title, surveyquestion_ref, handNext }) => {
           <AnimatedContainer style={containerAnimation}>
             <Title>{title}</Title>
             <ButtonGroup>
+              <Option
+                selected={visitCount === 0}
+                onClick={() => handleChoice("0")}
+                aria-label="Zero"
+              >
+                {"0"}
+              </Option>
               <Option
                 selected={visitCount === 1}
                 onClick={() => handleChoice("1x")}

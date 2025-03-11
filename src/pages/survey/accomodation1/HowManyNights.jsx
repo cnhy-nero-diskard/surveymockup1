@@ -174,7 +174,7 @@ const SURVEY_QUESTIONS = {
 const HowManyNights = () => {
   const { routes } = useContext(UnifiedContext);
   const currentStepIndex = useCurrentStepIndex(routes);
-  const { activeBlocks, appendActiveBlocks } = useContext(UnifiedContext);
+  const { activeBlocks, appendActiveBlocks, removeActiveBlocks } = useContext(UnifiedContext);
 
   const [stayOvernight, setStayOvernight] = useState(null);
   const [nights, setNights] = useState('');
@@ -226,13 +226,20 @@ const HowManyNights = () => {
       return;
     }
     setError('');
+
     
     await submitSurveyResponses(responses);
 
-    if (stayOvernight === "yes") {
-      appendActiveBlocks(['yesaccom']);
-    } else if (stayOvernight === "no") {
-      appendActiveBlocks(['noaccom']);
+    appendActiveBlocks(["yesaccom"]);
+    appendActiveBlocks(["noaccom"]);
+
+    // if (stayOvernight === "yes") {
+    //   appendActiveBlocks(['yesaccom']);
+    // } 
+    if (stayOvernight === "no") {
+      removeActiveBlocks('noaccom');
+      removeActiveBlocks('yesaccom');
+      
     }
 
     setBlocksUpdated(true);

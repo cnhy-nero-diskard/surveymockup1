@@ -198,7 +198,7 @@ const ratingToEmoji = { 1: '☹️', 2: '😐', 3: '🙂', 4: '😄' };
 const AccommodationForm = () => {
   const { routes } = useContext(UnifiedContext);
   const currentStepIndex = useCurrentStepIndex(routes);
-  const { activeBlocks } = useContext(UnifiedContext);
+  const { activeBlocks, removeActiveBlocks,appendActiveBlocks } = useContext(UnifiedContext);
 
   // ---------- State ---------- //
   const [isCommercial, setIsCommercial] = useState(null);
@@ -233,6 +233,7 @@ const AccommodationForm = () => {
 
   const [language, setLanguage] = useState(localStorage.getItem('selectedLanguage'));
   const translations = useTranslations('AccommodationForm', language);
+  
 
   // ---------- Handlers ---------- //
   const handleRatingChange = (type, emoji) => {
@@ -311,9 +312,11 @@ const AccommodationForm = () => {
       console.error('Error submitting survey responses:', error);
     }
   };
+  
 
   const handleNoButtonClick = () => {
     handleCommercialResponse('NO');
+
     setIsCommercial(false);
     handleNextClick();
     goToNextStep(currentStepIndex, navigate, routes, activeBlocks);
@@ -362,6 +365,10 @@ const AccommodationForm = () => {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => {
+                appendActiveBlocks(["yesaccom"]);
+                appendActiveBlocks(["noaccom"]);
+            
+                removeActiveBlocks('noaccom');
                 handleCommercialResponse('YES');
                 setIsCommercial(true);
               }}
@@ -371,7 +378,12 @@ const AccommodationForm = () => {
             <Button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              onClick={handleNoButtonClick}
+              onClick={() => {
+                appendActiveBlocks(["yesaccom"]);
+                appendActiveBlocks(["noaccom"]);
+            
+                removeActiveBlocks('yesaccom');
+                handleNoButtonClick();}}
             >
               {translations.accommodationFormNoButton}
             </Button>

@@ -31,9 +31,9 @@ const SurveyStepGuard = ({ route, index, totalSteps }) => {
           parentPath = location.pathname
         }
         if (location.pathname === "/survey" || getParentPath(location.pathname) == "/survey" && !activeBlocks.includes("surveytpms")) {
-          removeActiveBlocks(["feedback"]);
+          removeActiveBlocks("feedback");
         } else if (location.pathname === "/feedback" && !activeBlocks.includes("feedback")) {
-          removeActiveBlocks(["surveytpms"]);
+          removeActiveBlocks("surveytpms");
         }
         // Redirect to the first step if currentStep is 0 and the user is not on the first step
         if (currentStep === 0 && index !== 0) {
