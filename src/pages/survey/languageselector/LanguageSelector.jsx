@@ -1,13 +1,12 @@
 import React, { useContext, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import GradientBackground from '../../../components/partials/GradientBackground';
-import { Container, NextButtonU, Title } from '../../../components/utils/styles1';
+import { Title } from '../../../components/utils/styles1';
 import translate from "../../../components/img/translate.png";
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useLanguage } from '../../../components/partials/LanguageContext';
 import axios from 'axios';
 import BodyPartial from '../../../components/partials/BodyPartial';
-import { useCurrentStepIndex } from '../../../components/utils/useCurrentIndex';
 import { goToNextStep } from '../../../components/utils/navigationUtils';
 import 'flag-icons/css/flag-icons.min.css';
 import { UnifiedContext } from '../../../routes/UnifiedContext';
@@ -145,12 +144,22 @@ const LanguageSelector = () => {
   const [selectedLanguageCode, setSelectedLanguageCode] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [showConfirmation, setShowConfirmation] = useState(false);
+  const [setShowConfirmation] = useState(false);
 
   const { routes } = useContext(UnifiedContext);
-  const [currentStep, setCurrentStep] = useState();
+  const [setCurrentStep] = useState();
   const currentStepIndex = 0;
-  const { activeBlocks, appendActiveBlocks, removeActiveBlocks, isBlockActive } = useContext(UnifiedContext);
+  const { activeBlocks, appendActiveBlocks } = useContext(UnifiedContext);
+  const localization = {
+    en: "NEXT",
+    ko: "다음",
+    zh: "下一步",
+    ja: "次へ",
+    es: "SIGUIENTE",
+    fr: "SUIVANT",
+    ru: "ДАЛЕЕ",
+    hi: "अगला"
+  };
 
   useEffect(() => {
     const fetchProgress = async () => {
@@ -225,7 +234,11 @@ const LanguageSelector = () => {
   return (
     <>
       <BodyPartial />
-      <GradientBackground overlayImage={translate} handleNextClick={handleNextClick} buttonAppear={selectedLanguageCode !== null}>
+      <GradientBackground 
+      overlayImage={translate}
+      handleNextClick={handleNextClick}
+      buttonAppear={selectedLanguageCode !== null}
+      nextmsg={localization[selectedLanguageCode]}>
         <Title>
           <FaGlobe style={{ marginRight: '10px' }} />
           Select

@@ -42,7 +42,7 @@ const SurveyStepGuard = ({ route, index, totalSteps }) => {
           return;
         }
 
-        // Handle conditional blocks
+        // Handle conditional blocks 
         if (route.conditionalBlock && !activeBlocks.includes(route.conditionalBlock)) {
           console.log(`SSGUARD conditional block ${route.conditionalBlock} not found`);
           let newindex = index;
@@ -54,7 +54,6 @@ const SurveyStepGuard = ({ route, index, totalSteps }) => {
           await axios.post(`${process.env.REACT_APP_API_HOST}/api/survey/progress`, {
             currentStep: newindex,
           }, { withCredentials: true });
-
           navigate(`${parentPath}/${routes[newindex].path}`);
           return;
         }
@@ -71,9 +70,10 @@ const SurveyStepGuard = ({ route, index, totalSteps }) => {
             navigate("/404");
             return;
           }
-
+          
           // Redirect to the correct step immediately
-          navigate(`${parentPath}/${surveyRoutes[currentStep].path}`);
+          // (comment this so you don't get redirected when debugging)👇👇👇
+          // navigate(`${parentPath}/${surveyRoutes[currentStep].path}`);
           return;
         }
 

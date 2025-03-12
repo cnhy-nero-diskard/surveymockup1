@@ -19,7 +19,7 @@ const TableContainer = styled(animated.div)`
   width: 105%;
   max-width: 800px;
   margin: 50px auto;
-  padding-right:20px;
+  padding-right: 20px;
   max-height: 80vh;
   overflow-y: auto;
   overflow-x: hidden;
@@ -170,15 +170,10 @@ const SuggestionList = styled.ul`
   max-height: 150px;
   overflow-y: auto;
   position: absolute;
-  background-color: blue;
+  background-color: white;
   width: 100%;
   z-index: 1;
-
-  &:hover {
-    background-color: lightblue; /* Change this to your desired hover color */
-  }
 `;
-
 
 const SuggestionItem = styled.li`
   padding: 8px;
@@ -201,7 +196,7 @@ const AttractionForm = () => {
     rating: '',
   });
 
-  const [attractionSuggestions, setAttractionSuggestions] = useState([]); // Ensure this is an array
+  const [attractionSuggestions, setAttractionSuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
 
   const language = localStorage.getItem('selectedLanguage');
@@ -223,23 +218,22 @@ const AttractionForm = () => {
           throw new Error('Failed to fetch attraction localizations');
         }
         const data = response.data;
-  
-        // Extract the translatedNames array from the response
+
         if (data && data.translatedNames && Array.isArray(data.translatedNames)) {
           setAttractionSuggestions(data.translatedNames);
         } else {
           console.error('API response does not contain a valid translatedNames array:', data);
-          setAttractionSuggestions([]); // Set to empty array to avoid errors
+          setAttractionSuggestions([]);
         }
       } catch (error) {
         console.error('Error fetching attraction localizations:', error);
-        setAttractionSuggestions([]); // Set to empty array to avoid errors
+        setAttractionSuggestions([]);
       }
     };
-  
+
     fetchAttractionLocalizations();
   }, [language]);
-  
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setCurrentInput({ ...currentInput, [name]: value });
@@ -250,11 +244,10 @@ const AttractionForm = () => {
   };
 
   const handleSuggestionClick = (attraction) => {
-    // Find the selected attraction in the suggestions array
     const selectedAttraction = attractionSuggestions.find(item => Object.keys(item)[0] === attraction);
     setCurrentInput({
       attraction: attraction,
-      location: selectedAttraction ? selectedAttraction[attraction] : '', // Autofill location
+      location: selectedAttraction ? selectedAttraction[attraction] : '',
       rating: currentInput.rating
     });
     setShowSuggestions(false);
@@ -345,109 +338,111 @@ const AttractionForm = () => {
     <>
       <BodyPartial />
       <GradientBackground overlayImage={imgOverlay} opacity={0.15} blendMode='screen' handleNextClick={handleNextClick}>
-          <TableContainer style={formAnimation}>
-            <Title>{translations.attractionFormTitle}</Title>
-            <ScrollableTableContainer>
-              <Table>
-                <thead>
-                  <tr>
-                    <TableHeader>{translations.attractionFormHeaderAttraction}</TableHeader>
-                    <TableHeader>{translations.attractionFormHeaderLocation}</TableHeader>
-                    <TableHeader>{translations.attractionFormHeaderRating}</TableHeader>
-                    <TableHeader>{translations.attractionFormHeaderDelete}</TableHeader>
-                  </tr>
-                </thead>
-                <tbody>
-                  {rows.map((row) => (
-                    <tr key={row.id}>
-                      <TableCell>{row.attraction}</TableCell>
-                      <TableCell>{row.location}</TableCell>
-                      <TableCell>
-                        <RadioGroup>
-                          {[
-                            { value: '1', emoji: '☹️' },
-                            { value: '2', emoji: '😐' },
-                            { value: '3', emoji: '🙂' },
-                            { value: '4', emoji: '😄' },
-                          ].map((option) => (
-                            <label key={option.value}>
-                              <RadioInput
-                                type="radio"
-                                value={option.value}
-                                checked={row.rating === option.value}
-                                readOnly
-                              />
-                              <Emoji>{option.emoji}</Emoji>
-                            </label>
-                          ))}
-                        </RadioGroup>
-                      </TableCell>
-                      <TableCell>
-                        <TrashButton onClick={() => handleDeleteRow(row.id)}>🗑️</TrashButton>
-                      </TableCell>
-                    </tr>
-                  ))}
-                </tbody>
-              </Table>
-
-              <div>
-                <MobileRow>
-                  <MobileRowHeader>{translations.attractionFormHeaderAttraction}</MobileRowHeader>
-                  <Input
-                    name="attraction"
-                    value={currentInput.attraction}
-                    onChange={handleChange}
-                    placeholder={translations.attractionFormPlaceholderAttraction}
-                  />
-                  {showSuggestions && Array.isArray(attractionSuggestions) && (
-                    <SuggestionList>
-                      {attractionSuggestions
-                        .filter(item => Object.keys(item)[0].toLowerCase().includes(currentInput.attraction.toLowerCase()))
-                        .map((item, index) => (
-                          <SuggestionItem key={index} onClick={() => handleSuggestionClick(Object.keys(item)[0])}>
-                            {Object.keys(item)[0]}
-                          </SuggestionItem>
+        <TableContainer style={formAnimation}>
+          <Title>{translations.attractionFormTitle}</Title>
+          <ScrollableTableContainer>
+            <Table>
+              <thead>
+                <tr>
+                  <TableHeader>{translations.attractionFormHeaderAttraction}</TableHeader>
+                  <TableHeader>{translations.attractionFormHeaderLocation}</TableHeader>
+                  <TableHeader>{translations.attractionFormHeaderRating}</TableHeader>
+                  <TableHeader>{translations.attractionFormHeaderDelete}</TableHeader>
+                </tr>
+              </thead>
+              <tbody>
+                {rows.map((row) => (
+                  <tr key={row.id}>
+                    <TableCell>{row.attraction}</TableCell>
+                    <TableCell>{row.location}</TableCell>
+                    <TableCell>
+                      <RadioGroup>
+                        {[
+                          { value: '1', emoji: '☹️' },
+                          { value: '2', emoji: '😐' },
+                          { value: '3', emoji: '🙂' },
+                          { value: '4', emoji: '😄' },
+                        ].map((option) => (
+                          <label key={option.value}>
+                            <RadioInput
+                              type="radio"
+                              value={option.value}
+                              checked={row.rating === option.value}
+                              readOnly
+                            />
+                            <Emoji>{option.emoji}</Emoji>
+                          </label>
                         ))}
-                    </SuggestionList>
-                  )}
-                  <MobileRowHeader>{translations.attractionFormHeaderLocation}</MobileRowHeader>
-                  <Input
-                    name="location"
-                    value={currentInput.location}
-                    onChange={handleChange}
-                    placeholder={translations.attractionFormPlaceholderLocation}
-                  />
-                  <MobileRowHeader>{translations.attractionFormHeaderRating}</MobileRowHeader>
-                  <BottomEmojiRadioGroup>
-                    {[
-                      { value: '1', emoji: '☹️' },
-                      { value: '2', emoji: '😐' },
-                      { value: '3', emoji: '🙂' },
-                      { value: '4', emoji: '😄' },
-                    ].map((option) => (
-                      <label key={option.value}>
-                        <input
-                          type="radio"
-                          name="rating"
-                          value={option.value}
-                          checked={currentInput.rating === option.value}
-                          onChange={(e) => handleChange(e)}
-                        />
-                        <Emoji>{option.emoji}</Emoji>
-                      </label>
-                    ))}
-                  </BottomEmojiRadioGroup>
-                </MobileRow>
-              </div>
-            </ScrollableTableContainer>
-          </TableContainer>
-          <Button onClick={handleAddRow}>{translations.attractionFormButtonAddRow}</Button>
+                      </RadioGroup>
+                    </TableCell>
+                    <TableCell>
+                      <TrashButton onClick={() => handleDeleteRow(row.id)}>🗑️</TrashButton>
+                    </TableCell>
+                  </tr>
+                ))}
+              </tbody>
+            </Table>
+
+            <div>
+              <MobileRow>
+                <MobileRowHeader>{translations.attractionFormHeaderAttraction}</MobileRowHeader>
+                <Input
+                  name="attraction"
+                  value={currentInput.attraction}
+                  onChange={handleChange}
+                  placeholder={translations.attractionFormPlaceholderAttraction}
+                />
+                {showSuggestions && Array.isArray(attractionSuggestions) && (
+                  <SuggestionList>
+                    {attractionSuggestions
+                      .filter(item => Object.keys(item)[0].toLowerCase().includes(currentInput.attraction.toLowerCase()))
+                      .map((item, index) => (
+                        <SuggestionItem key={index} onClick={() => handleSuggestionClick(Object.keys(item)[0])}>
+                          {Object.keys(item)[0]}
+                        </SuggestionItem>
+                      ))}
+                  </SuggestionList>
+                )}
+                <MobileRowHeader>{translations.attractionFormHeaderLocation}</MobileRowHeader>
+                <Input
+                  name="location"
+                  value={currentInput.location}
+                  onChange={handleChange}
+                  placeholder={translations.attractionFormPlaceholderLocation}
+                />
+                <MobileRowHeader>{translations.attractionFormHeaderRating}</MobileRowHeader>
+                <BottomEmojiRadioGroup>
+                  {[
+                    { value: '1', emoji: '☹️' },
+                    { value: '2', emoji: '😐' },
+                    { value: '3', emoji: '🙂' },
+                    { value: '4', emoji: '😄' },
+                  ].map((option) => (
+                    <label key={option.value}>
+                      <input
+                        type="radio"
+                        name="rating"
+                        value={option.value}
+                        checked={currentInput.rating === option.value}
+                        onChange={(e) => handleChange(e)}
+                      />
+                      <Emoji>{option.emoji}</Emoji>
+                    </label>
+                  ))}
+                </BottomEmojiRadioGroup>
+              </MobileRow>
+            </div>
+          </ScrollableTableContainer>
+        </TableContainer>
+        <Button 
+          onClick={handleAddRow} 
+          disabled={rows.length >= 5} // Disable button if rows.length is 5 or more
+        >
+          {translations.attractionFormButtonAddRow}
+        </Button>
       </GradientBackground>
       <ToastContainer />
     </>
   );
 };
-
-
-
-export default AttractionForm;
+export default AttractionForm;<p></p>

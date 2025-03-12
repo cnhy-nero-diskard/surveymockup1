@@ -58,7 +58,7 @@ const AdminRoutes = () => {
   console.log('authorized? --> ', isAuthenticated);
 
   if (loading) {
-    return <div>Loading...</div>; // Show a loading indicator
+    return <div>Loading...</div>; 
   }
 
   return (

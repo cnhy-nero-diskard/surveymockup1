@@ -20,17 +20,29 @@ export const submitSurveyResponses = async (
             touchpoint,
         }));
 
-        // Send all responses in a single request
-        const response = await axios.post(
-            `${process.env.REACT_APP_API_HOST}/api/survey/submit`,
-            { surveyResponses },
-            {
-                withCredentials: true,
-            }
-        );
+        // Split the surveyResponses array into chunks of 10
+        const chunkSize = 10;
+        const chunks = [];
+        for (let i = 0; i < surveyResponses.length; i += chunkSize) {
+            chunks.push(surveyResponses.slice(i, i + chunkSize));
+        }
 
-        console.log('SUBMIT Survey responses submitted successfully:', response.data);
-        return response.data;
+        // Send each chunk in a separate request
+        const responses = [];
+        for (const chunk of chunks) {
+            const response = await axios.post(
+                `${process.env.REACT_APP_API_HOST}/api/survey/submit`,
+                { surveyResponses: chunk },
+                {
+                    withCredentials: true,
+                }
+            );
+            responses.push(response.data);
+            console.log('SUBMIT Survey responses chunk submitted successfully:', response.data);
+        }
+
+        console.log('SUBMIT All survey responses submitted successfully:', responses);
+        return responses;
     } catch (error) {
         console.error('SUBMIT Unexpected error while submitting survey responses:', error);
         throw error; // Re-throw the error to handle it in the component

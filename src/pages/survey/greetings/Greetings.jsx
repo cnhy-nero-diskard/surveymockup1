@@ -8,7 +8,6 @@ import { submitSurveyResponses } from '../../../components/utils/sendInputUtils'
 import useTranslations from '../../../components/utils/useTranslations';
 import { GREETINGS } from '../../../components/utils/componentConstants';
 import { Container, NextButtonU } from '../../../components/utils/styles1';
-import SurveyRoutesContext from '../../../routes/__SurveyRoutesContext';
 import { useNavigate } from 'react-router-dom';
 import { useCurrentStepIndex } from '../../../components/utils/useCurrentIndex';
 import { goToNextStep } from '../../../components/utils/navigationUtils';

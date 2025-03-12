@@ -46,7 +46,7 @@ const customSelectStyles = {
     color: '#fff',
     borderRadius: '15px',
     marginBottom: '16px',
-    width: '100%',
+    width: '30vw',
     border: '2px solid rgb(50, 143, 241)',
   }),
   singleValue: (provided) => ({
@@ -218,25 +218,6 @@ const PProfile1 = () => {
       return;
     }
 
-    // If we do have the conversion rate from the currency to *one* PHP, 
-    // we want to compute how many PHP per 1 currency. 
-    // Because "conversionRates" from 'api.exchangerate-api.com/v4/latest/PHP' 
-    // typically means: 1 PHP = X currencyCode. 
-    // So if 1 PHP = 0.018 USD, then 1 USD = 1 / 0.018 PHP = ~55.56 PHP 
-    // But let's confirm the direction carefully:
-    // 
-    // According to "exchangerate-api" docs, if you request base=PHP:
-    // data.rates.USD => how many USD in 1 PHP
-    // 
-    // So if data.rates.USD = 0.018, that means 1 PHP = 0.018 USD
-    // Then 1 USD = 1 / 0.018 = 55.55 PHP
-    //
-    // If the user typed 100 income in USD, we want to find out how many PHP that is.
-    // => 100 USD = 100 * (1 / data.rates.USD) PHP
-    //
-    // Summarily: 
-    //   userIncomeInCurrency => userIncomeInPHP:
-    //   userIncomeInCurrency * (1 / data.rates.USD)
 
     const rateAgainstPHP = conversionRates[currencyCode];
 
@@ -316,19 +297,19 @@ const PProfile1 = () => {
             {/* Age */}
             <Label htmlFor="age">{translations.ageLabel}</Label>
             <Input
-  type="number"
-  id="age"
-  name="age"
-  value={inputs.find((input) => input.id === 'age').value}
-  onChange={(e) => {
-    const enteredAge = parseInt(e.target.value, 10);
-    if (enteredAge > 100) {
-      handleInputChange('age', '100');
-    } else {
-      handleInputChange('age', e.target.value);
-    }
-  }}
-/>
+              type="number"
+              id="age"
+              name="age"
+              value={inputs.find((input) => input.id === 'age').value}
+              onChange={(e) => {
+                const enteredAge = parseInt(e.target.value, 10);
+                if (enteredAge > 100) {
+                  handleInputChange('age', '100');
+                } else {
+                  handleInputChange('age', e.target.value);
+                }
+              }}
+            />
 
 
             {/* Nationality */}

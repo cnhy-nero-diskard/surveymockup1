@@ -1,7 +1,6 @@
 // useCurrentStepIndex.js
 import { useContext, useEffect } from "react";
 import { useLocation } from "react-router-dom";
-import SurveyRoutesContext from "../../routes/__SurveyRoutesContext";
 import { UnifiedContext } from "../../routes/UnifiedContext";
 /**
  * Custom hook to get the index of the current step in the survey based on the current URL path.

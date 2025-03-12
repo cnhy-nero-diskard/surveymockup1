@@ -6,11 +6,10 @@ import styled from 'styled-components';
 import BodyPartial from '../../../components/partials/BodyPartial';
 import GradientBackground from '../../../components/partials/GradientBackground';
 import { useNavigate } from 'react-router-dom';
-import { submitSurveyResponses } from '../../../components/utils/sendInputUtils'; // Import the submit function
+import { submitSurveyResponses } from '../../../components/utils/sendInputUtils'; 
 import axios from 'axios';
 import { useCurrentStepIndex } from '../../../components/utils/useCurrentIndex';
 import { goToNextStep } from '../../../components/utils/navigationUtils';
-import SurveyRoutesContext from '../../../routes/__SurveyRoutesContext';
 import { UnifiedContext } from '../../../routes/UnifiedContext';
 const Container = styled.div`
   display: flex;
