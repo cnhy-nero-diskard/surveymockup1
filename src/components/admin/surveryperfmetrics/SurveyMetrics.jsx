@@ -112,7 +112,20 @@ const SurveyMetrics = () => {
     const handleAgeGroupOpen = () => setOpenAgeGroupModal(true);
     const handleAgeGroupClose = () => setOpenAgeGroupModal(false);
 
-
+    const NoData = () => (
+        <Box
+            sx={{
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                height: '100%',
+                color: 'text.secondary',
+                fontStyle: 'italic',
+            }}
+        >
+            <Typography variant="h6">No Data Available</Typography>
+        </Box>
+    );
     // Function to get current time in a readable format
     const getCurrentTime = () => {
         const now = new Date();
@@ -274,7 +287,7 @@ const SurveyMetrics = () => {
                             <StyledIcon as={CheckCircleIcon} color={theme.palette.success.main} />
                             <StyledTypography variant="h6">Total Surveys Completed</StyledTypography>
                             <Typography variant="h4" sx={{ color: theme.palette.success.main }}>
-                                {surveyMetrics.totalSurveysCompleted}
+                                {surveyMetrics.totalSurveysCompleted} / {surveyMetrics.totalSurveys}
                             </Typography>
                             <Typography variant="subtitle2" sx={{ color: theme.palette.text.secondary }}>
                                 As of {getCurrentTime()}
@@ -288,54 +301,58 @@ const SurveyMetrics = () => {
                             <StyledTypography variant="h6" sx={{ textAlign: 'center', mb: 2 }}>
                                 Survey Completion Rate
                             </StyledTypography>
-                            <ResponsiveContainer width="100%" height={200}>
-                                <PieChart>
-                                    <Pie
-                                        data={completionRateData}
-                                        cx="50%"
-                                        cy="50%"
-                                        innerRadius={50}
-                                        outerRadius={70}
-                                        fill="#8884d8"
-                                        dataKey="value"
-                                        label={({
-                                            cx,
-                                            cy,
-                                            midAngle,
-                                            innerRadius,
-                                            outerRadius,
-                                            percent,
-                                            index,
-                                        }) => {
-                                            const RADIAN = Math.PI / 180;
-                                            const radius = innerRadius + (outerRadius - innerRadius) * 1.5;
-                                            const x = cx + radius * Math.cos(-midAngle * RADIAN);
-                                            const y = cy + radius * Math.sin(-midAngle * RADIAN);
+                            {completionRateData[0]["value"] != null ? (
+                                <ResponsiveContainer width="100%" height={200}>
+                                    <PieChart>
+                                        <Pie
+                                            data={completionRateData}
+                                            cx="50%"
+                                            cy="50%"
+                                            innerRadius={50}
+                                            outerRadius={70}
+                                            fill="#8884d8"
+                                            dataKey="value"
+                                            label={({
+                                                cx,
+                                                cy,
+                                                midAngle,
+                                                innerRadius,
+                                                outerRadius,
+                                                percent,
+                                                index,
+                                            }) => {
+                                                const RADIAN = Math.PI / 180;
+                                                const radius = innerRadius + (outerRadius - innerRadius) * 1.5;
+                                                const x = cx + radius * Math.cos(-midAngle * RADIAN);
+                                                const y = cy + radius * Math.sin(-midAngle * RADIAN);
 
-                                            return (
-                                                <text
-                                                    x={x}
-                                                    y={y}
+                                                return (
+                                                    <text
+                                                        x={x}
+                                                        y={y}
+                                                        fill={colors[index % colors.length]}
+                                                        textAnchor={x > cx ? 'start' : 'end'}
+                                                        dominantBaseline="central"
+                                                    >
+                                                        {`${(percent * 100).toFixed(0)}%`}
+                                                    </text>
+                                                );
+                                            }}
+                                        >
+                                            {completionRateData.map((entry, index) => (
+                                                <Cell
+                                                    key={`cell-${index}`}
                                                     fill={colors[index % colors.length]}
-                                                    textAnchor={x > cx ? 'start' : 'end'}
-                                                    dominantBaseline="central"
-                                                >
-                                                    {`${(percent * 100).toFixed(0)}%`}
-                                                </text>
-                                            );
-                                        }}
-                                    >
-                                        {completionRateData.map((entry, index) => (
-                                            <Cell
-                                                key={`cell-${index}`}
-                                                fill={colors[index % colors.length]}
-                                            />
-                                        ))}
-                                    </Pie>
-                                    <Tooltip />
-                                    <Legend />
-                                </PieChart>
-                            </ResponsiveContainer>
+                                                />
+                                            ))}
+                                        </Pie>
+                                        <Tooltip />
+                                        <Legend />
+                                    </PieChart>
+                                </ResponsiveContainer>
+                            ) : (
+                                <NoData />
+                            )}
                         </StyledCardContent>
                     </Grid>
 
@@ -344,9 +361,16 @@ const SurveyMetrics = () => {
                         <StyledCardContent>
                             <StyledIcon as={AccessTimeIcon} color={theme.palette.warning.main} />
                             <StyledTypography variant="h6">Average Time to Complete</StyledTypography>
-                            <Typography variant="h4" sx={{ color: theme.palette.warning.main }}>
-                                {surveyMetrics.averageTimeToComplete}
-                            </Typography>
+                            {surveyMetrics.averageTimeToComplete != null ?
+                                (
+                                <>
+                                    <Typography variant="h4" sx={{ color: theme.palette.warning.main }}>
+                                        {surveyMetrics.averageTimeToComplete}
+                                    </Typography></>)
+                                : (
+                                    <NoData />
+                                )
+                            }
                         </StyledCardContent>
                     </Grid>
 
@@ -355,9 +379,17 @@ const SurveyMetrics = () => {
                         <StyledCardContent>
                             <StyledIcon as={CancelIcon} color={theme.palette.error.main} />
                             <StyledTypography variant="h6">Drop-off Rate</StyledTypography>
-                            <Typography variant="h4" sx={{ color: theme.palette.error.main }}>
-                                {surveyMetrics.dropOffRate}%
-                            </Typography>
+                            {surveyMetrics.dropOffRate != null ? (
+                                <>
+                                    <Typography variant="h4" sx={{ color: theme.palette.error.main }}>
+                                        {surveyMetrics.dropOffRate}%
+                                    </Typography>
+                                </>
+                            ) : (
+                                <NoData />
+                            )
+
+                            }
                         </StyledCardContent>
                     </Grid>
 
@@ -370,29 +402,33 @@ const SurveyMetrics = () => {
                             <StyledTypography variant="h6" sx={{ textAlign: 'center', mb: 2 }}>
                                 Survey Distribution
                             </StyledTypography>
-                            <ResponsiveContainer width="100%" height={200}>
-                                <PieChart>
-                                    <Pie
-                                        data={surveyDistributionData}
-                                        cx="50%"
-                                        cy="50%"
-                                        innerRadius={50}
-                                        outerRadius={70}
-                                        fill="#8884d8"
-                                        dataKey="value"
-                                        label
-                                    >
-                                        {surveyDistributionData.map((entry, index) => (
-                                            <Cell
-                                                key={`cell-${index}`}
-                                                fill={distributionColors[index % distributionColors.length]}
-                                            />
-                                        ))}
-                                    </Pie>
-                                    <Tooltip />
-                                    <Legend />
-                                </PieChart>
-                            </ResponsiveContainer>
+                            {surveyDistributionData.length > 0 ? (
+                                <ResponsiveContainer width="100%" height={200}>
+                                    <PieChart>
+                                        <Pie
+                                            data={surveyDistributionData}
+                                            cx="50%"
+                                            cy="50%"
+                                            innerRadius={50}
+                                            outerRadius={70}
+                                            fill="#8884d8"
+                                            dataKey="value"
+                                            label
+                                        >
+                                            {surveyDistributionData.map((entry, index) => (
+                                                <Cell
+                                                    key={`cell-${index}`}
+                                                    fill={distributionColors[index % distributionColors.length]}
+                                                />
+                                            ))}
+                                        </Pie>
+                                        <Tooltip />
+                                        <Legend />
+                                    </PieChart>
+                                </ResponsiveContainer>
+                            ) : (
+                                <NoData />
+                            )}
                         </StyledCardContent>
                     </Grid>
 
@@ -405,30 +441,33 @@ const SurveyMetrics = () => {
                             <StyledTypography variant="h6" sx={{ textAlign: 'center', mb: 2 }}>
                                 Responses by Nationality
                             </StyledTypography>
-
-                            {/* Display Top 3 Nationalities */}
-                            {topThreeRegions.length > 0 && (
-                                <Box sx={{ mb: 2 }}>
-                                    <Typography variant="h4" sx={{ fontWeight: 'bold', color: theme.palette.success.main, textAlign: 'center' }}>
-                                        {topThreeRegions[0].name}: {topThreeRegions[0].value}
-                                    </Typography>
-                                </Box>
-                            )}
-
-                            {topThreeRegions.length > 1 && (
-                                <Box sx={{ mb: 1 }}>
-                                    <Typography style={{ color: "grey" }} variant="subtitle1" sx={{ textAlign: 'center' }}>
-                                        {topThreeRegions[1].name}: {topThreeRegions[1].value}
-                                    </Typography>
-                                </Box>
-                            )}
-
-                            {topThreeRegions.length > 2 && (
-                                <Box>
-                                    <Typography style={{ color: "grey" }} variant="subtitle1" sx={{ textAlign: 'center' }}>
-                                        {topThreeRegions[2].name}: {topThreeRegions[2].value}
-                                    </Typography>
-                                </Box>
+                            {surveyResponsesByRegionData.length > 0 ? (
+                                <>
+                                    {/* Display Top 3 Nationalities */}
+                                    {topThreeRegions.length > 0 && (
+                                        <Box sx={{ mb: 2 }}>
+                                            <Typography variant="h4" sx={{ fontWeight: 'bold', color: theme.palette.success.main, textAlign: 'center' }}>
+                                                {topThreeRegions[0].name}: {topThreeRegions[0].value}
+                                            </Typography>
+                                        </Box>
+                                    )}
+                                    {topThreeRegions.length > 1 && (
+                                        <Box sx={{ mb: 1 }}>
+                                            <Typography style={{ color: "grey" }} variant="subtitle1" sx={{ textAlign: 'center' }}>
+                                                {topThreeRegions[1].name}: {topThreeRegions[1].value}
+                                            </Typography>
+                                        </Box>
+                                    )}
+                                    {topThreeRegions.length > 2 && (
+                                        <Box>
+                                            <Typography style={{ color: "grey" }} variant="subtitle1" sx={{ textAlign: 'center' }}>
+                                                {topThreeRegions[2].name}: {topThreeRegions[2].value}
+                                            </Typography>
+                                        </Box>
+                                    )}
+                                </>
+                            ) : (
+                                <NoData />
                             )}
                         </StyledCardContent>
                     </Grid>
@@ -442,30 +481,40 @@ const SurveyMetrics = () => {
                                 Responses by Country of Residence
                             </StyledTypography>
 
-                            {/* Display Top 3 Country of Residence */}
-                            {topThreeResidence.length > 0 && (
-                                <Box sx={{ mb: 2 }}>
-                                    <Typography variant="h4" sx={{ fontWeight: 'bold', color: theme.palette.success.main, textAlign: 'center' }}>
-                                        {topThreeResidence[0].name}: {topThreeResidence[0].value}
-                                    </Typography>
-                                </Box>
-                            )}
+                            {sortedResidence.length > 0 ? (
+                                <>
+                                    {/* Display Top 3 Country of Residence */}
+                                    {topThreeResidence.length > 0 && (
+                                        <Box sx={{ mb: 2 }}>
+                                            <Typography variant="h4" sx={{ fontWeight: 'bold', color: theme.palette.success.main, textAlign: 'center' }}>
+                                                {topThreeResidence[0].name}: {topThreeResidence[0].value}
+                                            </Typography>
+                                        </Box>
+                                    )}
 
-                            {topThreeResidence.length > 1 && (
-                                <Box sx={{ mb: 1 }}>
-                                    <Typography style={{ color: "grey" }} variant="subtitle1" sx={{ textAlign: 'center' }}>
-                                        {topThreeResidence[1].name}: {topThreeResidence[1].value}
-                                    </Typography>
-                                </Box>
-                            )}
+                                    {topThreeResidence.length > 1 && (
+                                        <Box sx={{ mb: 1 }}>
+                                            <Typography style={{ color: "grey" }} variant="subtitle1" sx={{ textAlign: 'center' }}>
+                                                {topThreeResidence[1].name}: {topThreeResidence[1].value}
+                                            </Typography>
+                                        </Box>
+                                    )}
 
-                            {topThreeResidence.length > 2 && (
-                                <Box>
-                                    <Typography style={{ color: "grey" }} variant="subtitle1" sx={{ textAlign: 'center' }}>
-                                        {topThreeResidence[2].name}: {topThreeResidence[2].value}
-                                    </Typography>
-                                </Box>
-                            )}
+                                    {topThreeResidence.length > 2 && (
+                                        <Box>
+                                            <Typography style={{ color: "grey" }} variant="subtitle1" sx={{ textAlign: 'center' }}>
+                                                {topThreeResidence[2].name}: {topThreeResidence[2].value}
+                                            </Typography>
+                                        </Box>
+                                    )}
+                                </>
+                            ) : (
+                                <NoData />
+                            )
+
+                            }
+
+
                         </StyledCardContent>
                     </Grid>
 
@@ -478,51 +527,60 @@ const SurveyMetrics = () => {
                             <StyledTypography variant="h6" sx={{ textAlign: 'center', mb: 2 }}>
                                 Responses by Age Group
                             </StyledTypography>
+                            {sortedAgeGroup.length > 0 ? (
+                                <>
 
-                            {/* Display Top 3 Country of Residence */}
-                            {topThreeAgeGroup.length > 0 && (
-                                <Box sx={{ mb: 2 }}>
-                                    <Typography variant="h4" sx={{ fontWeight: 'bold', color: theme.palette.success.main, textAlign: 'center' }}>
-                                        {topThreeAgeGroup[0].name} yrs old:
-                                        <Typography style={{ color: 'rgb(59, 221, 113)' }} variant="h5" sx={{ fontWeight: 'bold', color: theme.palette.success.main, textAlign: 'center' }}> 
-                                            ({topThreeAgeGroup[0].value} respondents)
-                                        </Typography>
-                                    </Typography>
-                                </Box>
-                            )}
+                                    {/* Display Top 3 Country of Residence */}
+                                    {topThreeAgeGroup.length > 0 && (
+                                        <Box sx={{ mb: 2 }}>
+                                            <Typography variant="h4" sx={{ fontWeight: 'bold', color: theme.palette.success.main, textAlign: 'center' }}>
+                                                {topThreeAgeGroup[0].name} yrs old:
+                                                <Typography style={{ color: 'rgb(59, 221, 113)' }} variant="h5" sx={{ fontWeight: 'bold', color: theme.palette.success.main, textAlign: 'center' }}>
+                                                    ({topThreeAgeGroup[0].value} respondents)
+                                                </Typography>
+                                            </Typography>
+                                        </Box>
+                                    )}
 
-                            {topThreeAgeGroup.length > 1 && (
-                                <Box sx={{ mb: 1 }}>
-                                    <Typography style={{ color: "grey" }} variant="subtitle1" sx={{ textAlign: 'center' }}>
-                                        {topThreeAgeGroup[1].name}: {topThreeAgeGroup[1].value} respondents
-                                    </Typography>
-                                </Box>
-                            )}
+                                    {topThreeAgeGroup.length > 1 && (
+                                        <Box sx={{ mb: 1 }}>
+                                            <Typography style={{ color: "grey" }} variant="subtitle1" sx={{ textAlign: 'center' }}>
+                                                {topThreeAgeGroup[1].name}: {topThreeAgeGroup[1].value} respondents
+                                            </Typography>
+                                        </Box>
+                                    )}
 
-                            {topThreeAgeGroup.length > 2 && (
-                                <Box>
-                                    <Typography style={{ color: "grey" }} variant="subtitle1" sx={{ textAlign: 'center' }}>
-                                        {topThreeAgeGroup[2].name}: {topThreeAgeGroup[2].value} respondents
-                                    </Typography>
-                                </Box>
-                            )}
+                                    {topThreeAgeGroup.length > 2 && (
+                                        <Box>
+                                            <Typography style={{ color: "grey" }} variant="subtitle1" sx={{ textAlign: 'center' }}>
+                                                {topThreeAgeGroup[2].name}: {topThreeAgeGroup[2].value} respondents
+                                            </Typography>
+                                        </Box>
+                                    )}
+
+
+                                </>
+                            ) : (
+                                <NoData />
+                            )
+                            }
                         </StyledCardContent>
                     </Grid>
-
-
                     {/* Survey Responses by Month */}
                     <Grid item xs={12} md={6} lg={3}>
                         <StyledCardContent onClick={handleOpen} style={{ cursor: 'pointer' }}>
                             <StyledIcon as={InsertChartIcon} color={theme.palette.info.main} />
                             <StyledTypography variant="h6">Responses by Month</StyledTypography>
-                            <Typography variant="h4" sx={{ color: theme.palette.info.main }}>
-                                {capitalizeFirstLetter(getCurrentMonth())}:
-                                <Typography variant="h5" sx={{ color: "rgb(5, 66, 136)" }}>
-                                    {
-                                        surveyMetrics.surveyResponsesByMonth[capitalizeFirstLetter(getCurrentMonth())]
-                                    } surveys
+                            {surveyMetrics.surveyResponsesByMonth[capitalizeFirstLetter(getCurrentMonth())] != undefined ? (
+                                <Typography variant="h4" sx={{ color: theme.palette.info.main }}>
+                                    {capitalizeFirstLetter(getCurrentMonth())}:
+                                    <Typography variant="h5" sx={{ color: "rgb(5, 66, 136)" }}>
+                                        {surveyMetrics.surveyResponsesByMonth[capitalizeFirstLetter(getCurrentMonth())]} surveys
+                                    </Typography>
                                 </Typography>
-                            </Typography>
+                            ) : (
+                                <NoData />
+                            )}
                         </StyledCardContent>
                     </Grid>
                 </Grid>

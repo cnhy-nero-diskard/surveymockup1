@@ -1,5 +1,5 @@
 import React, { useContext, useState, useEffect } from 'react';
-import styled from 'styled-components';
+import styled, { css, keyframes } from 'styled-components';
 import { useSpring, animated } from 'react-spring';
 import { useNavigate } from 'react-router-dom';
 import Select from 'react-select';
@@ -19,7 +19,27 @@ const Container = styled.div`
   max-width: 600px;
   margin: 0 auto;
 `;
+const shake = keyframes`
+  0% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  50% { transform: translateX(5px); }
+  75% { transform: translateX(-5px); }
+  100% { transform: translateX(0); }
+`;
 
+const ExpenseInput = styled(animated.input)`
+  font-size: 18px;
+  padding: 5px;
+  border: ${({hasError}) =>(hasError ? '3px' : '1px')} solid ${({ hasError }) => (hasError ? 'red' : '#ddd')};
+  border-radius: 4px;
+  width: 100px;
+  text-align: right;
+  ${({ hasError }) =>
+    hasError &&
+    css`
+      animation: ${shake} 0.5s ease-in-out;
+    `}
+`;
 const ExpenseItem = styled.div`
   display: flex;
   justify-content: space-between;
@@ -29,17 +49,17 @@ const ExpenseItem = styled.div`
 
 const ExpenseLabel = styled.span`
   font-size: 18px;
-  color: #555;
+  color: rgb(221, 247, 255);
 `;
 
-const ExpenseInput = styled.input`
-  font-size: 18px;
-  padding: 5px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  width: 100px;
-  text-align: right;
-`;
+// const ExpenseInput = styled.input`
+//   font-size: 18px;
+//   padding: 5px;
+//   border: 1px solid #ddd;
+//   border-radius: 4px;
+//   width: 100px;
+//   text-align: right;
+// `;
 
 const Summary = styled.div`
   margin-top: 20px;
@@ -104,7 +124,6 @@ const ExpenseTracker = () => {
   const { routes } = useContext(UnifiedContext);
   const currentStepIndex = useCurrentStepIndex(routes);
   const { activeBlocks, appendActiveBlocks } = useContext(UnifiedContext);
-
   const [expenses, setExpenses] = useState([
     { label: 'Accommodation', value: '' },
     { label: 'Food and Beverage', value: '' },
@@ -146,11 +165,7 @@ const ExpenseTracker = () => {
     fetchRates();
   }, []);
 
-  const handleChange = (e, index) => {
-    const newExpenses = [...expenses];
-    newExpenses[index].value = e.target.value;
-    setExpenses(newExpenses);
-  };
+
 
   const navigate = useNavigate();
   const [shouldNavigate, setShouldNavigate] = useState(false);
@@ -209,6 +224,39 @@ const ExpenseTracker = () => {
 
   const translations = useTranslations('ExpenseTracker', language);
 
+
+  const [errors, setErrors] = useState(Array(expenses.length).fill(false)); // Track errors for each input
+
+  const handleChange = (e, index) => {
+    const newExpenses = [...expenses];
+    const inputValue = e.target.value;
+
+    // Check if the input value is negative
+    if (parseFloat(inputValue) < 0) {
+      // Set error state
+      const newErrors = [...errors];
+      newErrors[index] = true;
+      setErrors(newErrors);
+
+      // Reset the error state after 0.5s
+      setTimeout(() => {
+        const resetErrors = [...errors];
+        resetErrors[index] = false;
+        setErrors(resetErrors);
+      }, 500);
+
+      return;
+    }
+
+    // Reset error state
+    const newErrors = [...errors];
+    newErrors[index] = false;
+    setErrors(newErrors);
+
+    newExpenses[index].value = inputValue;
+    setExpenses(newExpenses);
+  };
+
   return (
     <>
       <BodyPartial />
@@ -216,14 +264,13 @@ const ExpenseTracker = () => {
         <Container>
           <QuestionText>{translations.expenseTrackerTitle}</QuestionText>
 
-          {/* React-select searchable dropdown with dark menu styling */}
           <Select
             options={currencyOptions}
             value={{ value: selectedCurrency, label: selectedCurrency }}
             onChange={handleCurrencySelectChange}
-            isSearchable={true} // Allow text-based filtering
+            isSearchable={true}
             placeholder="Select a currency..."
-            styles={customSelectStyles} // Apply custom dark styles
+            styles={customSelectStyles}
           />
 
           {expenses.map((expense, index) => (
@@ -235,6 +282,7 @@ const ExpenseTracker = () => {
                 type="number"
                 value={expense.value}
                 onChange={(e) => handleChange(e, index)}
+                hasError={errors[index]}
               />
             </ExpenseItem>
           ))}
