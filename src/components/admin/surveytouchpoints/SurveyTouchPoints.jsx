@@ -13,11 +13,13 @@ import {
   Skeleton,
   Alert,
   IconButton,
+  TextField,
 } from '@mui/material';
 import { QRCodeSVG } from 'qrcode.react';
 import styled from 'styled-components';
-import domtoimage from 'dom-to-image'; 
+import domtoimage from 'dom-to-image';
 import { Refresh, Download, ArrowDropDown } from '@mui/icons-material';
+import { Autocomplete } from '@mui/material';
 
 const StyledContainer = styled(Container)`
   height: 100%;
@@ -97,11 +99,7 @@ const DownloadButton = styled(Button)`
   }
 `;
 
-/**
- * Component to handle the display and generation of QR codes for different touchpoints.
- */
 const SurveyTouchpoints = () => {
-  // State variables to manage the selected type, item, QR code value, establishments, loading state, and error messages
   const [selectedType, setSelectedType] = useState('');
   const [selectedItem, setSelectedItem] = useState('');
   const [qrValue, setQrValue] = useState('');
@@ -110,23 +108,20 @@ const SurveyTouchpoints = () => {
     barangay: [],
     transportation: [],
     attractions: [],
-    establishments: []
+    establishments: [],
+    point:[],
+    island:[]
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-
   useEffect(() => {
-
     setLoading(true);
     fetch(`${process.env.REACT_APP_API_HOST}/api/surveytouchpoints`, {
       credentials: 'include',
     })
       .then((response) => response.json())
       .then((data) => {
-        // console.log(`TOUCHPOINTS -- > ${JSON.stringify(data)}`);
-        console.log('KEY:', data.Establishments);
-
         setTouchpointData(data);
         setLoading(false);
       })
@@ -137,22 +132,14 @@ const SurveyTouchpoints = () => {
       });
   }, []);
 
-  /**
-   * Handler for changing the selected type
-   * @param {Object} event - The event object containing the selected value
-   */
   const handleTypeChange = (event) => {
     setSelectedType(event.target.value);
     setSelectedItem('');
     setQrValue('');
   };
 
-  /**
-   * Handler for changing the selected item
-   * @param {Object} event - The event object containing the selected value
-   */
-  const handleItemChange = (event) => {
-    const selectedKey = event.target.value;
+  const handleItemChange = (event, value) => {
+    const selectedKey = value ? value.short_id : '';
     const category = selectedType.toLowerCase();
     const selectedTouchpoint = touchpointData[category].find(
       (item) => item.short_id === selectedKey
@@ -161,46 +148,32 @@ const SurveyTouchpoints = () => {
     setQrValue(`${process.env.REACT_APP_SELF_URL}/feedback?idx=${selectedKey}`);
   };
 
-  /**
-   * Function to generate QR code SVG
-   * @param {string} value - The value to encode in the QR code
-   * @returns {JSX.Element} - The QR code SVG element
-   */
   const generateQRCode = (value) => {
     return <QRCodeSVG value={value} size={256} includeMargin={true} level="H" />;
   };
 
-  /**
-   * Handler for downloading the QR code as a PNG image
-   */
   const handleDownloadQRCode = () => {
-    const svg = document.getElementById('qr-code-svg'); // Get the SVG element by ID
+    const svg = document.getElementById('qr-code-svg');
     if (!svg) {
       console.error('SVG element not found');
       return;
     }
-    domtoimage.toPng(svg) // Convert SVG to PNG
+    domtoimage.toPng(svg)
       .then((dataUrl) => {
         const link = document.createElement('a');
         link.download = `${selectedItem}_QRCode.png`;
         link.href = dataUrl;
-        link.click(); // Trigger download
+        link.click();
       })
       .catch((error) => {
         console.error('Error generating image:', error);
       });
   };
 
-  /**
-   * Handler for closing the error Snackbar
-   */
   const handleCloseError = () => {
     setError('');
   };
 
-  /**
-   * Handler for retrying the data fetch operation
-   */
   const handleRetry = () => {
     setError('');
     setSelectedType('');
@@ -240,7 +213,7 @@ const SurveyTouchpoints = () => {
             </QRCodeContainer>
           </Grid>
         </Grid>
-  
+
         {/* Dynamic QR Code Generator Section */}
         <Grid container spacing={4} justifyContent="center" sx={{ mt: 4 }}>
           <Grid item xs={12} md={8}>
@@ -268,29 +241,27 @@ const SurveyTouchpoints = () => {
                     <MenuItem value="transportation">Transportation</MenuItem>
                     <MenuItem value="attractions">Attractions</MenuItem>
                     <MenuItem value="Establishments">Establishments</MenuItem>
+                    <MenuItem value="point">Points</MenuItem>
+                    <MenuItem value="island">Island</MenuItem>
                   </StyledSelect>
                 </Grid>
                 <Grid item xs={12} md={6}>
                   {loading ? (
                     <Skeleton variant="rectangular" width="100%" height={56} />
                   ) : (
-                    <StyledSelect
-                      value={selectedItem}
+                    <Autocomplete
+                      options={getTouchpointItems()}
+                      getOptionLabel={(option) => option.name}
                       onChange={handleItemChange}
                       disabled={!selectedType}
-                      displayEmpty
-                      aria-label="Select Item"
-                      IconComponent={ArrowDropDown}
-                    >
-                      <MenuItem value="" disabled>
-                        {`Select ${selectedType}`}
-                      </MenuItem>
-                      {getTouchpointItems().map((item) => (
-                        <MenuItem key={item.short_id} value={item.short_id}>
-                          {item.name}
-                        </MenuItem>
-                      ))}
-                    </StyledSelect>
+                      renderInput={(params) => (
+                        <TextField
+                          {...params}
+                          label={`Select ${selectedType}`}
+                          variant="outlined"
+                        />
+                      )}
+                    />
                   )}
                 </Grid>
               </Grid>
@@ -315,7 +286,7 @@ const SurveyTouchpoints = () => {
             </QRCodeContainer>
           </Grid>
         </Grid>
-  
+
         {/* Error Handling */}
         <Snackbar
           open={!!error}

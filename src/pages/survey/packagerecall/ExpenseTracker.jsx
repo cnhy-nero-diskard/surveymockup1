@@ -2,7 +2,7 @@ import React, { useContext, useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { useSpring, animated } from 'react-spring';
 import { useNavigate } from 'react-router-dom';
-import Select from 'react-select';  // <-- Import react-select
+import Select from 'react-select';
 import BodyPartial from '../../../components/partials/BodyPartial';
 import GradientBackground from '../../../components/partials/GradientBackground';
 import useTranslations from '../../../components/utils/useTranslations';
@@ -11,6 +11,7 @@ import { goToNextStep } from '../../../components/utils/navigationUtils';
 import { useCurrentStepIndex } from '../../../components/utils/useCurrentIndex';
 import { UnifiedContext } from '../../../routes/UnifiedContext';
 import { NormOption, QuestionText } from '../../../components/utils/styles1';
+import { fetchCurrencies, fetchConversionRates, convertIncomeToPHP } from '../../../components/utils/currencyUtils'; 
 
 const Container = styled.div`
   font-family: Arial, sans-serif;
@@ -114,7 +115,7 @@ const ExpenseTracker = () => {
   ]);
 
   const [conversionRates, setConversionRates] = useState({});
-  const [selectedCurrency, setSelectedCurrency] = useState('USD');
+  const [selectedCurrency, setSelectedCurrency] = useState('PHP'); // Default to PHP
   const [language, setLanguage] = useState(localStorage.getItem('selectedLanguage'));
   const [currencyOptions, setCurrencyOptions] = useState([]);  
 
@@ -123,30 +124,25 @@ const ExpenseTracker = () => {
     0
   );
 
-  // Use the fetched conversion rate for the selected currency; default to 1 if undefined
-  const convertedTotal = totalExpenses * (conversionRates[selectedCurrency] || 1);
+  // Convert total expenses to PHP using the convertIncomeToPHP function
+  const convertedTotal = convertIncomeToPHP(totalExpenses, selectedCurrency, conversionRates);
 
   const hasAtLeastOneExpense = expenses.some(expense => expense.value.trim() !== '');
 
   useEffect(() => {
-    // Example endpoint: https://api.exchangerate-api.com/v4/latest/USD
-    const fetchRates = async () => {
-      try {
-        const response = await fetch('https://api.exchangerate-api.com/v4/latest/USD');
-        const data = await response.json();
-        setConversionRates(data.rates);
-
-        // Convert currency codes into react-select options
-        const optionsArr = Object.keys(data.rates).map((currencyCode) => ({
-          value: currencyCode,
-          label: currencyCode
-        }));
-        setCurrencyOptions(optionsArr);
-      } catch (error) {
-        console.error('Error fetching currency rates:', error);
-      }
+    // Fetch currency options
+    const fetchCurrencyData = async () => {
+      const options = await fetchCurrencies();
+      setCurrencyOptions(options);
     };
 
+    // Fetch conversion rates
+    const fetchRates = async () => {
+      const rates = await fetchConversionRates();
+      setConversionRates(rates);
+    };
+
+    fetchCurrencyData();
     fetchRates();
   }, []);
 
@@ -250,7 +246,7 @@ const ExpenseTracker = () => {
             </SummaryValue>
             <SummaryValue>
               <br />
-              {translations.expenseTrackerTotalInPHP}: ₱ {convertedTotal.toFixed(2)}
+              {translations.expenseTrackerTotalInPHP}: ₱ {convertedTotal}
             </SummaryValue>
           </Summary>
 
