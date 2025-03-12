@@ -38,23 +38,29 @@ const SurveyStepGuard = ({ route, index, totalSteps }) => {
         // Redirect to the first step if currentStep is 0 and the user is not on the first step
         if (currentStep === 0 && index !== 0) {
           console.log("SSGUARD detected zero currentStep")
-          navigate(parentPath);
+          // (comment this so you don't get redirected when debugging)👇👇👇
+          // navigate(parentPath);
           return;
         }
 
         // Handle conditional blocks 
+
         if (route.conditionalBlock && !activeBlocks.includes(route.conditionalBlock)) {
           console.log(`SSGUARD conditional block ${route.conditionalBlock} not found`);
           let newindex = index;
-          while (routes[newindex].conditionalBlock !== 'universal') {
-            console.log(`SSGUARD route -> ${index}`);
-            newindex--;
-          }
+
+          // (comment this so you don't get redirected when debugging)👇👇👇
+          // while (routes[newindex].conditionalBlock !== 'universal') {
+          //   console.log(`SSGUARD route -> ${index}`);
+          //   newindex--;
+          // }
 
           await axios.post(`${process.env.REACT_APP_API_HOST}/api/survey/progress`, {
             currentStep: newindex,
           }, { withCredentials: true });
-          navigate(`${parentPath}/${routes[newindex].path}`);
+
+
+          // navigate(`${parentPath}/${routes[newindex].path}`);
           return;
         }
 

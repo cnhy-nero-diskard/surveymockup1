@@ -144,7 +144,7 @@ const LanguageSelector = () => {
   const [selectedLanguageCode, setSelectedLanguageCode] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [setShowConfirmation] = useState(false);
+  const [showConfirmation, setShowConfirmation] = useState(false);
 
   const { routes } = useContext(UnifiedContext);
   const [setCurrentStep] = useState();

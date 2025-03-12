@@ -12,6 +12,7 @@ import { Input } from '../../../components/utils/styles1';
 import { useCurrentStepIndex } from '../../../components/utils/useCurrentIndex';
 import { UnifiedContext } from '../../../routes/UnifiedContext';
 import { goToNextStep } from '../../../components/utils/navigationUtils';
+import { fetchCurrencies, fetchConversionRates, convertIncomeToPHP } from '../../../components/utils/currencyUtils'; 
 
 /** --- Styled Components --- **/
 const Container = styled(motion.div)`
@@ -45,8 +46,8 @@ const customSelectStyles = {
     backgroundColor: 'rgb(0, 102, 211)',
     color: '#fff',
     borderRadius: '15px',
-    marginBottom: '16px',
-    width: '30vw',
+    marginbottom: '16px',
+    minWidth: '300px',
     border: '2px solid rgb(50, 143, 241)',
   }),
   singleValue: (provided) => ({
@@ -111,27 +112,22 @@ const PProfile1 = () => {
     { id: 'civilStatus', value: null, surveyquestion_ref: 'CIV01' },
     { id: 'occupation', value: '', surveyquestion_ref: 'OCC01' },
     { id: 'income', value: '', surveyquestion_ref: 'INC01' },
-    { id: 'currency', value: 'PHP', surveyquestion_ref: 'CUR01' },   // We store the currency ISO code here, e.g. "USD"
+    { id: 'currency', value: 'PHP', surveyquestion_ref: 'CUR01' }, // We store the currency ISO code here, e.g. "USD"
     { id: 'convertedIncome', value: '', surveyquestion_ref: 'CONV01' },
   ]);
 
-  // We’ll store the dropdown options for nationality/currency and the conversion rates.
   const [nationalities, setNationalities] = useState([]);
   const [currencies, setCurrencies] = useState([]);
   const [conversionRates, setConversionRates] = useState({});
 
-  /**
-   * Fetch nationality and currency info from the RESTCountries API
-   * *Important:* We'll gather ISO currency codes from "Object.keys(country.currencies)" 
-   * so that we can match them with "conversionRates" from the exchange-rate API.
-   */
+  // Fetch nationality and currency info on component mount.
   useEffect(() => {
-    const fetchCountries = async () => {
+    const fetchData = async () => {
+      // Fetch nationalities.
       try {
         const response = await fetch('https://restcountries.com/v3.1/all');
         const data = await response.json();
 
-        // Build nationality options (sorted by demonym label).
         const nationalityOptions = data.map((country) => {
           const nationality = country.demonyms?.eng?.m || 'Unknown';
           return {
@@ -141,96 +137,32 @@ const PProfile1 = () => {
         });
         nationalityOptions.sort((a, b) => a.label.localeCompare(b.label));
         setNationalities(nationalityOptions);
-
-        // Build currency options using ISO codes (e.g. "USD", "PHP").
-        // We'll use the code as "value" and add a label that includes both the code and symbol or name.
-        const allCurrencies = [];
-        data.forEach((country) => {
-          if (country.currencies) {
-            Object.entries(country.currencies).forEach(([code, info]) => {
-              allCurrencies.push({
-                code,
-                name: info.name,
-                symbol: info.symbol,
-              });
-            });
-          }
-        });
-
-        // De-duplicate the array by code since multiple countries can share the same currency code.
-        const uniqueCurrencies = Array.from(
-          new Map(allCurrencies.map((curr) => [curr.code, curr])).values()
-        );
-
-        // Create dropdown options, sorted by code or name as you prefer
-        const currencyOptions = uniqueCurrencies
-          .map((curr) => ({
-            value: curr.code, // This is critical, e.g., "USD"
-            label: `${curr.code} – ${curr.name}${curr.symbol ? ' (' + curr.symbol + ')' : ''}`,
-          }))
-          .sort((a, b) => a.label.localeCompare(b.label));
-
-        setCurrencies(currencyOptions);
       } catch (error) {
-        console.error('Error fetching data:', error);
+        console.error('Error fetching nationalities:', error);
       }
+
+      // Fetch currencies.
+      const currencyOptions = await fetchCurrencies();
+      setCurrencies(currencyOptions);
+
+      // Fetch conversion rates.
+      const rates = await fetchConversionRates();
+      setConversionRates(rates);
     };
 
-    fetchCountries();
+    fetchData();
   }, []);
 
-  /**
-   * Fetch exchange rates with the base set to PHP,
-   * so that "rates.USD" means "1 PHP = X USD".
-   */
-  useEffect(() => {
-    const fetchConversionRates = async () => {
-      try {
-        const response = await fetch('https://api.exchangerate-api.com/v4/latest/PHP');
-        const data = await response.json();
-        setConversionRates(data.rates);
-      } catch (error) {
-        console.error('Error fetching conversion rates:', error);
-      }
-    };
-    fetchConversionRates();
-  }, []);
-
-  /**
-   * Convert to PHP as soon as either "income" or "currency" changes
-   */
+  // Convert income to PHP whenever income or currency changes.
   useEffect(() => {
     const incomeInput = inputs.find((input) => input.id === 'income');
     const currencyInput = inputs.find((input) => input.id === 'currency');
 
     const income = parseFloat(incomeInput.value || '0');
-    const currencyCode = currencyInput.value; // ISO code, e.g. "USD"
+    const currencyCode = currencyInput.value;
 
-    // If there's no input or it's invalid, or <=0, just set 0.00
-    if (isNaN(income) || income <= 0) {
-      handleInputChange('convertedIncome', '0.00');
-      return;
-    }
-
-    // If the user is already in PHP, one "unit" is 1:1
-    if (currencyCode === 'PHP') {
-      handleInputChange('convertedIncome', income.toFixed(2));
-      return;
-    }
-
-
-    const rateAgainstPHP = conversionRates[currencyCode];
-
-    if (!rateAgainstPHP) {
-      // If for some reason we don't have the rate for that currency, fallback
-      handleInputChange('convertedIncome', income.toFixed(2));
-      return;
-    }
-
-    // Calculate how many PHP the given income is
-    const convertedIncome = (income * (1 / rateAgainstPHP)).toFixed(2);
+    const convertedIncome = convertIncomeToPHP(income, currencyCode, conversionRates);
     handleInputChange('convertedIncome', convertedIncome);
-
   }, [
     inputs.find((input) => input.id === 'income').value,
     inputs.find((input) => input.id === 'currency').value,
@@ -311,7 +243,6 @@ const PProfile1 = () => {
               }}
             />
 
-
             {/* Nationality */}
             <Label htmlFor="nationality">{translations.nationalityLabel}</Label>
             <Select
@@ -378,7 +309,7 @@ const PProfile1 = () => {
               onChange={(e) => handleInputChange('income', e.target.value)}
             />
 
-            {/* Currency Selection (Store currency code!) */}
+            {/* Currency Selection */}
             <Label htmlFor="currency">{translations.currencyLabel}</Label>
             <Select
               options={currencies}

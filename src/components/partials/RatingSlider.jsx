@@ -13,7 +13,7 @@ import { useEffect } from 'react';
 const SlidesContainer = styled.div`
   position: relative;
   max-width: 100%;
-  height: 30vh;
+  height: 35vh;
   overflow: hidden;
 `;
 
@@ -187,7 +187,7 @@ const RatingSlider = ({ title, categories, onRatingComplete, surveyquestion_refs
   const [emojiSpring, emojiApi] = useSpring(() => ({
     opacity: 1,
     transform: 'scale(1)',
-    config: { tension: 1000, friction: 10},
+    config: { tension: 1000, friction: 100},
   }));
 
   const handleSliderChange = (e) => {
@@ -198,11 +198,11 @@ const RatingSlider = ({ title, categories, onRatingComplete, surveyquestion_refs
     emojiApi.start({
       opacity: 0.5,
       transform: 'scale(0.8)',
-      immediate: false,
+      immediate: true,
       onRest: () => {
         emojiApi.start({
           opacity: 1,
-          transform: 'scale(1)',
+          transform: 'scale(1.5)',
         });
       },
     });
