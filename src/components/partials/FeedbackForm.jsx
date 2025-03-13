@@ -132,7 +132,7 @@ const WarningMessage = styled(animated.div)`
  *
  * @returns {JSX.Element} The rendered FeedbackForm component.
  */
-const OpenFormat1 = ({ title, onNext, squestion_identifier, satisfactionOptions = {
+const OpenFormat1 = ({ title, onNext, squestion_identifier, minFeedbackLength = 1, satisfactionOptions = {
   Dissatisfied: 1,
   Neutral: 2,
   Satisfied: 3,
@@ -154,7 +154,7 @@ const OpenFormat1 = ({ title, onNext, squestion_identifier, satisfactionOptions 
   }, [language, translations]);
 
   useEffect(() => {
-    setIsFormValid(selectedOption !== null && feedback.trim().length >= 20);
+    setIsFormValid(selectedOption !== null && feedback.trim().length >= minFeedbackLength);
   }, [selectedOption, feedback]);
 
   const handleOptionClick = (option) => {

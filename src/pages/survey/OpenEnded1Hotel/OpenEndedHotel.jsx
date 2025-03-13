@@ -24,7 +24,7 @@ const OpenEndedHotel = () => {
                 textFieldPlaceholder: translations.openEnded1TextFieldPlaceholder
             }}
             surveyRefs={surveyRefs}
-            minFeedbackLength={20}
+            minFeedbackLength={1}
             overlayImage={imgoverlay}
         />
     );

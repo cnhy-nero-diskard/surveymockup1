@@ -1,6 +1,6 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { useSpring, animated } from 'react-spring';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import './BranchingSelect.css';
 import BodyPartial from '../../../components/partials/BodyPartial';
 import GradientBackground from '../../../components/partials/GradientBackground';
@@ -23,18 +23,19 @@ const Option = styled(animated.div)`
   border-color: transparent;
   transition: background-color 0.3s ease;
   background-color: rgb(47, 134, 206);
-    box-shadow: inset 0 1px 4px rgba(0,0,0,0.15);
+  box-shadow: inset 0 1px 4px rgba(0, 0, 0, 0.15);
 
   &:hover {
     background-color: rgb(4, 110, 197);
   }
 
-  ${({ selected }) =>
-    selected &&
-    `
-    background-color: rgb(2, 189, 49);
-    color: white;
-  `}
+  /* Use “$selected” instead of “selected” in the prop. */
+  ${({ $selected }) =>
+    $selected &&
+    css`
+      background-color: rgb(5, 156, 43);
+      color: white;
+    `}
 `;
 
 const NextButton = styled(animated.button)`
@@ -61,13 +62,14 @@ const BranchingSelect = () => {
   const { routes } = useContext(UnifiedContext);
   const currentStepIndex = useCurrentStepIndex(routes);
   const { activeBlocks, appendActiveBlocks, removeActiveBlocks } = useContext(UnifiedContext);
-  useEffect (() => {
+
+  useEffect(() => {
     removeActiveBlocks(optionToBlockMap.ACCOMODATION);
     removeActiveBlocks(optionToBlockMap.TRANSPORTATION);
     removeActiveBlocks(optionToBlockMap['EVENT/ACTIVITIES']);
     removeActiveBlocks(optionToBlockMap.SERVICES);
   }, []);
-  // Intro Animation
+
   const introAnimation = useSpring({
     from: { opacity: 0, transform: 'scale(0.8)' },
     to: { opacity: 1, transform: 'scale(1)' },
@@ -86,12 +88,12 @@ const BranchingSelect = () => {
   const handleOptionClick = (option) => {
     setSelectedOptions((prevOptions) => {
       if (prevOptions.includes(option)) {
-        // If the option is already selected, remove it
-        removeActiveBlocks(optionToBlockMap[option]); // Remove the corresponding block
+        // Remove from selected list
+        removeActiveBlocks(optionToBlockMap[option]);
         return prevOptions.filter((opt) => opt !== option);
       } else {
-        // If the option is not selected, add it
-        appendActiveBlocks([optionToBlockMap[option]]); // Add the corresponding block
+        // Add to selected list
+        appendActiveBlocks([optionToBlockMap[option]]);
         return [...prevOptions, option];
       }
     });
@@ -124,52 +126,37 @@ const BranchingSelect = () => {
   return (
     <>
       <BodyPartial />
-      <GradientBackground overlayImage={imgoverlay} handleNextClick={handleNextClick} buttonAppear={selectedOptions.length > 0}>
+      <GradientBackground
+        overlayImage={imgoverlay}
+        handleNextClick={handleNextClick}
+        buttonAppear={selectedOptions.length > 0}
+      >
         <animated.div style={introAnimation}>
           <QuestionText>{translations.branchingSelectSurveyTitle}</QuestionText>
           <Option
             onClick={() => handleOptionClick('ACCOMODATION')}
-            selected={selectedOptions.includes('ACCOMODATION')}
+            $selected={selectedOptions.includes('ACCOMODATION')}
           >
             {translations.branchingSelectAccommodation}
           </Option>
           <Option
             onClick={() => handleOptionClick('TRANSPORTATION')}
-            selected={selectedOptions.includes('TRANSPORTATION')}
+            $selected={selectedOptions.includes('TRANSPORTATION')}
           >
             {translations.branchingSelectTransportation}
           </Option>
           <Option
             onClick={() => handleOptionClick('EVENT/ACTIVITIES')}
-            selected={selectedOptions.includes('EVENT/ACTIVITIES')}
+            $selected={selectedOptions.includes('EVENT/ACTIVITIES')}
           >
             {translations.branchingSelectEventActivities}
           </Option>
           <Option
             onClick={() => handleOptionClick('SERVICES')}
-            selected={selectedOptions.includes('SERVICES')}
+            $selected={selectedOptions.includes('SERVICES')}
           >
             {translations.branchingSelectServices}
           </Option>
-          {/* {selectedOptions.length > 0 && (
-            <animated.div style={springProps} className="selected-option">
-              {translations.branchingSelectSelectedOptions}:{' '}
-              {selectedOptions.map((option) => {
-                switch (option) {
-                  case 'ACCOMODATION':
-                    return translations.branchingSelectAccommodation;
-                  case 'TRANSPORTATION':
-                    return translations.branchingSelectTransportation;
-                  case 'EVENT/ACTIVITIES':
-                    return translations.branchingSelectEventActivities;
-                  case 'SERVICES':
-                    return translations.branchingSelectServices;
-                  default:
-                    return '';
-                }
-              }).join(', ')}
-            </animated.div>
-          )} */}
         </animated.div>
       </GradientBackground>
     </>

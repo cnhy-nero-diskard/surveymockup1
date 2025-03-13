@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useContext } from 'react';
 import styled from 'styled-components';
 import { useSpring, animated } from 'react-spring';
 import BodyPartial from '../../../components/partials/BodyPartial';
@@ -13,10 +13,11 @@ import { UnifiedContext } from '../../../routes/UnifiedContext';
 import { goToNextStep } from '../../../components/utils/navigationUtils';
 
 const Container = styled.div`
-  font-family: Arial, sans-serif;
+  font-family: 'Roboto', Arial, sans-serif;
   padding: 20px;
-  max-width: 400px;
+  max-width: 450px;
   margin: 0 auto;
+  color: #333;
 `;
 
 const FormGroup = styled.div`
@@ -27,47 +28,41 @@ const Label = styled.label`
   display: block;
   margin-bottom: 8px;
   font-weight: bold;
-`;
-
-// const Input = styled.input`
-//   width: 100%;
-//   padding: 10px;
-//   border: 1px solid #ccc;
-//   border-radius: 4px;
-// `;
-
-const Dropdown = styled.select`
-  width: 100%;
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-`;
-
-const Option = styled.option``;
-
-const Button = styled.button`
-  padding: 10px 20px;
-  background-color: #007bff;
   color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
+`;
 
-  &:hover {
-    background-color: #0056b3;
+const ModernDropdown = styled.select`
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background-color: #fff;
+  font-size: 1rem;
+  box-shadow: 0 2px 5px rgba(255, 16, 16, 0.1);
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg width='14' height='10' viewBox='0 0 14 10' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M 1 1 L 7 7 L 13 1' stroke='%23000' stroke-width='2' fill='none' /%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: calc(100% - 1rem) center;
+  background-size: 16px;
+
+  &:focus {
+    outline: none;
+    border-color: #888;
   }
 `;
 
-const BookingForm = () => {
-  const { routes } = useContext(UnifiedContext);
-  const currentStepIndex = useCurrentStepIndex(routes);
-  const { activeBlocks } = useContext(UnifiedContext);
+const ModernOption = styled.option`
+  background-color: #fff;
+  color: #333;
+`;
 
+const BookingForm = () => {
+  const { routes, activeBlocks } = useContext(UnifiedContext);
+  const currentStepIndex = useCurrentStepIndex(routes);
   const [bookingMethod, setBookingMethod] = useState('');
   const [bookingPlatform, setBookingPlatform] = useState('');
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [language, setLanguage] = useState(localStorage.getItem('selectedLanguage'));
+  const [language, setLanguage] = useState(localStorage.getItem('selectedLanguage') || 'en');
   const [responses, setResponses] = useState([]);
 
   const navigate = useNavigate();
@@ -78,22 +73,23 @@ const BookingForm = () => {
     { label: translations.bookingMethodWalkIn, value: 'Walk-in' },
     { label: translations.bookingMethodTourOperator, value: 'Your Operator' },
     { label: translations.bookingMethodInternet, value: 'Internet' },
-    { label: translations.bookingMethodOthers, value: 'Others (specify)' }
+    { label: translations.bookingMethodOthers, value: 'Others (specify)' },
   ];
 
   // Define booking platforms keyed by the *value*, each array is label/value
   const bookingPlatforms = {
     'Walk-in': [
       { label: translations.bookingPlatformDirect, value: 'Direct' },
-      { label: translations.bookingPlatformCounter, value: 'Counter' }
+      { label: translations.bookingPlatformCounter, value: 'Counter' },
     ],
-    'Internet': [
+    Internet: [
       { label: translations.bookingPlatformBookingCom, value: 'Booking.com' },
       { label: translations.bookingPlatformExpedia, value: 'Expedia' },
       { label: translations.bookingPlatformAirbnb, value: 'Airbnb' },
-      { label: translations.bookingPlatformAgoda, value: 'Agoda' }
+      { label: translations.bookingPlatformAgoda, value: 'Agoda' },
+      { label: translations.bookingPlatformKlook, value: 'Klook' },
     ],
-    'Others (specify)': []
+    'Others (specify)': [],
   };
 
   const dropdownAnimation = useSpring({
@@ -130,7 +126,7 @@ const BookingForm = () => {
     const value = e.target.value;
     setBookingPlatform(value);
 
-    // Update responses array (store the user's typed text, which may be in any language)
+    // Update responses array (store user's typed text)
     setResponses((prevResponses) => [
       ...prevResponses.filter((response) => response.surveyquestion_ref !== 'OTHER'),
       { surveyquestion_ref: 'OTHER', response_value: value },
@@ -148,7 +144,9 @@ const BookingForm = () => {
 
   const isNextDisabled =
     !bookingMethod ||
-    (bookingMethod !== 'Others (specify)' && bookingMethod !== 'Your Operator' && !bookingPlatform) ||
+    (bookingMethod !== 'Others (specify)' &&
+      bookingMethod !== 'Your Operator' &&
+      !bookingPlatform) ||
     (bookingMethod === 'Others (specify)' && !bookingPlatform.trim()) ||
     (bookingMethod === 'Your Operator' && !bookingPlatform.trim());
 
@@ -165,35 +163,32 @@ const BookingForm = () => {
         <Container>
           <FormGroup>
             <Label>{translations.bookingFormBookingMethodLabel}</Label>
-            <Dropdown value={bookingMethod} onChange={handleBookingMethodChange}>
-              <Option value="">
+            <ModernDropdown value={bookingMethod} onChange={handleBookingMethodChange}>
+              <ModernOption value="">
                 {translations.bookingFormSelectBookingMethod}
-              </Option>
+              </ModernOption>
               {bookingMethods.map((method) => (
-                <Option key={method.value} value={method.value}>
+                <ModernOption key={method.value} value={method.value}>
                   {method.label}
-                </Option>
+                </ModernOption>
               ))}
-            </Dropdown>
+            </ModernDropdown>
           </FormGroup>
 
           {bookingMethod && bookingMethod !== 'Others (specify)' && bookingMethod !== 'Your Operator' && (
             <FormGroup>
               <Label>{translations.bookingFormBookingPlatformLabel}</Label>
               <animated.div style={dropdownAnimation}>
-                <Dropdown
-                  value={bookingPlatform}
-                  onChange={handleBookingPlatformChange}
-                >
-                  <Option value="">
+                <ModernDropdown value={bookingPlatform} onChange={handleBookingPlatformChange}>
+                  <ModernOption value="">
                     {translations.bookingFormSelectBookingPlatform}
-                  </Option>
+                  </ModernOption>
                   {bookingPlatforms[bookingMethod]?.map((platform) => (
-                    <Option key={platform.value} value={platform.value}>
+                    <ModernOption key={platform.value} value={platform.value}>
                       {platform.label}
-                    </Option>
+                    </ModernOption>
                   ))}
-                </Dropdown>
+                </ModernDropdown>
               </animated.div>
             </FormGroup>
           )}

@@ -24,7 +24,7 @@ const OpenEndedTranspo = () => {
                 textFieldPlaceholder: translations.openEnded1TextFieldPlaceholder
             }}
             surveyRefs={surveyRefs}
-            minFeedbackLength={11}
+            minFeedbackLength={1}
             overlayImage={imgoverlay}
         />
     );
