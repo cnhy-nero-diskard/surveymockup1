@@ -87,13 +87,13 @@ const PercentageShareList = () => {
 
 
     const [items, setItems] = useState([
-        { key: 'accommodation', percentage: 25 },
-        { key: 'foodAndBeverage', percentage: 20 },
-        { key: 'shopping', percentage: 15 },
-        { key: 'localTransport', percentage: 10 },
-        { key: 'tourismActivitiesAttraction', percentage: 15 },
-        { key: 'entertainment', percentage: 10 },
-        { key: 'miscellaneous', percentage: 5 },
+        { key: 'accommodation', percentage: 0 },
+        { key: 'foodAndBeverage', percentage: 0 },
+        { key: 'shopping', percentage: 0 },
+        { key: 'localTransport', percentage: 0 },
+        { key: 'tourismActivitiesAttraction', percentage: 0 },
+        { key: 'entertainment', percentage: 0 },
+        { key: 'miscellaneous', percentage: 0 },
     ]);
 
     const [language] = useState(localStorage.getItem('selectedLanguage') || 'en');
