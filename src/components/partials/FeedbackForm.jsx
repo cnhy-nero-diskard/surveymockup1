@@ -68,9 +68,9 @@ const OptionButton = styled.button`
 
   /* Satisfied (yellow-green gradient) */
   &.selected.Satisfied {
-    background-image: linear-gradient(45deg,rgb(207, 224, 50) 0%, #cddc39 100%);
+    background-image: linear-gradient(45deg,rgb(90, 160, 69) 0%,rgb(90, 160, 69) 100%);
     color: #000;
-    border-color: #cddc39;
+    border-color: rgb(90, 160, 69) ;
   }
 
   /* Very Satisfied (green gradient) */

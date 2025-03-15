@@ -148,16 +148,16 @@ export const OptionButton = styled.button`
 
   /* Satisfied (yellow-green gradient) */
   &.selected.Satisfied {
-    background-image: linear-gradient(45deg,rgb(207, 224, 50) 0%, #cddc39 100%);
+    background-image: linear-gradient(45deg,rgb(90, 160, 69) 0%,rgb(90, 160, 69) 100%);
     color: #000;
-    border-color: #cddc39;
+    border-color:rgb(48, 136, 51);
   }
 
   /* Very Satisfied (green gradient) */
   &.selected.VerySatisfied {
     background-image: linear-gradient(45deg,rgb(56, 172, 60) 0%, #45a049 100%);
     color: #fff;
-    border-color: #4caf50;
+    border-color:rgb(21, 128, 24);
   }
 `;
 export const NextButtonU = styled.button`

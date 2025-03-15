@@ -200,7 +200,7 @@ const PProfile1 = () => {
   const sexOptions = [
     { value: 'male', label: translations.sexMale },
     { value: 'female', label: translations.sexFemale },
-    { value: 'na', label: translations.sexNA },
+    { value: 'lgbtqia', label: translations.sexLgbt },
   ];
 
   const civilStatusOptions = [

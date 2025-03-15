@@ -584,8 +584,7 @@ const AIToolsDashboard = () => {
                         </Box>
                         <Box sx={{ mt: 1 }}>
                           <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                            Confidence:{' '}
-                            <strong>{result.confidence.toFixed(2)}%</strong>
+                            Confidence: <strong>{result.confidence.toFixed(2)}%</strong>
                           </Typography>
                         </Box>
                       </Paper>
@@ -625,6 +624,13 @@ const AIToolsDashboard = () => {
                         averageSentiment = "negative";
                       }
 
+                      // Calculate average confidence
+                      const totalConfidence = sentimentResults.reduce(
+                        (sum, item) => sum + parseFloat(item.confidence),
+                        0
+                      );
+                      const avgConfidence = totalConfidence / sentimentResults.length;
+
                       return (
                         <>
                           <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
@@ -645,8 +651,10 @@ const AIToolsDashboard = () => {
                             />
                           </Box>
                           <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                            Average Sentiment:{' '}
-                            <strong>{averageSentiment.toUpperCase()}</strong>
+                            Average Sentiment: <strong>{averageSentiment.toUpperCase()}</strong>
+                          </Typography>
+                          <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                            Average Confidence: <strong>{avgConfidence.toFixed(2)}%</strong>
                           </Typography>
                         </>
                       );

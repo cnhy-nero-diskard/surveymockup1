@@ -1,12 +1,45 @@
 import React, { useContext, useState, useEffect } from 'react';
-import styled from 'styled-components';
+import styled, { keyframes } from 'styled-components';
 import { useCurrentStepIndex } from '../utils/useCurrentIndex';
 import { UnifiedContext } from '../../routes/UnifiedContext';
 import { AnimatedContainer, NextButtonU } from '../utils/styles1';
 import useTranslations from '../utils/useTranslations';
-import { keyframes } from 'styled-components';
 import { useLocation } from 'react-router-dom';
 import { animated, useSpring } from 'react-spring';
+
+// --- Spinner Animation ---
+const spinAnimation = keyframes`
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+`;
+
+// --- Styled Spinner ---
+const Spinner = styled.div`
+  border: 3px solid rgba(255, 255, 255, 0.2);
+  border-left-color: #ffffff;
+  border-radius: 50%;
+  width: 2rem;
+  height: 2rem;
+  animation: ${spinAnimation} 1s linear infinite;
+`;
+
+// --- Overlay Container ---
+const OverlayContainer = styled.div`
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  top: 0; 
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.3); // semi-transparent dark overlay
+  z-index: 9999;
+`;
 
 // Styled-component for the background
 const BackgroundWrapper = styled.div`
@@ -114,7 +147,6 @@ const ProgressText = styled.p`
   text-align: center;
 `;
 
-// GradientBackground Component
 /**
  * @typedef {object} GradientBackgroundProps
  * @property {React.ReactNode} children - The content to be rendered within the gradient background.
@@ -124,18 +156,27 @@ const ProgressText = styled.p`
  * @property {function} handleNextClick - Function to handle the next button click.
  * @property {string} [nextmsg=""] - Text to display on the next button. If empty, a default translation is used.
  * @property {boolean} [buttonAppear=true] - Determines whether the next button is visible.
+ * @property {boolean} [isLoading=false] - Determines whether to show an overlay spinner.
  */
 
 /**
- * A component that provides a gradient background with an optional overlay image and a next button.
+ * A component that provides a gradient background with an optional overlay image,
+ * progress bar, and a next button. It also allows for an overlay spinner when loading.
  *
  * @param {GradientBackgroundProps} props - The props for the GradientBackground component.
  * @returns {JSX.Element} A React element representing the gradient background.
  */
 
-
-
-const GradientBackground = ({ children, overlayImage, opacity = 0.3, blendMode = 'overlay', handleNextClick, nextmsg = "", buttonAppear = true }) => {
+const GradientBackground = ({
+  children,
+  overlayImage,
+  opacity = 0.3,
+  blendMode = 'overlay',
+  handleNextClick,
+  nextmsg = "",
+  buttonAppear = true,
+  isLoading = false // New prop to display overlay spinner
+}) => {
   const { routes } = useContext(UnifiedContext);
   const [setCurrentStep] = useState();
   const location = useLocation();
@@ -144,7 +185,7 @@ const GradientBackground = ({ children, overlayImage, opacity = 0.3, blendMode =
   const [language, setLanguage] = useState(localStorage.getItem('selectedLanguage'));
   const translations = useTranslations('PackagePaid', language || 'en');
 
-  const progress = (((currentStepIndex) / routes.length) * 100)+6;
+  const progress = (((currentStepIndex) / routes.length) * 100) + 6;
   const getParentPath = (path) => {
     const segments = path.split("/");
     return segments.slice(0, -1).join("/");
@@ -161,15 +202,15 @@ const GradientBackground = ({ children, overlayImage, opacity = 0.3, blendMode =
     console.log(`GBACK -- ACTIVE BLOCKS -- ${JSON.stringify(activeBlocks)}`);
   }, []);
 
-
   const useNext = () => {
     if (location.pathname === "/survey" && !activeBlocks.includes("surveytpms")) {
       removeActiveBlocks(["feedback"]);
     } else if (location.pathname === "/feedback" && !activeBlocks.includes("feedback")) {
       removeActiveBlocks(["surveytpms"]);
-    };
+    }
     handleNextClick();
   };
+
   const containerAnimation = useSpring({
     from: { opacity: 0, transform: 'translateY(20px)' },
     to: { opacity: 1, transform: 'translateY(0)' },
@@ -178,14 +219,13 @@ const GradientBackground = ({ children, overlayImage, opacity = 0.3, blendMode =
 
   return (
     <>
-      <ProgressText>
-      </ProgressText>
+      <ProgressText />
       <ProgressBarContainer>
         <ProgressBar progress={progress} />
       </ProgressBarContainer>
       <AnimatedContainer style={containerAnimation}>
         <BackgroundWrapper>
-          {overlayImage && (
+          {true && (
             <OverlayImage
               src={overlayImage}
               alt="Overlay"
@@ -194,15 +234,25 @@ const GradientBackground = ({ children, overlayImage, opacity = 0.3, blendMode =
             />
           )}
           {children}
-        </BackgroundWrapper>
 
-      </AnimatedContainer>      {buttonAppear && (
+          {/* Overlay Spinner Section */}
+          {isLoading && (
+            <OverlayContainer>
+              <Spinner />
+            </OverlayContainer>
+          )}
+        </BackgroundWrapper>
+      </AnimatedContainer>
+
+      {buttonAppear && (
         <NextButtonU
           onClick={useNext}
           style={{ display: buttonAppear ? 'block' : 'none' }}
+          disabled={isLoading} // optionally disable the button if loading
         >
           {nextmsg === "" ? translations.packagePaidNextButton : nextmsg}
-        </NextButtonU>)}
+        </NextButtonU>
+      )}
     </>
   );
 };
