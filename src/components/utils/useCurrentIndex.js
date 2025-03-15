@@ -19,7 +19,7 @@ export const useCurrentStepIndex = (__surveyRoutes = []) => {
   const location = useLocation();
   const currentPath = location.pathname;
   const { removeActiveBlocks, activeBlocks, routes } = useContext(UnifiedContext);
-  console.log(`USECURRENTINDEX - we are in current path ${currentPath}`);
+  // console.log(`USECURRENTINDEX - we are in current path ${currentPath}`);
 
   const getParentPath = (path) => {
     const segments = path.split("/");
@@ -28,7 +28,7 @@ export const useCurrentStepIndex = (__surveyRoutes = []) => {
   // console.log(`!!!!!!!!!!! Acknowledge backend api ${process.env.REACT_APP_API_HOST}`);
 
 
-  console.log(`USECURRENTINDEX ACTIVE BLOCKS --> ${JSON.stringify(activeBlocks)}`);
+  // console.log(`USECURRENTINDEX ACTIVE BLOCKS --> ${JSON.stringify(activeBlocks)}`);
 
   // Find the index of the current route in the surveyRoutes array
   const currentStepIndex = routes.findIndex((route) => {

@@ -1,30 +1,34 @@
 // storageUtils.js
 export const saveToLocalStorage = (key, data) => {
     try {
-      const serializedData = JSON.stringify(data);
-      localStorage.setItem(key, serializedData);
+        const serializedData = JSON.stringify(data);
+        localStorage.setItem(key, serializedData);
+        console.log(`[LOCALSTORAGE] ---> Saved key ${data}`);
+
     } catch (error) {
-      console.error('Error saving to localStorage:', error);
+        console.error('Error saving to localStorage:', error);
     }
-  };
-  
-  export const loadFromLocalStorage = (key) => {
+};
+
+export const loadFromLocalStorage = (key) => {
     try {
-      const serializedData = localStorage.getItem(key);
-      if (serializedData === null) {
+        const serializedData = localStorage.getItem(key);
+        if (serializedData === null) {
+            return null;
+        }
+        return JSON.parse(serializedData);
+    } catch (error) {
+        console.error('Error loading from localStorage:', error);
         return null;
-      }
-      return JSON.parse(serializedData);
-    } catch (error) {
-      console.error('Error loading from localStorage:', error);
-      return null;
     }
-  };
-  
-  export const clearLocalStorage = (key) => {
+};
+
+export const clearLocalStorage = (key) => {
     try {
-      localStorage.removeItem(key);
+        localStorage.removeItem(key);
+        console.log(`Cleared localStorage key: ${key}`);
     } catch (error) {
-      console.error('Error clearing localStorage:', error);
+        console.error('Error clearing localStorage:', error);
     }
-  };
+};
+window.clearLocalStorage = clearLocalStorage;

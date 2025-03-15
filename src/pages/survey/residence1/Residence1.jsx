@@ -13,6 +13,7 @@ import { UnifiedContext } from '../../../routes/UnifiedContext';
 import { useCurrentStepIndex } from '../../../components/utils/useCurrentIndex';
 import { goToNextStep } from '../../../components/utils/navigationUtils';
 import { toast } from 'react-toastify';
+import { saveToLocalStorage, loadFromLocalStorage } from '../../../components/utils/storageUtils';
 
 // Animations
 const fadeIn = keyframes`
@@ -36,9 +37,6 @@ const slideIn = keyframes`
     transform: translateX(0);
   }
 `;
-
-
-
 
 const Paragraph = styled.p`
   font-size: 1rem;
@@ -64,12 +62,10 @@ const CustomCheckbox = styled.label`
   cursor: pointer;
 `;
 
-
-
 const InputGroup = styled.div`
   margin-bottom: 1.5rem;
   animation: ${slideIn} 0.5s ease-in-out;
-  position: relative; /* For the suggestion-list close button */
+  position: relative;
 `;
 
 const Label = styled.label`
@@ -79,7 +75,6 @@ const Label = styled.label`
   color: ${fontColorU};
   margin-bottom: 0.75rem;
 `;
-
 
 const Suggestions = styled.ul`
   list-style: none;
@@ -115,20 +110,19 @@ const SuggestionItem = styled.li`
 
 const CloseSuggestions = styled.button`
   position: absolute;
-
   width: 10px;
   top: 8px;
   right: 8px;
   border: none;
   cursor: pointer;
-  font-size: 0.8rem;  /* reduce size if desired */
+  font-size: 0.8rem;  
   color: #aaa;
   background: transparent;
+
   &:hover {
     color: #666;
   }
 `;
-
 
 const ErrorMessage = styled.p`
   color: #dc3545;
@@ -156,19 +150,21 @@ const FadeTransition = styled(CSSTransition)`
 
 const Residence1 = () => {
   /**
-   * Local state for managing language selection,
-   * location checks, form inputs, and suggestion lists.
+   * Check localStorage on initial render.
+   * If data exists, use it as the initial state values.
    */
+  const storedData = loadFromLocalStorage('Residence1Data') || {};
+
   const [language, setLanguage] = useState(localStorage.getItem('selectedLanguage'));
-  const [location, setLocation] = useState({
+  const [location, setLocation] = useState(storedData.location || {
     inCity: false,
     outsideCity: false,
     foreignCountry: false,
   });
 
-  const [provinceInput, setProvinceInput] = useState('');
-  const [cityMunInput, setCityMunInput] = useState('');
-  const [specifyInput, setSpecifyInput] = useState('');
+  const [provinceInput, setProvinceInput] = useState(storedData.provinceInput || '');
+  const [cityMunInput, setCityMunInput] = useState(storedData.cityMunInput || '');
+  const [specifyInput, setSpecifyInput] = useState(storedData.specifyInput || '');
 
   const [provinceSuggestions, setProvinceSuggestions] = useState([]);
   const [cityMunSuggestions, setCityMunSuggestions] = useState([]);
@@ -224,6 +220,19 @@ const Residence1 = () => {
     fetchMunicipalities();
   }, []);
 
+  /**
+   * Whenever the location or input states change,
+   * save them to localStorage.
+   */
+  useEffect(() => {
+    const dataToSave = {
+      location,
+      provinceInput,
+      cityMunInput,
+      specifyInput,
+    };
+    saveToLocalStorage('Residence1Data', dataToSave);
+  }, [location, provinceInput, cityMunInput, specifyInput]);
 
   const handleLocationChange = (e) => {
     const { name, checked } = e.target;
@@ -248,9 +257,8 @@ const Residence1 = () => {
     }
 
     setLocation(newLocation);
-    setError(''); // Clear any existing error if a new selection is made
+    setError('');
   };
-
 
   const handleProvinceInputChange = (e) => {
     const value = e.target.value;
@@ -287,9 +295,6 @@ const Residence1 = () => {
     setShowSpecifySuggestions(true);
   };
 
-  /**
-   * Suggestion list click handler.
-   */
   const handleSuggestionClick = (inputSetter, suggestion) => {
     inputSetter(suggestion);
     setShowProvinceSuggestions(false);
@@ -297,18 +302,12 @@ const Residence1 = () => {
     setShowSpecifySuggestions(false);
   };
 
-  /**
-   * Clear any open suggestion lists.
-   */
   const handleCloseSuggestions = () => {
     setShowProvinceSuggestions(false);
     setShowCityMunSuggestions(false);
     setShowSpecifySuggestions(false);
   };
 
-  /**
-   * Validate required fields and submit the survey responses.
-   */
   const handleNextClick = async () => {
     const isLocationSelected =
       location.inCity || location.outsideCity || location.foreignCountry;
@@ -354,8 +353,6 @@ const Residence1 = () => {
   return (
     <>
       <BodyPartial />
-
-
       <GradientBackground handleNextClick={handleNextClick}>
         <Container>
           <QuestionText>{translations.title}</QuestionText>
@@ -512,8 +509,8 @@ const Residence1 = () => {
               )}
             </InputGroup>
           </FadeTransition>
-
-        </Container>      </GradientBackground>
+        </Container>
+      </GradientBackground>
     </>
   );
 };

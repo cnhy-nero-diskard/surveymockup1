@@ -71,6 +71,7 @@ const Form = () => {
     const [currentStep, setCurrentStep] = useState();
     const currentStepIndex = useCurrentStepIndex(routes);
     const { activeBlocks, setActiveBlocks } = useContext(UnifiedContext);
+    let updatedFormData;
 
     useEffect(() => {
         const fetchProgress = async () => {
@@ -94,7 +95,7 @@ const Form = () => {
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
-        const updatedFormData = {
+        updatedFormData = {
           ...formData,
           [name]: value,
         };
@@ -109,6 +110,8 @@ const Form = () => {
         config: { duration: 500 },
     });
     const handleSubmit = async (e) => {
+        saveToLocalStorage('formData', updatedFormData); // Save the form data to localStorage
+
         const surveyResponses = [
             {
                 surveyquestion_ref: 'FNAME',

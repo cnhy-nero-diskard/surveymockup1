@@ -437,12 +437,12 @@ export const NormOption = styled(motion.div)`
   border: none;
   border-radius: 20px;
   cursor: pointer;
-  background-color: rgba(0, 123, 255, 0.78);
+  background-color: ${({ selected }) => (selected ? 'rgb(27, 70, 109)' : 'rgba(0, 123, 255, 0.78)')};
   transition: background-color 0.3s ease;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 
   &:hover {
-    background-color: rgb(18, 166, 224);
+    background-color: ${({ selected }) => (selected ? 'rgb(18, 166, 224)' : 'rgb(18, 166, 224)')};
   }
 
   @media (max-width: 768px) {
