@@ -12,6 +12,8 @@ import 'flag-icons/css/flag-icons.min.css';
 import { UnifiedContext } from '../../../routes/UnifiedContext';
 import '../../../components/utils/styles.css';
 import { FaGlobe } from 'react-icons/fa';
+import { saveToLocalStorage, loadFromLocalStorage } from '../../../components/utils/storageUtils';
+
 
 const LanguageButtonsGrid = styled.div`
   display: grid;
@@ -192,10 +194,8 @@ const LanguageSelector = () => {
     fetchProgress();
     fetchLanguages();
   }, [location.pathname, appendActiveBlocks, navigate]);
-  const getParentPath = (path) => {
-    const segments = path.split("/");
-    return segments.slice(0, -1).join("/");
-  };
+
+
 
   const handleLanguageSelect = (code) => {
     setSelectedLanguageCode(code);

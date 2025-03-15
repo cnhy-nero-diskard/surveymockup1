@@ -12,6 +12,7 @@ import { useCurrentStepIndex } from '../../../components/utils/useCurrentIndex';
 import axios from 'axios';
 import { goToNextStep } from '../../../components/utils/navigationUtils';
 import { UnifiedContext } from '../../../routes/UnifiedContext';
+import { saveToLocalStorage, loadFromLocalStorage } from '../../../components/utils/storageUtils';
 
 export const theme = {
     colors: {
@@ -73,45 +74,41 @@ const Form = () => {
 
     useEffect(() => {
         const fetchProgress = async () => {
-            try {
-                console.log("GET SURVEYPROGRESS");
-                const response = await axios.get(`${process.env.REACT_APP_API_HOST}/api/survey/progress`, { withCredentials: true });
-                setCurrentStep(response.data.currentStep);
-            } catch (err) {
-                console.error(err);
-            }
+          try {
+            console.log("GET SURVEYPROGRESS");
+            const response = await axios.get(`${process.env.REACT_APP_API_HOST}/api/survey/progress`, { withCredentials: true });
+            setCurrentStep(response.data.currentStep);
+          } catch (err) {
+            console.error(err);
+          }
         };
+    
+        // Load the form data from localStorage
+        const savedFormData = loadFromLocalStorage('formData');
+        if (savedFormData) {
+          setFormData(savedFormData);
+        }
+    
         fetchProgress();
-    }, [navigate]);
+      }, [navigate]);
 
-    // useEffect(() => {
-    //     // Check if all fields are filled and the email is valid
-    //     const isFullNameValid = formData.fullName.trim() !== '';
-    //     const isEmailValid = /^[a-zA-Z0-9._%+-]+@gmail\.com$/.test(formData.email);
-    //     setIsFormValid(isFullNameValid);
-    // }, [formData]);
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        const updatedFormData = {
+          ...formData,
+          [name]: value,
+        };
+        setFormData(updatedFormData);
+        saveToLocalStorage('formData', updatedFormData); // Save the form data to localStorage
+      };
+
 
     const formAnimation = useSpring({
         from: { opacity: 0, transform: 'translateY(-50px)' },
         to: { opacity: 1, transform: 'translateY(0)' },
         config: { duration: 500 },
     });
-
-    const handleInputChange = (e) => {
-        const { name, value } = e.target;
-        setFormData({
-            ...formData,
-            [name]: value,
-        });
-    };
-
     const handleSubmit = async (e) => {
-
-        // if (!isFormValid) {
-        //     alert('Please fill out all fields correctly.');
-        //     return;
-        // }
-
         const surveyResponses = [
             {
                 surveyquestion_ref: 'FNAME',
