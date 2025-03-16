@@ -2,6 +2,7 @@
 import styled, { keyframes } from 'styled-components';
 import { motion } from 'framer-motion';
 import { useSpring, animated } from 'react-spring';
+import { Box } from '@mui/material';
 export const fontColorU = 'white';
 
 
@@ -215,6 +216,17 @@ const popInAnimation = keyframes`
   }
 `;
 
+export const CardContainer = styled(Box)`
+  background: linear-gradient(135deg, rgba(214, 214, 214, 0.74), rgba(242, 250, 255, 0.97)); // Gradient background
+
+  padding: 16px;
+  border-radius: 8px;
+  box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+  height: 47vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden; // Prevent content from overflowing
+`;
 
 export const Option = styled.div`
   display: flex;

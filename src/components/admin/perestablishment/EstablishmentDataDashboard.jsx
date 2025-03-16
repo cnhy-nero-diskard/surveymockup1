@@ -12,9 +12,24 @@ const EstablishmentsDashboard = () => {
     const getMetrics = async () => {
       try {
         const data = await fetchEntityMetrics();
-        // Filter data to include only objects with touchpoint="attractions"
-        const filteredData = data.filter(item => item.touchpoint === "establishment");
-        setMetrics(filteredData);
+        const filteredData = Array.isArray(data)
+          ? data.filter(item => item.touchpoint === "establishment")
+          : [];        if (filteredData.length === 0) {
+          setMetrics([{
+            entity: "No Data Available",
+            total_responses: "0",
+            rating: {
+              Dissatisfied: "0",
+              Neutral: "0",
+              Satisfied: "0",
+              VerySatisfied: "0",
+            },
+            mentionedTerms: {},
+            language: {},
+          }]);
+        } else {
+          setMetrics(filteredData);
+        }
       } catch (err) {
         console.error(`FETCHING METRICS ERROR: ${err}`);
         setError(err);
