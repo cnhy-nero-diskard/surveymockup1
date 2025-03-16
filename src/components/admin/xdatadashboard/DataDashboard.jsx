@@ -36,6 +36,7 @@ const StyledPaper = styled(Paper)`
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  
 `;
 
 const StyledBox = styled(Box)`
@@ -101,8 +102,11 @@ const DataDashboard = ({ data, entities, entityLabel, entityKey }) => {
 
       {/* Total Survey Responses */}
       <Grid item xs={12}>
-        <Box display="flex" justifyContent="center">
-          <StyledPaper elevation={3}>
+        <Box display="flex" justifyContent="center"
+        >
+          <StyledPaper elevation={3}
+            sx={{ background: 'linear-gradient(135deg, rgba(214, 214, 214, 0.74), rgba(242, 250, 255, 0.97));' }}
+          >
             <Typography variant="h6" gutterBottom>
               Total Survey Responses
             </Typography>
@@ -114,7 +118,9 @@ const DataDashboard = ({ data, entities, entityLabel, entityKey }) => {
       {/* General Sentiment Pie Chart */}
       <Grid item xs={12} md={6}>
         <Box display="flex" justifyContent="center">
-          <StyledPaper elevation={3}>
+          <StyledPaper elevation={3}
+            sx={{ background: 'linear-gradient(135deg, rgba(214, 214, 214, 0.74), rgba(242, 250, 255, 0.97));' }}
+          >
             <Typography variant="h6" gutterBottom>
               General Sentiment
             </Typography>
@@ -144,7 +150,9 @@ const DataDashboard = ({ data, entities, entityLabel, entityKey }) => {
       {/* Most Mentioned Terms Bar Chart */}
       <Grid item xs={12} md={6}>
         <Box display="flex" justifyContent="center">
-          <StyledPaper elevation={3}>
+          <StyledPaper elevation={3}
+            sx={{ background: 'linear-gradient(135deg, rgba(214, 214, 214, 0.74), rgba(242, 250, 255, 0.97));' }}
+          >
             <Typography variant="h6" gutterBottom>
               Most Mentioned Terms
             </Typography>
@@ -169,7 +177,9 @@ const DataDashboard = ({ data, entities, entityLabel, entityKey }) => {
       {/* Language Distribution Bar Chart */}
       <Grid item xs={12} md={6}>
         <Box display="flex" justifyContent="center">
-          <StyledPaper elevation={3}>
+          <StyledPaper elevation={3}
+            sx={{ background: 'linear-gradient(135deg, rgba(214, 214, 214, 0.74), rgba(242, 250, 255, 0.97));' }}
+          >
             <Typography variant="h6" gutterBottom>
               Language Distribution
             </Typography>

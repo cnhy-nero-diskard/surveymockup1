@@ -17,7 +17,7 @@ import { useAuth } from './components/context/AuthContext';
 import WarningMessage from './components/partials/WarningMessage';
 import SurveyTouchpoints from './components/admin/surveytouchpoints/SurveyTouchPoints';
 import EstablishmentDataDashboard from './components/admin/perestablishment/EstablishmentDataDashboard';
-import BarangaysDashboard from './components/admin/perbarangaydashboard/BarangayDashboard';
+import AreaDashboard from './components/admin/perbarangaydashboard/BarangayDashboard';
 import MunicipalityDashboard from './components/admin/permunicipalitydashboard/MunicipalityDashboard';
 import AttractionDashboard from './components/admin/perattractiondashboard/AttractionDashboard';
 import LogStream from './components/admin/logstream/LogStream';
@@ -87,7 +87,7 @@ const AdminRoutes = () => {
           <Route path="usersdashboard" element={<UsersDashboard />} />
           <Route path="surveytouchpoints" element={<SurveyTouchpoints />} />
           <Route path="establishmentdashboard" element={<EstablishmentDataDashboard />} />
-          <Route path="barangaydashboard" element={<BarangaysDashboard />} />
+          <Route path="barangaydashboard" element={<AreaDashboard />} />
           <Route path="attractiondashboard" element={<AttractionDashboard />} />
           <Route path="logstream" element={<LogStream />} />
           <Route path="datamanager" element={<DataManager />} />

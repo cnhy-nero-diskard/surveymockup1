@@ -12,6 +12,7 @@ export const FeedbackProvider = ({ children }) => {
         touchpoint: null, 
         is_analyzed:false,
         submitted_at: null,
+        language: null
 
     });
 

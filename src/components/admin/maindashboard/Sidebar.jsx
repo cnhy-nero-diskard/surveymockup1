@@ -81,7 +81,7 @@ const CustomTypography = styled(Typography)`
 const menuItems = [
   { text: "Dashboard", icon: <DashboardIcon />, to: "dashboard" },
   { text: "Municipality Data", icon: <MunicipalityIcon />, to: "overallmun" },
-  { text: "Per Barangay Data", icon: <BarangayIcon />, to: "barangaydashboard" },
+  { text: "Per Area Data", icon: <BarangayIcon />, to: "barangaydashboard" },
   { text: "Per Attraction Data", icon: <AttIcon />, to: "attractiondashboard" },
   { text: "Per Establishment Data", icon: <EstablishmentIcon />, to: "establishmentdashboard" },
   { text: "Survey Metrics", icon: <SurveyIcon />, to: "surveymetrics" },

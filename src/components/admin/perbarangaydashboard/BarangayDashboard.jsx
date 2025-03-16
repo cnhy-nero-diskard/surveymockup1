@@ -5,7 +5,7 @@ import { fetchEntityMetrics } from '../../utils/getSurveyFeedbackApi';
 
 
 
-const BarangaysDashboard = () => {
+const AreaDashboard = () => {
   const [metrics, setMetrics] = useState([]);
   const [error, setError] = useState(null);
 
@@ -15,7 +15,7 @@ const BarangaysDashboard = () => {
         const data = await fetchEntityMetrics();
         // Filter data to include only objects with touchpoint="attractions"
         const filteredData = Array.isArray(data)
-          ? data.filter(item => item.touchpoint === "barangay")
+          ? data.filter(item => (item.touchpoint === "barangay" || item.touchpoint === "island" || item.touchpoint === "points" ))
           : [];        if (filteredData.length === 0) {
           setMetrics([{
             entity: "No Data Available",
@@ -89,10 +89,10 @@ const BarangaysDashboard = () => {
     <DataDashboard
       data={dashboardData}
       entities={entities}
-      entityLabel="Select Barangay"
+      entityLabel="Select Area"
       entityKey={entities[0]?.key} // Default to the first entity
     />
   );
 };
 
-export default BarangaysDashboard;
+export default AreaDashboard;
