@@ -32,6 +32,7 @@ const TouchpointFeedback = () => {
         review: feedbackk, // Update review
         is_analyzed: false,
         submitted_at: new Date().toLocaleString(),
+        language: localStorage.getItem('selectedLanguage')
 
     };
 

@@ -1,76 +1,96 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import DataDashboard from '../xdatadashboard/DataDashboard';
-const barangaysData = {
-  barangay1: {
-    name: 'Barangay 1',
-    totalResponses: 1000,
-    sentimentData: [
-      { name: 'Positive', value: 700 },
-      { name: 'Negative', value: 300 },
-    ],
-    mentionedTerms: [
-      { term: 'Service', count: 300 },
-      { term: 'Quality', count: 250 },
-      { term: 'Price', count: 200 },
-      { term: 'Speed', count: 150 },
-      { term: 'Cleanliness', count: 100 },
-    ],
-    languageDistribution: [
-      { language: 'English', count: 800 },
-      { language: 'Spanish', count: 150 },
-      { language: 'French', count: 50 },
-    ],
-    ageDistribution: [
-      { age: '18-24', count: 250 },
-      { age: '25-34', count: 300 },
-      { age: '35-44', count: 200 },
-      { age: '45-54', count: 150 },
-      { age: '55+', count: 100 },
-    ],
-  },
-  barangay2: {
-    name: 'Barangay 2',
-    totalResponses: 800,
-    sentimentData: [
-      { name: 'Positive', value: 500 },
-      { name: 'Negative', value: 300 },
-    ],
-    mentionedTerms: [
-      { term: 'Service', count: 200 },
-      { term: 'Quality', count: 150 },
-      { term: 'Price', count: 100 },
-      { term: 'Speed', count: 50 },
-      { term: 'Cleanliness', count: 50 },
-    ],
-    languageDistribution: [
-      { language: 'English', count: 600 },
-      { language: 'Spanish', count: 100 },
-      { language: 'French', count: 50 },
-    ],
-    ageDistribution: [
-      { age: '18-24', count: 200 },
-      { age: '25-34', count: 250 },
-      { age: '35-44', count: 150 },
-      { age: '45-54', count: 100 },
-      { age: '55+', count: 100 },
-    ],
-  },
-  // Add more barangays as needed
-};
+import { fetchEntityMetrics } from '../../utils/getSurveyFeedbackApi';
 
-const barangays = [
-  { key: 'barangay1', name: 'Barangay 1' },
-  { key: 'barangay2', name: 'Barangay 2' },
-  // Add more barangays as needed
-];
+
+
 
 const BarangaysDashboard = () => {
+  const [metrics, setMetrics] = useState([]);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const getMetrics = async () => {
+      try {
+        const data = await fetchEntityMetrics();
+        // Filter data to include only objects with touchpoint="attractions"
+        const filteredData = Array.isArray(data)
+          ? data.filter(item => item.touchpoint === "attractions")
+          : [];        if (filteredData.length === 0) {
+          setMetrics([{
+            entity: "No Data Available",
+            total_responses: "0",
+            rating: {
+              Dissatisfied: "0",
+              Neutral: "0",
+              Satisfied: "0",
+              VerySatisfied: "0",
+            },
+            mentionedTerms: {},
+            language: {},
+          }]);
+        } else {
+          setMetrics(filteredData);
+        }
+      } catch (err) {
+        console.error(`FETCHING METRICS ERROR: ${err}`);
+        setError(err);
+      }
+    };
+    getMetrics();
+  }, []);
+
+  // Transform metrics into the structure expected by DataDashboard
+  const transformMetricsToDashboardData = (metrics) => {
+    return metrics.reduce((acc, metric) => {
+      const key = metric.entity.toLowerCase().replace(/\s+/g, ''); // Create a unique key for each entity
+      acc[key] = {
+        name: metric.entity,
+        totalResponses: parseInt(metric.total_responses, 10),
+        sentimentData: [
+          { name: 'Dissatisfied', value: parseInt(metric.rating["Dissatisfied"], 10) },
+          { name: 'Neutral', value: parseInt(metric.rating["Neutral"], 10) },
+          { name: 'Satisfied', value: parseInt(metric.rating["Satisfied"], 10) },
+          { name: 'Very Satisfied', value: parseInt(metric.rating["VerySatisfied"], 10) },
+        ],
+        mentionedTerms: Object.entries(metric.mentionedTerms || {}).map(([term, count]) => ({
+          term,
+          count,
+        })),
+        languageDistribution: Object.entries(metric.language || {}).map(([language, count]) => ({
+          language,
+          count,
+        })),
+      };
+      return acc;
+    }, {});
+  };
+
+  // Transform metrics into the structure expected for entities
+  const transformMetricsToEntities = (metrics) => {
+    return metrics.map((metric) => ({
+      key: metric.entity.toLowerCase().replace(/\s+/g, ''), // Create a unique key for each entity
+      name: metric.entity,
+    }));
+  };
+
+  if (error) {
+    return <div>Error loading data: {error.message}</div>;
+  }
+
+  if (metrics.length === 0) {
+    return <div>Loading...</div>;
+  }
+
+  const dashboardData = transformMetricsToDashboardData(metrics);
+  const entities = transformMetricsToEntities(metrics);
+
   return (
     <DataDashboard
-      data={barangaysData}
-      entities={barangays}
+      data={dashboardData}
+      entities={entities}
       entityLabel="Select Barangay"
-      entityKey="barangay1"
+      entityKey={entities[0]?.key} // Default to the first entity
     />
   );
 };

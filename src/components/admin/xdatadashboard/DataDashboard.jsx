@@ -1,37 +1,45 @@
-import React from 'react';
-import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip, Legend } from 'recharts';
-import { Grid, Paper, Typography, MenuItem, Select, FormControl, InputLabel, Box } from '@mui/material';
+import React, { useState } from 'react';
+import {
+  PieChart,
+  Pie,
+  Cell,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  Legend,
+} from 'recharts';
+import {
+  Grid,
+  Paper,
+  Typography,
+  Box,
+  TextField,
+} from '@mui/material';
+import Autocomplete from '@mui/material/Autocomplete';
 import styled from 'styled-components';
-import { useState } from 'react';
 import { fontFamily, fontSize, fontWeight } from '../../../config/fontConfig';
 
 // Color palette for charts
 const COLORS = ['#0088FE', '#FF8042', '#00C49F', '#FFBB28', '#8884D8'];
 
-// Styled Components
 /**
  * Styled Paper component with custom padding, width, and alignment.
  */
 const StyledPaper = styled(Paper)`
-    padding: 16px;
-    width: 100%;
-    max-width: 600px;
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
+  padding: 16px;
+  width: 100%;
+  max-width: 600px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 `;
 
 const StyledBox = styled(Box)`
-    background-color: green
-`;
-
-/**
- * Styled FormControl component with a fixed width.
- */
-const StyledFormControl = styled(FormControl)`
-  width: 300px;
+  background-color: green;
 `;
 
 /**
@@ -39,61 +47,55 @@ const StyledFormControl = styled(FormControl)`
  */
 const StyledGridContainer = styled(Grid)`
   padding: 24px;
-  height:100vh;
-  overflow:visible;
-  background-color: rgba(0,0,0,0) ;
+  height: 100vh;
+  overflow: visible;
+  background-color: rgba(0,0,0,0);
 
-    font-family: ${fontFamily};
-    font-size: ${fontSize};
-    font-weight: ${fontWeight};
-  
+  font-family: ${fontFamily};
+  font-size: ${fontSize};
+  font-weight: ${fontWeight};
 `;
 
 /**
  * DataDashboard component that displays various charts and data related to survey responses.
- * 
+ *
  * @param {Object} props - The component props.
  * @param {Object} props.data - An object containing survey data categorized by entities.
  * @param {Array} props.entities - An array of entity objects with keys and names.
  * @param {string} props.entityLabel - The label for the entity selector.
  * @param {string} props.entityKey - The default entity key to display data for.
  */
-
-
 const DataDashboard = ({ data, entities, entityLabel, entityKey }) => {
-  // State to hold the currently selected entity
+  // State to hold the currently selected entity key
   const [selectedEntity, setSelectedEntity] = useState(entityKey);
+
   // Data for the currently selected entity
   const entityData = data[selectedEntity];
 
-  /**
-   * Handler for changing the selected entity.
-   * 
-   * @param {Object} event - The event object from the select change.
-   */
-  const handleEntityChange = (event) => {
-    setSelectedEntity(event.target.value);
-  };
-
   return (
     <StyledGridContainer container spacing={3}>
-      {/* Entity Selector */}
+      {/* Autocomplete "Searchable" Dropdown */}
       <Grid item xs={12}>
         <Box display="flex" justifyContent="center">
-          <StyledFormControl>
-            <InputLabel>{entityLabel}</InputLabel>
-            <Select
-              value={selectedEntity}
-              onChange={handleEntityChange}
-              label={entityLabel}
-            >
-              {entities.map((entity) => (
-                <MenuItem key={entity.key} value={entity.key}>
-                  {entity.name}
-                </MenuItem>
-              ))}
-            </Select>
-          </StyledFormControl>
+          <Autocomplete
+            sx={{ width: 300 }}
+            options={entities}
+            getOptionLabel={(option) => option.name}
+            // Ensure the Autocomplete value matches the entity object for the selected key
+            value={entities.find((entity) => entity.key === selectedEntity) || null}
+            onChange={(event, newValue) => {
+              if (newValue) {
+                setSelectedEntity(newValue.key);
+              }
+            }}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                label={entityLabel}
+                variant="outlined"
+              />
+            )}
+          />
         </Box>
       </Grid>
 
@@ -126,7 +128,10 @@ const DataDashboard = ({ data, entities, entityLabel, entityKey }) => {
                 label
               >
                 {entityData.sentimentData.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  <Cell
+                    key={`cell-${index}`}
+                    fill={COLORS[index % COLORS.length]}
+                  />
                 ))}
               </Pie>
               <Tooltip />
@@ -144,11 +149,13 @@ const DataDashboard = ({ data, entities, entityLabel, entityKey }) => {
               Most Mentioned Terms
             </Typography>
             <BarChart width={400} height={300} data={entityData.mentionedTerms}>
-              <XAxis 
-                dataKey="term" 
-                tickFormatter={(value) => value.length > 5 ? `${value.slice(0, 5)}...` : value} 
-                angle={-45} 
-                textAnchor="end" 
+              <XAxis
+                dataKey="term"
+                tickFormatter={(value) =>
+                  value.length > 5 ? `${value.slice(0, 5)}...` : value
+                }
+                angle={-45}
+                textAnchor="end"
               />
               <YAxis />
               <Tooltip />
@@ -166,7 +173,11 @@ const DataDashboard = ({ data, entities, entityLabel, entityKey }) => {
             <Typography variant="h6" gutterBottom>
               Language Distribution
             </Typography>
-            <BarChart width={400} height={300} data={entityData.languageDistribution}>
+            <BarChart
+              width={400}
+              height={300}
+              data={entityData.languageDistribution}
+            >
               <XAxis dataKey="language" />
               <YAxis />
               <Tooltip />
@@ -176,8 +187,6 @@ const DataDashboard = ({ data, entities, entityLabel, entityKey }) => {
           </StyledPaper>
         </Box>
       </Grid>
-
-
     </StyledGridContainer>
   );
 };
