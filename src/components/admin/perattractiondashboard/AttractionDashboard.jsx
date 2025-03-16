@@ -21,13 +21,6 @@ const establishmentsData = {
       { language: 'Spanish', count: 200 },
       { language: 'French', count: 100 },
     ],
-    ageDistribution: [
-      { age: '18-24', count: 300 },
-      { age: '25-34', count: 400 },
-      { age: '35-44', count: 250 },
-      { age: '45-54', count: 150 },
-      { age: '55+', count: 100 },
-    ],
   },
   establishment2: {
     name: 'Establishment B',
@@ -47,13 +40,6 @@ const establishmentsData = {
       { language: 'English', count: 700 },
       { language: 'Spanish', count: 150 },
       { language: 'French', count: 50 },
-    ],
-    ageDistribution: [
-      { age: '18-24', count: 200 },
-      { age: '25-34', count: 300 },
-      { age: '35-44', count: 200 },
-      { age: '45-54', count: 100 },
-      { age: '55+', count: 100 },
     ],
   },
   establishment3: {

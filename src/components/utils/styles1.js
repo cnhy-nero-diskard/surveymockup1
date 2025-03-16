@@ -1,5 +1,5 @@
 // components/shared/styles1.js
-import styled, {keyframes} from 'styled-components';
+import styled, { keyframes } from 'styled-components';
 import { motion } from 'framer-motion';
 import { useSpring, animated } from 'react-spring';
 export const fontColorU = 'white';
@@ -222,14 +222,14 @@ export const Option = styled.div`
   justify-content:center;
   background: ${({ selected }) =>
     selected
-      ? 'linear-gradient(to right, rgba(126, 135, 255, 0.8), rgba(70, 143, 240, 0.88))'
-      : 'linear-gradient(to right, rgb(0, 181, 253), srgba(11, 129, 240, 0.48))'};
+      ? 'linear-gradient(to right, rgba(86, 58, 189, 0.8), rgba(70, 143, 240, 0.88))'
+      : 'linear-gradient(to right, rgb(0, 235, 223), srgba(11, 129, 240, 0.48))'};
   padding: 15px 20px;
   border-radius: 25px;
   box-shadow: 0 4px 6px rgba(29, 43, 105, 0.69);
   transition: all 0.3s ease-in-out;
   cursor: pointer;
-  color: rgb(49, 49, 49);
+  color: white;
 
   /* Apply the pop-in animation on mount or if selected changes to "true" */
   animation: ${({ selected }) => (selected ? popInAnimation : null)} 0.4s ease-out;
@@ -237,15 +237,16 @@ export const Option = styled.div`
   &:hover {
     transform: translateY(-5px);
     background: ${({ selected }) =>
-      selected
-        ? 'linear-gradient(to right, #6a11cb, #2575fc)'
-        : 'linear-gradient(to right, #2575fc, #6a11cb)'};
+    selected
+      ? 'linear-gradient(to right, #6a11cb, #2575fc)'
+      : 'linear-gradient(to right, #2575fc, #6a11cb)'};
     box-shadow: 0 6px 8px rgba(29, 43, 105, 0.8);
-    color: white;
+    color: rgb(245, 212, 181);
   }
 
   &:active {
     transform: scale(0.95);
+    
   }
 `;
 
@@ -327,7 +328,7 @@ export const CheckboxInput = styled.input.attrs({ type: 'checkbox' })`
     border-color: #0056b3;
   }`
 
-  export const Input = styled.input`
+export const Input = styled.input`
   /* Basic size and spacing */
   width: 100%;
   margin-bottom:5px;
@@ -390,21 +391,21 @@ export const CloseSuggestions = styled.button`
   }
 `;
 
-  // // Animation props for container
-  // export const containerAnimation = useSpring({
-  //   from: { opacity: 0, transform: 'translateY(20px)' },
-  //   to: { opacity: 1, transform: 'translateY(0)' },
-  //   config: { tension: 180, friction: 14 },
-  // });
+// // Animation props for container
+// export const containerAnimation = useSpring({
+//   from: { opacity: 0, transform: 'translateY(20px)' },
+//   to: { opacity: 1, transform: 'translateY(0)' },
+//   config: { tension: 180, friction: 14 },
+// });
 
-  // // Animation props for button
-  // export const buttonProps = useSpring({
-  //   from: { opacity: 0, transform: 'scale(0.9)' },
-  //   to: { opacity: 1, transform: 'scale(1)' },
-  //   config: { tension: 200, friction: 12 },
-  // });
+// // Animation props for button
+// export const buttonProps = useSpring({
+//   from: { opacity: 0, transform: 'scale(0.9)' },
+//   to: { opacity: 1, transform: 'scale(1)' },
+//   config: { tension: 200, friction: 12 },
+// });
 
-  export const AnimatedButton = styled(animated.button)`
+export const AnimatedButton = styled(animated.button)`
   padding: 1rem 2rem;
   font-size: 1rem;
   color: #fff;

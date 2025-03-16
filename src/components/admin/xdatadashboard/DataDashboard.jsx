@@ -177,23 +177,7 @@ const DataDashboard = ({ data, entities, entityLabel, entityKey }) => {
         </Box>
       </Grid>
 
-      {/* Age Distribution Bar Chart */}
-      <Grid item xs={12} md={6}>
-        <Box display="flex" justifyContent="center">
-          <StyledPaper elevation={3}>
-            <Typography variant="h6" gutterBottom>
-              Age Distribution
-            </Typography>
-            <BarChart width={400} height={300} data={entityData.ageDistribution}>
-              <XAxis dataKey="age" />
-              <YAxis />
-              <Tooltip />
-              <Legend />
-              <Bar dataKey="count" fill="#ffc658" />
-            </BarChart>
-          </StyledPaper>
-        </Box>
-      </Grid>
+
     </StyledGridContainer>
   );
 };
