@@ -16,6 +16,13 @@ import {
   Typography,
   Box,
   TextField,
+  Modal,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
 } from '@mui/material';
 import Autocomplete from '@mui/material/Autocomplete';
 import styled from 'styled-components';
@@ -57,6 +64,22 @@ const StyledGridContainer = styled(Grid)`
 `;
 
 /**
+ * Modal style
+ */
+const modalStyle = {
+  position: 'absolute',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  width: '80%',
+  maxWidth: 800,
+  bgcolor: 'background.paper',
+  boxShadow: 24,
+  p: 4,
+  borderRadius: 2,
+};
+
+/**
  * DataDashboard component that displays various charts and data related to survey responses.
  *
  * @param {Object} props - The component props.
@@ -68,6 +91,9 @@ const StyledGridContainer = styled(Grid)`
 const DataDashboard = ({ data, entities, entityLabel, entityKey }) => {
   // State to hold the currently selected entity key
   const [selectedEntity, setSelectedEntity] = useState(entityKey);
+
+  // State to control modal visibility
+  const [modalOpen, setModalOpen] = useState(false);
 
   // Calculate the sum of all responses across all entities
   const totalResponsesAll = entities.reduce((acc, entity) => {
@@ -89,14 +115,22 @@ const DataDashboard = ({ data, entities, entityLabel, entityKey }) => {
       { name: '' }
     ),
   ];
+
   // Data for the currently selected entity
   const entityData = data[selectedEntity];
 
+  // Handle modal open
+  const handleModalOpen = () => {
+    setModalOpen(true);
+  };
+
+  // Handle modal close
+  const handleModalClose = () => {
+    setModalOpen(false);
+  };
+
   return (
     <StyledGridContainer container spacing={3}>
-
-
-
       {/* Autocomplete "Searchable" Dropdown */}
       <Grid item xs={12}>
         <Box display="flex" justifyContent="center">
@@ -104,7 +138,6 @@ const DataDashboard = ({ data, entities, entityLabel, entityKey }) => {
             sx={{ width: 300 }}
             options={entities}
             getOptionLabel={(option) => option.name}
-            // Ensure the Autocomplete value matches the entity object for the selected key
             value={entities.find((entity) => entity.key === selectedEntity) || null}
             onChange={(event, newValue) => {
               if (newValue) {
@@ -142,13 +175,14 @@ const DataDashboard = ({ data, entities, entityLabel, entityKey }) => {
 
       {/* Full Horizontal Stacked Proportion Bar */}
       <Grid item xs={12} lg={12}>
-        <Box display="flex" justifyContent="center" sx={{
-        }}>
+        <Box display="flex" justifyContent="center">
           <StyledPaper
             elevation={3}
+            onClick={handleModalOpen} // Open modal on click
             sx={{
               background:
                 'linear-gradient(135deg, rgba(214, 214, 214, 0.74), rgba(242, 250, 255, 0.97));',
+              cursor: 'pointer', // Add pointer cursor to indicate clickability
             }}
           >
             <Typography variant="h6" gutterBottom>
@@ -172,7 +206,7 @@ const DataDashboard = ({ data, entities, entityLabel, entityKey }) => {
                 tick={false} // Hide Y-axis labels for simplicity
               />
               <Tooltip formatter={(value) => `${value.toFixed(2)}%`} />
-              {entities.length <= 10 && <Legend />} {/* Conditionally render Legend */}
+              {entities.length <= 10 && <Legend />}
               {entities.map((entity, index) => (
                 <Bar
                   key={entity.key}
@@ -185,6 +219,55 @@ const DataDashboard = ({ data, entities, entityLabel, entityKey }) => {
           </StyledPaper>
         </Box>
       </Grid>
+
+      {/* Modal for Detailed Breakdown */}
+
+      <Modal
+        open={modalOpen}
+        onClose={handleModalClose}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box sx={{ ...modalStyle, overflow: 'auto' }}>
+          <Typography id="modal-modal-title" variant="h6" component="h2">
+            Detailed Breakdown of Responses
+          </Typography>
+          <TableContainer style={{
+            overflowY: 'auto',  // Adds vertical scrollbar
+            maxHeight: '500px' // Limits table height
+          }}>
+            <Table>
+              <TableHead style={{
+                position: 'sticky',  // Keeps header fixed while scrolling
+                top: 0,
+                backgroundColor: 'white' // Optional: header background color
+              }}>
+                <TableRow>
+                  <TableCell>Entity</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody style={{
+                display: 'block',  // Allows for table body scrolling
+                overflowY: 'auto'
+              }}>
+                {entities.map((entity) => {
+                  const entityTotal = data[entity.key]?.totalResponses || 0;
+                  const percentage = totalResponsesAll > 0
+                    ? ((entityTotal / totalResponsesAll) * 100).toFixed(2)
+                    : 0;
+                  return (
+                    <TableRow key={entity.key}>
+                      <TableCell>{entity.name}</TableCell>
+                      <TableCell align="right">{entityTotal}</TableCell>
+                      <TableCell align="right">{percentage}%</TableCell>
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </Box>
+      </Modal>
 
       {/* General Sentiment Pie Chart */}
       <Grid item xs={12} md={6}>

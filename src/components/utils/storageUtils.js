@@ -3,7 +3,7 @@ export const saveToLocalStorage = (key, data) => {
     try {
         const serializedData = JSON.stringify(data);
         localStorage.setItem(key, serializedData);
-        console.log(`[LOCALSTORAGE] ---> Saved key ${data}`);
+        console.log(`[LOCALSTORAGE] ---> Saved key ${key} with data ${JSON.stringify(data)}`);
 
     } catch (error) {
         console.error('Error saving to localStorage:', error);
@@ -16,6 +16,7 @@ export const loadFromLocalStorage = (key) => {
         if (serializedData === null) {
             return null;
         }
+        console.log(`[LOCALSTORAGE] ---> Loaded key ${key} with data ${JSON.stringify(serializedData)}`)
         return JSON.parse(serializedData);
     } catch (error) {
         console.error('Error loading from localStorage:', error);

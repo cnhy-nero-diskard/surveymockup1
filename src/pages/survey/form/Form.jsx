@@ -92,26 +92,27 @@ const Form = () => {
     
         fetchProgress();
       }, [navigate]);
-
-    const handleInputChange = (e) => {
+      const handleInputChange = (e) => {
         const { name, value } = e.target;
-        updatedFormData = {
-          ...formData,
-          [name]: value,
-        };
-        setFormData(updatedFormData);
-        saveToLocalStorage('formData', updatedFormData); // Save the form data to localStorage
-      };
-
+        setFormData(prevState => {
+            const newFormData = {
+                ...prevState,
+                [name]: value
+            };
+            saveToLocalStorage('formData', newFormData);
+            return newFormData;
+        });
+    };
+    
 
     const formAnimation = useSpring({
         from: { opacity: 0, transform: 'translateY(-50px)' },
         to: { opacity: 1, transform: 'translateY(0)' },
         config: { duration: 500 },
     });
-    const handleSubmit = async (e) => {
-        saveToLocalStorage('formData', updatedFormData); // Save the form data to localStorage
-
+    const handleSubmit = async () => {
+        saveToLocalStorage('formData', formData);
+    
         const surveyResponses = [
             {
                 surveyquestion_ref: 'FNAME',
@@ -122,17 +123,16 @@ const Form = () => {
                 response_value: formData.email,
             },
         ];
-
         try {
             await submitSurveyResponses(surveyResponses);
             console.log('Survey responses submitted successfully!');
             goToNextStep(currentStepIndex, navigate, routes, activeBlocks);
         } catch (error) {
             console.error('Failed to submit survey responses:', error);
+            // Decide if you still want to navigate on error or stay on the same page
         }
-
-        goToNextStep(currentStepIndex, navigate, routes, activeBlocks);
     };
+    
 
     return (
         <ThemeProvider theme={theme}>

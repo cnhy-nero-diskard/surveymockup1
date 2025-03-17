@@ -1,23 +1,6 @@
-/**
- * @file MainPurpose.jsx
- * @description This component renders the main purpose survey question with multiple checkbox options.
- * It allows users to select one or more purposes for their travel and submits the responses to the server.
- *
- * @requires react
- * @requires styled-components
- * @requires react-router-dom
- * @requires ./../../../components/partials/BodyPartial
- * @requires ./../../../components/partials/GradientBackground
- * @requires ./../../../components/img/question.png
- * @requires ./../../../components/utils/componentConstants
- * @requires ./../../../components/utils/useTranslations
- * @requires ./../../../components/utils/sendInputUtils
- * @requires ./../../../routes/UnifiedContext
- * @requires ./../../../components/utils/useCurrentIndex
- * @requires ./../../../components/utils/navigationUtils
- */
+import { saveToLocalStorage, loadFromLocalStorage } from '../../../components/utils/storageUtils';
 import styled, { keyframes } from 'styled-components';
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import BodyPartial from '../../../components/partials/BodyPartial';
 import GradientBackground from '../../../components/partials/GradientBackground';
 import imgoverlay from "../../../components/img/question.png";
@@ -30,7 +13,6 @@ import { useCurrentStepIndex } from '../../../components/utils/useCurrentIndex';
 import { goToNextStep } from '../../../components/utils/navigationUtils';
 import { Option, QuestionText } from '../../../components/utils/styles1';
 
-// Keyframes for animations
 const fadeIn = keyframes`
   from {
     opacity: 0;
@@ -80,16 +62,11 @@ export const OptionsGrid = styled.div`
   }
 `;
 
-
-
 export const CustomCheckbox = styled.input.attrs({ type: 'checkbox' })`
   cursor: pointer;
   opacity: 0;
   position: absolute;
-
-  &:checked + label {
-    color: white;
-  }
+  /* Removed color: transparent to avoid overriding the label's 'selected' style */
 `;
 
 export const Label = styled.label`
@@ -126,38 +103,46 @@ export const NextButton = styled.button`
   }
 `;
 
-/**
- * @function MainPurpose
- * @description A survey component that allows users to select the main purpose of their visit.
- * It renders a form with several options, each represented by a checkbox.
- * Upon submission, the selected purpose is sent to the server, and the user is navigated to the next step in the survey.
- *
- * @component
- * @returns {JSX.Element} The MainPurpose component.
- *
- * @example
- * // Usage:
- * <MainPurpose />
- */
 const MainPurpose = () => {
-  const [selectedPurpose, setSelectedPurpose] = useState('');
+  const [selectedPurposes, setSelectedPurposes] = useState([]);
   const [showOptions, setShowOptions] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [language, setLanguage] = useState(localStorage.getItem('selectedLanguage'));
+  const [language] = useState(localStorage.getItem('selectedLanguage'));
   const navigate = useNavigate();
-
+  
   const { routes } = useContext(UnifiedContext);
   const currentStepIndex = useCurrentStepIndex(routes);
-  const { activeBlocks, appendActiveBlocks, removeActiveBlocks } = useContext(UnifiedContext);
-
+  const { activeBlocks } = useContext(UnifiedContext);
+  
   const translations = useTranslations(COMPONENT, language);
 
+  // Load saved purposes from localStorage on mount
+  useEffect(() => {
+    const savedPurposeData = loadFromLocalStorage('selectedPurposes');
+    if (savedPurposeData && Array.isArray(savedPurposeData)) {
+      setSelectedPurposes(savedPurposeData);
+    }
+  }, []);
+
   const handlePurposeChange = (event) => {
-    setSelectedPurpose(event.target.value);
+    const { id, checked } = event.target;
+    setSelectedPurposes((prev) => {
+      if (checked) {
+        return prev.includes(id) ? prev : [...prev, id];
+      } else {
+        return prev.filter((purposeId) => purposeId !== id);
+      }
+    });
   };
+
+  // // Save to localStorage every time selectedPurposes changes
+  // useEffect(() => {
+  //   saveToLocalStorage('selectedPurposes', selectedPurposes);
+  // }, [selectedPurposes]);
 
   const handleNextClick = async () => {
     setIsSubmitting(true);
+    saveToLocalStorage('selectedPurposes', selectedPurposes);
     const purposes = [
       { id: 'pleasureVacation', value: 'Pleasure/Vacation', ref: 'PUR01' },
       { id: 'businessProfessional', value: 'Business/Professional Work', ref: 'PUR02' },
@@ -168,16 +153,15 @@ const MainPurpose = () => {
     ];
 
     try {
-      const surveyResponses = purposes.map(purpose => ({
+      const surveyResponses = purposes.map((purpose) => ({
         surveyquestion_ref: purpose.ref,
-        response_value: document.getElementById(purpose.id).checked ? 'YES' : 'NO',
+        response_value: selectedPurposes.includes(purpose.id) ? 'YES' : 'NO',
       }));
 
       await submitSurveyResponses(surveyResponses);
       goToNextStep(currentStepIndex, navigate, routes, activeBlocks);
     } catch (error) {
       console.error('Error submitting survey responses:', error);
-      // alert('Failed to submit survey responses. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
@@ -186,29 +170,52 @@ const MainPurpose = () => {
   return (
     <>
       <BodyPartial />
-      <GradientBackground overlayImage={imgoverlay} handleNextClick={handleNextClick} buttonAppear={selectedPurpose !== ''}>
+      <GradientBackground
+        overlayImage={imgoverlay}
+        handleNextClick={handleNextClick}
+        buttonAppear={selectedPurposes.length > 0}
+      >
         <Container>
           <QuestionText>{translations.MainPurposeHeader}</QuestionText>
           <form>
             {showOptions && (
               <OptionsGrid>
                 {[
-                  { id: 'pleasureVacation', label: translations.MainPurposePleasureVacation },
-                  { id: 'businessProfessional', label: translations.MainPurposeBusinessProfessional },
-                  { id: 'educationalFieldtrip', label: translations.MainPurposeEducationalFieldtrip },
-                  { id: 'healthWellnessRetirement', label: translations.MainPurposeHealthWellnessRetirement },
-                  { id: 'visitFriendsRelatives', label: translations.MainPurposeVisitFriendsRelatives },
-                  { id: 'meetingIncentiveConventionExhibition', label: translations.MainPurposeMeetingIncentiveConventionExhibition },
+                  {
+                    id: 'pleasureVacation',
+                    label: translations.MainPurposePleasureVacation,
+                  },
+                  {
+                    id: 'businessProfessional',
+                    label: translations.MainPurposeBusinessProfessional,
+                  },
+                  {
+                    id: 'educationalFieldtrip',
+                    label: translations.MainPurposeEducationalFieldtrip,
+                  },
+                  {
+                    id: 'healthWellnessRetirement',
+                    label: translations.MainPurposeHealthWellnessRetirement,
+                  },
+                  {
+                    id: 'visitFriendsRelatives',
+                    label: translations.MainPurposeVisitFriendsRelatives,
+                  },
+                  {
+                    id: 'meetingIncentiveConventionExhibition',
+                    label: translations.MainPurposeMeetingIncentiveConventionExhibition,
+                  },
                 ].map(({ id, label }) => (
-                  <Option key={id} selected={selectedPurpose === id}>
+                  <Option key={id} selected={selectedPurposes.includes(id)}>
                     <CustomCheckbox
                       type="checkbox"
                       id={id}
                       value={label}
+                      checked={selectedPurposes.includes(id)}
                       onChange={handlePurposeChange}
                       aria-label={label}
                     />
-                    <Label htmlFor={id} selected={selectedPurpose === id}>
+                    <Label htmlFor={id} selected={selectedPurposes.includes(id)}>
                       {label}
                     </Label>
                   </Option>
