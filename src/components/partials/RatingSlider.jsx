@@ -1,257 +1,148 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { useTransition, animated, useSpring } from 'react-spring';
 import GradientBackground from '../../components/partials/GradientBackground';
 import BodyPartial from '../../components/partials/BodyPartial';
-import { Container, Title } from '../utils/styles1';
+import { Title } from '../utils/styles1';
 import imgOverlay from "../../components/img/sentiment.png";
-import { useNavigate } from 'react-router-dom';
 import { submitSurveyResponses } from '../utils/sendInputUtils';
 import { NextButtonU } from '../utils/styles1';
 import useTranslations from '../utils/useTranslations';
-import { useEffect } from 'react';
-const SlidesContainer = styled.div`
-  position: relative;
-  max-width: 100%;
-  height: 35vh;
-  overflow: hidden;
-`;
 
-const Slide = styled(animated.div)`
-  position: absolute;
+const StyledTable = styled.table`
   width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 20px;
+  border-collapse: collapse;
+  margin: 2rem 0;
 `;
 
-const Label = styled.div`
-  font-size: calc(1rem + 0.5vw);
-  color: #fff;
-  margin-bottom: 20px;
+const StyledThead = styled.thead`
   background-color: #007bff;
-  padding: 10px;
-  border-radius: 20px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  color: #fff;
 `;
 
-const EmojiSlider = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  width: 50%;
+const StyledTbody = styled.tbody``;
+
+const StyledTr = styled.tr`
+  border-bottom: 1px solid #ddd;
 `;
 
-const EmojiDisplay = styled(animated.div)`
-  font-size: 4rem;
-  margin-left: 20px;
+const StyledTh = styled.th`
+  padding: 0.75rem;
+  text-align: left;
 `;
 
-const SliderContainer = styled.div`
-  width: 100%;
-  position: relative;
+const StyledTd = styled.td`
+  padding: 1rem;
+  vertical-align: middle;
 `;
 
-const Slider = styled.input`
-  -webkit-appearance: none;
-  width: 100%;
-  height: 15px;
-  border-radius: 15px;
-  background: #ddd;
-  outline: none;
-  opacity: 0.7;
-  transition: opacity 0.2s;
-
-  &::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    appearance: none;
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
-    background: #007bff;
-    cursor: pointer;
-  }
-
-  &::-moz-range-thumb {
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
-    background: #007bff;
-    cursor: pointer;
-  }
-`;
-
-const SliderSteps = styled.div`
-  display: flex;
-  justify-content: space-between;
-  width: 100%;
-  position: absolute;
-  top: 25px;
-`;
-
-const StepMarker = styled.div`
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: ${(props) => (props.active ? '#007bff' : '#aaa')};
-  transform: translateX(-50%);
-`;
-
-const EmojiButtons = styled.div`
-  display: flex;
-  justify-content: center;
-  width: 100%;
-  margin-top: 20px;
-`;
-
-const EmojiButton = styled.button`
-  padding: 10px 20px;
-  border: none;
+const StyledSelect = styled.select`
+  padding: 0.5rem;
   border-radius: 5px;
-  background-color: #007bff;
-  color: #fff;
-  font-size: 14px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-
-  &:hover {
-    background-color: #0056b3;
-  }
+  border: 1px solid #ccc;
+  background-color: #fff;
+  font-size: 1rem;
 `;
 
-const NextButton = styled.button`
-  margin-top: 20px;
-  padding: 10px 20px;
-  border: none;
-  border-radius: 5px;
-  background-color: #007bff;
-  color: #fff;
-  font-size: 14px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
+const RatingSlider = ({ 
+  title, 
+  categories, 
+  onRatingComplete, 
+  surveyquestion_refs, 
+  entranslations 
+}) => {
+  // Store each category's rating in an array rather than controlling row-by-row with currentSlide
+  const [sliderValues, setSliderValues] = useState(Array(categories.length).fill(''));
+  
+  // We'll store final responses in state, though you can build them on the fly in handleSubmitAll
+  const [responses, setResponses] = useState([]);
 
-  &:hover {
-    background-color: #0056b3;
-  }
-`;
+  const choosetoskip = useTranslations('RATINGSLIDER', localStorage.getItem('selectedLanguage')).chooseToSkipText;
+  const rtranslations = useTranslations('RATINGSLIDER', localStorage.getItem('selectedLanguage'));
 
-const RatingSlider = ({ title, categories, onRatingComplete, surveyquestion_refs, entranslations }) => {
-  const [currentSlide, setCurrentSlide] = useState(0);
-  const [sliderValue, setSliderValue] = useState(2); // Default to neutral
-  const [responses, setResponses] = useState([]); // Array to store responses
-  const choosetoskip = useTranslations('RATINGSLIDER', localStorage.getItem('selectedLanguage')).chooseToSkipText
-
+  // Potential emoji array for reference
   const emojis = ['☹️', '😐', '🙂', '😄'];
 
-  // Use useEffect to log responses after they are updated
-  useEffect(() => {
-    if (responses.length === categories.length) {
-      // console.log(`RESPONSES: >>>> ${JSON.stringify(responses)}`);
-      submitSurveyResponses(responses)
-        .then(() => {
-          onRatingComplete();
-        })
-        .catch((error) => {
-          console.error('Error submitting survey responses:', error);
-        });
-    }
-  }, [responses, categories.length, onRatingComplete]);
-
-  const handleRating = (value) => {
-    const currentCategory = entranslations[currentSlide];
-    const response = {
-      surveyquestion_ref: surveyquestion_refs + currentCategory.substring(0, 5).toUpperCase(),
-      response_value: value.toString(),
-    };
-
-    setResponses((prevResponses) => {
-      const updatedResponses = [...prevResponses, response];
-
-      if (currentSlide < categories.length - 1) {
-        setCurrentSlide(currentSlide + 1);
-        setSliderValue(2);
-      }
-
-      return updatedResponses;
-    });
+  // Handle dropdown changes for any row 
+  const handleSelectChange = (e, index) => {
+    const newSliderValues = [...sliderValues];
+    newSliderValues[index] = e.target.value;
+    setSliderValues(newSliderValues);
   };
 
-  const transitions = useTransition(currentSlide, {
-    from: { opacity: 0, transform: 'translate3d(100%,0,0)' },
-    enter: { opacity: 1, transform: 'translate3d(0%,0,0)' },
-    leave: { opacity: 0, transform: 'translate3d(-50%,0,0)' },
-  });
-
-  const [emojiSpring, emojiApi] = useSpring(() => ({
-    opacity: 1,
-    transform: 'scale(1)',
-    config: { tension: 1000, friction: 100},
-  }));
-
-  const handleSliderChange = (e) => {
-    const newValue = parseInt(e.target.value);
-    setSliderValue(newValue);
-
-    // Animate the emoji transition
-    emojiApi.start({
-      opacity: 0.5,
-      transform: 'scale(0.8)',
-      immediate: true,
-      onRest: () => {
-        emojiApi.start({
-          opacity: 1,
-          transform: 'scale(1.5)',
-        });
-      },
+  // Collect all responses and submit 
+  const handleSubmitAll = () => {
+    // Build a response object for each category
+    const newResponses = sliderValues.map((value, index) => {
+      const parsedValue = parseInt(value, 10) || 0;
+      const questionStub = entranslations[index] || '';
+      return {
+        surveyquestion_ref: surveyquestion_refs + questionStub.substring(0, 5).toUpperCase(),
+        response_value: parsedValue ? parsedValue.toString() : ''
+      };
     });
+
+    // Store them in state if needed, then submit
+    setResponses(newResponses);
+    submitSurveyResponses(newResponses)
+      .then(() => {
+        onRatingComplete();
+      })
+      .catch((error) => {
+        console.error('Error submitting survey responses:', error);
+      });
   };
 
   return (
     <>
       <BodyPartial />
-      <GradientBackground overlayImage={imgOverlay} opacity={0.2} blendMode='screen' buttonAppear={false}>
-            <Title>{title}</Title>
-            <Title style={{fontSize:'1rem'}}>{choosetoskip}</Title>
-            
-            <SlidesContainer>
-              {transitions((style, index) => (
-                <Slide style={style}>
-                  <EmojiSlider>
-                    <Label>{categories[index]}</Label>
-                    <SliderContainer>
-                      <Slider
-                        type="range"
-                        min="1"
-                        max="4"
-                        step="1" // Snap to discrete steps
-                        value={sliderValue}
-                        onChange={handleSliderChange}
-                      />
-                      <SliderSteps>
-                        {[1, 2, 3, 4].map((step) => (
-                          <StepMarker key={step} active={step === sliderValue} />
-                        ))}
-                      </SliderSteps>
-                    </SliderContainer>
-                    <EmojiButtons>
-                      <NextButtonU onClick={() => handleRating(sliderValue)}>
-                        Submit
-                      </NextButtonU>
-                    </EmojiButtons>
-                  </EmojiSlider>
-                  <EmojiDisplay style={emojiSpring}>
-                    {emojis[sliderValue - 1]}
-                  </EmojiDisplay>
-                </Slide>
-              ))}
-            </SlidesContainer>
-  
+      <GradientBackground overlayImage={imgOverlay} opacity={0.2} blendMode="screen" buttonAppear={true} handleNextClick={handleSubmitAll}>
+        <Title>{title}</Title>
+        <Title style={{ fontSize: '1rem' }}>{choosetoskip}</Title>
+        
+        <StyledTable>
+          <StyledThead>
+            <StyledTr>
+              <StyledTh>{rtranslations.category}</StyledTh>
+              <StyledTh>{rtranslations.choose}</StyledTh>
+              <StyledTh>{rtranslations.rating}</StyledTh>
+            </StyledTr>
+          </StyledThead>
+          <StyledTbody>
+            {categories.map((category, index) => {
+              const selectedValue = sliderValues[index];
+              const parsedValue = parseInt(selectedValue, 10) || 0;
+              // Display the corresponding emoji (or ⛔ if empty)
+              const displayedEmoji = parsedValue ? emojis[parsedValue - 1] : '⛔';
+
+              return (
+                <StyledTr key={index}>
+                  <StyledTd>{category}</StyledTd>
+                  <StyledTd>
+                    <StyledSelect 
+                      value={selectedValue} 
+                      onChange={(e) => handleSelectChange(e, index)}
+                    >
+                      <option value="">⛔</option>
+                      <option value="1">☹️</option>
+                      <option value="2">😐</option>
+                      <option value="3">🙂</option>
+                      <option value="4">😄</option>
+                    </StyledSelect>
+                  </StyledTd>
+                  <StyledTd style={{ fontSize: '2rem' }}>
+                    {displayedEmoji}
+                  </StyledTd>
+                </StyledTr>
+              );
+            })}
+          </StyledTbody>
+        </StyledTable>
+        {/* <NextButtonU onClick={handleSubmitAll}>
+          {rtranslations.submitAll}
+        </NextButtonU> */}
       </GradientBackground>
     </>
   );
 };
 
 export default RatingSlider;
-

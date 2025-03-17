@@ -50,7 +50,7 @@ import PackTranspo from '../pages/survey/packTranspo/PackTranspo';
 import HowManyNights from '../pages/survey/accomodation1/HowManyNights';
 import AccommodationForm from '../pages/survey/accomodation2/AccomodationForm';
 import BookingForm from '../pages/survey/accomodation3/BookingForm';
-import WhereStayArrival from '../pages/survey/accomodation4/WhereStay_arrival';
+import WhereStayed from '../pages/survey/accomodation4/WhereStay_arrival';
 import AccomodationOpen2 from '../pages/survey/accomodation6o/AccomodationOpen2';
 import Transportation3 from '../pages/survey/transportation3/Transportation3';
 import Transportation1 from '../pages/survey/transportation1/Transportation1';
@@ -92,7 +92,7 @@ export const sroutes = [
     
     { label: 'How Many Nights', path: 'howmanynights', component: HowManyNights, conditionalBlock: 'accom'},
     { label: 'Accommodation Form', path: 'accommodationform', component: AccommodationForm, conditionalBlock: 'yesaccom'},
-    { label: 'Where Stay Departure', path: 'wherestayed', component: WhereStayArrival, conditionalBlock: 'noaccom'},
+    { label: 'Where Stay Departure', path: 'wherestayed', component: WhereStayed, conditionalBlock: 'noaccom'},
     { label: 'Booking Form', path: 'bookingform', component: BookingForm, conditionalBlock: 'yesaccom'},
     { label: 'Accommodation Open 2 (GENERAL) ', path: 'accomodationopen2', component: AccomodationOpen2, conditionalBlock: 'accom'},
     
@@ -104,7 +104,7 @@ export const sroutes = [
     { label: 'Will Recommend', path: 'willrecom', component: Willrecom, conditionalBlock: 'evatt'},
     { label: 'Where Learn', path: 'wherelearn', component: WhereLearn, conditionalBlock: 'evatt'},
     { label: 'Events Open 1', path: 'eventsopen1', component: EventsOpen1, conditionalBlock: 'evatt'},
-    { label: 'Attractions Feedback', path: 'attractionsfeedback', component: AttractionsFeedback, conditionalBlock: 'evatt'},
+    // { label: 'Attractions Feedback', path: 'attractionsfeedback', component: AttractionsFeedback, conditionalBlock: 'evatt'},
     
     
     

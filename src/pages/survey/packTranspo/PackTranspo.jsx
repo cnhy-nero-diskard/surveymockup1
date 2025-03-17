@@ -1,6 +1,7 @@
 import React, { useState, useContext, useEffect } from 'react';
 import styled from 'styled-components';
 import { useSpring, animated } from 'react-spring';
+import Select from 'react-select';
 import BodyPartial from '../../../components/partials/BodyPartial';
 import GradientBackground from '../../../components/partials/GradientBackground';
 import { useNavigate } from "react-router-dom";
@@ -11,16 +12,9 @@ import { UnifiedContext } from '../../../routes/UnifiedContext';
 import { goToNextStep } from '../../../components/utils/navigationUtils';
 import { submitSurveyResponses } from '../../../components/utils/sendInputUtils';
 import { NextButtonU, QuestionText } from '../../../components/utils/styles1';
+import { fetchCurrencies } from '../../../components/utils/currencyUtils';
 
-const Container = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 60vh;
-  width: 60vw;
-  font-family: 'Arial', sans-serif;
-`;
+
 
 const InputContainer = styled.div`
   display: flex;
@@ -42,15 +36,6 @@ const CurrencyInput = styled.input`
   width: 200px;
   text-align: center;
   margin-bottom: 15px;
-`;
-
-const CurrencySelect = styled.select`
-  font-size: 16px;
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  width: 220px;
-  margin-bottom: 20px;
 `;
 
 const ConversionResult = styled.div`
@@ -88,49 +73,11 @@ const PackTranspo = () => {
 
   // Fetch all currencies from RESTCountries:
   useEffect(() => {
-    const fetchCountries = async () => {
-      try {
-        const response = await fetch('https://restcountries.com/v3.1/all');
-        const data = await response.json();
-
-        // Build an array of unique currency codes:
-        const allCurrencies = [];
-        data.forEach((country) => {
-          if (country.currencies) {
-            Object.entries(country.currencies).forEach(([code, info]) => {
-              allCurrencies.push({
-                code,
-                name: info.name,
-                symbol: info.symbol,
-              });
-            });
-          }
-        });
-
-        // Remove duplicates:
-        const uniqueCurrencies = Array.from(
-          new Map(allCurrencies.map((curr) => [curr.code, curr])).values()
-        );
-
-        // Sort them for neatness:
-        const sortedCurrencies = uniqueCurrencies.sort((a, b) =>
-          a.code.localeCompare(b.code)
-        );
-
-        // Convert to <option> format:
-        const currencyOptions = sortedCurrencies.map((curr) => ({
-          code: curr.code,
-          label: `${curr.code} – ${curr.name}${
-            curr.symbol ? ' (' + curr.symbol + ')' : ''
-          }`,
-        }));
-
-        setCurrencies(currencyOptions);
-      } catch (error) {
-        console.error('Error fetching countries:', error);
-      }
+    const fetchData = async () => {
+      const currencyOptions = await fetchCurrencies();
+      setCurrencies(currencyOptions);
     };
-    fetchCountries();
+    fetchData();
   }, []);
 
   // Fetch exchange rates from the ExchangeRate API (base = PHP):
@@ -172,8 +119,8 @@ const PackTranspo = () => {
     setPrice(e.target.value);
   };
 
-  const handleCurrencyChange = (e) => {
-    setCurrency(e.target.value);
+  const handleCurrencyChange = (selectedOption) => {
+    setCurrency(selectedOption.value);
   };
 
   // Submit data, including converted price:
@@ -211,6 +158,7 @@ const PackTranspo = () => {
         blendMode="screen"
         handleNextClick={handleNextClick}
         buttonAppear={price && currency}
+
       >
         <QuestionText>{translations.packTranspoQuestion}</QuestionText>
         <InputContainer>
@@ -222,17 +170,64 @@ const PackTranspo = () => {
             onChange={handleInputChange}
           />
 
-          <CurrencySelect value={currency} onChange={handleCurrencyChange}>
-            <option value="" disabled>
-              {translations.packTranspoCurrencySelect}
-            </option>
-            {currencies.map((curr) => (
-              <option value={curr.code} key={curr.code}>
-                {curr.label}
-              </option>
-            ))}
-          </CurrencySelect>
-        </InputContainer>
+          <Select
+            options={currencies}
+            value={currencies.find((option) => option.value === currency)}
+            onChange={handleCurrencyChange}
+            styles={{
+              control: (provided) => ({
+                ...provided,
+                width: 240,
+                fontSize: 16,
+                padding: '6px 12px',
+                color: 'white',
+                background: 'rgb(0, 100, 182)',
+                borderRadius: 8,
+                border: '2px solid #ccc',
+                transition: 'border-color 0.3s ease',
+                '&:hover': {
+                  borderColor: '#007bff',
+                },
+              }),
+              option: (provided, state) => ({
+                ...provided,
+                fontSize: 16,
+                backgroundColor: state.isSelected ? 'rgb(0, 50, 100)' : 'rgb(0, 100, 182)', // Background color for options
+                color: 'white', // Text color for options
+                '&:hover': {
+                  backgroundColor: 'rgb(0, 150, 255)', // Background color on hover
+                },
+              }),
+              menu: (provided) => ({
+                ...provided,
+                backgroundColor: 'rgb(0, 100, 182)', // Background color for the dropdown menu
+                borderRadius: 8,
+                border: '2px solid #ccc',
+                zIndex: 9999, // Ensure the dropdown menu overlays everything
+              }),
+              menuPortal: (provided) => ({
+                ...provided,
+                zIndex: 9999, // Ensure the dropdown menu overlays everything
+              }),
+              singleValue: (provided) => ({
+                ...provided,
+                color: 'white', // Text color for the selected value
+              }),
+              input: (provided) => ({
+                ...provided,
+                color: 'white', // Text color for the input field
+              }),
+              placeholder: (provided) => ({
+                ...provided,
+                color: '#ccc', // Text color for the placeholder
+              }),
+            }}
+            isSearchable
+            placeholder= '...'
+            menuPortalTarget={document.body} // Render the dropdown menu outside the parent container
+            menuPosition="fixed" // Ensure the dropdown menu is positioned correctly
+          />
+                  </InputContainer>
 
         <ConversionResult>
           {convertedPrice && (

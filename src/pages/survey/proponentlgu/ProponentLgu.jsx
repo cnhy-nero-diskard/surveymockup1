@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
 import BodyPartial from '../../../components/partials/BodyPartial';
@@ -79,6 +79,10 @@ const ProponentLgu = () => {
   const currentStepIndex = useCurrentStepIndex(routes);
   const { activeBlocks, appendActiveBlocks, removeActiveBlocks } = useContext(UnifiedContext);
 
+  useEffect( () => {
+    goToNextStep(currentStepIndex, navigate, routes, activeBlocks);
+
+  }, []);
 
   const navigate = useNavigate(); 
   const [inputs, setInputs] = useState([

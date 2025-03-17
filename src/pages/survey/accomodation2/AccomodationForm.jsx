@@ -10,8 +10,7 @@ import GradientBackground from '../../../components/partials/GradientBackground'
 import { useCurrentStepIndex } from '../../../components/utils/useCurrentIndex';
 import { UnifiedContext } from '../../../routes/UnifiedContext';
 import { goToNextStep } from '../../../components/utils/navigationUtils';
-import { NextButtonU } from '../../../components/utils/styles1';
-
+import { saveToLocalStorage, loadFromLocalStorage } from '../../../components/utils/storageUtils';
 // ---------- Styled Components ---------- //
 
 const FormContainer = styled(motion.div)`
@@ -198,7 +197,7 @@ const ratingToEmoji = { 1: '☹️', 2: '😐', 3: '🙂', 4: '😄' };
 const AccommodationForm = () => {
   const { routes } = useContext(UnifiedContext);
   const currentStepIndex = useCurrentStepIndex(routes);
-  const { activeBlocks, removeActiveBlocks,appendActiveBlocks } = useContext(UnifiedContext);
+  const { activeBlocks, removeActiveBlocks, appendActiveBlocks } = useContext(UnifiedContext);
 
   // ---------- State ---------- //
   const [isCommercial, setIsCommercial] = useState(null);
@@ -233,7 +232,17 @@ const AccommodationForm = () => {
 
   const [language, setLanguage] = useState(localStorage.getItem('selectedLanguage'));
   const translations = useTranslations('AccommodationForm', language);
-  
+
+  // ---------- Load Data from LocalStorage on Mount ---------- //
+  useEffect(() => {
+    const savedData = loadFromLocalStorage('accommodationFormData');
+    if (savedData) {
+      setIsCommercial(savedData.isCommercial);
+      setRatings(savedData.ratings);
+      setDurations(savedData.durations);
+      setSurveyResponses(savedData.surveyResponses);
+    }
+  }, []);
 
   // ---------- Handlers ---------- //
   const handleRatingChange = (type, emoji) => {
@@ -306,20 +315,26 @@ const AccommodationForm = () => {
 
   const handleNextClick = async () => {
     try {
+      // Save data to localStorage before navigating
+      const dataToSave = {
+        isCommercial,
+        ratings,
+        durations,
+        surveyResponses,
+      };
+      saveToLocalStorage('accommodationFormData', dataToSave);
+
       await submitSurveyResponses(surveyResponses);
       goToNextStep(currentStepIndex, navigate, routes, activeBlocks);
     } catch (error) {
       console.error('Error submitting survey responses:', error);
     }
   };
-  
 
   const handleNoButtonClick = () => {
     handleCommercialResponse('NO');
-
     setIsCommercial(false);
     handleNextClick();
-    goToNextStep(currentStepIndex, navigate, routes, activeBlocks);
   };
 
   const hasFilledValues = () => {
@@ -328,20 +343,6 @@ const AccommodationForm = () => {
       Object.values(ratings).some((rating) => rating !== '')
     );
   };
-
-  useEffect(() => {
-    if (surveyResponses.length > 0) {
-      const updatedRatings = { ...ratings };
-      surveyResponses.forEach((response) => {
-        if (response.surveyquestion_ref.endsWith('RTNG')) {
-          const type = response.surveyquestion_ref.split('_')[0];
-          const ratingValue = parseInt(response.response_value);
-          updatedRatings[type] = ratingToEmoji[ratingValue] || '';
-        }
-      });
-      setRatings(updatedRatings);
-    }
-  }, [surveyResponses]);
 
   // ---------- Render ---------- //
   return (
@@ -367,7 +368,6 @@ const AccommodationForm = () => {
               onClick={() => {
                 appendActiveBlocks(["yesaccom"]);
                 appendActiveBlocks(["noaccom"]);
-            
                 removeActiveBlocks('noaccom');
                 handleCommercialResponse('YES');
                 setIsCommercial(true);
@@ -381,9 +381,9 @@ const AccommodationForm = () => {
               onClick={() => {
                 appendActiveBlocks(["yesaccom"]);
                 appendActiveBlocks(["noaccom"]);
-            
                 removeActiveBlocks('yesaccom');
-                handleNoButtonClick();}}
+                handleNoButtonClick();
+              }}
             >
               {translations.accommodationFormNoButton}
             </Button>
@@ -405,7 +405,6 @@ const AccommodationForm = () => {
                     {accommodationTypes.map((type) => (
                       <TableRow key={type}>
                         <TableCell>
-                          {/* Mobile label (hidden on desktop) */}
                           <TableCellLabel>
                             {translations.accommodationFormNameHeader}
                           </TableCellLabel>
@@ -413,7 +412,6 @@ const AccommodationForm = () => {
                         </TableCell>
 
                         <RatingCell>
-                          {/* Mobile label (hidden on desktop) */}
                           <TableCellLabel>
                             {translations.accommodationFormRatingHeader}
                           </TableCellLabel>
@@ -431,7 +429,6 @@ const AccommodationForm = () => {
                         </RatingCell>
 
                         <TableCell>
-                          {/* Mobile label (hidden on desktop) */}
                           <TableCellLabel>
                             {translations.accommodationFormDurationHeader}
                           </TableCellLabel>

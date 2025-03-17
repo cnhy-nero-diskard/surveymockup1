@@ -12,6 +12,7 @@ import { useCurrentStepIndex } from '../../../components/utils/useCurrentIndex';
 import { UnifiedContext } from '../../../routes/UnifiedContext';
 import { goToNextStep } from '../../../components/utils/navigationUtils';
 import { useNavigate } from 'react-router-dom';
+import { saveToLocalStorage, loadFromLocalStorage } from '../../../components/utils/storageUtils';
 
 const Option = styled(animated.div)`
   padding: 15px;
@@ -29,7 +30,6 @@ const Option = styled(animated.div)`
     background-color: rgb(4, 110, 197);
   }
 
-  /* Use “$selected” instead of “selected” in the prop. */
   ${({ $selected }) =>
     $selected &&
     css`
@@ -63,6 +63,20 @@ const BranchingSelect = () => {
   const currentStepIndex = useCurrentStepIndex(routes);
   const { activeBlocks, appendActiveBlocks, removeActiveBlocks } = useContext(UnifiedContext);
 
+  // Load saved options from localStorage on component mount
+  useEffect(() => {
+    const savedOptions = loadFromLocalStorage('branchingSelectOptions');
+    if (savedOptions) {
+      setSelectedOptions(savedOptions);
+      savedOptions.forEach(option => appendActiveBlocks([optionToBlockMap[option]]));
+    }
+  }, []);
+
+  // Save selected options to localStorage whenever they change
+  // useEffect(() => {
+  //   saveToLocalStorage('branchingSelectOptions', selectedOptions);
+  // }, [selectedOptions]);
+
   useEffect(() => {
     removeActiveBlocks(optionToBlockMap.ACCOMODATION);
     removeActiveBlocks(optionToBlockMap.TRANSPORTATION);
@@ -77,7 +91,6 @@ const BranchingSelect = () => {
     delay: 300,
   });
 
-  // Map options to their respective strings for activeBlocks
   const optionToBlockMap = {
     ACCOMODATION: 'accom',
     TRANSPORTATION: 'transp',
@@ -88,11 +101,9 @@ const BranchingSelect = () => {
   const handleOptionClick = (option) => {
     setSelectedOptions((prevOptions) => {
       if (prevOptions.includes(option)) {
-        // Remove from selected list
         removeActiveBlocks(optionToBlockMap[option]);
         return prevOptions.filter((opt) => opt !== option);
       } else {
-        // Add to selected list
         appendActiveBlocks([optionToBlockMap[option]]);
         return [...prevOptions, option];
       }
@@ -100,6 +111,8 @@ const BranchingSelect = () => {
   };
 
   const handleNextClick = async () => {
+    saveToLocalStorage('branchingSelectOptions', selectedOptions);
+
     const surveyResponses = selectedOptions.map((option) => ({
       surveyquestion_ref: getSurveyQuestionRef(option),
       response_value: option,

@@ -11,6 +11,7 @@ import { goToNextStep } from '../../../components/utils/navigationUtils';
 import { useCurrentStepIndex } from '../../../components/utils/useCurrentIndex';
 import { UnifiedContext } from '../../../routes/UnifiedContext';
 import { QuestionText } from '../../../components/utils/styles1';
+import { saveToLocalStorage, loadFromLocalStorage } from '../../../components/utils/storageUtils';
 
 // Styled Components
 const Container = styled(motion.div)`
@@ -108,7 +109,7 @@ const ErrorMessage = styled.div`
   margin-bottom: 8px;
 `;
 
-const WhereStayArrival = () => {
+const WhereStayed = () => {
   const { routes } = useContext(UnifiedContext);
   const currentStepIndex = useCurrentStepIndex(routes);
   const { activeBlocks } = useContext(UnifiedContext);
@@ -122,8 +123,19 @@ const WhereStayArrival = () => {
 
   const navigate = useNavigate();
 
-  const handleNextClick = async () => {
+  // Load data from local storage when the component mounts
+  useEffect(() => {
+    setLanguage(localStorage.getItem('selectedLanguage'));
 
+    const storedData = loadFromLocalStorage('whereStayedData');
+    if (storedData) {
+      setSelectedOption(storedData.selectedOption || '');
+      setDuration(storedData.duration || '');
+      setDurationUnit(storedData.durationUnit || 'days');
+    }
+  }, []);
+
+  const handleNextClick = async () => {
     // Validation
     if (!selectedOption) {
       setError(translations.whereStayArrivalErrorNoOption);
@@ -160,6 +172,14 @@ const WhereStayArrival = () => {
       }
     ];
 
+    // Save the input data to local storage before submission
+    const toStore = {
+      selectedOption,
+      duration,
+      durationUnit
+    };
+    saveToLocalStorage('whereStayedData', toStore);
+
     try {
       await submitSurveyResponses(surveyResponses);
       goToNextStep(currentStepIndex, navigate, routes, activeBlocks);
@@ -168,10 +188,6 @@ const WhereStayArrival = () => {
       setError(translations.whereStayArrivalErrorSubmission);
     }
   };
-
-  useEffect(() => {
-    setLanguage(localStorage.getItem('selectedLanguage'));
-  }, []);
 
   return (
     <>
@@ -224,8 +240,7 @@ const WhereStayArrival = () => {
             </DurationContainer>
 
             {error && <ErrorMessage>{error}</ErrorMessage>}
-
-
+            {/* You can include a 'NextButton' component if you wish to display a button in the form */}
           </Form>
         </Container>
       </GradientBackground>
@@ -233,4 +248,4 @@ const WhereStayArrival = () => {
   );
 };
 
-export default WhereStayArrival;
+export default WhereStayed;

@@ -137,7 +137,7 @@ const OpenFormat1 = ({ title, onNext, squestion_identifier, minFeedbackLength = 
   Neutral: 2,
   Satisfied: 3,
   VerySatisfied: 4,
-} }) => {
+} , initialValue=''}) => {
   const [feedback, setFeedback] = useState('');
   const [selectedOption, setSelectedOption] = useState(null);
   const [placeholderText, setPlaceholderText] = useState('');

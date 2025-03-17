@@ -12,17 +12,23 @@ import { useCurrentStepIndex } from '../../../components/utils/useCurrentIndex';
 import { UnifiedContext } from '../../../routes/UnifiedContext';
 import { goToNextStep } from '../../../components/utils/navigationUtils';
 import { saveToLocalStorage, loadFromLocalStorage } from '../../../components/utils/storageUtils';
-import Select from 'react-select'; // Import react-select
-
-// Import your utility functions from currencyUtils.js
+import Select from 'react-select';
 import {
   fetchCurrencies,
   fetchConversionRates,
   convertIncomeToPHP
 } from '../../../components/utils/currencyUtils';
 
+// Language-to-Currency Mapping
+const languageToCurrency = {
+  KO: 'KRW', // South Korean Won
+  EN: 'USD', // US Dollar
+  JP: 'JPY', // Japanese Yen
+  // Add more mappings as needed
+};
+
 // --------------------------------------------------------
-// Styled components
+// Styled components (unchanged)
 // --------------------------------------------------------
 const Container = styled.div`
   display: flex;
@@ -84,7 +90,7 @@ const PackagePaid = () => {
 
   const [responses, setResponses] = useState({
     price: '',
-    currency: 'USD'
+    currency: 'USD' // Default currency, will be overridden based on language
   });
   const [currencyOptions, setCurrencyOptions] = useState([]);
   const [conversionRates, setConversionRates] = useState({});
@@ -94,13 +100,11 @@ const PackagePaid = () => {
   const translations = useTranslations('PackagePaid', language);
   const navigate = useNavigate();
 
-  // Simple fade-in & slide animation for question text
-  const questionAnimation = useSpring({
-    opacity: 1,
-    transform: 'translateY(0)',
-    from: { opacity: 0, transform: 'translateY(-20px)' },
-    config: { tension: 200, friction: 10 },
-  });
+  // Set default currency based on selected language
+  useEffect(() => {
+    const defaultCurrency = languageToCurrency[language] || 'USD'; // Fallback to USD if no mapping exists
+    setResponses((prev) => ({ ...prev, currency: defaultCurrency }));
+  }, [language]);
 
   // Load saved form data from localStorage on mount
   useEffect(() => {
@@ -170,7 +174,7 @@ const PackagePaid = () => {
         handleNextClick={handleNextClick}
       >
         <Container>
-          <QuestionText style={questionAnimation}>
+          <QuestionText >
             {translations.packagePaidQuestion}
           </QuestionText>
 
@@ -185,7 +189,6 @@ const PackagePaid = () => {
               aria-label="Enter package price"
             />
 
-            {/* Replace the native dropdown with react-select Autocomplete */}
             <InputLabel>{translations.packagePaidInputLabel} (Currency)</InputLabel>
             <Select
               options={currencyOptions}
@@ -223,6 +226,11 @@ const PackagePaid = () => {
                   backgroundColor: 'rgb(0, 100, 182)', // Background color for the dropdown menu
                   borderRadius: 8,
                   border: '2px solid #ccc',
+                  zIndex: 9999, // Ensure the dropdown menu overlays everything
+                }),
+                menuPortal: (provided) => ({
+                  ...provided,
+                  zIndex: 9999, // Ensure the dropdown menu overlays everything
                 }),
                 singleValue: (provided) => ({
                   ...provided,
@@ -237,7 +245,9 @@ const PackagePaid = () => {
                   color: '#ccc', // Text color for the placeholder
                 }),
               }}
-            />          </InputContainer>
+  
+            />
+          </InputContainer>
 
           {responses.price && responses.currency && (
             <ConversionResult>

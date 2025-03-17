@@ -12,7 +12,7 @@ import { Input } from '../../../components/utils/styles1';
 import { useCurrentStepIndex } from '../../../components/utils/useCurrentIndex';
 import { UnifiedContext } from '../../../routes/UnifiedContext';
 import { goToNextStep } from '../../../components/utils/navigationUtils';
-import { fetchCurrencies, fetchConversionRates, convertIncomeToPHP } from '../../../components/utils/currencyUtils'; 
+import { fetchCurrencies, fetchConversionRates, convertIncomeToPHP } from '../../../components/utils/currencyUtils';
 
 /** --- Styled Components --- **/
 const Container = styled(motion.div)`
@@ -347,6 +347,11 @@ const PProfile1 = () => {
                   backgroundColor: 'rgb(0, 100, 182)', // Background color for the dropdown menu
                   borderRadius: 8,
                   border: '2px solid #ccc',
+                  zIndex: 9999, // Ensure the dropdown menu overlays everything
+                }),
+                menuPortal: (provided) => ({
+                  ...provided,
+                  zIndex: 9999, // Ensure the dropdown menu overlays everything
                 }),
                 singleValue: (provided) => ({
                   ...provided,
@@ -360,7 +365,11 @@ const PProfile1 = () => {
                   ...provided,
                   color: '#ccc', // Text color for the placeholder
                 }),
-              }}              isSearchable
+              }}
+
+              isSearchable
+              menuPortalTarget={document.body} // Render the dropdown menu outside the parent container
+              menuPosition="fixed" // Ensure the dropdown menu is positioned correctly
             />
 
             {/* Converted Income (read-only display) */}

@@ -10,6 +10,8 @@ import { useCurrentStepIndex } from '../../../components/utils/useCurrentIndex';
 import { UnifiedContext } from '../../../routes/UnifiedContext';
 import { goToNextStep } from '../../../components/utils/navigationUtils';
 import { RadioLabel } from '../../../components/utils/styles1';
+// Import the localStorage utility functions
+import { saveToLocalStorage, loadFromLocalStorage } from '../../../components/utils/storageUtils';
 
 const fadeIn = keyframes`
   from {
@@ -54,25 +56,6 @@ const RadioGroup = styled.div`
   justify-content: center;
 `;
 
-// const RadioLabel = styled.label`
-//   display: flex;
-//   align-items: center;
-//   cursor: pointer;
-//   font-size: 18px;
-//   font-weight: 500;
-//   padding: 12px 24px;
-//   border: 2px solid #007bff;
-//   border-radius: 25px;
-//   transition: all 0.3s ease;
-//   background-color: ${props => (props.checked ? '#007bff' : 'transparent')};
-//   color: ${props => (props.checked ? 'white' : '#007bff')};
-
-//   &:hover {
-//     background-color: #007bff;
-//     color: white;
-//   }
-// `;
-
 const RadioInput = styled.input`
   margin-right: 12px;
   cursor: pointer;
@@ -97,8 +80,6 @@ const InputField = styled.input`
   border: 1px solid #ccc;
   border-radius: 4px;
 `;
-
-
 
 const ProgressBar = styled.div`
   width: 100%;
@@ -130,6 +111,9 @@ const RadioOption = ({ value, label, checked, onChange }) => (
   </RadioLabel>
 );
 
+// We will use this key to identify the data in localStorage
+const HOW_MANY_NIGHTS_KEY = 'HOW_MANY_NIGHTS_DATA';
+
 const SURVEY_QUESTIONS = {
   STAY: 'STAY',
   NIGHTS: 'NIGHTS',
@@ -141,35 +125,10 @@ const SURVEY_QUESTIONS = {
  * It manages user input, validates the input, and submits the responses.
  * It also controls navigation to the next step based on the user's answers.
  *
+ * Data is persistently stored in localStorage via storageUtils.js. If the user revisits
+ * this component, previously entered values are automatically restored.
+ *
  * @returns {JSX.Element} The HowManyNights component.
- *
- * @example
- * // Usage:
- * <HowManyNights />
- *
- * @component
- *
- * @requires React
- * @requires useNavigate
- * @requires useState
- * @requires useEffect
- * @requires useContext
- * @requires ./BodyPartial
- * @requires ./GradientBackground
- * @requires ./FormContainer
- * @requires ./Question
- * @requires ./RadioGroup
- * @requires ./RadioOption
- * @requires ./InputGroup
- * @requires ./InputLabel
- * @requires ./InputField
- * @requires ../../../context/UnifiedContext
- * @requires ../../../hooks/useCurrentStepIndex
- * @requires ../../../hooks/useTranslations
- * @requires ../../../api/submitSurveyResponses
- * @requires ../../../utils/goToNextStep
- * @requires ../../../assets/img/overlay.png
- * @requires ../../../constants/SURVEY_QUESTIONS
  */
 const HowManyNights = () => {
   const { routes } = useContext(UnifiedContext);
@@ -184,62 +143,98 @@ const HowManyNights = () => {
   const [error, setError] = useState('');
   const translations = useTranslations('HowManyNights', language);
 
+  const navigate = useNavigate();
+
+  // Load any saved data from localStorage when the component mounts
+  useEffect(() => {
+    const savedData = loadFromLocalStorage(HOW_MANY_NIGHTS_KEY);
+    if (savedData) {
+      if (savedData.stayOvernight !== undefined) {
+        setStayOvernight(savedData.stayOvernight);
+      }
+      if (savedData.nights !== undefined) {
+        setNights(savedData.nights);
+      }
+      if (Array.isArray(savedData.responses)) {
+        setResponses(savedData.responses);
+      }
+    }
+  }, []);
+
+  // Save data to localStorage whenever relevant state changes
+  // useEffect(() => {
+  //   const dataToSave = {
+  //     stayOvernight,
+  //     nights,
+  //     responses
+  //   };
+  //   // saveToLocalStorage(HOW_MANY_NIGHTS_KEY, dataToSave);
+  // }, [stayOvernight, nights, responses]);
+
   const handleRadioChange = (e) => {
     const value = e.target.value;
     setStayOvernight(value);
     setError('');
-    
+
     setResponses(prev => {
       const existing = prev.find(item => item.surveyquestion_ref === SURVEY_QUESTIONS.STAY);
       if (existing) {
         existing.response_value = value.toUpperCase();
         return [...prev];
       }
-      return [...prev, { 
-        surveyquestion_ref: SURVEY_QUESTIONS.STAY,
-        response_value: value.toUpperCase()
-      }];
+      return [
+        ...prev,
+        {
+          surveyquestion_ref: SURVEY_QUESTIONS.STAY,
+          response_value: value.toUpperCase()
+        }
+      ];
     });
   };
 
   const handleNightsChange = (e) => {
     const value = e.target.value;
     setNights(value);
-    
+
     setResponses(prev => {
       const existing = prev.find(item => item.surveyquestion_ref === SURVEY_QUESTIONS.NIGHTS);
       if (existing) {
         existing.response_value = value;
         return [...prev];
       }
-      return [...prev, { 
-        surveyquestion_ref: SURVEY_QUESTIONS.NIGHTS,
-        response_value: value
-      }];
+      return [
+        ...prev,
+        {
+          surveyquestion_ref: SURVEY_QUESTIONS.NIGHTS,
+          response_value: value
+        }
+      ];
     });
   };
 
-  const navigate = useNavigate();
   const handleNextClick = async () => {
+    const dataToSave = {
+      stayOvernight,
+      nights,
+      responses
+    };
+    saveToLocalStorage(HOW_MANY_NIGHTS_KEY, dataToSave);
+
     if (stayOvernight === "yes" && !nights) {
       setError(translations.howManyNightsError);
       return;
     }
     setError('');
 
-    
     await submitSurveyResponses(responses);
 
     appendActiveBlocks(["yesaccom"]);
     appendActiveBlocks(["noaccom"]);
 
-    // if (stayOvernight === "yes") {
-    //   appendActiveBlocks(['yesaccom']);
-    // } 
+    // If the user chooses "no", remove any references to accommodations
     if (stayOvernight === "no") {
       removeActiveBlocks('noaccom');
       removeActiveBlocks('yesaccom');
-      
     }
 
     setBlocksUpdated(true);
@@ -258,7 +253,10 @@ const HowManyNights = () => {
 
   useEffect(() => {
     if (stayOvernight === "yes") {
-      document.getElementById('nightsInput').focus();
+      const nightsInputEl = document.getElementById('nightsInput');
+      if (nightsInputEl) {
+        nightsInputEl.focus();
+      }
     }
   }, [stayOvernight]);
 
@@ -271,43 +269,42 @@ const HowManyNights = () => {
   useEffect(() => {
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [handleNextClick]);
-
+  }, []);
 
   return (
     <>
       <BodyPartial />
       <GradientBackground overlayImage={imgOverlay} opacity={0.34} blendMode="multiply" handleNextClick={handleNextClick} buttonAppear={stayOvernight}>
-          <FormContainer>
-            <Question>{translations.howManyNightsQuestion}</Question>
-            <RadioGroup role="radiogroup" aria-label={translations.howManyNightsQuestion}>
-              <RadioOption
-                value="yes"
-                label={translations.howManyNightsYes}
-                checked={stayOvernight === "yes"}
-                onChange={handleRadioChange}
+        <FormContainer>
+          <Question>{translations.howManyNightsQuestion}</Question>
+          <RadioGroup role="radiogroup" aria-label={translations.howManyNightsQuestion}>
+            <RadioOption
+              value="yes"
+              label={translations.howManyNightsYes}
+              checked={stayOvernight === "yes"}
+              onChange={handleRadioChange}
+            />
+            <RadioOption
+              value="no"
+              label={translations.howManyNightsNo}
+              checked={stayOvernight === "no"}
+              onChange={handleRadioChange}
+            />
+          </RadioGroup>
+          {stayOvernight === "yes" && (
+            <InputGroup>
+              <InputLabel>{translations.howManyNightsNightsLabel}</InputLabel>
+              <InputField
+                id="nightsInput"
+                type="number"
+                value={nights}
+                onChange={handleNightsChange}
+                aria-label={translations.howManyNightsNightsLabel}
               />
-              <RadioOption
-                value="no"
-                label={translations.howManyNightsNo}
-                checked={stayOvernight === "no"}
-                onChange={handleRadioChange}
-              />
-            </RadioGroup>
-            {stayOvernight === "yes" && (
-              <InputGroup>
-                <InputLabel>{translations.howManyNightsNightsLabel}</InputLabel>
-                <InputField
-                  id="nightsInput"
-                  type="number"
-                  value={nights}
-                  onChange={handleNightsChange}
-                  aria-label={translations.howManyNightsNightsLabel}
-                />
-              </InputGroup>
-            )}
-            {error && <p style={{ color: 'red', marginBottom: '10px' }}>{error}</p>}
-          </FormContainer>
+            </InputGroup>
+          )}
+          {error && <p style={{ color: 'red', marginBottom: '10px' }}>{error}</p>}
+        </FormContainer>
       </GradientBackground>
     </>
   );

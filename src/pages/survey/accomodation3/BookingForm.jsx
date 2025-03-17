@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import styled from 'styled-components';
 import { useSpring, animated } from 'react-spring';
 import BodyPartial from '../../../components/partials/BodyPartial';
@@ -11,6 +11,7 @@ import { submitSurveyResponses } from '../../../components/utils/sendInputUtils'
 import { useCurrentStepIndex } from '../../../components/utils/useCurrentIndex';
 import { UnifiedContext } from '../../../routes/UnifiedContext';
 import { goToNextStep } from '../../../components/utils/navigationUtils';
+import { saveToLocalStorage, loadFromLocalStorage } from '../../../components/utils/storageUtils';
 
 const Container = styled.div`
   font-family: 'Roboto', Arial, sans-serif;
@@ -67,6 +68,22 @@ const BookingForm = () => {
 
   const navigate = useNavigate();
   const translations = useTranslations('BookingForm', language);
+
+  // Load saved data from localStorage on component mount
+  useEffect(() => {
+    const savedData = loadFromLocalStorage('bookingFormData');
+    if (savedData) {
+      setBookingMethod(savedData.bookingMethod || '');
+      setBookingPlatform(savedData.bookingPlatform || '');
+      setResponses(savedData.responses || []);
+
+      // Set isDropdownOpen based on the loaded bookingMethod
+      setIsDropdownOpen(
+        savedData.bookingMethod !== 'Others (specify)' &&
+        savedData.bookingMethod !== 'Your Operator'
+      );
+    }
+  }, []);
 
   // Define booking methods with label/value
   const bookingMethods = [
@@ -135,6 +152,13 @@ const BookingForm = () => {
 
   const handleNextClick = async () => {
     try {
+      // Save current state to localStorage before navigating
+      saveToLocalStorage('bookingFormData', {
+        bookingMethod,
+        bookingPlatform,
+        responses,
+      });
+
       await submitSurveyResponses(responses);
       goToNextStep(currentStepIndex, navigate, routes, activeBlocks);
     } catch (error) {
