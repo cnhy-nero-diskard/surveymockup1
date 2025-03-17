@@ -36,7 +36,6 @@ const StyledPaper = styled(Paper)`
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  
 `;
 
 const StyledBox = styled(Box)`
@@ -70,11 +69,34 @@ const DataDashboard = ({ data, entities, entityLabel, entityKey }) => {
   // State to hold the currently selected entity key
   const [selectedEntity, setSelectedEntity] = useState(entityKey);
 
+  // Calculate the sum of all responses across all entities
+  const totalResponsesAll = entities.reduce((acc, entity) => {
+    return acc + (data[entity.key]?.totalResponses || 0);
+  }, 0);
+
+  // Build a single data entry for the stacked bar,
+  // where each property is named after an entity's 'name' and stores its % of total
+  const stackedData = [
+    entities.reduce(
+      (acc, entity) => {
+        const entityTotal = data[entity.key]?.totalResponses || 0;
+        const percentage = totalResponsesAll > 0
+          ? (entityTotal / totalResponsesAll) * 100
+          : 0;
+        acc[entity.name] = Math.round(percentage * 100) / 100; // Round to 2 decimal places
+        return acc;
+      },
+      { name: '' }
+    ),
+  ];
   // Data for the currently selected entity
   const entityData = data[selectedEntity];
 
   return (
     <StyledGridContainer container spacing={3}>
+
+
+
       {/* Autocomplete "Searchable" Dropdown */}
       <Grid item xs={12}>
         <Box display="flex" justifyContent="center">
@@ -102,10 +124,13 @@ const DataDashboard = ({ data, entities, entityLabel, entityKey }) => {
 
       {/* Total Survey Responses */}
       <Grid item xs={12}>
-        <Box display="flex" justifyContent="center"
-        >
-          <StyledPaper elevation={3}
-            sx={{ background: 'linear-gradient(135deg, rgba(214, 214, 214, 0.74), rgba(242, 250, 255, 0.97));' }}
+        <Box display="flex" justifyContent="center">
+          <StyledPaper
+            elevation={3}
+            sx={{
+              background:
+                'linear-gradient(135deg, rgba(214, 214, 214, 0.74), rgba(242, 250, 255, 0.97));',
+            }}
           >
             <Typography variant="h6" gutterBottom>
               Total Survey Responses
@@ -115,11 +140,61 @@ const DataDashboard = ({ data, entities, entityLabel, entityKey }) => {
         </Box>
       </Grid>
 
+      {/* Full Horizontal Stacked Proportion Bar */}
+      <Grid item xs={12} lg={12}>
+        <Box display="flex" justifyContent="center" sx={{
+        }}>
+          <StyledPaper
+            elevation={3}
+            sx={{
+              background:
+                'linear-gradient(135deg, rgba(214, 214, 214, 0.74), rgba(242, 250, 255, 0.97));',
+            }}
+          >
+            <Typography variant="h6" gutterBottom>
+              Responses Proportion
+            </Typography>
+            <BarChart
+              layout="vertical"
+              width={550}
+              height={80}
+              data={stackedData}
+              margin={{ top: 0, right: 0, left: 0, bottom: 0 }}
+            >
+              <XAxis
+                type="number"
+                domain={[0, 100]}
+                tickFormatter={(tick) => `${tick}%`}
+              />
+              <YAxis
+                dataKey="name"
+                type="category"
+                tick={false} // Hide Y-axis labels for simplicity
+              />
+              <Tooltip formatter={(value) => `${value.toFixed(2)}%`} />
+              {entities.length <= 10 && <Legend />} {/* Conditionally render Legend */}
+              {entities.map((entity, index) => (
+                <Bar
+                  key={entity.key}
+                  dataKey={entity.name}
+                  stackId="allEntities"
+                  fill={COLORS[index % COLORS.length]}
+                />
+              ))}
+            </BarChart>
+          </StyledPaper>
+        </Box>
+      </Grid>
+
       {/* General Sentiment Pie Chart */}
       <Grid item xs={12} md={6}>
         <Box display="flex" justifyContent="center">
-          <StyledPaper elevation={3}
-            sx={{ background: 'linear-gradient(135deg, rgba(214, 214, 214, 0.74), rgba(242, 250, 255, 0.97));' }}
+          <StyledPaper
+            elevation={3}
+            sx={{
+              background:
+                'linear-gradient(135deg, rgba(214, 214, 214, 0.74), rgba(242, 250, 255, 0.97));',
+            }}
           >
             <Typography variant="h6" gutterBottom>
               General Sentiment
@@ -150,13 +225,21 @@ const DataDashboard = ({ data, entities, entityLabel, entityKey }) => {
       {/* Most Mentioned Terms Bar Chart */}
       <Grid item xs={12} md={6}>
         <Box display="flex" justifyContent="center">
-          <StyledPaper elevation={3}
-            sx={{ background: 'linear-gradient(135deg, rgba(214, 214, 214, 0.74), rgba(242, 250, 255, 0.97));' }}
+          <StyledPaper
+            elevation={3}
+            sx={{
+              background:
+                'linear-gradient(135deg, rgba(214, 214, 214, 0.74), rgba(242, 250, 255, 0.97));',
+            }}
           >
             <Typography variant="h6" gutterBottom>
               Most Mentioned Terms
             </Typography>
-            <BarChart width={400} height={300} data={entityData.mentionedTerms}>
+            <BarChart
+              width={400}
+              height={300}
+              data={entityData.mentionedTerms}
+            >
               <XAxis
                 dataKey="term"
                 tickFormatter={(value) =>
@@ -177,8 +260,12 @@ const DataDashboard = ({ data, entities, entityLabel, entityKey }) => {
       {/* Language Distribution Bar Chart */}
       <Grid item xs={12} md={6}>
         <Box display="flex" justifyContent="center">
-          <StyledPaper elevation={3}
-            sx={{ background: 'linear-gradient(135deg, rgba(214, 214, 214, 0.74), rgba(242, 250, 255, 0.97));' }}
+          <StyledPaper
+            elevation={3}
+            sx={{
+              background:
+                'linear-gradient(135deg, rgba(214, 214, 214, 0.74), rgba(242, 250, 255, 0.97));',
+            }}
           >
             <Typography variant="h6" gutterBottom>
               Language Distribution

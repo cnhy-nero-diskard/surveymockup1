@@ -65,7 +65,7 @@ const SurveyRoutesContent = () => {
                         Object.keys(response.data).forEach(category => {
                             response.data[category].forEach(item => {
                                 if (item.short_id === idx) {
-                                    foundEntity = item.name;
+                                    foundEntity = item.short_id;
                                     foundTouchpoint = category;
                                 }
                             });

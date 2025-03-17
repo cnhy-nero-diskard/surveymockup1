@@ -11,9 +11,10 @@ const MunicipalityDashboard = () => {
       try {
         const data = await fetchEntityMetrics();
         // Check if data is an array, if not, default to an empty array
-        const filteredData = Array.isArray(data)
-          ? data.filter(item => item.details?.city_mun === "PANGLAO") // Filter for "PANGLAO" in city_mun
-          : [];
+        // const filteredData = Array.isArray(data)
+        //   ? data.filter(item => item.details?.city_mun === "PANGLAO") // Filter for "PANGLAO" in city_mun
+        //   : [];
+        const filteredData = data;
 
         if (filteredData.length === 0) {
           setMetrics([{
