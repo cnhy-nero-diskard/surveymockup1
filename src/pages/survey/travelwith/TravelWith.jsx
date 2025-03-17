@@ -11,6 +11,7 @@ import { submitSurveyResponses } from '../../../components/utils/sendInputUtils'
 import { useCurrentStepIndex } from '../../../components/utils/useCurrentIndex';
 import { UnifiedContext } from '../../../routes/UnifiedContext';
 import { goToNextStep } from '../../../components/utils/navigationUtils';
+import { saveToLocalStorage, loadFromLocalStorage } from '../../../components/utils/storageUtils';
 
 const FormContainer = styled.div`
   display: flex;
@@ -38,28 +39,6 @@ const OptionsContainer = styled.div`
   margin-bottom: 20px;
 `;
 
-// const Option = styled(motion.div)`
-//   padding: 15px;
-//   text-align: center;
-//   border-radius: 25px;
-//   cursor: pointer;
-//   font-size: 1.1rem;
-//   color: #333;
-//   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-//   transition: background-color 0.3s ease, transform 0.2s ease;
-//   background-color: ${props => (props.selected ? 'blue' : '#f0f0f0')};
-//   color: ${props => (props.selected ? '#fff' : '#333')};
-
-//   &:hover {
-//     transform: translateY(-3px);
-//     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-//   }
-
-//   &:active {
-//     transform: translateY(0);
-//   }
-// `;
-
 const ErrorMessage = styled.div`
   color: #e74c3c;
   font-size: 0.9rem;
@@ -77,34 +56,50 @@ const TravelWith = () => {
     const currentStepIndex = useCurrentStepIndex(routes);
     const { activeBlocks, appendActiveBlocks, removeActiveBlocks, isBlockActive } = useContext(UnifiedContext);
 
-    useEffect (() => {
-        if (isBlockActive('isalone')){
-            console.log('COUNTER IS ALONE FOR ENUMERATION');
-            submitSurveyResponses({ surveyquestion_ref: "TRWTH", response_value: "Alone" })
-            goToNextStep(currentStepIndex, navigate, routes, activeBlocks);
+    const navigate = useNavigate();
+
+    // Load any previously stored selection from localStorage on component mount
+    useEffect(() => {
+        const storedOptions = loadFromLocalStorage("TRWTH_selection");
+        if (storedOptions) {
+            setSelectedOptions(storedOptions);
         }
     }, []);
-    const handleOptionClick = (option) => {
-        const optionObject = { surveyquestion_ref: "TRWTH", response_value: option };
 
-        if (selectedOptions.some(item => item.response_value === option)) {
-            setSelectedOptions(selectedOptions.filter(item => item.response_value !== option));
-        } else {
-            setSelectedOptions([...selectedOptions, optionObject]);
+    // Check if user is traveling alone and proceed automatically if so
+    useEffect(() => {
+        if (isBlockActive('isalone')) {
+            console.log('COUNTER IS ALONE FOR ENUMERATION');
+            submitSurveyResponses({ surveyquestion_ref: "TRWTH", response_value: "Alone" });
+            goToNextStep(currentStepIndex, navigate, routes, activeBlocks);
         }
-        setError('');
-    };
+    }, [isBlockActive, currentStepIndex, navigate, routes, activeBlocks]);
 
+    // Options for travel companions
     const options = [
-        translations.travelWithOptionAlone,
         translations.travelWithOptionBusinessColleague,
         translations.travelWithOptionFamilyRelatives,
         translations.travelWithOptionFriends,
         translations.travelWithOptionPartner
     ];
 
-    const navigate = useNavigate();
+    // Toggle the selection of an option and save to localStorage
+    const handleOptionClick = (option) => {
+        const optionObject = { surveyquestion_ref: "TRWTH", response_value: option };
+        let updatedOptions;
 
+        if (selectedOptions.some(item => item.response_value === option)) {
+            updatedOptions = selectedOptions.filter(item => item.response_value !== option);
+        } else {
+            updatedOptions = [...selectedOptions, optionObject];
+        }
+
+        setSelectedOptions(updatedOptions);
+        saveToLocalStorage("TRWTH_selection", updatedOptions);
+        setError('');
+    };
+
+    // Handle the user clicking "Next"
     const handleNextClick = async () => {
         if (selectedOptions.length === 0) {
             setError(translations.errorNoSelection);

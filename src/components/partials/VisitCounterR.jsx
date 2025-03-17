@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { useState } from 'react';
 import { useSpring, animated } from 'react-spring';
 import styled from 'styled-components';
 import BodyPartial from '../../components/partials/BodyPartial';
@@ -67,23 +68,14 @@ const ChoiceButton = styled.button`
  * @param {string} props.title - The title of the survey question.
  * @param {string} props.surveyquestion_ref - Reference to the survey question.
  * @param {Function} props.handNext - Callback function to handle the next step.
+ * @param {number|null} props.visitCount - The selected visit count (passed from parent).
+ * @param {Function} props.handleChoice - Function to handle choice selection (passed from parent).
  */
-const VisitCounterR = ({ title, surveyquestion_ref, handNext }) => {
-  // State to store the selected visit count
-  const [visitCount, setVisitCount] = useState(null);
+const VisitCounterR = ({ title, surveyquestion_ref, handNext, visitCount, handleChoice }) => {
   // State to track if the form is currently being submitted
   const [isSubmitting, setIsSubmitting] = useState(false);
   // State to store the current language
   const [language, setLanguage] = useState(localStorage.getItem('selectedLanguage'));
-
-  /**
-   * Handles the selection of visit count.
-   * @param {string} value - The selected visit frequency option.
-   */
-  const handleChoice = (value) => {
-    const numericalValue = value === "0" ? 0: value === "1x" ? 1 : value === "2x" ? 2 : 3;
-    setVisitCount(numericalValue);
-  };
 
   /**
    * Handles the next button click.

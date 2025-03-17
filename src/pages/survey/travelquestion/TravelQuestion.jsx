@@ -11,20 +11,8 @@ import { submitSurveyResponses } from '../../../components/utils/sendInputUtils'
 import { useCurrentStepIndex } from '../../../components/utils/useCurrentIndex';
 import { UnifiedContext } from '../../../routes/UnifiedContext';
 import { goToNextStep } from '../../../components/utils/navigationUtils';
+import { saveToLocalStorage, loadFromLocalStorage } from '../../../components/utils/storageUtils';
 
-// const Container = styled.div`
-//   display: flex;
-//   flex-direction: column;
-//   align-items: center;
-//   justify-content: center;
-//   min-height: 60vh;
-//   padding: 20px;
-//   font-family: Arial, sans-serif;
-
-//   @media (max-width: 768px) {
-//     padding: 10px;
-//   }
-// `;
 
 const QuestionContainer = styled.div`
   padding: 20px;
@@ -55,14 +43,11 @@ const InputContainer = styled.div`
   }
 `;
 
-
-
 const ErrorText = styled.p`
   color: #ff4d4f;
   font-size: 0.9rem;
   margin-top: 10px;
 `;
-
 
 const TravelQuestion = () => {
   const [value, setValue] = useState('');
@@ -73,7 +58,9 @@ const TravelQuestion = () => {
 
   const { routes } = useContext(UnifiedContext);
   const currentStepIndex = useCurrentStepIndex(routes);
-  const { activeBlocks, setTouristAlone, removeActiveBlocks, appendActiveBlocks } = useContext(UnifiedContext);
+  const { activeBlocks, removeActiveBlocks, appendActiveBlocks } = useContext(UnifiedContext);
+
+  const navigate = useNavigate();
 
   const inputAnimation = useSpring({
     opacity: 1,
@@ -89,18 +76,31 @@ const TravelQuestion = () => {
     config: { tension: 200, friction: 12 },
   });
 
+  // Load the stored value from localStorage when component mounts
+  useEffect(() => {
+    const storedValue = loadFromLocalStorage('travelQuestionValue');
+    if (storedValue !== null && storedValue !== undefined) {
+      setValue(storedValue);
+    }
+    setLanguage(localStorage.getItem('selectedLanguage'));
+  }, []);
+
   const handleNextClick = async () => {
     if (!value || isNaN(value) || value <= 0) {
       setError(translations.travelQuestionErrorText);
       return;
     }
-    if (value != 1){
+
+    if (value != 1) {
       removeActiveBlocks('isalone');
     } else {
       appendActiveBlocks(['isalone']);
     }
 
     setIsLoading(true);
+
+    // Save the current value to localStorage before submitting
+    saveToLocalStorage('travelQuestionValue', value);
 
     const surveyResponse = {
       surveyquestion_ref: 'TRVQ1',
@@ -117,32 +117,39 @@ const TravelQuestion = () => {
     }
   };
 
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    setLanguage(localStorage.getItem('selectedLanguage'));
-  }, []);
+  // Save new value on every input change
+  const handleValueChange = (e) => {
+    const inputValue = e.target.value;
+    setValue(inputValue);
+    saveToLocalStorage('travelQuestionValue', inputValue);
+    setError('');  // Clear any existing error when user starts typing
+  };
 
   return (
     <>
       <BodyPartial />
-      <GradientBackground overlayImage={imgoverlay} opacity={0.1} handleNextClick={handleNextClick} blendMode="multiply">
-          <QuestionContainer>
-            <QuestionText>{translations.travelQuestionPersonCountText}</QuestionText>
-            <HelperText>{translations.travelQuestionHelperText}</HelperText>
-            <InputContainer>
-              <animated.div style={inputAnimation}>
-                <Input
-                  type="number"
-                  value={value}
-                  onChange={(e) => setValue(e.target.value)}
-                  placeholder={translations.travelQuestionInputPlaceholder}
-                  aria-label="Number of persons"
-                />
-              </animated.div>
-              {error && <ErrorText>{error}</ErrorText>}
-            </InputContainer>
-          </QuestionContainer>
+      <GradientBackground
+        overlayImage={imgoverlay}
+        opacity={0.1}
+        handleNextClick={handleNextClick}
+        blendMode="multiply"
+      >
+        <QuestionContainer>
+          <QuestionText>{translations.travelQuestionPersonCountText}</QuestionText>
+          <HelperText>{translations.travelQuestionHelperText}</HelperText>
+          <InputContainer>
+            <animated.div style={inputAnimation}>
+              <Input
+                type="number"
+                value={value}
+                onChange={handleValueChange}
+                placeholder={translations.travelQuestionInputPlaceholder}
+                aria-label="Number of persons"
+              />
+            </animated.div>
+            {error && <ErrorText>{error}</ErrorText>}
+          </InputContainer>
+        </QuestionContainer>
       </GradientBackground>
     </>
   );
