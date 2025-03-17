@@ -10,6 +10,7 @@ import { submitSurveyResponses } from '../../../components/utils/sendInputUtils'
 import { useCurrentStepIndex } from '../../../components/utils/useCurrentIndex';
 import { UnifiedContext } from '../../../routes/UnifiedContext';
 import { goToNextStep } from '../../../components/utils/navigationUtils';
+import { saveToLocalStorage, loadFromLocalStorage } from '../../../components/utils/storageUtils';
 
 // Motion Variants
 const itemVariants = {
@@ -136,6 +137,19 @@ const PackageTourItems = () => {
     [translations.packageTourItemsMiscellaneous]: 'Miscellaneous',
   };
 
+  // Load selected items from localStorage on component mount
+  useEffect(() => {
+    const savedItems = loadFromLocalStorage('packageTourItems');
+    if (savedItems) {
+      setSelectedItems(savedItems);
+    }
+  }, []);
+
+  // Save selected items to localStorage whenever they change
+  // useEffect(() => {
+  //   saveToLocalStorage('packageTourItems', selectedItems);
+  // }, [selectedItems]);
+
   const handleCheckboxChange = (item) => {
     const englishValue = englishValues[item];
     const surveyResponse = {
@@ -153,6 +167,8 @@ const PackageTourItems = () => {
   const navigate = useNavigate();
 
   const handleNextClick = async () => {
+    saveToLocalStorage('packageTourItems', selectedItems);
+
     if (isLoading || selectedItems.length === 0) return;
     setIsLoading(true);
     console.log('Selected Items:', selectedItems);

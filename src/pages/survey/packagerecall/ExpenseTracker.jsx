@@ -11,7 +11,15 @@ import { goToNextStep } from '../../../components/utils/navigationUtils';
 import { useCurrentStepIndex } from '../../../components/utils/useCurrentIndex';
 import { UnifiedContext } from '../../../routes/UnifiedContext';
 import { NormOption, QuestionText } from '../../../components/utils/styles1';
-import { fetchCurrencies, fetchConversionRates, convertIncomeToPHP } from '../../../components/utils/currencyUtils'; 
+import { 
+  fetchCurrencies, 
+  fetchConversionRates, 
+  convertIncomeToPHP 
+} from '../../../components/utils/currencyUtils'; 
+import { 
+  saveToLocalStorage, 
+  loadFromLocalStorage 
+} from '../../../components/utils/storageUtils';
 
 const Container = styled.div`
   font-family: Arial, sans-serif;
@@ -19,6 +27,7 @@ const Container = styled.div`
   max-width: 600px;
   margin: 0 auto;
 `;
+
 const shake = keyframes`
   0% { transform: translateX(0); }
   25% { transform: translateX(-5px); }
@@ -30,7 +39,7 @@ const shake = keyframes`
 const ExpenseInput = styled(animated.input)`
   font-size: 18px;
   padding: 5px;
-  border: ${({hasError}) =>(hasError ? '3px' : '1px')} solid ${({ hasError }) => (hasError ? 'red' : '#ddd')};
+  border: ${({ hasError }) => (hasError ? '3px' : '1px')} solid ${({ hasError }) => (hasError ? 'red' : '#ddd')};
   border-radius: 4px;
   width: 100px;
   text-align: right;
@@ -40,6 +49,7 @@ const ExpenseInput = styled(animated.input)`
       animation: ${shake} 0.5s ease-in-out;
     `}
 `;
+
 const ExpenseItem = styled.div`
   display: flex;
   justify-content: space-between;
@@ -51,15 +61,6 @@ const ExpenseLabel = styled.span`
   font-size: 18px;
   color: rgb(221, 247, 255);
 `;
-
-// const ExpenseInput = styled.input`
-//   font-size: 18px;
-//   padding: 5px;
-//   border: 1px solid #ddd;
-//   border-radius: 4px;
-//   width: 100px;
-//   text-align: right;
-// `;
 
 const Summary = styled.div`
   margin-top: 20px;
@@ -120,42 +121,61 @@ const customSelectStyles = {
   }),
 };
 
-const ExpenseTracker = () => {
-  const { routes } = useContext(UnifiedContext);
-  const currentStepIndex = useCurrentStepIndex(routes);
-  const { activeBlocks, appendActiveBlocks } = useContext(UnifiedContext);
-  const [expenses, setExpenses] = useState([
+// 1. Retrieve initial data from localStorage, or use defaults if none found.
+function getInitialExpenses() {
+  const storedData = loadFromLocalStorage('expenseTrackerData');
+  if (storedData && Array.isArray(storedData.expenses)) {
+    return storedData.expenses;
+  }
+  return [
     { label: 'Accommodation', value: '' },
     { label: 'Food and Beverage', value: '' },
     { label: 'Shopping', value: '' },
     { label: 'Local Transport', value: '' },
     { label: 'Tourism Activities Entertainment', value: '' },
     { label: 'Miscellaneous', value: '' },
-  ]);
+  ];
+}
 
+function getInitialCurrency() {
+  const storedData = loadFromLocalStorage('expenseTrackerData');
+  if (storedData && storedData.selectedCurrency) {
+    return storedData.selectedCurrency;
+  }
+  return 'PHP';
+}
+
+const ExpenseTracker = () => {
+  const { routes } = useContext(UnifiedContext);
+  const currentStepIndex = useCurrentStepIndex(routes);
+  const { activeBlocks, appendActiveBlocks } = useContext(UnifiedContext);
+
+  // 2. Initialize state directly from localStorage or with defaults
+  const [expenses, setExpenses] = useState(getInitialExpenses);
+  const [selectedCurrency, setSelectedCurrency] = useState(getInitialCurrency);
   const [conversionRates, setConversionRates] = useState({});
-  const [selectedCurrency, setSelectedCurrency] = useState('PHP'); // Default to PHP
+  const [currencyOptions, setCurrencyOptions] = useState([]);
   const [language, setLanguage] = useState(localStorage.getItem('selectedLanguage'));
-  const [currencyOptions, setCurrencyOptions] = useState([]);  
+  const [shouldNavigate, setShouldNavigate] = useState(false);
 
-  const totalExpenses = expenses.reduce(
-    (sum, expense) => sum + (parseFloat(expense.value) || 0),
-    0
-  );
+  // Keep track of input errors
+  const [errors, setErrors] = useState(Array(expenses.length).fill(false));
 
-  // Convert total expenses to PHP using the convertIncomeToPHP function
-  const convertedTotal = convertIncomeToPHP(totalExpenses, selectedCurrency, conversionRates);
-
-  const hasAtLeastOneExpense = expenses.some(expense => expense.value.trim() !== '');
-
+  // 3. Save to localStorage whenever expenses or selectedCurrency change
   useEffect(() => {
-    // Fetch currency options
+    saveToLocalStorage('expenseTrackerData', {
+      expenses,
+      selectedCurrency
+    });
+  }, [expenses, selectedCurrency]);
+
+  // 4. Fetch currency options and conversion rates once
+  useEffect(() => {
     const fetchCurrencyData = async () => {
       const options = await fetchCurrencies();
       setCurrencyOptions(options);
     };
 
-    // Fetch conversion rates
     const fetchRates = async () => {
       const rates = await fetchConversionRates();
       setConversionRates(rates);
@@ -165,10 +185,16 @@ const ExpenseTracker = () => {
     fetchRates();
   }, []);
 
+  // 5. Compute totals
+  const totalExpenses = expenses.reduce(
+    (sum, expense) => sum + (parseFloat(expense.value) || 0),
+    0
+  );
+  const convertedTotal = convertIncomeToPHP(totalExpenses, selectedCurrency, conversionRates);
+  const hasAtLeastOneExpense = expenses.some(expense => expense.value.trim() !== '');
 
-
+  // 6. Handle user actions
   const navigate = useNavigate();
-  const [shouldNavigate, setShouldNavigate] = useState(false);
 
   const handleNextClick = async () => {
     if (!hasAtLeastOneExpense) {
@@ -194,6 +220,39 @@ const ExpenseTracker = () => {
     }
   };
 
+  const handleCurrencySelectChange = (selectedOption) => {
+    if (selectedOption) {
+      setSelectedCurrency(selectedOption.value);
+    }
+  };
+
+  const handleChange = (e, index) => {
+    const inputValue = e.target.value;
+    const newExpenses = [...expenses];
+
+    // Disallow negative values, show a quick error "shake"
+    if (parseFloat(inputValue) < 0) {
+      const newErrors = [...errors];
+      newErrors[index] = true;
+      setErrors(newErrors);
+
+      setTimeout(() => {
+        const resetErrors = [...errors];
+        resetErrors[index] = false;
+        setErrors(resetErrors);
+      }, 500);
+      return;
+    }
+
+    // Clear any previous error and update the value
+    const newErrors = [...errors];
+    newErrors[index] = false;
+    setErrors(newErrors);
+
+    newExpenses[index].value = inputValue;
+    setExpenses(newExpenses);
+  };
+
   const buttonAnimation = useSpring({
     transform: 'scale(1)',
     from: { transform: 'scale(0.95)' },
@@ -212,50 +271,8 @@ const ExpenseTracker = () => {
     }
   }, [activeBlocks, shouldNavigate, currentStepIndex, navigate, routes]);
 
-  /**
-   * This function updates the selected currency based on the react-select value.
-   * react-select will handle keyboard searching and filtering by default when isSearchable={true}.
-   */
-  const handleCurrencySelectChange = (selectedOption) => {
-    if (selectedOption) {
-      setSelectedCurrency(selectedOption.value);
-    }
-  };
-
+  // 7. Translations
   const translations = useTranslations('ExpenseTracker', language);
-
-
-  const [errors, setErrors] = useState(Array(expenses.length).fill(false)); // Track errors for each input
-
-  const handleChange = (e, index) => {
-    const newExpenses = [...expenses];
-    const inputValue = e.target.value;
-
-    // Check if the input value is negative
-    if (parseFloat(inputValue) < 0) {
-      // Set error state
-      const newErrors = [...errors];
-      newErrors[index] = true;
-      setErrors(newErrors);
-
-      // Reset the error state after 0.5s
-      setTimeout(() => {
-        const resetErrors = [...errors];
-        resetErrors[index] = false;
-        setErrors(resetErrors);
-      }, 500);
-
-      return;
-    }
-
-    // Reset error state
-    const newErrors = [...errors];
-    newErrors[index] = false;
-    setErrors(newErrors);
-
-    newExpenses[index].value = inputValue;
-    setExpenses(newExpenses);
-  };
 
   return (
     <>

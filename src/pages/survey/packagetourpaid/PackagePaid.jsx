@@ -1,6 +1,6 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import styled from 'styled-components';
-import { useSpring, animated } from 'react-spring';
+import { useSpring } from 'react-spring';
 import BodyPartial from '../../../components/partials/BodyPartial';
 import GradientBackground from '../../../components/partials/GradientBackground';
 import imgoverlay from "../../../components/img/money.png";
@@ -11,7 +11,19 @@ import { NextButtonU, QuestionText } from '../../../components/utils/styles1';
 import { useCurrentStepIndex } from '../../../components/utils/useCurrentIndex';
 import { UnifiedContext } from '../../../routes/UnifiedContext';
 import { goToNextStep } from '../../../components/utils/navigationUtils';
+import { saveToLocalStorage, loadFromLocalStorage } from '../../../components/utils/storageUtils';
+import Select from 'react-select'; // Import react-select
 
+// Import your utility functions from currencyUtils.js
+import {
+  fetchCurrencies,
+  fetchConversionRates,
+  convertIncomeToPHP
+} from '../../../components/utils/currencyUtils';
+
+// --------------------------------------------------------
+// Styled components
+// --------------------------------------------------------
 const Container = styled.div`
   display: flex;
   flex-direction: column;
@@ -20,14 +32,6 @@ const Container = styled.div`
   height: 60vh;
   font-family: 'Arial', sans-serif;
   padding: 20px;
-`;
-
-const Question = styled(animated.h1)`
-  font-size: 28px;
-  font-weight: 700;
-  color: #333;
-  margin-bottom: 30px;
-  text-align: center;
 `;
 
 const InputContainer = styled.div`
@@ -62,46 +66,6 @@ const CurrencyInput = styled.input`
   }
 `;
 
-const CurrencySelect = styled.select`
-  font-size: 16px;
-  padding: 12px;
-  border: 2px solid #ccc;
-  border-radius: 8px;
-  width: 240px;
-  background-color: #fff;
-  cursor: pointer;
-  transition: border-color 0.3s ease;
-
-  &:focus {
-    border-color: #007bff;
-    outline: none;
-  }
-`;
-
-const NextButton = styled(animated.button)`
-  margin-top: 30px;
-  padding: 12px 24px;
-  font-size: 16px;
-  font-weight: 600;
-  color: #fff;
-  background-color: #007bff;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: background-color 0.3s ease, transform 0.2s ease;
-  opacity: ${({ disabled }) => (disabled ? 0.6 : 1)};
-  pointer-events: ${({ disabled }) => (disabled ? 'none' : 'auto')};
-
-  &:hover {
-    background-color: #0056b3;
-    transform: scale(1.05);
-  }
-
-  &:active {
-    transform: scale(0.95);
-  }
-`;
-
 const ConversionResult = styled.div`
   margin-top: 20px;
   font-size: 18px;
@@ -113,25 +77,24 @@ const ConversionResult = styled.div`
   text-align: center;
 `;
 
-
-
 const PackagePaid = () => {
   const { routes } = useContext(UnifiedContext);
   const currentStepIndex = useCurrentStepIndex(routes);
-  const { activeBlocks, appendActiveBlocks, removeActiveBlocks } = useContext(UnifiedContext);
+  const { activeBlocks } = useContext(UnifiedContext);
 
-  const [responses, setResponses] = useState({ price: '', currency: 'USD' });
+  const [responses, setResponses] = useState({
+    price: '',
+    currency: 'USD'
+  });
+  const [currencyOptions, setCurrencyOptions] = useState([]);
+  const [conversionRates, setConversionRates] = useState({});
   const [isLoading, setIsLoading] = useState(false);
+
   const [language, setLanguage] = useState(localStorage.getItem('selectedLanguage'));
   const translations = useTranslations('PackagePaid', language);
   const navigate = useNavigate();
 
-  const buttonAnimation = useSpring({
-    transform: 'scale(1)',
-    from: { transform: 'scale(0.9)' },
-    config: { tension: 200, friction: 10 },
-  });
-
+  // Simple fade-in & slide animation for question text
   const questionAnimation = useSpring({
     opacity: 1,
     transform: 'translateY(0)',
@@ -139,18 +102,50 @@ const PackagePaid = () => {
     config: { tension: 200, friction: 10 },
   });
 
+  // Load saved form data from localStorage on mount
+  useEffect(() => {
+    const savedResponses = loadFromLocalStorage('packagePaidResponses');
+    if (savedResponses) {
+      setResponses(savedResponses);
+    }
+  }, []);
+
+  // Fetch currency list and conversion rates
+  useEffect(() => {
+    const loadCurrencyData = async () => {
+      try {
+        const fetchedCurrencies = await fetchCurrencies();
+        const fetchedRates = await fetchConversionRates();
+        setCurrencyOptions(fetchedCurrencies);
+        setConversionRates(fetchedRates);
+      } catch (error) {
+        console.error('Error loading currency data:', error);
+      }
+    };
+    loadCurrencyData();
+  }, []);
+
+  // Handle numeric or text changes in the user input
   const handleInputChange = (e) => {
-    setResponses(prev => ({ ...prev, [e.target.name]: e.target.value }));
+    const { name, value } = e.target;
+    setResponses((prev) => ({ ...prev, [name]: value }));
   };
 
-  const conversionRates = {
-    USD: 56, EUR: 60, JPY: 0.4, PHP: 1, CNY: 8,
-    INR: 0.7, RUB: 0.75, KRW: 0.04, FRF: 60, ESP: 60
+  // Handle currency selection change
+  const handleCurrencyChange = (selectedOption) => {
+    setResponses((prev) => ({ ...prev, currency: selectedOption.value }));
   };
 
-  const convertedPrice = (parseFloat(responses.price) * conversionRates[responses.currency]).toFixed(2);
+  // Use the provided currencyUtils function for conversion
+  const convertedPrice = convertIncomeToPHP(
+    parseFloat(responses.price) || 0,
+    responses.currency,
+    conversionRates
+  );
 
   const handleNextClick = async () => {
+    saveToLocalStorage('packagePaidResponses', responses);
+
     setIsLoading(true);
     const surveyResponses = [
       { surveyquestion_ref: 'PRCAM', response_value: responses.price },
@@ -159,20 +154,26 @@ const PackagePaid = () => {
     ];
     await submitSurveyResponses(surveyResponses);
     setIsLoading(false);
+
+    // Proceed to the next step in your survey or workflow
     goToNextStep(currentStepIndex, navigate, routes, activeBlocks);
   };
 
   return (
     <>
       <BodyPartial />
-      <GradientBackground 
-        overlayImage={imgoverlay} 
-        opacity={0.3} blendMode="screen" 
+      <GradientBackground
+        overlayImage={imgoverlay}
+        opacity={0.3}
+        blendMode="screen"
         buttonAppear={!!responses.price}
         handleNextClick={handleNextClick}
       >
         <Container>
-          <QuestionText style={questionAnimation}>{translations.packagePaidQuestion}</QuestionText>
+          <QuestionText style={questionAnimation}>
+            {translations.packagePaidQuestion}
+          </QuestionText>
+
           <InputContainer>
             <InputLabel>({translations.packagePaidInputLabel})</InputLabel>
             <CurrencyInput
@@ -183,20 +184,65 @@ const PackagePaid = () => {
               onChange={handleInputChange}
               aria-label="Enter package price"
             />
-            <CurrencySelect 
-              name="currency" 
-              value={responses.currency} 
-              onChange={handleInputChange}
-              aria-label="Select currency"
-            >
-              {Object.keys(conversionRates).map(code => (
-                <option key={code} value={code}>{translations[`packagePaidCurrency${code}`]}</option>
-              ))}
-            </CurrencySelect>
-          </InputContainer>
+
+            {/* Replace the native dropdown with react-select Autocomplete */}
+            <InputLabel>{translations.packagePaidInputLabel} (Currency)</InputLabel>
+            <Select
+              options={currencyOptions}
+              value={currencyOptions.find(option => option.value === responses.currency)}
+              onChange={handleCurrencyChange}
+              placeholder="Type or choose currency code..."
+              isSearchable
+              aria-label="Choose currency"
+              styles={{
+                control: (provided) => ({
+                  ...provided,
+                  width: 240,
+                  fontSize: 16,
+                  padding: '6px 12px',
+                  color: 'white',
+                  background: 'rgb(0, 100, 182)',
+                  borderRadius: 8,
+                  border: '2px solid #ccc',
+                  transition: 'border-color 0.3s ease',
+                  '&:hover': {
+                    borderColor: '#007bff',
+                  },
+                }),
+                option: (provided, state) => ({
+                  ...provided,
+                  fontSize: 16,
+                  backgroundColor: state.isSelected ? 'rgb(0, 50, 100)' : 'rgb(0, 100, 182)', // Background color for options
+                  color: 'white', // Text color for options
+                  '&:hover': {
+                    backgroundColor: 'rgb(0, 150, 255)', // Background color on hover
+                  },
+                }),
+                menu: (provided) => ({
+                  ...provided,
+                  backgroundColor: 'rgb(0, 100, 182)', // Background color for the dropdown menu
+                  borderRadius: 8,
+                  border: '2px solid #ccc',
+                }),
+                singleValue: (provided) => ({
+                  ...provided,
+                  color: 'white', // Text color for the selected value
+                }),
+                input: (provided) => ({
+                  ...provided,
+                  color: 'white', // Text color for the input field
+                }),
+                placeholder: (provided) => ({
+                  ...provided,
+                  color: '#ccc', // Text color for the placeholder
+                }),
+              }}
+            />          </InputContainer>
+
           {responses.price && responses.currency && (
             <ConversionResult>
-              {translations.packagePaidConversionResult} {responses.price} {responses.currency} {translations.packagePaidConversionResultApprox} {convertedPrice} PHP.
+              {translations.packagePaidConversionResult} {responses.price} {responses.currency}{' '}
+              {translations.packagePaidConversionResultApprox} {convertedPrice} PHP.
             </ConversionResult>
           )}
         </Container>

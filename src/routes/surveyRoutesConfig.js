@@ -86,8 +86,6 @@ export const sroutes = [
     { label: 'Percentage Share List', path: 'percentagesharelist', component: PercentageShareList, conditionalBlock: 'perclist'},
     { label: 'Expense Companions', path: 'expensecompanions', component: ExpenseCompanions, conditionalBlock: 'surveytpms'},
     
-    //ACCOMODATION: 'accom', TRANSPORTATION; 'transp', 'EVENT/ACTIVITIES': 'evatt', 'SERVICES': 'serv'
-    
     //                  !!!!!!!!!!!!!!!!!!!!!!   BRANCHING SELECT !!!!!!!!!!!!!!!!!!!!!!
     { label: 'Branching Select', path: 'branchingselect', component: BranchingSelect, conditionalBlock: 'surveytpms'},
     

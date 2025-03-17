@@ -318,8 +318,49 @@ const PProfile1 = () => {
                   option.value === inputs.find((input) => input.id === 'currency').value
               )}
               onChange={(option) => handleInputChange('currency', option.value)}
-              styles={customSelectStyles}
-              isSearchable
+              styles={{
+                control: (provided) => ({
+                  ...provided,
+                  width: 240,
+                  fontSize: 16,
+                  padding: '6px 12px',
+                  color: 'white',
+                  background: 'rgb(0, 100, 182)',
+                  borderRadius: 8,
+                  border: '2px solid #ccc',
+                  transition: 'border-color 0.3s ease',
+                  '&:hover': {
+                    borderColor: '#007bff',
+                  },
+                }),
+                option: (provided, state) => ({
+                  ...provided,
+                  fontSize: 16,
+                  backgroundColor: state.isSelected ? 'rgb(0, 50, 100)' : 'rgb(0, 100, 182)', // Background color for options
+                  color: 'white', // Text color for options
+                  '&:hover': {
+                    backgroundColor: 'rgb(0, 150, 255)', // Background color on hover
+                  },
+                }),
+                menu: (provided) => ({
+                  ...provided,
+                  backgroundColor: 'rgb(0, 100, 182)', // Background color for the dropdown menu
+                  borderRadius: 8,
+                  border: '2px solid #ccc',
+                }),
+                singleValue: (provided) => ({
+                  ...provided,
+                  color: 'white', // Text color for the selected value
+                }),
+                input: (provided) => ({
+                  ...provided,
+                  color: 'white', // Text color for the input field
+                }),
+                placeholder: (provided) => ({
+                  ...provided,
+                  color: '#ccc', // Text color for the placeholder
+                }),
+              }}              isSearchable
             />
 
             {/* Converted Income (read-only display) */}
