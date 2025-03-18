@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { useCurrentStepIndex } from '../../../components/utils/useCurrentIndex';
 import { UnifiedContext } from '../../../routes/UnifiedContext';
 import { goToNextStep } from '../../../components/utils/navigationUtils';
+import { saveToLocalStorage, loadFromLocalStorage } from '../../../components/utils/storageUtils';
 
 const EventsOpen1 = () => {
   const { routes } = useContext(UnifiedContext);
@@ -22,19 +23,38 @@ const EventsOpen1 = () => {
 
   const navigate = useNavigate();
 
-  const handleNext = (selectedOption, feedback) => {
-    console.log('Selected Option:', selectedOption);
-    console.log('Feedback:', feedback);
-    goToNextStep(currentStepIndex, navigate, routes, activeBlocks);
+  // State to hold user input
+  const [formData, setFormData] = useState({
+    selectedOptionValue: '',
+    feedback: ''
+  });
+  // Load any existing data from localStorage on component mount
+  useEffect(() => {
+    const storedData = loadFromLocalStorage('Eventsopen1');
+    if (storedData) {
+      setFormData(storedData);
+    }
+  }, []);
 
-    // Handle the next action, e.g., send data to the server
+  // Called when user clicks next
+  const handleNext = (selectedOptionValue, feedback) => {
+    // Create a new data object from the user inputs
+    const newData = { selectedOptionValue, feedback };
+
+    // Persist to localStorage before proceeding to the next step
+    saveToLocalStorage('Eventsopen1', newData);
+
+    // Navigate to the next step
+    goToNextStep(currentStepIndex, navigate, routes, activeBlocks);
   };
 
   return (
     <OpenFormat1
       title={translations.eventsOpen1AttractionsExpectations}
-      squestion_identifier={'EV'}
       onNext={handleNext}
+      squestion_identifier='EV'
+      initialValue={formData}
+
     />
   );
 };
