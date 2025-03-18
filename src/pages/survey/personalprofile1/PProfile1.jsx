@@ -248,7 +248,7 @@ const PProfile1 = () => {
       <BodyPartial />
       <GradientBackground
         overlayImage={imgoverlay}
-        opacity={0.2}
+        opacity={0.09}
         blendMode="darken"
         handleNextClick={handleNextClick}
         buttonAppear={isFormComplete}

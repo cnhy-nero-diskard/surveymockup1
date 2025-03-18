@@ -128,7 +128,7 @@ export const sroutes = [
     { label: 'Personal Profile 1', path: 'pprofile1', component: PProfile1, conditionalBlock: 'surveytpms'},
     { label: 'Personal Profile 2', path: 'pprofile2', component: PProfile2, conditionalBlock: 'surveytpms'},
     { label: 'Survey Venue', path: 'surveyvenue', component: SurveyVenue, conditionalBlock: 'surveytpms'},
-    { label: 'Proponent LGU', path: 'proponentlgu', component: ProponentLgu, conditionalBlock: 'surveytpms'},
+    // { label: 'Proponent LGU', path: 'proponentlgu', component: ProponentLgu, conditionalBlock: 'surveytpms'},
     { label: 'Survey Evaluation VERSION1', path: 'surveyevaluation05', component: SurveyEvaluation05, conditionalBlock: 'surveytpms'},
     { label: 'Thank You Message', path: 'survey-complete', component: ThankYouMessage, conditionalBlock: 'surveytpms'},
     // { label: '(IGNORE)Where Stay Departure', path: 'wherestaydepart', component: },

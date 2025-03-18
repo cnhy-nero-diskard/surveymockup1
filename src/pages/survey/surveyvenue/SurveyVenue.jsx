@@ -10,6 +10,7 @@ import { submitSurveyResponses } from '../../../components/utils/sendInputUtils'
 import { useCurrentStepIndex } from '../../../components/utils/useCurrentIndex';
 import { UnifiedContext } from '../../../routes/UnifiedContext';
 import { goToNextStep } from '../../../components/utils/navigationUtils';
+import { saveToLocalStorage, loadFromLocalStorage } from '../../../components/utils/storageUtils';
 
 /**
  * Styled container for the survey venue selection component.
@@ -51,7 +52,7 @@ const ListItem = styled(motion.li)`
   padding: 10px;
   border-radius: 10px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  background-color: ${({ selected }) => (selected ? '#007bff' : ' rgba(35, 144, 245, 0.86)')};
+  background-color: ${({ selected }) => (selected ? 'rgba(22, 92, 158, 0.86)' : ' rgba(35, 144, 245, 0.86)')};
   color: ${({ selected }) => (selected ? 'white' : '#fff')};
 
   &:hover {
@@ -129,14 +130,23 @@ const PopupButton = styled.button`
 const SurveyVenue = () => {
   const { routes } = useContext(UnifiedContext);
   const currentStepIndex = useCurrentStepIndex(routes);
-  const { activeBlocks, appendActiveBlocks, removeActiveBlocks } = useContext(UnifiedContext);
+  const { activeBlocks } = useContext(UnifiedContext);
 
   const [selectedVenue, setSelectedVenue] = useState(null);
   const [showPopup, setShowPopup] = useState(false);
   const [otherVenue, setOtherVenue] = useState('');
   const navigate = useNavigate();
-  const [language, setLanguage] = useState(localStorage.getItem('selectedLanguage'));
+  const [language] = useState(localStorage.getItem('selectedLanguage'));
   const translations = useTranslations('SurveyVenue', language);
+
+  // Load data from localStorage on component mount
+  useEffect(() => {
+    const storedData = loadFromLocalStorage('surveyVenue');
+    if (storedData) {
+      setSelectedVenue(storedData.selectedVenue);
+      setOtherVenue(storedData.otherVenue);
+    }
+  }, []);
 
   // List of venue options
   const venues = [
@@ -158,6 +168,8 @@ const SurveyVenue = () => {
       setShowPopup(true);
     } else {
       submitResponse(venue);
+      // Save to localStorage right before navigating
+      saveToLocalStorage('surveyVenue', { selectedVenue: venue, otherVenue: '' });
       goToNextStep(currentStepIndex, navigate, routes, activeBlocks);
     }
   };
@@ -169,6 +181,8 @@ const SurveyVenue = () => {
     if (otherVenue) {
       setSelectedVenue(otherVenue);
       submitResponse(otherVenue);
+      // Save to localStorage right before navigating
+      saveToLocalStorage('surveyVenue', { selectedVenue: otherVenue, otherVenue });
       setShowPopup(false);
       goToNextStep(currentStepIndex, navigate, routes, activeBlocks);
     }
@@ -229,7 +243,9 @@ const SurveyVenue = () => {
               value={otherVenue}
               onChange={(e) => setOtherVenue(e.target.value)}
             />
-            <PopupButton onClick={handlePopupSubmit}>{translations.surveyVenuePopupButton}</PopupButton>
+            <PopupButton onClick={handlePopupSubmit}>
+              {translations.surveyVenuePopupButton}
+            </PopupButton>
           </PopupContent>
         </PopupOverlay>
       )}

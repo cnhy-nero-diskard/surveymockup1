@@ -14,6 +14,12 @@ import { UnifiedContext } from '../../../routes/UnifiedContext';
 import { goToNextStep } from '../../../components/utils/navigationUtils';
 import 'react-datepicker/dist/react-datepicker.css';
 
+// Import your storage utility functions
+import {
+  saveToLocalStorage,
+  loadFromLocalStorage,
+} from '../../../components/utils/storageUtils';
+
 const FormContainer = styled(animated.div)`
   display: flex;
   flex-direction: column;
@@ -43,6 +49,7 @@ const Label = styled.label`
   color: #555;
 `;
 
+// If you prefer, you could directly use the existing "NextButton" from your styles
 const NextButton = styled(animated.button)`
   padding: 10px 20px;
   border: none;
@@ -65,11 +72,32 @@ const PProfile2 = () => {
 
   const navigate = useNavigate();
 
-  const [responses, setResponses] = useState([
-    { ref: 'ARRDT', value: null, label: 'pprofile2ArrivalDateLabel' },
-    { ref: 'DEPDT', value: null, label: 'pprofile2DepartureDateLabel' },
-    { ref: 'ACCMP', value: new Date(), label: 'pprofile2AccomplishedDateLabel' },
-  ]);
+  // Key to use in localStorage
+  const localStorageKey = 'pProfile2FormData';
+
+  // Helper to parse date strings from localStorage back to Date objects
+  const parseDate = (dateString) => {
+    if (!dateString) return null;
+    const parsed = new Date(dateString);
+    return isNaN(parsed.getTime()) ? null : parsed;
+  };
+
+  // Load any existing data from localStorage; otherwise use default initial state
+  const [responses, setResponses] = useState(() => {
+    const storedData = loadFromLocalStorage(localStorageKey);
+    if (storedData) {
+      return storedData.map((item) => ({
+        ...item,
+        value: item.value ? parseDate(item.value) : null,
+      }));
+    } else {
+      return [
+        { ref: 'ARRDT', value: null, label: 'pprofile2ArrivalDateLabel' },
+        { ref: 'DEPDT', value: null, label: 'pprofile2DepartureDateLabel' },
+        { ref: 'ACCMP', value: new Date(), label: 'pprofile2AccomplishedDateLabel' },
+      ];
+    }
+  });
 
   const language = localStorage.getItem('selectedLanguage');
   const translations = useTranslations('PProfile2', language);
@@ -99,10 +127,17 @@ const PProfile2 = () => {
   const handleNextClick = async () => {
     const surveyResponses = responses.map(({ ref, value }) => ({
       surveyquestion_ref: ref,
+      // Convert date to ISO string (yyyy-mm-dd format) or null
       response_value: value ? value.toISOString().split('T')[0] : null,
     }));
 
+    // Save the data to localStorage before proceeding
+    saveToLocalStorage(localStorageKey, responses);
+
+    // Submit the data
     await submitSurveyResponses(surveyResponses);
+
+    // Move to the next step
     goToNextStep(currentStepIndex, navigate, routes, activeBlocks);
   };
 
@@ -112,7 +147,8 @@ const PProfile2 = () => {
   };
 
   useEffect(() => {
-    // If you need to do something each time responses update, add it here
+    // If you want to react to changes in 'responses', you can uncomment:
+    // console.log('Current responses:', responses);
   }, [responses]);
 
   return (
@@ -132,22 +168,15 @@ const PProfile2 = () => {
             <FormField key={item.ref}>
               <Label>{translations[item.label]}</Label>
               <DatePicker
-                // Bind the chosen date from state
                 selected={item.value}
-                // Update that date in state whenever the user picks a new one
                 onChange={(date) => handleInputChange(index, date)}
-                
-                // If you want to disable the 'ACCMP' field
-                disabled={item.ref === 'ACCMP'}
-
-                // This is how the chosen date will appear in the text field
+                disabled={item.ref === 'ACCMP'} 
                 dateFormat="MM/dd/yyyy"
-
-                // You can remove or change this placeholder if it’s confusing
                 placeholderText="mm/dd/yyyy"
-
-                // This stops the date picker from popping in the 'wrong' place on small screens
                 popperPlacement="bottom"
+                // Add constraints based on the field type
+                minDate={item.ref === 'DEPDT' ? new Date() : null} // Departure date must be today or later
+                maxDate={item.ref === 'ARRDT' ? new Date() : null} // Arrival date must be today or earlier
               />
             </FormField>
           ))}
