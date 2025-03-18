@@ -138,7 +138,7 @@ function getInitialExpenses() {
 }
 
 function getInitialCurrency() {
-  const storedData = loadFromLocalStorage('expenseTrackerData');
+  const storedData = {selectedCurrency: loadFromLocalStorage('touristCurrency')};
   if (storedData && storedData.selectedCurrency) {
     return storedData.selectedCurrency;
   }
@@ -167,6 +167,7 @@ const ExpenseTracker = () => {
       expenses,
       selectedCurrency
     });
+    saveToLocalStorage('touristCurrency', selectedCurrency);
   }, [expenses, selectedCurrency]);
 
   // 4. Fetch currency options and conversion rates once

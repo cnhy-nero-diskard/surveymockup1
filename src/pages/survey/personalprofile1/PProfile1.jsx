@@ -136,9 +136,20 @@ const PProfile1 = () => {
    */
   useEffect(() => {
     const savedData = loadFromLocalStorage('pProfile1Inputs');
+    
     if (savedData) {
       setInputs(savedData);
+      
     }
+    setInputs(inputs.map(input => {
+      if (input.surveyquestion_ref === 'CUR01') {
+        return {
+          ...input,
+          value: loadFromLocalStorage('touristCurrency')
+        };
+      }
+      return input;
+    }));
   }, []);
 
   /**

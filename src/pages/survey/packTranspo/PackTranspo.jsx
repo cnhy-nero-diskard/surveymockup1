@@ -54,7 +54,7 @@ const PackTranspo = () => {
 
   // Load persisted values (if any) from localStorage on mount
   const [price, setPrice] = useState(() => loadFromLocalStorage('packTranspoPrice') || '');
-  const [currency, setCurrency] = useState(() => loadFromLocalStorage('packTranspoCurrency') || '');
+  const [currency, setCurrency] = useState(() => loadFromLocalStorage('touristCurrency') || '');
 
   // Dynamic currency data:
   const [currencies, setCurrencies] = useState([]);
@@ -124,7 +124,7 @@ const PackTranspo = () => {
   const handleNextClick = async () => {
     // Persist the current values to localStorage
     saveToLocalStorage('packTranspoPrice', price);
-    saveToLocalStorage('packTranspoCurrency', currency);
+    saveToLocalStorage('touristCurrency', currency);
 
     // Prepare the survey responses:
     const surveyResponses = [

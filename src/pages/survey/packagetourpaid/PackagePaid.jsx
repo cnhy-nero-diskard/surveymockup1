@@ -110,7 +110,7 @@ const PackagePaid = () => {
   useEffect(() => {
     const savedResponses = loadFromLocalStorage('packagePaidResponses');
     if (savedResponses) {
-      setResponses(savedResponses);
+      setResponses({price: savedResponses.price, currency: loadFromLocalStorage('touristCurrency')});
     }
   }, []);
 
@@ -149,6 +149,7 @@ const PackagePaid = () => {
 
   const handleNextClick = async () => {
     saveToLocalStorage('packagePaidResponses', responses);
+    saveToLocalStorage('touristCurrency', responses.currency);
 
     setIsLoading(true);
     const surveyResponses = [
@@ -245,16 +246,19 @@ const PackagePaid = () => {
                   color: '#ccc', // Text color for the placeholder
                 }),
               }}
+              menuPortalTarget={document.body}
+              menuPosition="fixed"
+
   
             />
           </InputContainer>
 
-          {responses.price && responses.currency && (
+          {/* {responses.price && responses.currency && (
             <ConversionResult>
               {translations.packagePaidConversionResult} {responses.price} {responses.currency}{' '}
               {translations.packagePaidConversionResultApprox} {convertedPrice} PHP.
             </ConversionResult>
-          )}
+          )} */}
         </Container>
       </GradientBackground>
     </>

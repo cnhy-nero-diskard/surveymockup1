@@ -32,4 +32,12 @@ export const clearLocalStorage = (key) => {
         console.error('Error clearing localStorage:', error);
     }
 };
-window.clearLocalStorage = clearLocalStorage;
+// Make clearLocalStorage globally accessible
+window.clearLocalStorageFromConsole = (key) => {
+    try {
+        localStorage.removeItem(key);
+        console.log(`Cleared localStorage key: ${key}`);
+    } catch (error) {
+        console.error('Error clearing localStorage:', error);
+    }
+};
