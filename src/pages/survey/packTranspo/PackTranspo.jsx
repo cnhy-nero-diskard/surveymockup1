@@ -13,8 +13,7 @@ import { goToNextStep } from '../../../components/utils/navigationUtils';
 import { submitSurveyResponses } from '../../../components/utils/sendInputUtils';
 import { NextButtonU, QuestionText } from '../../../components/utils/styles1';
 import { fetchCurrencies } from '../../../components/utils/currencyUtils';
-
-
+import { saveToLocalStorage, loadFromLocalStorage } from '../../../components/utils/storageUtils';
 
 const InputContainer = styled.div`
   display: flex;
@@ -53,9 +52,9 @@ const PackTranspo = () => {
   const [language] = useState(localStorage.getItem('selectedLanguage') || 'en');
   const translations = useTranslations('PackTranspo', language);
 
-  // User input states:
-  const [price, setPrice] = useState('');
-  const [currency, setCurrency] = useState('');
+  // Load persisted values (if any) from localStorage on mount
+  const [price, setPrice] = useState(() => loadFromLocalStorage('packTranspoPrice') || '');
+  const [currency, setCurrency] = useState(() => loadFromLocalStorage('packTranspoCurrency') || '');
 
   // Dynamic currency data:
   const [currencies, setCurrencies] = useState([]);
@@ -107,8 +106,6 @@ const PackTranspo = () => {
       return;
     }
 
-    // If we have "1 PHP = X currency", then "1 currency = 1/X PHP"
-    // userInput in currency => in PHP is userInput * (1 / conversionRates[currency]).
     const rateAgainstPHP = conversionRates[currency];
     const newConverted = (userInput * (1 / rateAgainstPHP)).toFixed(2);
     setConvertedPrice(newConverted);
@@ -125,19 +122,23 @@ const PackTranspo = () => {
 
   // Submit data, including converted price:
   const handleNextClick = async () => {
+    // Persist the current values to localStorage
+    saveToLocalStorage('packTranspoPrice', price);
+    saveToLocalStorage('packTranspoCurrency', currency);
+
     // Prepare the survey responses:
     const surveyResponses = [
       {
         surveyquestion_ref: 'NPCURNC',
-        response_value: price, // The price value in original currency
+        response_value: price,
       },
       {
         surveyquestion_ref: 'NPRCAM',
-        response_value: currency, // The selected currency code
+        response_value: currency,
       },
       {
         surveyquestion_ref: 'NPCONVR',
-        response_value: convertedPrice, // The price in PHP
+        response_value: convertedPrice,
       }
     ];
 
@@ -158,7 +159,6 @@ const PackTranspo = () => {
         blendMode="screen"
         handleNextClick={handleNextClick}
         buttonAppear={price && currency}
-
       >
         <QuestionText>{translations.packTranspoQuestion}</QuestionText>
         <InputContainer>
@@ -192,50 +192,50 @@ const PackTranspo = () => {
               option: (provided, state) => ({
                 ...provided,
                 fontSize: 16,
-                backgroundColor: state.isSelected ? 'rgb(0, 50, 100)' : 'rgb(0, 100, 182)', // Background color for options
-                color: 'white', // Text color for options
+                backgroundColor: state.isSelected ? 'rgb(0, 50, 100)' : 'rgb(0, 100, 182)',
+                color: 'white',
                 '&:hover': {
-                  backgroundColor: 'rgb(0, 150, 255)', // Background color on hover
+                  backgroundColor: 'rgb(0, 150, 255)',
                 },
               }),
               menu: (provided) => ({
                 ...provided,
-                backgroundColor: 'rgb(0, 100, 182)', // Background color for the dropdown menu
+                backgroundColor: 'rgb(0, 100, 182)',
                 borderRadius: 8,
                 border: '2px solid #ccc',
-                zIndex: 9999, // Ensure the dropdown menu overlays everything
+                zIndex: 9999,
               }),
               menuPortal: (provided) => ({
                 ...provided,
-                zIndex: 9999, // Ensure the dropdown menu overlays everything
+                zIndex: 9999,
               }),
               singleValue: (provided) => ({
                 ...provided,
-                color: 'white', // Text color for the selected value
+                color: 'white',
               }),
               input: (provided) => ({
                 ...provided,
-                color: 'white', // Text color for the input field
+                color: 'white',
               }),
               placeholder: (provided) => ({
                 ...provided,
-                color: '#ccc', // Text color for the placeholder
+                color: '#ccc',
               }),
             }}
             isSearchable
-            placeholder= '...'
-            menuPortalTarget={document.body} // Render the dropdown menu outside the parent container
-            menuPosition="fixed" // Ensure the dropdown menu is positioned correctly
+            placeholder='...'
+            menuPortalTarget={document.body}
+            menuPosition="fixed"
           />
-                  </InputContainer>
+        </InputContainer>
 
-        <ConversionResult>
+        {/* <ConversionResult>
           {convertedPrice && (
             <span>
               {price} {currency} {translations.packTranspoConversionResult} {convertedPrice} PHP.
             </span>
           )}
-        </ConversionResult>
+        </ConversionResult> */}
       </GradientBackground>
     </>
   );

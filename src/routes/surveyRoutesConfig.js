@@ -61,6 +61,7 @@ import ProponentLgu from '../pages/survey/proponentlgu/ProponentLgu';
 import OpenEndedTranspo from '../pages/survey/OpenEndedTransportation/OpenEndedTranspo';
 import TouchpointFeedback from '../pages/survey/accomodation5o/AccomodationFeedback';
 import ThankYouMessageF from '../pages/survey/thanku/ThankYouMessageF';
+import OpenEndedTranspov2 from '../pages/survey/OpenEndedTransportation/OpenEndedTranspov2';
 
 
 export const sroutes = [
@@ -110,7 +111,7 @@ export const sroutes = [
     
     { label: 'Pack Transpo', path: 'packtranspo', component: PackTranspo, conditionalBlock: 'transp'},
     { label: 'Transportation 3', path: 'transportation3', component: Transportation3, conditionalBlock: 'transp'},
-    { label: 'Open Ended Transportation', path: 'opentranspo', component: OpenEndedTranspo, conditionalBlock: 'transp'},
+    { label: 'Open Ended Transportation', path: 'opentranspo', component: OpenEndedTranspov2, conditionalBlock: 'transp'},
     
     
     { label: 'rateservicesf', path: 'services2', component: Services2, conditionalBlock: 'serv'},

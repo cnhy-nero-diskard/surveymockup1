@@ -11,6 +11,7 @@ import { useCurrentStepIndex } from '../../../components/utils/useCurrentIndex';
 import { UnifiedContext } from '../../../routes/UnifiedContext';
 import { goToNextStep } from '../../../components/utils/navigationUtils';
 import { NextButtonU } from '../../../components/utils/styles1';
+import { saveToLocalStorage, loadFromLocalStorage } from '../../../components/utils/storageUtils';
 
 const Container = styled.div`
   font-family: Arial, sans-serif;
@@ -69,11 +70,16 @@ const NextButton = styled(Button)`
   width: 100%;
 `;
 
-const emojiMap = {
-  1: '☹️',
-  2: '😐',
-  3: '🙂',
-  4: '😄',
+/**
+ * Added a "⛔" choice with an empty string key
+ * to represent no rating as the default.
+ */
+const ratingOptions = {
+  '': '⛔',
+  '1': '☹️',
+  '2': '😐',
+  '3': '🙂',
+  '4': '😄',
 };
 
 const surveyQuestionRefs = ["LOCARTS", "APPAR", "FOODDE", "ACCESS", "COSM", "PERSO"];
@@ -83,19 +89,23 @@ const DestinationShoppingList = () => {
   const currentStepIndex = useCurrentStepIndex(routes);
   const { activeBlocks } = useContext(UnifiedContext);
 
-
-  
   const [items, setItems] = useState([]);
   const [surveyResponses, setSurveyResponses] = useState([]);
   const [language, setLanguage] = useState(localStorage.getItem('selectedLanguage') || 'en');
 
   const translations = useTranslations('DestinationShoppingList', language);
+  const navigate = useNavigate();
+  const animations = useSpring({ opacity: 1, from: { opacity: 0 } });
 
   useEffect(() => {
-    if (translations.destinationShoppingListItems) {
+    const storedItems = loadFromLocalStorage('destinationShoppingListItems');
+
+    if (storedItems) {
+      setItems(storedItems);
+    } else if (translations.destinationShoppingListItems) {
       const parsedItems = JSON.parse(translations.destinationShoppingListItems).map((item, index) => ({
         name: item.name,
-        rating: item.rating || 1,
+        rating: item.rating || '',
         surveyquestion_ref: surveyQuestionRefs[index % surveyQuestionRefs.length]
       }));
       setItems(parsedItems);
@@ -111,14 +121,13 @@ const DestinationShoppingList = () => {
   const handleNextClick = async () => {
     const formattedResponses = items.map(item => ({
       surveyquestion_ref: item.surveyquestion_ref,
-      response_value: item.rating.toString()
+      response_value: item.rating
     }));
+
     await submitSurveyResponses(formattedResponses);
+    saveToLocalStorage('destinationShoppingListItems', items);
     goToNextStep(currentStepIndex, navigate, routes, activeBlocks);
   };
-
-  const animations = useSpring({ opacity: 1, from: { opacity: 0 } });
-  const navigate = useNavigate();
 
   return (
     <>
@@ -132,10 +141,10 @@ const DestinationShoppingList = () => {
                 <ItemName>{item.name}</ItemName>
                 <Select
                   value={item.rating}
-                  onChange={(e) => handleUpdateRating(index, parseInt(e.target.value))}
+                  onChange={(e) => handleUpdateRating(index, e.target.value)}
                 >
-                  {Object.entries(emojiMap).map(([key, emoji]) => (
-                    <option key={key} value={key}>
+                  {Object.entries(ratingOptions).map(([value, emoji]) => (
+                    <option key={value} value={value}>
                       {emoji}
                     </option>
                   ))}

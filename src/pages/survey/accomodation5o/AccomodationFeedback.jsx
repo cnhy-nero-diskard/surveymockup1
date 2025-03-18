@@ -8,11 +8,6 @@ import { goToNextStep } from '../../../components/utils/navigationUtils';
 import { useFeedback } from '../../../routes/FeedbackContext';
 import axios from 'axios';
 
-/**
- * AccomodationFeedback Component
- * This component renders a feedback form for accommodation experiences.
- * It uses context to manage routing and active blocks, and translations for localization.
- */
 const TouchpointFeedback = () => {
   const { routes, setHeaderText } = useContext(UnifiedContext);
   const currentStepIndex = useCurrentStepIndex(routes);
