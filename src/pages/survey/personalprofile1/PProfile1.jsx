@@ -12,7 +12,15 @@ import { Input } from '../../../components/utils/styles1';
 import { useCurrentStepIndex } from '../../../components/utils/useCurrentIndex';
 import { UnifiedContext } from '../../../routes/UnifiedContext';
 import { goToNextStep } from '../../../components/utils/navigationUtils';
-import { fetchCurrencies, fetchConversionRates, convertIncomeToPHP } from '../../../components/utils/currencyUtils';
+import {
+  fetchCurrencies,
+  fetchConversionRates,
+  convertIncomeToPHP,
+} from '../../../components/utils/currencyUtils';
+import {
+  saveToLocalStorage,
+  loadFromLocalStorage,
+} from '../../../components/utils/storageUtils';
 
 /** --- Styled Components --- **/
 const Container = styled(motion.div)`
@@ -101,10 +109,12 @@ const PProfile1 = () => {
   const currentStepIndex = useCurrentStepIndex(routes);
   const { activeBlocks } = useContext(UnifiedContext);
 
-  const [language, setLanguage] = useState(localStorage.getItem('selectedLanguage'));
+  // Attempt to load any previously persisted language choice from local storage
+  const storedLanguage = localStorage.getItem('selectedLanguage');
+  const [language, setLanguage] = useState(storedLanguage);
   const translations = useTranslations('PProfile1', language);
 
-  // All the fields we collect.
+  // Define our inputs state
   const [inputs, setInputs] = useState([
     { id: 'age', value: '', surveyquestion_ref: 'AGE01' },
     { id: 'nationality', value: null, surveyquestion_ref: 'NAT01' },
@@ -112,7 +122,7 @@ const PProfile1 = () => {
     { id: 'civilStatus', value: null, surveyquestion_ref: 'CIV01' },
     { id: 'occupation', value: '', surveyquestion_ref: 'OCC01' },
     { id: 'income', value: '', surveyquestion_ref: 'INC01' },
-    { id: 'currency', value: 'PHP', surveyquestion_ref: 'CUR01' }, // We store the currency ISO code here, e.g. "USD"
+    { id: 'currency', value: 'PHP', surveyquestion_ref: 'CUR01' },
     { id: 'convertedIncome', value: '', surveyquestion_ref: 'CONV01' },
   ]);
 
@@ -120,11 +130,24 @@ const PProfile1 = () => {
   const [currencies, setCurrencies] = useState([]);
   const [conversionRates, setConversionRates] = useState({});
 
-  // Fetch nationality and currency info on component mount.
+  /**
+   * On component mount, check local storage for any existing data.
+   * If found, we use that data to initialize our inputs.
+   */
+  useEffect(() => {
+    const savedData = loadFromLocalStorage('pProfile1Inputs');
+    if (savedData) {
+      setInputs(savedData);
+    }
+  }, []);
+
+  /**
+   * Fetch relevant data (nationalities, currencies, conversion rates) on component mount.
+   */
   useEffect(() => {
     const fetchData = async () => {
-      // Fetch nationalities.
       try {
+        // Fetch nationalities
         const response = await fetch('https://restcountries.com/v3.1/all');
         const data = await response.json();
 
@@ -141,11 +164,11 @@ const PProfile1 = () => {
         console.error('Error fetching nationalities:', error);
       }
 
-      // Fetch currencies.
+      // Fetch currencies
       const currencyOptions = await fetchCurrencies();
       setCurrencies(currencyOptions);
 
-      // Fetch conversion rates.
+      // Fetch conversion rates
       const rates = await fetchConversionRates();
       setConversionRates(rates);
     };
@@ -153,16 +176,16 @@ const PProfile1 = () => {
     fetchData();
   }, []);
 
-  // Convert income to PHP whenever income or currency changes.
+  /**
+   * Convert income to PHP whenever income or currency changes.
+   */
   useEffect(() => {
-    const incomeInput = inputs.find((input) => input.id === 'income');
-    const currencyInput = inputs.find((input) => input.id === 'currency');
-
-    const income = parseFloat(incomeInput.value || '0');
-    const currencyCode = currencyInput.value;
-
-    const convertedIncome = convertIncomeToPHP(income, currencyCode, conversionRates);
-    handleInputChange('convertedIncome', convertedIncome);
+    const incomeObj = inputs.find((input) => input.id === 'income');
+    const currencyObj = inputs.find((input) => input.id === 'currency');
+    const income = parseFloat(incomeObj.value || '0');
+    const currencyCode = currencyObj.value;
+    const converted = convertIncomeToPHP(income, currencyCode, conversionRates);
+    handleInputChange('convertedIncome', converted);
   }, [
     inputs.find((input) => input.id === 'income').value,
     inputs.find((input) => input.id === 'currency').value,
@@ -178,25 +201,35 @@ const PProfile1 = () => {
     );
   };
 
-  /**
-   * Submission logic
-   */
   const navigate = useNavigate();
-  const isFormComplete = inputs.every((input) => input.value !== null && input.value !== '');
+  const isFormComplete = inputs.every((input) => {
+    // Exclude 'occupation' and 'income' from the mandatory fields
+    if (input.id === 'occupation' || input.id === 'income') {
+      return true;
+    }
+    return input.value !== null && input.value !== '';
+  });
 
+  /**
+   * On Next click:
+   * 1. Persist the inputs to local storage
+   * 2. Submit the survey responses
+   * 3. Navigate to the next step
+   */
   const handleNextClick = () => {
+    // Save to local storage first
+    saveToLocalStorage('pProfile1Inputs', inputs);
+
     const surveyResponses = inputs.map((input) => ({
       surveyquestion_ref: input.surveyquestion_ref,
       response_value: input.value.toString(),
     }));
-
     submitSurveyResponses(surveyResponses);
+
     goToNextStep(currentStepIndex, navigate, routes, activeBlocks);
   };
 
-  /**
-   * Sex and civil status options
-   */
+  // Sex and civil status options
   const sexOptions = [
     { value: 'male', label: translations.sexMale },
     { value: 'female', label: translations.sexFemale },
@@ -252,7 +285,7 @@ const PProfile1 = () => {
                   option.value === inputs.find((input) => input.id === 'nationality').value
               )}
               onChange={(option) => handleInputChange('nationality', option.value)}
-              placeholder={'.........'}
+              placeholder="........."
               styles={customSelectStyles}
               isSearchable
             />
@@ -265,7 +298,7 @@ const PProfile1 = () => {
                 (option) => option.value === inputs.find((input) => input.id === 'sex').value
               )}
               onChange={(option) => handleInputChange('sex', option.value)}
-              placeholder={'.........'}
+              placeholder="........."
               styles={customSelectStyles}
             />
 
@@ -336,40 +369,41 @@ const PProfile1 = () => {
                 option: (provided, state) => ({
                   ...provided,
                   fontSize: 16,
-                  backgroundColor: state.isSelected ? 'rgb(0, 50, 100)' : 'rgb(0, 100, 182)', // Background color for options
-                  color: 'white', // Text color for options
+                  backgroundColor: state.isSelected
+                    ? 'rgb(0, 50, 100)'
+                    : 'rgb(0, 100, 182)',
+                  color: 'white',
                   '&:hover': {
-                    backgroundColor: 'rgb(0, 150, 255)', // Background color on hover
+                    backgroundColor: 'rgb(0, 150, 255)',
                   },
                 }),
                 menu: (provided) => ({
                   ...provided,
-                  backgroundColor: 'rgb(0, 100, 182)', // Background color for the dropdown menu
+                  backgroundColor: 'rgb(0, 100, 182)',
                   borderRadius: 8,
                   border: '2px solid #ccc',
-                  zIndex: 9999, // Ensure the dropdown menu overlays everything
+                  zIndex: 9999,
                 }),
                 menuPortal: (provided) => ({
                   ...provided,
-                  zIndex: 9999, // Ensure the dropdown menu overlays everything
+                  zIndex: 9999,
                 }),
                 singleValue: (provided) => ({
                   ...provided,
-                  color: 'white', // Text color for the selected value
+                  color: 'white',
                 }),
                 input: (provided) => ({
                   ...provided,
-                  color: 'white', // Text color for the input field
+                  color: 'white',
                 }),
                 placeholder: (provided) => ({
                   ...provided,
-                  color: '#ccc', // Text color for the placeholder
+                  color: '#ccc',
                 }),
               }}
-
               isSearchable
-              menuPortalTarget={document.body} // Render the dropdown menu outside the parent container
-              menuPosition="fixed" // Ensure the dropdown menu is positioned correctly
+              menuPortalTarget={document.body}
+              menuPosition="fixed"
             />
 
             {/* Converted Income (read-only display) */}

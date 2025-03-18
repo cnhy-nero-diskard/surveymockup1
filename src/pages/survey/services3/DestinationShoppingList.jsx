@@ -105,7 +105,7 @@ const DestinationShoppingList = () => {
     } else if (translations.destinationShoppingListItems) {
       const parsedItems = JSON.parse(translations.destinationShoppingListItems).map((item, index) => ({
         name: item.name,
-        rating: item.rating || '',
+        rating: '',
         surveyquestion_ref: surveyQuestionRefs[index % surveyQuestionRefs.length]
       }));
       setItems(parsedItems);

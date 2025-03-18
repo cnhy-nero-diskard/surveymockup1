@@ -62,6 +62,8 @@ import OpenEndedTranspo from '../pages/survey/OpenEndedTransportation/OpenEndedT
 import TouchpointFeedback from '../pages/survey/accomodation5o/AccomodationFeedback';
 import ThankYouMessageF from '../pages/survey/thanku/ThankYouMessageF';
 import OpenEndedTranspov2 from '../pages/survey/OpenEndedTransportation/OpenEndedTranspov2';
+import OpenEndedServicev2 from '../pages/survey/OpenEnded1Hotel/OpenEndedHotelv2';
+import OpenEndedLifestylev2 from '../pages/survey/OpenEnded2LIfestyle/OpenEndedLifestylev2';
 
 
 export const sroutes = [
@@ -115,9 +117,9 @@ export const sroutes = [
     
     
     { label: 'rateservicesf', path: 'services2', component: Services2, conditionalBlock: 'serv'},
+    { label: 'Open Ended 1', path: 'openendedservice', component: OpenEndedServicev2, conditionalBlock: 'serv'},
     { label: 'Destination Shopping List', path: 'destshlist', component: DestinationShoppingList, conditionalBlock: 'serv'},
-    { label: 'Open Ended 1', path: 'openendedservice', component: OpenEnded1Services, conditionalBlock: 'serv'},
-    { label: 'Open Ended Lifestyle', path: 'openendedlifestyle', component: OpenEnded2,conditionalBlock: 'serv'},
+    { label: 'Open Ended Lifestyle', path: 'openendedlifestyle', component: OpenEndedLifestylev2,conditionalBlock: 'serv'},
     
     
     
