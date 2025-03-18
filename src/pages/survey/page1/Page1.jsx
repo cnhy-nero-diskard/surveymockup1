@@ -10,6 +10,7 @@ import axios from 'axios';
 import { useCurrentStepIndex } from '../../../components/utils/useCurrentIndex';
 import { goToNextStep } from '../../../components/utils/navigationUtils';
 import { UnifiedContext } from '../../../routes/UnifiedContext';
+import { BackButtonU } from '../../../components/partials/GradientBackground';
 
 // Define keyframes for animations
 const fadeIn = keyframes`
@@ -133,9 +134,18 @@ const Page1 = () => {
       <Content>
         <Logo src={logo} alt="Department of Tourism Philippines logo" />
         <Title>TOURISM PRODUCT MARKET SURVEY</Title>
-        <NextButtonU onClick={handleNextClick}>
-          {translations.next}
-        </NextButtonU>
+        <div style={{ display: 'flex', justifyContent: 'center', marginTop: '10px' }}>
+          <BackButtonU
+            onClick={() => navigate(-1)}
+          >
+              ←
+          </BackButtonU>
+
+
+          <NextButtonU onClick={handleNextClick}>
+            {translations.next}
+          </NextButtonU>
+</div>
       </Content>
     </>
   );

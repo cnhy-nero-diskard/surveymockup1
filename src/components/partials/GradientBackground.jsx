@@ -4,7 +4,7 @@ import { useCurrentStepIndex } from '../utils/useCurrentIndex';
 import { UnifiedContext } from '../../routes/UnifiedContext';
 import { AnimatedContainer, NextButtonU } from '../utils/styles1';
 import useTranslations from '../utils/useTranslations';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { animated, useSpring } from 'react-spring';
 
 // --- Spinner Animation ---
@@ -147,6 +147,12 @@ const ProgressText = styled.p`
   text-align: center;
 `;
 
+// New styled-component for the back button
+export const BackButtonU = styled(NextButtonU)`
+  width: 90px; /* Slightly shorter width */
+  margin-right: 10px; /* Spacing to separate from the next button */
+`;
+
 /**
  * @typedef {object} GradientBackgroundProps
  * @property {React.ReactNode} children - The content to be rendered within the gradient background.
@@ -154,28 +160,30 @@ const ProgressText = styled.p`
  * @property {number} [opacity=0.3] - Opacity of the overlay image.
  * @property {string} [blendMode='overlay'] - Blend mode for the overlay image.
  * @property {function} handleNextClick - Function to handle the next button click.
+ * @property {function} handleBackClick - Function to handle the back button click.
  * @property {string} [nextmsg=""] - Text to display on the next button. If empty, a default translation is used.
- * @property {boolean} [buttonAppear=true] - Determines whether the next button is visible.
+ * @property {boolean} [buttonAppear=true] - Determines whether the next/back buttons are visible.
  * @property {boolean} [isLoading=false] - Determines whether to show an overlay spinner.
  */
 
 /**
  * A component that provides a gradient background with an optional overlay image,
  * progress bar, and a next button. It also allows for an overlay spinner when loading.
+ * Now includes a back button on the left.
  *
  * @param {GradientBackgroundProps} props - The props for the GradientBackground component.
  * @returns {JSX.Element} A React element representing the gradient background.
  */
-
 const GradientBackground = ({
   children,
   overlayImage,
   opacity = 0.3,
   blendMode = 'overlay',
   handleNextClick,
+  handleBackClick,
   nextmsg = "",
   buttonAppear = true,
-  isLoading = false // New prop to display overlay spinner
+  isLoading = false
 }) => {
   const { routes } = useContext(UnifiedContext);
   const [setCurrentStep] = useState();
@@ -184,6 +192,7 @@ const GradientBackground = ({
   const { activeBlocks, isBlockActive, removeActiveBlocks } = useContext(UnifiedContext);
   const [language, setLanguage] = useState(localStorage.getItem('selectedLanguage'));
   const translations = useTranslations('PackagePaid', language || 'en');
+  const navigate = useNavigate();
 
   const progress = (((currentStepIndex) / routes.length) * 100) + 6;
   const getParentPath = (path) => {
@@ -245,13 +254,22 @@ const GradientBackground = ({
       </AnimatedContainer>
 
       {buttonAppear && (
-        <NextButtonU
-          onClick={useNext}
-          style={{ display: buttonAppear ? 'block' : 'none' }}
-          disabled={isLoading} // optionally disable the button if loading
-        >
-          {nextmsg === "" ? translations.packagePaidNextButton : nextmsg}
-        </NextButtonU>
+        <div style={{ display: 'flex', justifyContent: 'center', marginTop: '10px' }}>
+          <BackButtonU
+            onClick={() => navigate(-1)}
+            disabled={isLoading}
+          >
+              ←
+          </BackButtonU>
+
+          <NextButtonU
+            onClick={useNext}
+            style={{ display: buttonAppear ? 'block' : 'none' }}
+            disabled={isLoading}
+          >
+            {nextmsg === "" ? translations.packagePaidNextButton : nextmsg}
+          </NextButtonU>
+        </div>
       )}
     </>
   );
