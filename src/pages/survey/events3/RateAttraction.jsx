@@ -5,12 +5,12 @@ import { useNavigate } from 'react-router-dom';
 import { goToNextStep } from '../../../components/utils/navigationUtils';
 import { useCurrentStepIndex } from '../../../components/utils/useCurrentIndex';
 import { UnifiedContext } from '../../../routes/UnifiedContext';
+import { saveToLocalStorage, loadFromLocalStorage } from '../../../components/utils/storageUtils';
 
 const RateAttraction = () => {
   const { routes } = useContext(UnifiedContext);
   const currentStepIndex = useCurrentStepIndex(routes);
   const { activeBlocks, appendActiveBlocks, removeActiveBlocks } = useContext(UnifiedContext);
-
 
   const navigate = useNavigate();
 
@@ -32,7 +32,19 @@ const RateAttraction = () => {
     entranslations.rateAttractionClientService,
     entranslations.rateAttractionValueForMoney
   ];
-  const handleRatingComplete = () => {
+
+  // Load data from localStorage when the component mounts
+  const [initialSliderValues, setInitialSliderValues] = useState(Array(categories.length).fill(''));
+  useEffect(() => {
+    const storedData = loadFromLocalStorage('RateAttraction');
+    if (storedData) {
+      setInitialSliderValues(storedData);
+    }
+  }, []);
+
+  const handleRatingComplete = (sliderValues) => {
+    // Save the current slider values to localStorage before navigating
+    saveToLocalStorage('RateAttraction', sliderValues);
     goToNextStep(currentStepIndex, navigate, routes, activeBlocks);
   };
 
@@ -43,8 +55,8 @@ const RateAttraction = () => {
       onRatingComplete={handleRatingComplete}
       surveyquestion_refs={'RATT'}
       entranslations={encategories}
-
-
+      
+      initialSliderValues={initialSliderValues}
     />
   );
 };

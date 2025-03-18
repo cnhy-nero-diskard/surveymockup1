@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
+import { saveToLocalStorage, loadFromLocalStorage } from '../../../components/utils/storageUtils';
 import RatingSlider from '../../../components/partials/RatingSlider';
 import useTranslations from '../../../components/utils/useTranslations';
 import { useNavigate } from 'react-router-dom';
@@ -51,10 +52,20 @@ const Services2 = () => {
     entranslations.services2MobileSignalWifi
   ];
   const navigate = useNavigate();
-  const handleRatingComplete = () => {
+  const handleRatingComplete = (sliderValues) => {
+        saveToLocalStorage('Services2', sliderValues);
+    
     console.log(translations.services2AllRatingsCompleted);
     goToNextStep(currentStepIndex, navigate, routes, activeBlocks);
   };
+  // Load data from localStorage when the component mounts
+  const [initialSliderValues, setInitialSliderValues] = useState(Array(categories.length).fill(''));
+  useEffect(() => {
+    const storedData = loadFromLocalStorage('Services2');
+    if (storedData) {
+      setInitialSliderValues(storedData);
+    }
+  }, []);
 
   return (
     <RatingSlider
@@ -63,6 +74,8 @@ const Services2 = () => {
       onRatingComplete={handleRatingComplete}
       surveyquestion_refs={'SVC2'}
       entranslations={encategories}
+      initialSliderValues={initialSliderValues}
+
     />
   );
 };

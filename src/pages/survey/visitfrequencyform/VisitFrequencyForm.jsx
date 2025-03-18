@@ -36,17 +36,6 @@ const VisitFrequencyForm = () => {
     goToNextStep(currentStepIndex, navigate, routes, activeBlocks);
   };
 
-  const containerAnimation = useSpring({
-    from: { opacity: 0, transform: 'translateY(-50px)' },
-    to: { opacity: 1, transform: 'translateY(0)' },
-    config: { duration: 500 },
-  });
-
-  const buttonAnimation = useSpring({
-    transform: visitCount ? 'scale(1.05)' : 'scale(1)',
-    config: { tension: 300, friction: 10 },
-  });
-
   const navigate = useNavigate(); // Initialize useNavigate
 
   const translations = useTranslations(VISITFREQUENCYFORM, language);

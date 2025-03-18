@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import GradientBackground from '../../components/partials/GradientBackground';
 import BodyPartial from '../../components/partials/BodyPartial';
@@ -48,30 +48,33 @@ const RatingSlider = ({
   categories, 
   onRatingComplete, 
   surveyquestion_refs, 
-  entranslations 
+  entranslations,
+  initialSliderValues 
 }) => {
-  // Store each category's rating in an array rather than controlling row-by-row with currentSlide
-  const [sliderValues, setSliderValues] = useState(Array(categories.length).fill(''));
-  
-  // We'll store final responses in state, though you can build them on the fly in handleSubmitAll
+  // Initialize sliderValues with initialSliderValues when the component mounts
+  const [sliderValues, setSliderValues] = useState(initialSliderValues || Array(categories.length).fill(''));
+
+  // Update sliderValues whenever initialSliderValues changes
+  useEffect(() => {
+    if (initialSliderValues) {
+      setSliderValues(initialSliderValues);
+    }
+  }, [initialSliderValues]);
+
   const [responses, setResponses] = useState([]);
 
   const choosetoskip = useTranslations('RATINGSLIDER', localStorage.getItem('selectedLanguage')).chooseToSkipText;
   const rtranslations = useTranslations('RATINGSLIDER', localStorage.getItem('selectedLanguage'));
 
-  // Potential emoji array for reference
   const emojis = ['☹️', '😐', '🙂', '😄'];
 
-  // Handle dropdown changes for any row 
   const handleSelectChange = (e, index) => {
     const newSliderValues = [...sliderValues];
     newSliderValues[index] = e.target.value;
     setSliderValues(newSliderValues);
   };
 
-  // Collect all responses and submit 
   const handleSubmitAll = () => {
-    // Build a response object for each category
     const newResponses = sliderValues.map((value, index) => {
       const parsedValue = parseInt(value, 10) || 0;
       const questionStub = entranslations[index] || '';
@@ -81,11 +84,10 @@ const RatingSlider = ({
       };
     });
 
-    // Store them in state if needed, then submit
     setResponses(newResponses);
     submitSurveyResponses(newResponses)
       .then(() => {
-        onRatingComplete();
+        onRatingComplete(sliderValues);
       })
       .catch((error) => {
         console.error('Error submitting survey responses:', error);
@@ -111,7 +113,6 @@ const RatingSlider = ({
             {categories.map((category, index) => {
               const selectedValue = sliderValues[index];
               const parsedValue = parseInt(selectedValue, 10) || 0;
-              // Display the corresponding emoji (or ⛔ if empty)
               const displayedEmoji = parsedValue ? emojis[parsedValue - 1] : '⛔';
 
               return (
@@ -137,9 +138,6 @@ const RatingSlider = ({
             })}
           </StyledTbody>
         </StyledTable>
-        {/* <NextButtonU onClick={handleSubmitAll}>
-          {rtranslations.submitAll}
-        </NextButtonU> */}
       </GradientBackground>
     </>
   );

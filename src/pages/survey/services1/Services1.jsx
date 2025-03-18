@@ -5,6 +5,7 @@ import RatingSlider from '../../../components/partials/RatingSlider';
 import { goToNextStep } from '../../../components/utils/navigationUtils';
 import { useCurrentStepIndex } from '../../../components/utils/useCurrentIndex';
 import { UnifiedContext } from '../../../routes/UnifiedContext';
+import { saveToLocalStorage, loadFromLocalStorage } from '../../../components/utils/storageUtils';
 
 const Services1 = () => {
 
@@ -42,12 +43,21 @@ const Services1 = () => {
       [category]: rating
     }));
   };
+  // Load data from localStorage when the component mounts
+  const [initialSliderValues, setInitialSliderValues] = useState(Array(categories.length).fill(''));
+  useEffect(() => {
+    const storedData = loadFromLocalStorage('Services1');
+    if (storedData) {
+      setInitialSliderValues(storedData);
+    }
+  }, []);
 
   useEffect(() => {
     console.log('Ratings updated:', ratings);
   }, [ratings]); // This will log the updated ratings whenever it changes
 
-  const handleRatingComplete = () => {
+  const handleRatingComplete = (sliderValues) => {
+    saveToLocalStorage('Services1', sliderValues);
     console.log(translations.services2AllRatingsCompleted);
     goToNextStep(currentStepIndex, navigate, routes, activeBlocks);
   };
@@ -57,10 +67,11 @@ const Services1 = () => {
     <RatingSlider
       title={translations.services1PricingTitle}
       categories={categories}
-      onRatingChange={handleRatingChange}
-      onRatingComplete={handleRatingComplete}
+      initialSliderValues={initialSliderValues}
       surveyquestion_refs={'SVC1'}
       entranslations={encategories}
+      onRatingComplete={handleRatingComplete}
+
     />
   );
 };

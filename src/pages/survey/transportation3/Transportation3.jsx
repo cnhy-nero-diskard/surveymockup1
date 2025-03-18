@@ -6,6 +6,7 @@ import { UnifiedContext } from '../../../routes/UnifiedContext';
 import { useCurrentStepIndex } from '../../../components/utils/useCurrentIndex';
 import { goToNextStep } from '../../../components/utils/navigationUtils';
 import { useContext } from 'react';
+import { saveToLocalStorage, loadFromLocalStorage } from '../../../components/utils/storageUtils';
 
 const Transportation3 = () => {
   const [language, setLanguage] = useState(localStorage.getItem('selectedLanguage'));
@@ -48,9 +49,19 @@ const Transportation3 = () => {
 
   const navigate = useNavigate();
 
-  const handleRatingComplete = () => {
-      goToNextStep(currentStepIndex, navigate,routes,activeBlocks);
+  const handleRatingComplete = (sliderValues) => {
+    saveToLocalStorage('Transportation3', sliderValues);
+
+    goToNextStep(currentStepIndex, navigate, routes, activeBlocks);
   };
+  // Load data from localStorage when the component mounts
+  const [initialSliderValues, setInitialSliderValues] = useState(Array(categories.length).fill(''));
+  useEffect(() => {
+    const storedData = loadFromLocalStorage('Transportation3');
+    if (storedData) {
+      setInitialSliderValues(storedData);
+    }
+  }, []);
 
   return (
     <RatingSlider
@@ -58,6 +69,8 @@ const Transportation3 = () => {
       categories={categories}
       onRatingComplete={handleRatingComplete}
       surveyquestion_refs={"RTRA"}
+      initialSliderValues={initialSliderValues}
+
       entranslations={encategories}
     />
   );
