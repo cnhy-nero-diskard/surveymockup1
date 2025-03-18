@@ -189,7 +189,6 @@ const DurationInput = styled.input`
   }
 `;
 
-// ---------- Helper Dictionaries ---------- //
 
 const emojiToRating = { '☹️': 1, '😐': 2, '🙂': 3, '😄': 4 };
 const ratingToEmoji = { 1: '☹️', 2: '😐', 3: '🙂', 4: '😄' };
@@ -199,7 +198,6 @@ const AccommodationForm = () => {
   const currentStepIndex = useCurrentStepIndex(routes);
   const { activeBlocks, removeActiveBlocks, appendActiveBlocks } = useContext(UnifiedContext);
 
-  // ---------- State ---------- //
   const [isCommercial, setIsCommercial] = useState(null);
   const [ratings, setRatings] = useState({
     Hotel: '',

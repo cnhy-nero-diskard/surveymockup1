@@ -159,6 +159,7 @@ const PackTranspo = () => {
         blendMode="screen"
         handleNextClick={handleNextClick}
         buttonAppear={price && currency}
+        nextmsg= {translations.packTranspoNextButton}
       >
         <QuestionText>{translations.packTranspoQuestion}</QuestionText>
         <InputContainer>
