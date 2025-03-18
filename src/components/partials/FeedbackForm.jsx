@@ -9,14 +9,13 @@ import useTranslations from '../utils/useTranslations';
 import { submitSurveyResponses } from '../utils/sendInputUtils';
 import { Paragraph, QuestionText } from '../utils/styles1';
 
+/** ---------------- Styled Components ---------------- **/
 const FeedbackFormContainer = styled(animated.div)`
   max-width: 600px;
   margin: 0 auto;
   padding: 20px;
   border-radius: 12px;
 `;
-
-
 
 const OptionsContainer = styled.div`
   display: flex;
@@ -30,7 +29,7 @@ const OptionButton = styled.button`
   padding: 12px 24px;
   border-radius: 25px;
   border: 2px solid #ddd;
-  background-image: linear-gradient(135deg,rgba(2, 191, 248, 0.25) 0%, #e9ecef 100%);
+  background-image: linear-gradient(135deg, rgba(2, 191, 248, 0.25) 0%, #e9ecef 100%);
   background-color: #fff;
   color: #333;
   font-size: 1rem;
@@ -47,7 +46,6 @@ const OptionButton = styled.button`
     box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.3);
   }
 
-  /* Default selected styling */
   &.selected {
     transform: scale(1.05);
   }
@@ -61,21 +59,21 @@ const OptionButton = styled.button`
 
   /* Neutral (yellow gradient) */
   &.selected.Neutral {
-    background-image: linear-gradient(45deg,rgb(248, 204, 147) 0%, #ffeb3b 100%);
+    background-image: linear-gradient(45deg, rgb(248, 204, 147) 0%, #ffeb3b 100%);
     color: #000;
     border-color: #ffeb3b;
   }
 
-  /* Satisfied (yellow-green gradient) */
+  /* Satisfied (green gradient) */
   &.selected.Satisfied {
-    background-image: linear-gradient(45deg,rgb(90, 160, 69) 0%,rgb(90, 160, 69) 100%);
+    background-image: linear-gradient(45deg, rgb(90, 160, 69) 0%, rgb(90, 160, 69) 100%);
     color: #000;
-    border-color: rgb(90, 160, 69) ;
+    border-color: rgb(90, 160, 69);
   }
 
   /* Very Satisfied (green gradient) */
   &.selected.VerySatisfied {
-    background-image: linear-gradient(45deg,rgb(56, 172, 60) 0%, #45a049 100%);
+    background-image: linear-gradient(45deg, rgb(56, 172, 60) 0%, #45a049 100%);
     color: #fff;
     border-color: #4caf50;
   }
@@ -105,8 +103,6 @@ const FeedbackTextarea = styled.textarea`
   }
 `;
 
-
-
 const WarningMessage = styled(animated.div)`
   color: #d32f2f;
   margin-bottom: 16px;
@@ -117,50 +113,74 @@ const WarningMessage = styled(animated.div)`
   border-radius: 8px;
 `;
 
-/**
- * FeedbackForm component allows users to provide feedback on their satisfaction level.
- *
- * @param {Object} props - The component props.
- * @param {string} props.title - The title of the feedback form.
- * @param {Function} props.onNext - Callback function to handle the next action.
- * @param {string} props.squestion_identifier - Identifier for the survey question.
- * @param {Object} [props.satisfactionOptions] - Options for satisfaction levels with default values.
- * @param {number} [props.satisfactionOptions.Dissatisfied=1] - Value for Dissatisfied option.
- * @param {number} [props.satisfactionOptions.Neutral=2] - Value for Neutral option.
- * @param {number} [props.satisfactionOptions.Satisfied=3] - Value for Satisfied option.
- * @param {number} [props.satisfactionOptions.VerySatisfied=4] - Value for Very Satisfied option.
- *
- * @returns {JSX.Element} The rendered FeedbackForm component.
+/** 
+ * OpenFormat1: A flexible feedback form that asks for satisfaction (4 levels)
+ * and an open-ended comment.  
+ * 
+ * Props:
+ * - title (string): The form’s title.  
+ * - onNext (function): Callback fired when user completes and clicks next.  
+ * - squestion_identifier (string): Identifier for referencing the question.  
+ * - minFeedbackLength (number): Minimum feedback length to pass validation.  
+ * - satisfactionOptions (object): Maps labels to integer values.  
+ * - initialValue (object): An optional object with either 
+ *   { selectedOptionValue: 'Satisfied', feedback: '...' }
+ *   or 
+ *   { selectedOptionValue: 3, feedback: '...' }
+ *   to preload state from localStorage or elsewhere.
  */
-const OpenFormat1 = ({ title, onNext, squestion_identifier, minFeedbackLength = 1, satisfactionOptions = {
-  Dissatisfied: 1,
-  Neutral: 2,
-  Satisfied: 3,
-  VerySatisfied: 4,
-} , initialValue=''}) => {
+const OpenFormat1 = ({
+  title,
+  onNext,
+  squestion_identifier,
+  minFeedbackLength = 1,
+  satisfactionOptions = {
+    Dissatisfied: 1,
+    Neutral: 2,
+    Satisfied: 3,
+    VerySatisfied: 4,
+  },
+  initialValue = {}
+}) => {
+  // Local states for user’s entry:
   const [feedback, setFeedback] = useState('');
   const [selectedOption, setSelectedOption] = useState(null);
   const [placeholderText, setPlaceholderText] = useState('');
-  const [language, setLanguage] = useState(localStorage.getItem('selectedLanguage'));
+  const [language] = useState(localStorage.getItem('selectedLanguage'));
   const [isFormValid, setIsFormValid] = useState(false);
   const [showWarning, setShowWarning] = useState(false);
 
+  // Retrieve translations
   const translations = useTranslations('FeedbackForm', language);
   const translationsborrow = useTranslations('OpenEnded1', language);
-  console.log(`borrows == > ${JSON.stringify(translationsborrow)}`);
 
+  /**
+   * On mount (or if initialValue changes), 
+   * figure out how to set "selectedOption" from initialValue.selectedOptionValue.
+   * If it's a string that exactly matches a label, use it directly.
+   * If it's numeric, find the corresponding label in satisfactionOptions.
+   */
   useEffect(() => {
-    setPlaceholderText(translations.feedbackFormPlaceholderDefault);
-  }, [language, translations]);
+    if (initialValue.selectedOptionValue) {
+      if (typeof initialValue.selectedOptionValue === 'number') {
+        // find which label matches that numeric value
+        const foundLabel = Object.keys(satisfactionOptions).find(
+          (label) => satisfactionOptions[label] === initialValue.selectedOptionValue
+        );
+        setSelectedOption(foundLabel || null);
+      } else {
+        // it's already a text label (Dissatisfied/Neutral/etc.)
+        setSelectedOption(initialValue.selectedOptionValue);
+      }
+    }
+    if (initialValue.feedback) {
+      setFeedback(initialValue.feedback);
+    }
+  }, [initialValue, satisfactionOptions]);
 
+  // Dynamically change placeholder text depending on the selected option
   useEffect(() => {
-    setIsFormValid(selectedOption !== null && feedback.trim().length >= minFeedbackLength);
-  }, [selectedOption, feedback]);
-
-  const handleOptionClick = (option) => {
-    setSelectedOption(option);
-
-    switch (option) {
+    switch (selectedOption) {
       case 'Dissatisfied':
         setPlaceholderText(translations.feedbackFormPlaceholderDissatisfied);
         break;
@@ -176,12 +196,25 @@ const OpenFormat1 = ({ title, onNext, squestion_identifier, minFeedbackLength = 
       default:
         setPlaceholderText(translations.feedbackFormPlaceholderDefault);
     }
+  }, [selectedOption, language, translations]);
+
+  // Validate the form whenever selectedOption or feedback changes
+  useEffect(() => {
+    setIsFormValid(
+      selectedOption !== null && feedback.trim().length >= minFeedbackLength
+    );
+  }, [selectedOption, feedback, minFeedbackLength]);
+
+  // Handle user clicking an option
+  const handleOptionClick = (option) => {
+    setSelectedOption(option);
   };
 
-  const animation = useSpring({
+  // React-spring animations
+  const mainAnimation = useSpring({
     opacity: 1,
     from: { opacity: 0 },
-    config: { duration: 1000 },
+    config: { duration: 1000 }
   });
 
   const warningAnimation = useSpring({
@@ -192,6 +225,7 @@ const OpenFormat1 = ({ title, onNext, squestion_identifier, minFeedbackLength = 
 
   const navigate = useNavigate();
 
+  // Handle "Next" button
   const handleNextClick = async () => {
     if (!isFormValid) {
       setShowWarning(true);
@@ -199,16 +233,14 @@ const OpenFormat1 = ({ title, onNext, squestion_identifier, minFeedbackLength = 
     }
 
     const surveyResponses = [];
-
     const selectedValue = satisfactionOptions[selectedOption];
+
     if (selectedOption) {
-      // Map the selected option to its corresponding numeric value
       surveyResponses.push({
         surveyquestion_ref: 'SATLV' + squestion_identifier,
-        response_value: selectedValue, // Use the numeric value here
+        response_value: selectedValue,
       });
     }
-
     if (feedback) {
       surveyResponses.push({
         surveyquestion_ref: 'FDBK' + squestion_identifier,
@@ -218,32 +250,34 @@ const OpenFormat1 = ({ title, onNext, squestion_identifier, minFeedbackLength = 
 
     try {
       await submitSurveyResponses(surveyResponses);
+      // Once submission is complete, trigger parent onNext
       onNext(selectedValue, feedback);
     } catch (error) {
       console.error('Error submitting survey responses:', error);
     }
   };
 
-
   return (
-    <><BodyPartial />
-      <GradientBackground overlayImage={imgOverlay}
+    <>
+      <BodyPartial />
+      <GradientBackground
+        overlayImage={imgOverlay}
         opacity={0.15}
         blendMode='screen'
         buttonAppear={isFormValid}
         handleNextClick={handleNextClick}
-
       >
-        <FeedbackFormContainer style={animation}>
-          <QuestionText>{title || translations.feedbackFormTitle}</QuestionText>
+        <FeedbackFormContainer style={mainAnimation}>
+          <QuestionText>
+            {title || translations.feedbackFormTitle}
+          </QuestionText>
+
           <OptionsContainer>
             {Object.keys(satisfactionOptions).map((option) => (
               <OptionButton
                 key={option}
                 className={
-                  selectedOption === option
-                    ? `selected ${option}`
-                    : ''
+                  selectedOption === option ? `selected ${option}` : ''
                 }
                 onClick={() => handleOptionClick(option)}
                 aria-pressed={selectedOption === option}
@@ -252,13 +286,18 @@ const OpenFormat1 = ({ title, onNext, squestion_identifier, minFeedbackLength = 
               </OptionButton>
             ))}
           </OptionsContainer>
-<Paragraph style={{fontSize:'0.75rem'}}>{translationsborrow.openEnded1FeedbackRequest}</Paragraph>
+
+          <Paragraph style={{ fontSize: '0.75rem' }}>
+            {translationsborrow.openEnded1FeedbackRequest}
+          </Paragraph>
+
           <FeedbackTextarea
             placeholder={placeholderText}
             value={feedback}
             onChange={(e) => setFeedback(e.target.value)}
             aria-label="Feedback textarea"
           />
+
           {showWarning && (
             <WarningMessage style={warningAnimation}>
               {translations.feedbackFormWarning}
