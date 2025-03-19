@@ -35,11 +35,20 @@ import {
 } from 'chart.js';
 import axios from 'axios';
 
+// ----------------------------------
+// NEW IMPORTS FOR DATE PICKERS
+// ----------------------------------
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import dayjs from 'dayjs';
+// ----------------------------------
+
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
 const AIToolsDashboard = () => {
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
+  const [startDate, setStartDate] = useState(null);
+  const [endDate, setEndDate] = useState(null);
   const [topicText, setTopicText] = useState("");
   const [isTopicModeling, setIsTopicModeling] = useState(false);
   const [topicModelingResult, setTopicModelingResult] = useState(null);
@@ -69,10 +78,14 @@ const AIToolsDashboard = () => {
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [snackbarSeverity, setSnackbarSeverity] = useState("info");
 
-  const [selectedEntities, setSelectedEntities] = useState([]); // Store selected entities
+  // Entity selection states
+  const [selectedEntities, setSelectedEntities] = useState([]);
   const uniqueEntities = [
-    ...new Set(openEndedResponses.flatMap((response) => response.entity || [])),
+    ...new Set(openEndedResponses.flatMap((res) => res.entity || [])),
   ];
+
+  // Track valid dates in dataset to disable invalid picks
+  const [uniqueDates, setUniqueDates] = useState(new Set());
 
   // State for API Usage Data
   const [apiUsageData, setApiUsageData] = useState({
@@ -106,6 +119,14 @@ const AIToolsDashboard = () => {
     fetchHFTokens();
   }, []);
 
+  // Whenever openEndedResponses is updated, recalculate uniqueDates
+  useEffect(() => {
+    const dateStrings = openEndedResponses
+      .map((r) => (r.created_at ? r.created_at.split('T')[0] : undefined))
+      .filter(Boolean);
+    setUniqueDates(new Set(dateStrings));
+  }, [openEndedResponses]);
+
   const handleScanOpenEndedResponses = async () => {
     try {
       const response = await axios.get(
@@ -117,18 +138,17 @@ const AIToolsDashboard = () => {
       setOpenEndedResponses(response.data);
       console.log('Open-ended responses:', response.data);
 
-      // Filter all responses where is_analyzed is false
+      // Filter responses where is_analyzed is false
       const unanalyzedResponses = response.data.filter(
         (r) => !r.is_analyzed
       );
 
       if (unanalyzedResponses.length > 0) {
-        // Concatenate all unanalyzed response_values into a single string
+        // Concatenate all to one string
         const combinedText = unanalyzedResponses
           .map((r) => r.response_value)
           .join("\n\n");
 
-        // Set the combined text to both text fields
         setSentimentText(combinedText);
         setTopicText(combinedText);
       } else {
@@ -143,7 +163,7 @@ const AIToolsDashboard = () => {
     setIsSentimentAnalyzing(true);
     setSentimentError(null);
     setSnackbarMessage(
-      "Just a heads-up, the first response might take a little longer, around 20-30 seconds. This is only if it's the first time you're using it in about 15 minutes, as the AI endpoint needs to initialize"
+      "Just a heads-up, the first response might take a little longer (20-30 seconds) if the AI endpoint was dormant."
     );
     setSnackbarSeverity("info");
     setSnackbarOpen(true);
@@ -169,8 +189,7 @@ const AIToolsDashboard = () => {
         setSentimentResults(response.data);
       } else {
         console.error('Unexpected response format:', response.data);
-        console.log(response.data);
-        if (response.data.hasOwnProperty("error")) {
+        if (response.data?.error) {
           setSnackbarMessage("THE AI ENDPOINT IS CURRENTLY UNAVAILABLE. PLEASE TRY AGAIN LATER");
           setSnackbarSeverity("error");
           setSnackbarOpen(true);
@@ -186,88 +205,39 @@ const AIToolsDashboard = () => {
     }
   };
 
-  const handleRetrieveOpenEndedResponsesForTopicModeling = async () => {
-    try {
-      const response = await axios.get(
-        `${process.env.REACT_APP_API_HOST}/api/admin/survey-responses/open-ended`,
-        { withCredentials: true }
-      );
-      setOpenEndedResponses(response.data);
-
-      // Filter by date range and selected entities
-      const filteredResponses = response.data.filter((resp) => {
-        // Date filtering
-        const dateFilter =
-          !startDate ||
-          !endDate ||
-          (new Date(resp.created_at) >= new Date(startDate) &&
-            new Date(resp.created_at) <= new Date(endDate));
-
-        // Entity filtering
-        const entityFilter =
-          selectedEntities.length === 0 ||
-          selectedEntities.some((entity) =>
-            (resp.entity || []).includes(entity)
-          );
-
-        return dateFilter && entityFilter;
-      });
-
-      // Concatenate all filtered responses
-      const combinedText = filteredResponses
-        .map((resp) => resp.response_value)
-        .join("\n\n");
-
-      // Update the text area for topic modeling
-      if (combinedText) {
-        setTopicText(combinedText);
-      } else {
-        setTopicText("");
-        console.log("No open-ended responses found for the selected filters.");
-      }
-    } catch (error) {
-      console.error('Error fetching open-ended responses:', error);
-    }
-  };
-
   const handleStoreSentimentResults = async () => {
-    console.log(`sentiment results ${JSON.stringify(sentimentResults)}`);
     if (!sentimentResults) return;
-
     try {
-      // Fetch all open-ended responses from the server
+      // Re-fetch or use existing openEndedResponses
       const openEndedResponsesResponse = await axios.get(
         `${process.env.REACT_APP_API_HOST}/api/admin/survey-responses/open-ended`,
         { withCredentials: true }
       );
-      const openEndedResponses = openEndedResponsesResponse.data;
+      const openEnded = openEndedResponsesResponse.data;
 
-      // Map sentiment results to the required fields
       const resultsToStore = sentimentResults.map((result) => {
-        // Find the corresponding open-ended response (if it exists)
-        const matchingResponse = openEndedResponses.find((response) => {
-          // Normalize both texts for comparison
-          const normalizedResponseValue = response.response_value.trim().toLowerCase();
-          const normalizedSentimentText = result.text.trim().toLowerCase();
-          // Check if one string is included in the other
+        const matchingResponse = openEnded.find((response) => {
+          const normalizedRes = response.response_value.trim().toLowerCase();
+          const normalizedSens = result.text.trim().toLowerCase();
           return (
-            normalizedResponseValue.includes(normalizedSentimentText) ||
-            normalizedSentimentText.includes(normalizedResponseValue)
+            normalizedRes.includes(normalizedSens) ||
+            normalizedSens.includes(normalizedRes)
           );
         });
 
-        const sqref = "TPENT";
         const userId = matchingResponse
           ? matchingResponse.anonymous_user_id
           : "default_user_id";
 
+        const responseId = matchingResponse ? matchingResponse.response_id : null;
         const now = new Date();
         const timeString = `${now.getHours()}:${now.getMinutes()}:${now.getSeconds()}`;
         return {
           user_id: userId,
+          response_id: responseId,
           review_date: new Date().toISOString() + timeString,
           rating: "0",
-          sqref: sqref,
+          sqref: "TPENT",
           sentiment: result.sentiment,
           confidence: parseFloat(result.confidence).toFixed(3),
         };
@@ -289,28 +259,8 @@ const AIToolsDashboard = () => {
         setSnackbarOpen(true);
       }
 
-      // -----------------------------
-      // CREATE ARRAY OF USER IDs
-      // -----------------------------
-      const userIds = openEndedResponses
-        .map((r) => r.anonymous_user_id)
-        .filter((id) => !!id); // Filter out any falsy values
-
-      // CREATE A UNIQUE SET
-      const uniqueUserIds = [...new Set(userIds)];
-      console.log(`USERS ANALYZED: ${uniqueUserIds}`);
-
-      // PLACEHOLDER for sending user IDs to external endpoint
-      // If needed, uncomment and adjust:
-      /*
-      await axios.post(
-        `${process.env.REACT_APP_API_HOST}/api/admin/anonymous-users`,
-        { userIds: uniqueUserIds },
-        { withCredentials: true }
-      );
-      */
-
-      console.log("Placeholder for sending user IDs to an external endpoint:", uniqueUserIds);
+      // Potentially do something with the anonymized user IDs
+      console.log("Placeholder for admin/anonymous-users endpoint if needed.");
     } catch (error) {
       console.error('Error storing sentiment analysis results:', error);
       setSnackbarMessage("Error storing sentiment analysis results.");
@@ -319,10 +269,51 @@ const AIToolsDashboard = () => {
     }
   };
 
+  const handleRetrieveOpenEndedResponsesForTopicModeling = async () => {
+    try {
+      const response = await axios.get(
+        `${process.env.REACT_APP_API_HOST}/api/admin/survey-responses/open-ended`,
+        { withCredentials: true }
+      );
+      setOpenEndedResponses(response.data);
+
+      // Filter by date range + selected entities
+      const filteredResponses = response.data.filter((resp) => {
+        const hasCreatedDate = resp.created_at != null;
+        // If no startDate or endDate selected, skip date filtering
+        let dateFilter = true;
+        if (startDate && endDate && hasCreatedDate) {
+          const createdDate = new Date(resp.created_at).getTime();
+          const startTime = new Date(startDate).getTime();
+          const endTime = new Date(endDate).getTime();
+          dateFilter = createdDate >= startTime && createdDate <= endTime;
+        }
+        // Entity filter
+        const entityFilter =
+          selectedEntities.length === 0 ||
+          selectedEntities.some((entity) => (resp.entity || []).includes(entity));
+
+        return dateFilter && entityFilter;
+      });
+
+      const combinedText = filteredResponses
+        .map((resp) => resp.response_value)
+        .join("\n\n");
+
+      if (combinedText) {
+        setTopicText(combinedText);
+      } else {
+        setTopicText("");
+        console.log("No open-ended responses found for the selected filters.");
+      }
+    } catch (error) {
+      console.error('Error fetching open-ended responses:', error);
+    }
+  };
+
   const handleTopicModeling = async () => {
     setIsTopicModeling(true);
     setTopicModelingError(null);
-
     setSnackbarMessage(
       "Starting Topic Modeling. This may take a moment if the endpoint is initializing."
     );
@@ -353,22 +344,27 @@ const AIToolsDashboard = () => {
         setSnackbarOpen(true);
       }
     } catch (error) {
-      console.error('Error during topic modeling (analyzetopics):', error);
+      console.error('Error during topic modeling:', error);
       setTopicModelingError(error.message);
     } finally {
       setIsTopicModeling(false);
     }
   };
 
+  // ---------------------------------------------
+  // UPDATED: send "customFilter" along with result
+  // ---------------------------------------------
   const handleStoreTopicModelingResult = async () => {
     if (!topicModelingResult) return;
     try {
-      console.log(`RAW RESULT ${JSON.stringify(topicModelingResult[0])}`);
-      let zeroidx = topicModelingResult[0];
+      // For demonstration, pick the first topic object
+      let zeroidx = topicModelingResult[0] || {};
       zeroidx = {
         ...zeroidx,
-        startDate: startDate || '2020-01-01',
-        endDate: endDate || new Date().toISOString().split('T')[0],
+        // If no date is selected, default to some fallback
+        startDate: startDate ? dayjs(startDate).format('YYYY-MM-DD') : '2020-01-01',
+        endDate: endDate ? dayjs(endDate).format('YYYY-MM-DD') : dayjs().format('YYYY-MM-DD'),
+        customFilter: selectedEntities, // <--- Pass selected entities
       };
 
       const response = await axios.post(
@@ -380,12 +376,10 @@ const AIToolsDashboard = () => {
       if (response.status === 201 || response.status === 200) {
         setSnackbarMessage("Topic modeling results stored successfully!");
         setSnackbarSeverity("success");
+        setSnackbarOpen(true);
       } else {
         throw new Error('Failed to store topic modeling results');
       }
-      setSnackbarMessage("Topic Modeling Analysis results stored successfully!");
-      setSnackbarSeverity("success");
-      setSnackbarOpen(true);
     } catch (error) {
       console.error('Error storing topic modeling results:', error);
       setSnackbarMessage("Error storing topic modeling results.");
@@ -424,7 +418,7 @@ const AIToolsDashboard = () => {
       </Fade>
 
       <Grid container spacing={3}>
-        {/* API Configuration Section - Full Width */}
+        {/* API Configuration Section */}
         <Grid item xs={12}>
           <Slide in direction="up" timeout={1000}>
             <Paper
@@ -481,7 +475,7 @@ const AIToolsDashboard = () => {
           </Button>
         </Grid>
 
-        {/* Sentiment Analysis Section */}
+        {/* Sentiment Analysis */}
         <Grid item xs={12} md={6}>
           <Slide in direction="up" timeout={1200}>
             <Paper
@@ -591,6 +585,7 @@ const AIToolsDashboard = () => {
                     ))}
                   </Box>
 
+                  {/* Quick Summary */}
                   <Box sx={{ mt: 3 }}>
                     <Typography
                       variant="body1"
@@ -601,27 +596,25 @@ const AIToolsDashboard = () => {
                     {(() => {
                       // Calculate sentiment counts
                       const sentimentCounts = sentimentResults.reduce(
-                        (acc, result) => {
-                          acc[result.sentiment] = (acc[result.sentiment] || 0) + 1;
+                        (acc, res) => {
+                          acc[res.sentiment] = (acc[res.sentiment] || 0) + 1;
                           return acc;
                         },
                         { positive: 0, neutral: 0, negative: 0 }
                       );
-
-                      // Calculate average sentiment
                       const total = sentimentResults.length;
                       const positiveRatio = sentimentCounts.positive / total;
                       const negativeRatio = sentimentCounts.negative / total;
                       const neutralRatio = sentimentCounts.neutral / total;
 
-                      let averageSentiment = "neutral";
+                      let averageSentiment = 'neutral';
                       if (positiveRatio > negativeRatio && positiveRatio > neutralRatio) {
-                        averageSentiment = "positive";
+                        averageSentiment = 'positive';
                       } else if (
                         negativeRatio > positiveRatio &&
                         negativeRatio > neutralRatio
                       ) {
-                        averageSentiment = "negative";
+                        averageSentiment = 'negative';
                       }
 
                       // Calculate average confidence
@@ -629,7 +622,7 @@ const AIToolsDashboard = () => {
                         (sum, item) => sum + parseFloat(item.confidence),
                         0
                       );
-                      const avgConfidence = totalConfidence / sentimentResults.length;
+                      const avgConfidence = totalConfidence / total;
 
                       return (
                         <>
@@ -679,7 +672,7 @@ const AIToolsDashboard = () => {
           </Slide>
         </Grid>
 
-        {/* Combined Topic Modeling Section (Date Filters + Topic Box) */}
+        {/* Topic Modeling Section */}
         <Grid item xs={12} md={6}>
           <Slide in direction="up" timeout={1400}>
             <Paper
@@ -725,31 +718,49 @@ const AIToolsDashboard = () => {
                 >
                   Date Range & Entity Filters
                 </Typography>
-                <Box
-                  sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 2,
-                    mb: 2,
-                  }}
-                >
-                  <TextField
-                    label="Start Date"
-                    type="date"
-                    value={startDate}
-                    onChange={(e) => setStartDate(e.target.value)}
-                    InputLabelProps={{ shrink: true }}
-                    sx={{ width: '50%' }}
-                  />
-                  <TextField
-                    label="End Date"
-                    type="date"
-                    value={endDate}
-                    onChange={(e) => setEndDate(e.target.value)}
-                    InputLabelProps={{ shrink: true }}
-                    sx={{ width: '50%' }}
-                  />
-                </Box>
+
+                {/* 
+                  UPDATED: Using MUI DatePicker to disable invalid dates 
+                  based on openEndedResponses
+                */}
+                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 2,
+                      mb: 2,
+                    }}
+                  >
+                    <DatePicker
+                      label="Start Date"
+                      value={startDate}
+                      onChange={(newVal) => setStartDate(newVal)}
+                      renderInput={(params) => (
+                        <TextField fullWidth {...params} />
+                      )}
+                      shouldDisableDate={(date) => {
+                        const dateString = dayjs(date).format('YYYY-MM-DD');
+                        // Grey out if date is not in uniqueDates set
+                        return !uniqueDates.has(dateString);
+                      }}
+                    />
+
+                    <DatePicker
+                      label="End Date"
+                      value={endDate}
+                      onChange={(newVal) => setEndDate(newVal)}
+                      renderInput={(params) => (
+                        <TextField fullWidth {...params} />
+                      )}
+                      shouldDisableDate={(date) => {
+                        const dateString = dayjs(date).format('YYYY-MM-DD');
+                        return !uniqueDates.has(dateString);
+                      }}
+                    />
+                  </Box>
+                </LocalizationProvider>
+
                 <Box sx={{ mb: 2 }}>
                   <Typography
                     variant="subtitle2"
