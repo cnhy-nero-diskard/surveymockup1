@@ -85,14 +85,14 @@ const menuItems = [
   { text: "Per Attraction Data", icon: <AttIcon />, to: "attractiondashboard" },
   { text: "Per Establishment Data", icon: <EstablishmentIcon />, to: "establishmentdashboard" },
   { text: "Survey Metrics", icon: <SurveyIcon />, to: "surveymetrics" },
+  { text: "Survey Statistics", icon: <GraphIcon />, to: "stally" },
   { text: "AI Tools", icon: <AiToolsIcon />, to: "aitoolsdashboard" },
-  { text: "Data Manager", icon: <CompIcon />, to: "datamanager" },
-  { text: "System Performance", icon: <CompIcon />, to: "systemperf" },
   { text: "Users Dashboard", icon: <UserIcon />, to: "usersdashboard" },
   { text: "Survey Touchpoints", icon: <SurveyTouchpointsIcon />, to: "surveytouchpoints" },
-  { text: "LOGSTREAM", icon: <SurveyTouchpointsIcon />, to: "logstream" },
-  { text: "Topic Modelling", icon: <GraphIcon />, to: "tmgraph" },
+  { text: "Data Manager", icon: <CompIcon />, to: "datamanager" },
   { text: "Sentiment Analysis", icon: <InsightsIcon />, to: "sentimentgraphs" },
+  { text: "System Performance", icon: <CompIcon />, to: "systemperf" },
+  { text: "LOGSTREAM", icon: <SurveyTouchpointsIcon />, to: "logstream" },
 ];
 
 const Sidebar = ({ drawerWidth }) => {

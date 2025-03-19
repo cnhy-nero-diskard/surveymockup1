@@ -22,6 +22,7 @@ import MunicipalityDashboard from './components/admin/permunicipalitydashboard/M
 import AttractionDashboard from './components/admin/perattractiondashboard/AttractionDashboard';
 import LogStream from './components/admin/logstream/LogStream';
 import DataManager from './components/datamanager/DataManager';
+import SurveyTally from './components/admin/surveytallybreakdown/SurveyTally';
 
 const AdminRoutes = () => {
   const { isAuthenticated, unauthorized, handleUnauthorized, login } = useAuth();
@@ -79,8 +80,6 @@ const AdminRoutes = () => {
           <Route path="overallbarangay" element={<OverallBarangay />} />
           <Route path="overalltopic" element={<OverallSurveyTopic />} />
           <Route path="overallonebarangay" element={<OverallOneBarangay />} />
-          <Route path="tmgraph" element={<TMGraph />} />
-          <Route path="sentimentgraphs" element={<HeatmapChart />} />
           <Route path="surveymetrics" element={<SurveyMetrics />} />
           <Route path="aitoolsdashboard" element={<AIToolsDashboard />} />
           <Route path="systemperf" element={<Metrics />} />
@@ -89,8 +88,10 @@ const AdminRoutes = () => {
           <Route path="establishmentdashboard" element={<EstablishmentDataDashboard />} />
           <Route path="barangaydashboard" element={<AreaDashboard />} />
           <Route path="attractiondashboard" element={<AttractionDashboard />} />
-          <Route path="logstream" element={<LogStream />} />
           <Route path="datamanager" element={<DataManager />} />
+          <Route path="stally" element={<SurveyTally />} />
+          <Route path="sentimentgraphs" element={<HeatmapChart />} />
+          <Route path="logstream" element={<LogStream />} />
         </Route>
       </Routes>
     </>

@@ -12,8 +12,8 @@ const GradientContainer = styled(Container)`
   background: linear-gradient(135deg, rgb(57, 93, 146), #c3cfe2);
   padding: 2rem;
   width: 100vw;
-  min-width: 100vw;
   border-radius: 15px;
+  min-width: 100vw;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
   overflow-x: auto;
   margin: 0;
