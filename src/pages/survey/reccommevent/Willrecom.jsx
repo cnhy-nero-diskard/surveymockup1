@@ -60,6 +60,7 @@ const Willrecom = () => {
             transition={{ duration: 0.5 }}
           >
             <motion.div
+            style={{fontSize:'1.5rem'}}
               className="question"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}

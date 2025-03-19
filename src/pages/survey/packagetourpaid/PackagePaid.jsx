@@ -190,7 +190,7 @@ const PackagePaid = () => {
               aria-label="Enter package price"
             />
 
-            <InputLabel>{translations.packagePaidInputLabel} (Currency)</InputLabel>
+            <InputLabel>{translations.packagePaidInputLabel}</InputLabel>
             <Select
               options={currencyOptions}
               value={currencyOptions.find(option => option.value === responses.currency)}

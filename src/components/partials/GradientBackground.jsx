@@ -237,7 +237,7 @@ const GradientBackground = ({
           {true && (
             <OverlayImage
               src={overlayImage}
-              alt="Overlay"
+              alt=""
               opacity={opacity}
               blendMode={blendMode}
             />

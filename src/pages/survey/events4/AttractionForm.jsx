@@ -170,7 +170,7 @@ const SuggestionList = styled.ul`
   max-height: 150px;
   overflow-y: auto;
   position: absolute;
-  background-color: blue;
+  background-color: rgb(3, 94, 214);
   width: 100%;
   z-index: 1;
 `;
@@ -180,7 +180,19 @@ const SuggestionItem = styled.li`
   cursor: pointer;
 
   &:hover {
-    background-color: #f0f0f0;
+    background-color:rgb(75, 75, 75);
+  }
+`;
+
+const Select = styled.select`
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  margin-top: 8px;
+  @media (max-width: 768px) {
+    padding: 6px;
+    font-size: 14px;
   }
 `;
 
@@ -194,9 +206,13 @@ const AttractionForm = () => {
     attraction: '',
     location: '',
     rating: '',
+    activity: '',
+    attractionEnName: '',
+    activityEnName: '',
   });
 
   const [attractionSuggestions, setAttractionSuggestions] = useState([]);
+  const [activities, setActivities] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
 
   const language = localStorage.getItem('selectedLanguage');
@@ -215,36 +231,46 @@ const AttractionForm = () => {
     }
   }, []);
 
-  // Fetch attraction localizations and remove duplicates already in local storage
+  // Fetch attraction localizations and activities
   useEffect(() => {
     const fetchAttractionLocalizations = async () => {
       try {
         const response = await axios.get(`${process.env.REACT_APP_API_HOST}/api/survey/attraction`, {
           params: { languageCode: language },
-          withCredentials: true
+          withCredentials: true,
         });
+
         if (response.status !== 200) {
           throw new Error('Failed to fetch attraction localizations');
         }
+
         const data = response.data;
-        if (data && data.translatedNames && Array.isArray(data.translatedNames)) {
-          let fetchedList = data.translatedNames;
-          // Filter out any already added attractions from local storage
-          if (rows && rows.length > 0) {
-            const existingAttractions = rows.map((row) => row.attraction);
-            fetchedList = fetchedList.filter((item) => {
-              const attractionKey = Object.keys(item)[0];
-              return !existingAttractions.includes(attractionKey);
-            });
-          }
-          setAttractionSuggestions(fetchedList);
+        // data[0].act => Activities
+        // data[1].att => Attractions
+        if (!Array.isArray(data) || data.length < 2) {
+          throw new Error('Invalid data structure from API');
+        }
+
+        const fetchedActivities = data[0].act || [];
+        const fetchedAttractions = data[1].att || [];
+
+        setActivities(fetchedActivities);
+
+        // Filter out any already-added attractions from local storage
+        if (rows && rows.length > 0) {
+          const existingAttractions = rows.map((row) => row.attraction);
+          const filteredAttractions = fetchedAttractions.filter((item) => {
+            const attractionKey = Object.keys(item)[0];
+            return !existingAttractions.includes(attractionKey);
+          });
+          setAttractionSuggestions(filteredAttractions);
         } else {
-          console.error('API response does not contain a valid translatedNames array:', data);
-          setAttractionSuggestions([]);
+          setAttractionSuggestions(fetchedAttractions);
         }
       } catch (error) {
         console.error('Error fetching attraction localizations:', error);
         setAttractionSuggestions([]);
+        setActivities([]);
       }
     };
 
@@ -253,21 +279,47 @@ const AttractionForm = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setCurrentInput({ ...currentInput, [name]: value });
 
-    if (name === 'attraction') {
-      setShowSuggestions(value.length > 0);
+    // If the user is selecting an activity, capture its English text as well
+    if (name === 'activity') {
+      // Find the object in "activities" whose key matches the selected Japanese text
+      const matchedActivity = activities.find((activityObj) => {
+        const jpKey = Object.keys(activityObj)[0];
+        return jpKey === value;
+      });
+
+      const enActivityName = matchedActivity ? matchedActivity[value] : '';
+      setCurrentInput({
+        ...currentInput,
+        activity: value,
+        activityEnName: enActivityName,
+      });
+    }
+    // Otherwise, handle normal inputs
+    else {
+      setCurrentInput({ ...currentInput, [name]: value });
+
+      // Show suggestions only for the "attraction" input
+      if (name === 'attraction') {
+        setShowSuggestions(value.length > 0);
+      }
     }
   };
 
   const handleSuggestionClick = (attraction) => {
+    // Find the selected item to populate location and en_name automatically
     const selectedAttraction = attractionSuggestions.find(
       (item) => Object.keys(item)[0] === attraction
     );
+
+    const enName = selectedAttraction?.en_name || '';
+    const loc = selectedAttraction ? selectedAttraction[attraction] : '';
+
     setCurrentInput({
+      ...currentInput,
       attraction: attraction,
-      location: selectedAttraction ? selectedAttraction[attraction] : '',
-      rating: currentInput.rating
+      location: loc,
+      attractionEnName: enName,
     });
     setShowSuggestions(false);
   };
@@ -293,9 +345,14 @@ const AttractionForm = () => {
       });
       return;
     }
-  
-    // Check if all fields are filled
-    if (!currentInput.attraction || !currentInput.location || !currentInput.rating) {
+
+    // Check if all required fields are filled
+    if (
+      !currentInput.attraction ||
+      !currentInput.location ||
+      !currentInput.rating ||
+      !currentInput.activity
+    ) {
       toast.error(translations.attractionFormErrorAllFields, {
         position: 'top-right',
         autoClose: 3000,
@@ -306,7 +363,7 @@ const AttractionForm = () => {
       });
       return;
     }
-  
+
     // Check if the attraction already exists in the table
     const isDuplicate = rows.some((row) => row.attraction === currentInput.attraction);
     if (isDuplicate) {
@@ -320,7 +377,7 @@ const AttractionForm = () => {
       });
       return;
     }
-  
+
     // If no duplicates, proceed to add the new row
     const rowNumber = rows.length + 1;
     const newRow = {
@@ -329,13 +386,13 @@ const AttractionForm = () => {
       attraction_ref: `ATTRA${rowNumber}`,
       location_ref: `LOCAT${rowNumber}`,
       rating_ref: `RATNG${rowNumber}`,
+      activity_ref: `ACTV${rowNumber}`,
     };
-  
-    // Update rows in state and local storage
+
     const updatedRows = [...rows, newRow];
     setRows(updatedRows);
     saveToLocalStorage('attractionFormData', updatedRows);
-  
+
     // Remove the added attraction from suggestions to avoid duplicates
     if (attractionSuggestions.some((item) => Object.keys(item)[0] === currentInput.attraction)) {
       const filteredSuggestions = attractionSuggestions.filter((item) => {
@@ -344,10 +401,17 @@ const AttractionForm = () => {
       });
       setAttractionSuggestions(filteredSuggestions);
     }
-  
+
     // Reset the input fields
-    setCurrentInput({ attraction: '', location: '', rating: '' });
-  
+    setCurrentInput({
+      attraction: '',
+      location: '',
+      rating: '',
+      activity: '',
+      attractionEnName: '',
+      activityEnName: '',
+    });
+
     // Show success message
     toast.success(translations.attractionFormRowAdded, {
       position: 'top-right',
@@ -375,11 +439,26 @@ const AttractionForm = () => {
 
   const navigate = useNavigate();
   const handleNextClick = async () => {
+    // Instead of sending the Japanese text for attraction/activity,
+    // we send the English text saved in row.attractionEnName and row.activityEnName.
     const surveyResponses = rows
       .map((row) => [
-        { surveyquestion_ref: row.attraction_ref, response_value: row.attraction },
-        { surveyquestion_ref: row.location_ref, response_value: row.location },
-        { surveyquestion_ref: row.rating_ref, response_value: row.rating },
+        {
+          surveyquestion_ref: row.attraction_ref,
+          response_value: row.attractionEnName || '', // send EN name
+        },
+        {
+          surveyquestion_ref: row.location_ref,
+          response_value: row.location,
+        },
+        {
+          surveyquestion_ref: row.rating_ref,
+          response_value: row.rating,
+        },
+        {
+          surveyquestion_ref: row.activity_ref,
+          response_value: row.activityEnName || '', // send EN text of activity
+        },
       ])
       .flat();
 
@@ -417,6 +496,7 @@ const AttractionForm = () => {
                   <TableHeader>{translations.attractionFormHeaderAttraction}</TableHeader>
                   <TableHeader>{translations.attractionFormHeaderLocation}</TableHeader>
                   <TableHeader>{translations.attractionFormHeaderRating}</TableHeader>
+                  <TableHeader>{translations.attactivity}</TableHeader>
                   <TableHeader>{translations.attractionFormHeaderDelete}</TableHeader>
                 </tr>
               </thead>
@@ -446,8 +526,11 @@ const AttractionForm = () => {
                         ))}
                       </RadioGroup>
                     </TableCell>
+                    <TableCell>{row.activity}</TableCell>
                     <TableCell>
-                      <TrashButton onClick={() => handleDeleteRow(row.id)}>🗑️</TrashButton>
+                      <TrashButton onClick={() => handleDeleteRow(row.id)}>
+                        🗑️
+                      </TrashButton>
                     </TableCell>
                   </tr>
                 ))}
@@ -481,6 +564,7 @@ const AttractionForm = () => {
                       ))}
                   </SuggestionList>
                 )}
+
                 <MobileRowHeader>{translations.attractionFormHeaderLocation}</MobileRowHeader>
                 <Input
                   name="location"
@@ -488,6 +572,7 @@ const AttractionForm = () => {
                   onChange={handleChange}
                   placeholder={translations.attractionFormPlaceholderLocation}
                 />
+
                 <MobileRowHeader>{translations.attractionFormHeaderRating}</MobileRowHeader>
                 <BottomEmojiRadioGroup>
                   {[
@@ -508,6 +593,24 @@ const AttractionForm = () => {
                     </label>
                   ))}
                 </BottomEmojiRadioGroup>
+
+                {/* New: Dropdown for Activity (Japanese text with hidden English text) */}
+                <MobileRowHeader>{translations.attactivity}</MobileRowHeader>
+                <Select
+                  name="activity"
+                  value={currentInput.activity}
+                  onChange={handleChange}
+                >
+                  <option value="">-- {translations.attselectacti} --</option>
+                  {activities.map((item, index) => {
+                    const jpKey = Object.keys(item)[0]; // e.g. "スキューバダイビング"
+                    return (
+                      <option key={index} value={jpKey}>
+                        {jpKey}
+                      </option>
+                    );
+                  })}
+                </Select>
               </MobileRow>
             </div>
           </ScrollableTableContainer>

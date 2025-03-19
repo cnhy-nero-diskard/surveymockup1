@@ -110,7 +110,8 @@ const SurveyTouchpoints = () => {
     attractions: [],
     establishments: [],
     point:[],
-    island:[]
+    island:[],
+    activities:[],
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -122,6 +123,7 @@ const SurveyTouchpoints = () => {
     })
       .then((response) => response.json())
       .then((data) => {
+        console.log(`DATA RECEIVED: ${JSON.stringify(data)}`);
         setTouchpointData(data);
         setLoading(false);
       })
@@ -240,6 +242,7 @@ const SurveyTouchpoints = () => {
                     <MenuItem value="barangay">Barangay</MenuItem>
                     <MenuItem value="transportation">Transportation</MenuItem>
                     <MenuItem value="attractions">Attractions</MenuItem>
+                    <MenuItem value="Activities">Activities</MenuItem>
                     <MenuItem value="Establishments">Establishments</MenuItem>
                     <MenuItem value="point">Points</MenuItem>
                     <MenuItem value="island">Island</MenuItem>

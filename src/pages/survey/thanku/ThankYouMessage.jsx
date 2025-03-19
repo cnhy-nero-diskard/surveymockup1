@@ -117,7 +117,7 @@ const ThankYouMessage = () => {
           <Paragraph>{translations.thankYouMessageParagraph1}</Paragraph>
           <Paragraph>{translations.thankYouMessageParagraph2}</Paragraph>
           <FinishButton onClick={handleFinish}>
-            <FaCheckCircle /> FINISH
+            <FaCheckCircle /> SALAMAT
           </FinishButton>
         </Container>
       </GradientBackground>

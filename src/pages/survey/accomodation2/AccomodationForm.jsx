@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
-import styled from 'styled-components';
+import styled, { keyframes, css } from 'styled-components';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import imgoverlay from '../../../components/img/bed.png';
@@ -11,7 +11,36 @@ import { useCurrentStepIndex } from '../../../components/utils/useCurrentIndex';
 import { UnifiedContext } from '../../../routes/UnifiedContext';
 import { goToNextStep } from '../../../components/utils/navigationUtils';
 import { saveToLocalStorage, loadFromLocalStorage } from '../../../components/utils/storageUtils';
+
+// ---------- Toast for Warnings (You may use react-toastify or any library) ---------- //
+import { toast } from 'react-toastify'; 
+// Remember to install and configure react-toastify, then import "react-toastify/dist/ReactToastify.css" in your app.
+
+
 // ---------- Styled Components ---------- //
+
+// Anchoring the keyframes for the red, shaking animation
+const shakeAnimation = keyframes`
+  0%, 100% {
+    transform: translateX(0);
+    border-color: red;
+  }
+  25% {
+    transform: translateX(-5px);
+  }
+  50% {
+    transform: translateX(5px);
+  }
+  75% {
+    transform: translateX(-5px);
+  }
+`;
+
+// Conditionally apply the shake animation via props
+const InputShake = css`
+  animation: ${shakeAnimation} 0.3s ease;
+  border: 2px solid red !important;
+`;
 
 const FormContainer = styled(motion.div)`
   font-family: Arial, sans-serif;
@@ -88,9 +117,7 @@ const TableHeader = styled.th`
 
 const TableRow = styled.tr`
   border: 1px solid rgb(25, 105, 255);
-
   text-align: left;
-
   &:hover {
     background-color: rgba(0,0,0,0);
   }
@@ -107,7 +134,6 @@ const TableRow = styled.tr`
 
 const TableCell = styled.td`
   padding: 12px;
-
   vertical-align: middle;
 
   @media (max-width: 600px) {
@@ -171,6 +197,7 @@ const RatingButton = styled.button`
   }
 `;
 
+// We add a prop "isShaking" that, when true, applies the InputShake style.
 const DurationInput = styled.input`
   width: 90px;
   padding: 8px;
@@ -187,8 +214,11 @@ const DurationInput = styled.input`
   @media (max-width: 600px) {
     margin-top: 0;
   }
+
+  ${(props) => props.isShaking && InputShake};
 `;
 
+// ---------- Main Accommodation Form Component ---------- //
 
 const emojiToRating = { '☹️': 1, '😐': 2, '🙂': 3, '😄': 4 };
 const ratingToEmoji = { 1: '☹️', 2: '😐', 3: '🙂', 4: '😄' };
@@ -217,6 +247,18 @@ const AccommodationForm = () => {
   });
   const [surveyResponses, setSurveyResponses] = useState([]);
 
+  // This state tracks whether each row is "shaking" due to exceeding total
+  const [shakingRows, setShakingRows] = useState({
+    Hotel: false,
+    Resort: false,
+    'Serviced Residences': false,
+    'PensionLodging house': false,
+    'Tourist InnMotelDriveIn': false,
+    Homestay: false,
+  });
+
+  const [maxNights, setMaxNights] = useState(0);
+
   const emoj = ['☹️', '😐', '🙂', '😄'];
   const accommodationTypes = [
     'Hotel',
@@ -233,12 +275,19 @@ const AccommodationForm = () => {
 
   // ---------- Load Data from LocalStorage on Mount ---------- //
   useEffect(() => {
+    // Load accommodation form data
     const savedData = loadFromLocalStorage('accommodationFormData');
     if (savedData) {
       setIsCommercial(savedData.isCommercial);
       setRatings(savedData.ratings);
       setDurations(savedData.durations);
       setSurveyResponses(savedData.surveyResponses);
+    }
+
+    // Load the maximum nights from another localStorage key, e.g. "HOW_MANY_NIGHTS_DATA"
+    const howManyNightsData = loadFromLocalStorage('HOW_MANY_NIGHTS_DATA');
+    if (howManyNightsData && howManyNightsData.nights) {
+      setMaxNights(parseInt(howManyNightsData.nights, 10));
     }
   }, []);
 
@@ -249,21 +298,52 @@ const AccommodationForm = () => {
     updateSurveyResponses(type, 'RTNG', rating);
   };
 
-  const handleDurationChange = (type, duration) => {
-    setDurations((prevState) => ({ ...prevState, [type]: duration }));
+  // This function checks whether the new value keeps the total within the max allowed.
+  const handleDurationChange = (type, newDurationStr) => {
+    // Safeguard empty/NaN input
+    const newDuration = parseInt(newDurationStr, 10) || 0;
 
-    if (duration === '' || duration === '0') {
+    // Calculate the sum of all durations if we replace the old value with the new one
+    const oldValue = parseInt(durations[type], 10) || 0;
+    const currentTotal = Object.values(durations).reduce(
+      (acc, val) => acc + (parseInt(val, 10) || 0),
+      0
+    );
+    const newTotal = currentTotal - oldValue + newDuration;
+
+    // If newTotal would exceed maxNights, reject and animate
+    if (newTotal > maxNights) {
+      triggerShakingAnimation(type);
+      toast.error(
+        'Your total duration entered here must match with the duration you entered in the previous entry',
+        { autoClose: 3000 }
+      );
+      return;
+    }
+
+    // Otherwise, update durations normally
+    setDurations((prevState) => ({ ...prevState, [type]: newDurationStr }));
+
+    if (newDurationStr === '' || newDurationStr === '0') {
       setRatings((prevState) => ({ ...prevState, [type]: '' }));
       updateSurveyResponses(type, 'RTNG', '');
     }
 
-    updateSurveyResponses(type, 'DRTN', duration);
+    updateSurveyResponses(type, 'DRTN', newDurationStr);
+  };
+
+  // We set the row to shake (via state), then reset it after the animation
+  const triggerShakingAnimation = (type) => {
+    setShakingRows((prev) => ({ ...prev, [type]: true }));
+    setTimeout(() => {
+      setShakingRows((prev) => ({ ...prev, [type]: false }));
+    }, 400); // roughly matches the 0.3s from keyframes
   };
 
   const updateSurveyResponses = (type, field, value) => {
     const transformType = (t) => {
       if (t === 'Homestay') {
-        return t.slice(1).toUpperCase(); // Example transform
+        return t.slice(1).toUpperCase(); // Example transform, not strictly necessary
       }
       return t;
     };
@@ -437,6 +517,7 @@ const AccommodationForm = () => {
                             placeholder={translations.accommodationFormDaysPlaceholder}
                             min="0"
                             aria-label={`Enter the number of days for ${type}`}
+                            isShaking={shakingRows[type]}
                           />
                         </TableCell>
                       </TableRow>
