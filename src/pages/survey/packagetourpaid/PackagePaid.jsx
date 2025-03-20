@@ -195,7 +195,7 @@ const PackagePaid = () => {
               options={currencyOptions}
               value={currencyOptions.find(option => option.value === responses.currency)}
               onChange={handleCurrencyChange}
-              placeholder="Type or choose currency code..."
+              placeholder="..."
               isSearchable
               aria-label="Choose currency"
               styles={{
