@@ -7,6 +7,7 @@ import { UnifiedContext } from '../../../routes/UnifiedContext';
 import { goToNextStep } from '../../../components/utils/navigationUtils';
 import { useFeedback } from '../../../routes/FeedbackContext';
 import axios from 'axios';
+import { saveToLocalStorage, loadFromLocalStorage } from '../../../components/utils/storageUtils';
 
 const TouchpointFeedback = () => {
   const { routes, setHeaderText } = useContext(UnifiedContext);
@@ -16,6 +17,20 @@ const TouchpointFeedback = () => {
   const [language, setLanguage] = useState(localStorage.getItem('selectedLanguage'));
   const translations = useTranslations('estabFeedBack', language);
   const { feedback, setFeedback } = useFeedback();
+
+  // State to hold user input
+  const [formData, setFormData] = useState({
+    selectedOptionValue: '',
+    feedback: ''
+  });
+
+  // Load any existing data from localStorage on component mount
+  useEffect(() => {
+    const storedData = loadFromLocalStorage('AccomodationFeedback');
+    if (storedData) {
+      setFormData(storedData);
+    }
+  }, []);
 
   const handleNext = async (selectedOptionValue, feedbackk) => {
     console.log('Selected Option:', selectedOptionValue, 'Feedback:', feedbackk);
@@ -28,11 +43,13 @@ const TouchpointFeedback = () => {
         is_analyzed: false,
         submitted_at: new Date().toLocaleString(),
         language: localStorage.getItem('selectedLanguage')
-
     };
 
     // Set the feedback state
     setFeedback(updatedFeedback);
+
+    // Persist to localStorage before proceeding to the next step
+    saveToLocalStorage('AccomodationFeedback', { selectedOptionValue, feedback: feedbackk });
     
     try {
         console.log(`FEEDBACK ----> ${JSON.stringify(updatedFeedback)}`); // Log the updated feedback
@@ -47,7 +64,7 @@ const TouchpointFeedback = () => {
 
     // Navigate to the next step
     goToNextStep(currentStepIndex, navigate, routes, activeBlocks);
-};
+  };
 
   // Add useEffect to fetch translated touchpoint when component mounts
   useEffect(() => {
@@ -89,6 +106,7 @@ const TouchpointFeedback = () => {
       title={translations.estabFeedBackTitle} // Use the translation variable for the title
       onNext={handleNext} // Pass the handleNext function to the FeedbackForm
       squestion_identifier={"TPNTF"} // Unique identifier for the feedback form
+      initialValue={formData} // Pass initialValue correctly
     />
   );
 };

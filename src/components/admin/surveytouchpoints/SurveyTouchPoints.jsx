@@ -18,11 +18,44 @@ import {
 import { QRCodeSVG } from 'qrcode.react';
 import styled from 'styled-components';
 import domtoimage from 'dom-to-image';
-import { Refresh, Download, ArrowDropDown } from '@mui/icons-material';
+import { Refresh, Download, ArrowDropDown, ContentCopy } from '@mui/icons-material';
 import { Autocomplete } from '@mui/material';
 
+const StyledLink = styled(Link)`
+  color: #3f51b5;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 1.1rem;
+  padding: 0.5rem 1rem;
+  background-color: rgba(63, 81, 181, 0.1);
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+  &:hover {
+    text-decoration: none;
+    color: #1a237e;
+    background-color: rgba(63, 81, 181, 0.2);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    transform: translateY(-2px);
+  }
+`;
+
+const LinkContainer = styled(Box)`
+  display: inline-block;
+  margin-top: 1rem;
+  padding: 1rem;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+  }
+`;
+
 const StyledContainer = styled(Container)`
-  height: 100%;
+  height: 100vh;
   width: 100vw;
   display: flex;
   flex-direction: column;
@@ -73,18 +106,6 @@ const QRCodeContainer = styled(Box)`
   }
 `;
 
-const StyledLink = styled(Link)`
-  color: #3f51b5;
-  text-decoration: none;
-  font-weight: 500;
-  transition: all 0.3s ease;
-
-  &:hover {
-    text-decoration: underline;
-    color: #1a237e;
-  }
-`;
-
 const DownloadButton = styled(Button)`
   margin-top: 1rem;
   background: linear-gradient(45deg, #3f51b5, #1a237e);
@@ -109,9 +130,9 @@ const SurveyTouchpoints = () => {
     transportation: [],
     attractions: [],
     establishments: [],
-    point:[],
-    island:[],
-    activities:[],
+    point: [],
+    island: [],
+    activities: [],
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -172,6 +193,16 @@ const SurveyTouchpoints = () => {
       });
   };
 
+  const handleCopyLink = (link) => {
+    navigator.clipboard.writeText(link)
+      .then(() => {
+        alert('Link copied to clipboard!');
+      })
+      .catch((error) => {
+        console.error('Failed to copy link:', error);
+      });
+  };
+
   const handleCloseError = () => {
     setError('');
   };
@@ -203,7 +234,7 @@ const SurveyTouchpoints = () => {
                 Scan the QR code below to access the survey.
               </Subtitle>
               {generateQRCode(`${process.env.REACT_APP_SELF_URL}/tpms/`)}
-              <Typography variant="body1" sx={{ mt: 2 }}>
+              <LinkContainer>
                 <StyledLink
                   href={`${process.env.REACT_APP_SELF_URL}/survey/`}
                   target="_blank"
@@ -211,7 +242,19 @@ const SurveyTouchpoints = () => {
                 >
                   {`${process.env.REACT_APP_SELF_URL}/survey/`}
                 </StyledLink>
-              </Typography>
+                <IconButton
+  onClick={() => handleCopyLink(`${process.env.REACT_APP_SELF_URL}/survey/`)}
+  sx={{
+    '&:hover': {
+      backgroundColor: 'transparent', // Remove hover background
+      boxShadow: 'none', // Remove hover shadow
+    },
+    borderRadius: '50%', // Ensure the button is circular
+    padding: '8px', // Adjust padding for better shape
+  }}
+>
+  <ContentCopy />
+</IconButton>              </LinkContainer>
             </QRCodeContainer>
           </Grid>
         </Grid>
@@ -273,11 +316,23 @@ const SurveyTouchpoints = () => {
                   <Box id="qr-code-svg" sx={{ mt: 3 }}>
                     {generateQRCode(qrValue)}
                   </Box>
-                  <Typography variant="body1" sx={{ mt: 2 }}>
+                  <LinkContainer>
                     <StyledLink href={qrValue} target="_blank" rel="noopener">
                       {qrValue}
                     </StyledLink>
-                  </Typography>
+                    <IconButton
+  onClick={() => handleCopyLink(qrValue)}
+  sx={{
+    '&:hover': {
+      backgroundColor: 'transparent', // Remove hover background
+      boxShadow: 'none', // Remove hover shadow
+    },
+    borderRadius: '50%', // Ensure the button is circular
+    padding: '8px', // Adjust padding for better shape
+  }}
+>
+  <ContentCopy />
+</IconButton>                  </LinkContainer>
                   <DownloadButton
                     onClick={handleDownloadQRCode}
                     startIcon={<Download />}
@@ -289,14 +344,13 @@ const SurveyTouchpoints = () => {
             </QRCodeContainer>
           </Grid>
         </Grid>
-
         {/* Error Handling */}
         <Snackbar
           open={!!error}
           autoHideDuration={6000}
           onClose={handleCloseError}
         >
-          <Alert
+          {/* <Alert
             severity="error"
             action={
               <IconButton size="small" color="inherit" onClick={handleRetry}>
@@ -305,7 +359,7 @@ const SurveyTouchpoints = () => {
             }
           >
             {error}
-          </Alert>
+          </Alert> */}
         </Snackbar>
       </StyledContainer>
     </>

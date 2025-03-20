@@ -13,7 +13,7 @@ const EstablishmentsDashboard = () => {
       try {
         const data = await fetchEntityMetrics();
         const filteredData = Array.isArray(data)
-          ? data.filter(item => item.touchpoint === "establishment")
+          ? data.filter(item => item.touchpoint === "establishments")
           : [];        if (filteredData.length === 0) {
           setMetrics([{
             entity: "No Data Available",

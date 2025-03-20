@@ -2,42 +2,42 @@
 export const saveToLocalStorage = (key, data) => {
     try {
         const serializedData = JSON.stringify(data);
-        localStorage.setItem(key, serializedData);
-        console.log(`[LOCALSTORAGE] ---> Saved key ${key} with data ${JSON.stringify(data)}`);
-
+        sessionStorage.setItem(key, serializedData);
+        console.log(`[SESSIONSTORAGE] ---> Saved key ${key} with data ${JSON.stringify(data)}`);
     } catch (error) {
-        console.error('Error saving to localStorage:', error);
+        console.error('Error saving to sessionStorage:', error);
     }
 };
 
 export const loadFromLocalStorage = (key) => {
     try {
-        const serializedData = localStorage.getItem(key);
+        const serializedData = sessionStorage.getItem(key);
         if (serializedData === null) {
             return null;
         }
-        console.log(`[LOCALSTORAGE] ---> Loaded key ${key} with data ${JSON.stringify(serializedData)}`)
+        console.log(`[SESSIONSTORAGE] ---> Loaded key ${key} with data ${JSON.stringify(serializedData)}`);
         return JSON.parse(serializedData);
     } catch (error) {
-        console.error('Error loading from localStorage:', error);
+        console.error('Error loading from sessionStorage:', error);
         return null;
     }
 };
 
 export const clearLocalStorage = (key) => {
     try {
-        localStorage.removeItem(key);
-        console.log(`Cleared localStorage key: ${key}`);
+        sessionStorage.removeItem(key);
+        console.log(`Cleared sessionStorage key: ${key}`);
     } catch (error) {
-        console.error('Error clearing localStorage:', error);
+        console.error('Error clearing sessionStorage:', error);
     }
 };
-// Make clearLocalStorage globally accessible
-window.clearLocalStorageFromConsole = (key) => {
+
+// Make clearSessionStorage globally accessible (optional)
+window.clearSessionStorageFromConsole = (key) => {
     try {
-        localStorage.removeItem(key);
-        console.log(`Cleared localStorage key: ${key}`);
+        sessionStorage.removeItem(key);
+        console.log(`Cleared sessionStorage key: ${key}`);
     } catch (error) {
-        console.error('Error clearing localStorage:', error);
+        console.error('Error clearing sessionStorage:', error);
     }
 };
