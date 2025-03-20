@@ -1,7 +1,7 @@
 // BodyPartial.js
 import React from 'react';
 import { Helmet } from 'react-helmet';
-import defaultimg from "../img/page1bg.jpg";
+import defaultimg from "../img/page1bg.png";
 
 const BodyPartial = ({ backgroundColor, gradient, fonts, backgroundImage }) => {
   // Use the first font in the provided `fonts` array or default to 'Montserrat'
