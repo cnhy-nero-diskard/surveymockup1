@@ -3,21 +3,6 @@ import React from 'react';
 import { Helmet } from 'react-helmet';
 import defaultimg from "../img/page1bg.jpg";
 
-const globalFonts = [
-  {
-    family: "'Roboto', sans-serif",
-    url: "https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap",
-  },
-  {
-    family: "'Montserrat', sans-serif",
-    url: "https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap",
-  },
-  {
-    family: "'Open Sans', sans-serif",
-    url: "https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap",
-  },
-];
-
 const BodyPartial = ({ backgroundColor, gradient, fonts, backgroundImage }) => {
   // Use the first font in the provided `fonts` array or default to 'Montserrat'
   const defaultFont = fonts ? fonts[2].family : "'Montserrat', sans-serif";

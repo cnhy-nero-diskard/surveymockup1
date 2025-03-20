@@ -47,7 +47,7 @@ const OpenEndedTranspov2 = () => {
       title={translations.openEndedTranspoTitle}
       onNext={handleNext}
       squestion_identifier="TRN"
-      initialValue={formData}
+      initialValue={formData} // Pass initialValue correctly
     />
   );
 };

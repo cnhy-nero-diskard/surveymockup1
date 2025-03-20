@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { useSpring, animated } from 'react-spring';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 import BodyPartial from './BodyPartial';
@@ -10,7 +9,7 @@ import { submitSurveyResponses } from '../utils/sendInputUtils';
 import { Paragraph, QuestionText } from '../utils/styles1';
 
 /** ---------------- Styled Components ---------------- **/
-const FeedbackFormContainer = styled(animated.div)`
+const FeedbackFormContainer = styled.div`
   max-width: 600px;
   margin: 0 auto;
   padding: 20px;
@@ -103,7 +102,7 @@ const FeedbackTextarea = styled.textarea`
   }
 `;
 
-const WarningMessage = styled(animated.div)`
+const WarningMessage = styled.div`
   color: #d32f2f;
   margin-bottom: 16px;
   text-align: center;
@@ -112,23 +111,6 @@ const WarningMessage = styled(animated.div)`
   background-color: rgba(211, 47, 47, 0.1);
   border-radius: 8px;
 `;
-
-/** 
- * OpenFormat1: A flexible feedback form that asks for satisfaction (4 levels)
- * and an open-ended comment.  
- * 
- * Props:
- * - title (string): The form’s title.  
- * - onNext (function): Callback fired when user completes and clicks next.  
- * - squestion_identifier (string): Identifier for referencing the question.  
- * - minFeedbackLength (number): Minimum feedback length to pass validation.  
- * - satisfactionOptions (object): Maps labels to integer values.  
- * - initialValue (object): An optional object with either 
- *   { selectedOptionValue: 'Satisfied', feedback: '...' }
- *   or 
- *   { selectedOptionValue: 3, feedback: '...' }
- *   to preload state from localStorage or elsewhere.
- */
 const OpenFormat1 = ({
   title,
   onNext,
@@ -140,45 +122,37 @@ const OpenFormat1 = ({
     Satisfied: 3,
     VerySatisfied: 4,
   },
-  initialValue = {}
+  initialValue = {} // Ensure initialValue is passed correctly
 }) => {
-  // Local states for user’s entry:
-  const [feedback, setFeedback] = useState('');
-  const [selectedOption, setSelectedOption] = useState(null);
+  // Set initial state directly from initialValue
+  const [feedback, setFeedback] = useState(initialValue.feedback || '');
+  const [selectedOption, setSelectedOption] = useState(initialValue.selectedOptionValue || null);
   const [placeholderText, setPlaceholderText] = useState('');
   const [language] = useState(localStorage.getItem('selectedLanguage'));
   const [isFormValid, setIsFormValid] = useState(false);
   const [showWarning, setShowWarning] = useState(false);
-
-  // Retrieve translations
+  
   const translations = useTranslations('FeedbackForm', language);
   const translationsborrow = useTranslations('OpenEnded1', language);
-
-  /**
-   * On mount (or if initialValue changes), 
-   * figure out how to set "selectedOption" from initialValue.selectedOptionValue.
-   * If it's a string that exactly matches a label, use it directly.
-   * If it's numeric, find the corresponding label in satisfactionOptions.
-   */
   useEffect(() => {
-    if (initialValue.selectedOptionValue) {
-      if (typeof initialValue.selectedOptionValue === 'number') {
-        // find which label matches that numeric value
-        const foundLabel = Object.keys(satisfactionOptions).find(
-          (label) => satisfactionOptions[label] === initialValue.selectedOptionValue
-        );
-        setSelectedOption(foundLabel || null);
-      } else {
-        // it's already a text label (Dissatisfied/Neutral/etc.)
-        setSelectedOption(initialValue.selectedOptionValue);
-      }
-    }
-    if (initialValue.feedback) {
-      setFeedback(initialValue.feedback);
-    }
-  }, [initialValue, satisfactionOptions]);
+    setFeedback(initialValue.feedback || '');
+    setSelectedOption(initialValue.selectedOptionValue || null);
+    console.log(`Initial value: ${JSON.stringify(initialValue)}`);
 
-  // Dynamically change placeholder text depending on the selected option
+
+
+  }, [initialValue]);
+ useEffect(() => {
+  if (initialValue.selectedOptionValue) {
+    const numericValue = initialValue.selectedOptionValue;
+    // Find which key in the satisfactionOptions has that numericValue
+    const matchedKey = Object.keys(satisfactionOptions).find(
+      (key) => satisfactionOptions[key] === numericValue
+    );
+    setSelectedOption(matchedKey || null);
+  }
+}, [initialValue]); 
+  // Dynamically change placeholder text
   useEffect(() => {
     switch (selectedOption) {
       case 'Dissatisfied':
@@ -198,34 +172,19 @@ const OpenFormat1 = ({
     }
   }, [selectedOption, language, translations]);
 
-  // Validate the form whenever selectedOption or feedback changes
+  // Validate the form
   useEffect(() => {
     setIsFormValid(
       selectedOption !== null && feedback.trim().length >= minFeedbackLength
     );
   }, [selectedOption, feedback, minFeedbackLength]);
 
-  // Handle user clicking an option
+  // Handle option click
   const handleOptionClick = (option) => {
     setSelectedOption(option);
   };
 
-  // React-spring animations
-  const mainAnimation = useSpring({
-    opacity: 1,
-    from: { opacity: 0 },
-    config: { duration: 1000 }
-  });
-
-  const warningAnimation = useSpring({
-    opacity: showWarning ? 1 : 0,
-    transform: showWarning ? 'translateY(0)' : 'translateY(-10px)',
-    config: { tension: 300, friction: 20 },
-  });
-
-  const navigate = useNavigate();
-
-  // Handle "Next" button
+  // Handle next button click
   const handleNextClick = async () => {
     if (!isFormValid) {
       setShowWarning(true);
@@ -250,7 +209,6 @@ const OpenFormat1 = ({
 
     try {
       await submitSurveyResponses(surveyResponses);
-      // Once submission is complete, trigger parent onNext
       onNext(selectedValue, feedback);
     } catch (error) {
       console.error('Error submitting survey responses:', error);
@@ -267,7 +225,7 @@ const OpenFormat1 = ({
         buttonAppear={isFormValid}
         handleNextClick={handleNextClick}
       >
-        <FeedbackFormContainer style={mainAnimation}>
+        <FeedbackFormContainer>
           <QuestionText>
             {title || translations.feedbackFormTitle}
           </QuestionText>
@@ -293,13 +251,13 @@ const OpenFormat1 = ({
 
           <FeedbackTextarea
             placeholder={placeholderText}
-            value={feedback}
+            value={feedback} // Ensure feedback is bound to the state
             onChange={(e) => setFeedback(e.target.value)}
             aria-label="Feedback textarea"
           />
 
           {showWarning && (
-            <WarningMessage style={warningAnimation}>
+            <WarningMessage>
               {translations.feedbackFormWarning}
             </WarningMessage>
           )}

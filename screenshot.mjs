@@ -2,7 +2,6 @@ import puppeteer from 'puppeteer';
 import fs from 'fs';
 import path from 'path';
 import { setTimeout } from 'node:timers/promises';
-
 const sroutes = [
   { path: '' },
   { path: 'page1' },
@@ -65,15 +64,14 @@ const sroutes = [
   const BASE_URL = 'http://localhost:3000';
 
   const pagesToScreenshot = [
-      `${BASE_URL}/`,
-      `${BASE_URL}/survey`,
-      ...sroutes.map(route => `${BASE_URL}/survey/${route.path}`).filter(url => !url.endsWith('/'))
+    `${BASE_URL}/survey`,
+    ...sroutes.map(route => `${BASE_URL}/survey/${route.path}`).filter(url => !url.endsWith('/'))
   ];
   
   console.log(pagesToScreenshot);
   
   // Define the language you want to set in localStorage
-  const selectedLanguage = 'en'; // Example: Japanese
+  const selectedLanguage = 'ja'; // Example: Japanese
 
   // Define the base directory for saving screenshots
   const baseDir = 'C:\\Users\\Paul Andre\\Pictures\\localization';
@@ -89,21 +87,20 @@ const sroutes = [
     fs.mkdirSync(saveDir, { recursive: true });
   }
 
+  // Pre-inject localStorage setting before any navigations
+  await page.evaluateOnNewDocument((language) => {
+    localStorage.setItem('selectedLanguage', language);
+  }, selectedLanguage);
+
   // Loop through each URL and take a screenshot
-  for (const url of pagesToScreenshot) {
-    // Inject the selectedLanguage into localStorage before navigating to the page
-    await page.goto(url, { waitUntil: 'domcontentloaded' }); // Navigate to the page
-    await page.evaluate((language) => {
-      localStorage.setItem('selectedLanguage', language);
-    }, selectedLanguage);
+  for (let i = 0; i < pagesToScreenshot.length; i++) {
+    const url = pagesToScreenshot[i];
+    await page.goto(url, { waitUntil: 'domcontentloaded' });
 
-    // Reload the page to apply the new localStorage value
-    await page.reload({ waitUntil: 'networkidle2' });
-
-    // Wait for a specific amount of time (e.g., 2000ms = 2 seconds) to ensure animations are complete
-    await setTimeout(800); // Adjust the time as needed
-    // Take a screenshot
-    const fileName = `screenshot_${url.split('/').pop() || 'home'}.png`;
+    // Give the page time to fully animate and render
+    await setTimeout(800 ); // Adjust the time as needed
+    // Take a screenshot, named by its number in sequence
+    const fileName = `${i + 1}.png`;
     const filePath = path.join(saveDir, fileName);
     await page.screenshot({ path: filePath, fullPage: true });
     console.log(`Screenshot saved: ${filePath}`);
@@ -112,3 +109,6 @@ const sroutes = [
   // Close the browser
   await browser.close();
 })();
+
+
+//HIDDEN LOCALIZATION PAGES:   bookingform, accomodationform, attractionform, wherestayed
