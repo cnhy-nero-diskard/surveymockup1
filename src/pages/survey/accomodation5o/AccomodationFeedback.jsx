@@ -65,7 +65,7 @@ const TouchpointFeedback = () => {
         );
         
         // Directly set the translated text to header
-        console.log(`LOCALIZED ENTITY ${response.data}`);
+        console.log(`LOCALIZED ENTITY ${JSON.stringify(response.data)}`);
         setHeaderText(response.data.translatedName || feedback.entity);
       } catch (error) {
         console.error('Error fetching touchpoint translation:', error);

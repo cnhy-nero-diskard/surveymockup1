@@ -90,7 +90,7 @@ const menuItems = [
   { text: "Users Dashboard", icon: <UserIcon />, to: "usersdashboard" },
   { text: "Survey Touchpoints", icon: <SurveyTouchpointsIcon />, to: "surveytouchpoints" },
   { text: "Data Manager", icon: <CompIcon />, to: "datamanager" },
-  { text: "Sentiment Analysis", icon: <InsightsIcon />, to: "sentimentgraphs" },
+  // { text: "Sentiment Analysis", icon: <InsightsIcon />, to: "sentimentgraphs" },
   { text: "System Performance", icon: <CompIcon />, to: "systemperf" },
   { text: "LOGSTREAM", icon: <SurveyTouchpointsIcon />, to: "logstream" },
 ];
