@@ -80,12 +80,15 @@ const AIToolsDashboard = () => {
 
   // Entity selection states
   const [selectedEntities, setSelectedEntities] = useState([]);
-  const uniqueEntities = [
-    ...new Set(openEndedResponses.flatMap((res) => res.entity || [])),
-  ];
-
-  // Track valid dates in dataset to disable invalid picks
-  const [uniqueDates, setUniqueDates] = useState(new Set());
+  const uniqueEntities = Array.from(
+    new Map(
+      openEndedResponses
+        .map((response) => [response.entity, response]) // Use entity as the key
+    ).values() // Get unique response objects
+  ).map((response) => ({
+    entity: response.entity,
+    name: response.name,
+  }));  const [uniqueDates, setUniqueDates] = useState(new Set());
 
   // State for API Usage Data
   const [apiUsageData, setApiUsageData] = useState({
@@ -357,22 +360,20 @@ const AIToolsDashboard = () => {
   const handleStoreTopicModelingResult = async () => {
     if (!topicModelingResult) return;
     try {
-      // For demonstration, pick the first topic object
       let zeroidx = topicModelingResult[0] || {};
       zeroidx = {
         ...zeroidx,
-        // If no date is selected, default to some fallback
         startDate: startDate ? dayjs(startDate).format('YYYY-MM-DD') : '2020-01-01',
         endDate: endDate ? dayjs(endDate).format('YYYY-MM-DD') : dayjs().format('YYYY-MM-DD'),
-        customFilter: selectedEntities, // <--- Pass selected entities
+        customFilter: selectedEntities, // <--- Selected entities are included here
       };
-
+  
       const response = await axios.post(
         `${process.env.REACT_APP_API_HOST}/api/storetopics`,
         { zeroidx },
         { withCredentials: true }
       );
-
+  
       if (response.status === 201 || response.status === 200) {
         setSnackbarMessage("Topic modeling results stored successfully!");
         setSnackbarSeverity("success");
@@ -570,8 +571,8 @@ const AIToolsDashboard = () => {
                               result.sentiment === 'positive'
                                 ? 'success'
                                 : result.sentiment === 'negative'
-                                ? 'error'
-                                : 'warning'
+                                  ? 'error'
+                                  : 'warning'
                             }
                             size="small"
                           />
@@ -762,26 +763,30 @@ const AIToolsDashboard = () => {
                 </LocalizationProvider>
 
                 <Box sx={{ mb: 2 }}>
-                  <Typography
-                    variant="subtitle2"
-                    sx={{ color: 'text.secondary', mb: 1 }}
-                  >
-                    Filter by Entity
-                  </Typography>
-                  <Select
-                    fullWidth
-                    multiple
-                    value={selectedEntities}
-                    onChange={(e) => setSelectedEntities(e.target.value)}
-                    renderValue={(selected) => selected.join(', ')}
-                  >
-                    {uniqueEntities.map((entity) => (
-                      <MenuItem key={entity} value={entity}>
-                        {entity}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </Box>
+  <Typography
+    variant="subtitle2"
+    sx={{ color: 'text.secondary', mb: 1 }}
+  >
+    Filter by Entity
+  </Typography>
+  <Select
+    fullWidth
+    multiple
+    value={selectedEntities}
+    onChange={(e) => setSelectedEntities(e.target.value)}
+    renderValue={(selected) => selected.join(', ')}
+  >
+    {uniqueEntities.map((entityObj) => {
+      console.log(entityObj);
+      const displayLabel = `[${entityObj.name}] - [${entityObj.entity}]`;
+      return (
+        <MenuItem key={entityObj.entity} value={entityObj.entity}>
+          {displayLabel}
+        </MenuItem>
+      );
+    })}
+  </Select>
+</Box>
                 <Button
                   variant="contained"
                   color="primary"

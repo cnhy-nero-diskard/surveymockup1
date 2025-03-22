@@ -100,6 +100,14 @@ export const sroutes = [
     { label: 'Accommodation Open 2 (GENERAL) ', path: 'accomodationopen2', component: AccomodationOpen2, conditionalBlock: 'accom'},
     
     
+    
+    
+    
+    { label: 'Pack Transpo', path: 'packtranspo', component: PackTranspo, conditionalBlock: 'transp'},
+    { label: 'Transportation 3', path: 'transportation3', component: Transportation3, conditionalBlock: 'transp'},
+    { label: 'Open Ended Transportation', path: 'opentranspo', component: OpenEndedTranspov2, conditionalBlock: 'transp'},
+
+    
     { label: 'Primary Attraction', path: 'primaryatt', component: PrimaryAtt, conditionalBlock: 'evatt'},
     { label: 'Visit Counter', path: 'visitcounteratt', component: VisitCounterAtt, conditionalBlock: 'evatt'},
     { label: 'Rate Attraction', path: 'rateattraction', component: RateAttraction, conditionalBlock: 'evatt'},
@@ -111,9 +119,6 @@ export const sroutes = [
     
     
     
-    { label: 'Pack Transpo', path: 'packtranspo', component: PackTranspo, conditionalBlock: 'transp'},
-    { label: 'Transportation 3', path: 'transportation3', component: Transportation3, conditionalBlock: 'transp'},
-    { label: 'Open Ended Transportation', path: 'opentranspo', component: OpenEndedTranspov2, conditionalBlock: 'transp'},
     
     
     { label: 'rateservicesf', path: 'services2', component: Services2, conditionalBlock: 'serv'},

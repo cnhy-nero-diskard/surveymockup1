@@ -109,17 +109,19 @@ const PProfile1 = () => {
   const currentStepIndex = useCurrentStepIndex(routes);
   const { activeBlocks } = useContext(UnifiedContext);
 
-  // Attempt to load any previously persisted language choice from local storage
-  const storedLanguage = localStorage.getItem('selectedLanguage');
-  const [language, setLanguage] = useState(storedLanguage);
+  // We continue to load translations, if used for labels, etc.
+  const [language, setLanguage] = useState(localStorage.getItem('selectedLanguage')); 
   const translations = useTranslations('PProfile1', language);
 
-  // Define our inputs state
+  // For showing a “local” or “native” demonym label in the UI
+  const [nativeNationalityLabel, setNativeNationalityLabel] = useState('');
+
+  // The main set of inputs for the form
   const [inputs, setInputs] = useState([
     { id: 'age', value: '', surveyquestion_ref: 'AGE01' },
-    { id: 'nationality', value: null, surveyquestion_ref: 'NAT01' },
-    { id: 'sex', value: null, surveyquestion_ref: 'SEX01' },
-    { id: 'civilStatus', value: null, surveyquestion_ref: 'CIV01' },
+    { id: 'nationality', value: '', surveyquestion_ref: 'NAT01' }, // Will store the English demonym behind the scenes
+    { id: 'sex', value: '', surveyquestion_ref: 'SEX01' },
+    { id: 'civilStatus', value: '', surveyquestion_ref: 'CIV01' },
     { id: 'occupation', value: '', surveyquestion_ref: 'OCC01' },
     { id: 'income', value: '', surveyquestion_ref: 'INC01' },
     { id: 'currency', value: 'PHP', surveyquestion_ref: 'CUR01' },
@@ -131,59 +133,149 @@ const PProfile1 = () => {
   const [conversionRates, setConversionRates] = useState({});
 
   /**
-   * On component mount, check local storage for any existing data.
-   * If found, we use that data to initialize our inputs.
+   * Load any previously stored data for this page, plus the Residence1Data
+   * for "specifyInput" (the user’s country name).
    */
   useEffect(() => {
     const savedData = loadFromLocalStorage('pProfile1Inputs');
-    
+    // Where we get the user's manually typed country from a previous page
+    const residence1Data = loadFromLocalStorage('Residence1Data');
+
     if (savedData) {
+      // If we already have saved form data, use it
       setInputs(savedData);
-      
     }
-    setInputs(inputs.map(input => {
-      if (input.surveyquestion_ref === 'CUR01') {
-        return {
-          ...input,
-          value: loadFromLocalStorage('touristCurrency')
-        };
-      }
-      return input;
-    }));
+
+    // If we have "specifyInput" from last page, attempt to get that country's demonyms
+    if (residence1Data && residence1Data.specifyInput) {
+      const countryName = residence1Data.specifyInput.trim();
+
+      // Fetch from REST Countries to get the demonym: English vs. Native
+      // This uses the ?fullText=true param so that an exact match on the country name is attempted
+      fetch(`https://restcountries.com/v3.1/name/${countryName}?fullText=true`)
+        .then((response) => response.json())
+        .then((data) => {
+          if (Array.isArray(data) && data.length > 0) {
+            // The first returned answer is typically the correct country
+            const countryInfo = data[0];
+            
+            // 1) Fetch the English demonym
+            const engMale = countryInfo.demonyms?.eng?.m || '';
+            const engFemale = countryInfo.demonyms?.eng?.f || '';
+            const englishDemonym = engMale || engFemale || 'Unknown';
+
+            // 2) Attempt to fetch a local demonym for display
+            //    We look at the first local language code
+            const langObj = countryInfo.languages || {};
+            const firstLangCode = Object.keys(langObj)[0]; // e.g., "lav" for Latvian
+            let localLabel = '';
+            if (firstLangCode && countryInfo.demonyms?.[firstLangCode]) {
+              const localMale = countryInfo.demonyms[firstLangCode].m || '';
+              const localFemale = countryInfo.demonyms[firstLangCode].f || '';
+              localLabel = localMale || localFemale;
+            }
+
+            // If no local demonym found, fallback to the English version
+            const nativeLabel = localLabel || englishDemonym;
+
+            // Set our localNationalityLabel for the UI
+            setNativeNationalityLabel(nativeLabel);
+
+            // If we *did not already* have a saved NAT01 in local storage,
+            // set the inputs to reflect the English demonym behind the scenes
+            setInputs((prevInputs) => {
+              // Check if we have an existing nationality from pProfile1Inputs
+              const alreadySet = (savedData || []).find(
+                (inp) => inp.id === 'nationality' && inp.value
+              );
+              if (alreadySet) {
+                return prevInputs; // Don't overwrite if already set
+              }
+              return prevInputs.map((inp) => {
+                if (inp.id === 'nationality') {
+                  return { ...inp, value: englishDemonym };
+                }
+                return inp;
+              });
+            });
+          } else {
+            // If we cannot match the country, at least show the raw specifyInput
+            setNativeNationalityLabel(countryName);
+            // Optionally also store the raw name behind the scenes
+            setInputs((prev) =>
+              prev.map((inp) => (inp.id === 'nationality' ? { ...inp, value: countryName } : inp))
+            );
+          }
+        })
+        .catch((error) => {
+          console.error('Error fetching restcountries data:', error);
+          // Fallback: just show user’s specifyInput
+          setNativeNationalityLabel(countryName);
+          setInputs((prev) =>
+            prev.map((inp) => (inp.id === 'nationality' ? { ...inp, value: countryName } : inp))
+          );
+        });
+    }
+
+    // Update currency from local storage if any
+    setInputs((prev) =>
+      prev.map((input) => {
+        if (input.surveyquestion_ref === 'CUR01') {
+          return {
+            ...input,
+            value: loadFromLocalStorage('touristCurrency') || input.value,
+          };
+        }
+        return input;
+      })
+    );
   }, []);
 
   /**
-   * Fetch relevant data (nationalities, currencies, conversion rates) on component mount.
+   * Fetch relevant data (all possible nationalities, currencies, conversion rates).
    */
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Fetch nationalities
+        // 1) Fetch a list of countries from restcountries (for your dropdown)
         const response = await fetch('https://restcountries.com/v3.1/all');
         const data = await response.json();
-
+  
         const nationalityOptions = data.map((country) => {
-          const nationality = country.demonyms?.eng?.m || 'Unknown';
+          const engMale = country.demonyms?.eng?.m || 'Unknown';
+          const engFemale = country.demonyms?.eng?.f || 'Unknown';
+          const englishDemonym = engMale !== 'Unknown' ? engMale : engFemale;
+  
+          // Attempt to fetch a local demonym for display
+          const langObj = country.languages || {};
+          const firstLangCode = Object.keys(langObj)[0]; // e.g., "lav" for Latvian
+          let localDemonym = '';
+          if (firstLangCode && country.demonyms?.[firstLangCode]) {
+            const localMale = country.demonyms[firstLangCode].m || '';
+            const localFemale = country.demonyms[firstLangCode].f || '';
+            localDemonym = localMale || localFemale || englishDemonym;
+          }
+  
           return {
-            value: nationality,
-            label: nationality,
+            value: englishDemonym, // For submission
+            label: localDemonym || englishDemonym, // For display
           };
         });
+  
         nationalityOptions.sort((a, b) => a.label.localeCompare(b.label));
         setNationalities(nationalityOptions);
       } catch (error) {
         console.error('Error fetching nationalities:', error);
       }
-
-      // Fetch currencies
+  
+      // 2) Fetch currencies
       const currencyOptions = await fetchCurrencies();
       setCurrencies(currencyOptions);
-
-      // Fetch conversion rates
+  
+      // 3) Fetch conversion rates
       const rates = await fetchConversionRates();
       setConversionRates(rates);
     };
-
     fetchData();
   }, []);
 
@@ -230,17 +322,18 @@ const PProfile1 = () => {
   const handleNextClick = () => {
     // Save to local storage first
     saveToLocalStorage('pProfile1Inputs', inputs);
-
+  
+    // Submit the final responses (uses the behind-the-scenes English demonym for 'nationality')
     const surveyResponses = inputs.map((input) => ({
       surveyquestion_ref: input.surveyquestion_ref,
       response_value: input.value.toString(),
     }));
     submitSurveyResponses(surveyResponses);
-
+  
     goToNextStep(currentStepIndex, navigate, routes, activeBlocks);
   };
 
-  // Sex and civil status options
+  // Example sex and civil status options
   const sexOptions = [
     { value: 'male', label: translations.sexMale },
     { value: 'female', label: translations.sexFemale },
@@ -289,24 +382,26 @@ const PProfile1 = () => {
 
             {/* Nationality */}
             <Label htmlFor="nationality">{translations.nationalityLabel}</Label>
-            <Select
-              options={nationalities}
-              value={nationalities.find(
-                (option) =>
-                  option.value === inputs.find((input) => input.id === 'nationality').value
-              )}
-              onChange={(option) => handleInputChange('nationality', option.value)}
-              placeholder="........."
-              styles={customSelectStyles}
-              isSearchable
-            />
 
+
+
+            <Select
+  options={nationalities}
+  value={nationalities.find(
+    (option) =>
+      option.value === inputs.find((inp) => inp.id === 'nationality')?.value
+  )}
+  onChange={(option) => handleInputChange('nationality', option.value)}
+  placeholder="........."
+  styles={customSelectStyles}
+  isSearchable
+/>
             {/* Sex */}
             <Label htmlFor="sex">{translations.sexLabel}</Label>
             <Select
               options={sexOptions}
               value={sexOptions.find(
-                (option) => option.value === inputs.find((input) => input.id === 'sex').value
+                (option) => option.value === inputs.find((inp) => inp.id === 'sex').value
               )}
               onChange={(option) => handleInputChange('sex', option.value)}
               placeholder="........."
@@ -353,7 +448,7 @@ const PProfile1 = () => {
               onChange={(e) => handleInputChange('income', e.target.value)}
             />
 
-            {/* Currency Selection */}
+            {/* Currency */}
             <Label htmlFor="currency">{translations.currencyLabel}</Label>
             <Select
               options={currencies}
@@ -417,7 +512,7 @@ const PProfile1 = () => {
               menuPosition="fixed"
             />
 
-            {/* Converted Income (read-only display) */}
+            {/* Converted Income (read-only) */}
             <Label>
               {translations.convertedIncomeLabel}{' '}
               {inputs.find((input) => input.id === 'convertedIncome').value}

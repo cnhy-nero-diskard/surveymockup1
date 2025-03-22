@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from 'react';
+import React, { useState, useContext, useEffect, useRef, useCallback } from 'react';
 import { useSpring, animated } from 'react-spring';
 import styled, { css } from 'styled-components';
 import './BranchingSelect.css';
@@ -22,12 +22,12 @@ const Option = styled(animated.div)`
   cursor: pointer;
   color: white;
   border-color: transparent;
-  transition: background-color 0.3s ease;
+  transition: background-color 0.1s ease;
   background-color: rgb(47, 134, 206);
   box-shadow: inset 0 1px 4px rgba(0, 0, 0, 0.15);
 
-  &:hover {
-    background-color: rgb(4, 110, 197);
+  &:active {
+    background-color: rgb(5, 156, 43) !important;
   }
 
   ${({ $selected }) =>
@@ -36,6 +36,12 @@ const Option = styled(animated.div)`
       background-color: rgb(5, 156, 43);
       color: white;
     `}
+
+  @media (hover: hover) and (pointer: fine) {
+    &:hover {
+      background-color: rgb(4, 110, 197);
+    }
+  }
 `;
 
 const NextButton = styled(animated.button)`
@@ -59,38 +65,10 @@ const BranchingSelect = () => {
   const [language, setLanguage] = useState(localStorage.getItem('selectedLanguage'));
   const translations = useTranslations('BranchingSelect', language);
 
-  const { routes } = useContext(UnifiedContext);
+  const { routes, appendActiveBlocks, removeActiveBlocks, activeBlocks } = useContext(UnifiedContext);
   const currentStepIndex = useCurrentStepIndex(routes);
-  const { activeBlocks, appendActiveBlocks, removeActiveBlocks } = useContext(UnifiedContext);
 
-  // Load saved options from localStorage on component mount
-  useEffect(() => {
-    const savedOptions = loadFromLocalStorage('branchingSelectOptions');
-    if (savedOptions) {
-      setSelectedOptions(savedOptions);
-      savedOptions.forEach(option => appendActiveBlocks([optionToBlockMap[option]]));
-    }
-  }, []);
-
-  // Save selected options to localStorage whenever they change
-  // useEffect(() => {
-  //   saveToLocalStorage('branchingSelectOptions', selectedOptions);
-  // }, [selectedOptions]);
-
-  useEffect(() => {
-    removeActiveBlocks(optionToBlockMap.ACCOMODATION);
-    removeActiveBlocks(optionToBlockMap.TRANSPORTATION);
-    removeActiveBlocks(optionToBlockMap['EVENT/ACTIVITIES']);
-    removeActiveBlocks(optionToBlockMap.SERVICES);
-  }, []);
-
-  const introAnimation = useSpring({
-    from: { opacity: 0, transform: 'scale(0.8)' },
-    to: { opacity: 1, transform: 'scale(1)' },
-    config: { tension: 200, friction: 20 },
-    delay: 300,
-  });
-
+  // Maps user-selected options to blocks
   const optionToBlockMap = {
     ACCOMODATION: 'accom',
     TRANSPORTATION: 'transp',
@@ -98,21 +76,63 @@ const BranchingSelect = () => {
     SERVICES: 'serv',
   };
 
+  // Used to compare prev vs current selected options
+  const prevSelectedOptionsRef = useRef();
+
+  // 1) Load from localStorage **once** on mount
+  useEffect(() => {
+    const savedOptions = loadFromLocalStorage('branchingSelectOptions');
+    if (savedOptions) {
+      setSelectedOptions(savedOptions);
+      savedOptions.forEach((option) => {
+        if (optionToBlockMap[option]) {
+          appendActiveBlocks([optionToBlockMap[option]]);
+        }
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Empty dependency ensures it runs only once
+
+  // 2) Save to localStorage when selectedOptions changes (avoiding repeated calls)
+  useEffect(() => {
+    if (
+      prevSelectedOptionsRef.current !== undefined &&
+      JSON.stringify(prevSelectedOptionsRef.current) !== JSON.stringify(selectedOptions)
+    ) {
+      saveToLocalStorage('branchingSelectOptions', selectedOptions);
+    }
+    prevSelectedOptionsRef.current = selectedOptions;
+  }, [selectedOptions]);
+
+  // Animation
+  const introAnimation = useSpring({
+    from: { opacity: 0, transform: 'scale(0.8)' },
+    to: { opacity: 1, transform: 'scale(1)' },
+    config: { tension: 200, friction: 20 },
+    delay: 300,
+  });
+
+  // Handle user clicking on an option
   const handleOptionClick = (option) => {
     setSelectedOptions((prevOptions) => {
       if (prevOptions.includes(option)) {
-        removeActiveBlocks(optionToBlockMap[option]);
+        // Remove from active blocks if unselected
+        if (optionToBlockMap[option]) {
+          removeActiveBlocks(optionToBlockMap[option]);
+        }
         return prevOptions.filter((opt) => opt !== option);
       } else {
-        appendActiveBlocks([optionToBlockMap[option]]);
+        // Append to active blocks if newly selected
+        if (optionToBlockMap[option]) {
+          appendActiveBlocks([optionToBlockMap[option]]);
+        }
         return [...prevOptions, option];
       }
     });
   };
 
+  // Prepare survey responses and move to next route
   const handleNextClick = async () => {
-    saveToLocalStorage('branchingSelectOptions', selectedOptions);
-
     const surveyResponses = selectedOptions.map((option) => ({
       surveyquestion_ref: getSurveyQuestionRef(option),
       response_value: option,
@@ -126,6 +146,7 @@ const BranchingSelect = () => {
     }
   };
 
+  // Helper function to map selected option to question reference
   const getSurveyQuestionRef = (option) => {
     const refMap = {
       ACCOMODATION: 'BRACC',
@@ -146,6 +167,7 @@ const BranchingSelect = () => {
       >
         <animated.div style={introAnimation}>
           <QuestionText>{translations.branchingSelectSurveyTitle}</QuestionText>
+
           <Option
             onClick={() => handleOptionClick('ACCOMODATION')}
             $selected={selectedOptions.includes('ACCOMODATION')}

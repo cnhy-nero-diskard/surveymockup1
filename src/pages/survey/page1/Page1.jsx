@@ -101,8 +101,22 @@ const NextButton = styled.input`
 `;
 
 const Page1 = () => {
-  const [language, setLanguage] = useState(localStorage.getItem('selectedLanguage'));
+  // Retain your existing translation logic
+  const [language, setLanguage] = useState(localStorage.getItem('selectedLanguage') || 'en');
   const translations = useTranslations('residence1', language);
+
+  // Inline localizations for the page title only
+  const titleLocalizations = {
+    en: 'TOURISM PRODUCT MARKET SURVEY',
+    ko: '관광 제품 시장 조사',
+    zh: '旅游产品市场调查',
+    ja: '観光製品市場調査',
+    es: 'ENCUESTA DE MERCADO DE PRODUCTOS TURÍSTICOS',
+    fr: 'ENQUÊTE SUR LE MARCHÉ DES PRODUITS TOURISTIQUES',
+    ru: 'ОПРОС РЫНКА ТУРИСТИЧЕСКИХ ПРОДУКТОВ',
+    hi: 'पर्यटन उत्पाद बाजार सर्वेक्षण'
+  };
+
   const navigate = useNavigate();
   const { routes } = useContext(UnifiedContext);
   const [currentStep, setCurrentStep] = useState();
@@ -113,7 +127,10 @@ const Page1 = () => {
     const fetchProgress = async () => {
       try {
         console.log("GET SURVEYPROGRESS");
-        const response = await axios.get(`${process.env.REACT_APP_API_HOST}/api/survey/progress`, { withCredentials: true });
+        const response = await axios.get(
+          `${process.env.REACT_APP_API_HOST}/api/survey/progress`,
+          { withCredentials: true }
+        );
         setCurrentStep(response.data.currentStep);
       } catch (err) {
         console.error(err);
@@ -133,19 +150,18 @@ const Page1 = () => {
       <Wave />
       <Content>
         <Logo src={logo} alt="Department of Tourism Philippines logo" />
-        <Title>TOURISM PRODUCT MARKET SURVEY</Title>
+        
+        {/* Display the title using the inline localizations object */}
+        <Title>{titleLocalizations[language]}</Title>
+
         <div style={{ display: 'flex', justifyContent: 'center', marginTop: '10px' }}>
-          <BackButtonU
-            onClick={() => navigate(-1)}
-          >
-              ←
+          <BackButtonU onClick={() => navigate(-1)}>
+            ←
           </BackButtonU>
-
-
           <NextButtonU onClick={handleNextClick}>
             {translations.next}
           </NextButtonU>
-</div>
+        </div>
       </Content>
     </>
   );
