@@ -47,9 +47,13 @@ const TravelOptions = () => {
         setSelectedOption(option);
         setNextStep(true);
         removeActiveBlocks('pkgtour');
+        removeActiveBlocks('indtravel');
 
         if (option !== 'Independent Traveler/s') {
             appendActiveBlocks(['pkgtour']);
+        } else{
+            appendActiveBlocks(['indtravel']);
+
         }
         // Prepare the survey response object
         const surveyResponse = {

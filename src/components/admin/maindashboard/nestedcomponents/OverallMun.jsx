@@ -66,6 +66,7 @@ const OverallMun = () => {
       if (counts.negative !== "0" && negativeLabel) {
         data.push({ name: `Negative (${negativeLabel})`, value: parseInt(counts.negative), color: "#e31a1c" }); // Red
       }
+      console.log(`PIE DATA -->${JSON.stringify(data)}`);
 
       setPieData(data);
     };
@@ -91,7 +92,7 @@ const OverallMun = () => {
                 cx="50%"
                 cy="50%"
                 innerRadius={60}
-                outerRadius={80}
+                outerRadius={100}
                 fill="#8884d8"
                 label
               >
@@ -100,7 +101,11 @@ const OverallMun = () => {
                 ))}
               </Pie>
               <Tooltip />
-              <Legend />
+              <Legend
+                wrapperStyle={{
+                  fontSize: '20px',
+                }}
+              />
             </PieChart>
           </ResponsiveContainer>
         </ChartContainer>

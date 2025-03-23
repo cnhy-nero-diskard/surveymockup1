@@ -8,14 +8,14 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { animated, useSpring } from 'react-spring';
 
 // --- Spinner Animation ---
-const spinAnimation = keyframes`
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
-`;
+// const spinAnimation = keyframes`
+//   0% {
+//     transform: rotate(0deg);
+//   }
+//   100% {
+//     transform: rotate(360deg);
+//   }
+// `;
 
 // --- Styled Spinner ---
 const Spinner = styled.div`
@@ -24,7 +24,6 @@ const Spinner = styled.div`
   border-radius: 50%;
   width: 2rem;
   height: 2rem;
-  animation: ${spinAnimation} 1s linear infinite;
 `;
 
 // --- Overlay Container ---
@@ -129,9 +128,6 @@ const ProgressBar = styled.div`
   );
   border-radius: 1px;
   width: ${({ progress }) => progress}%;
-  transition: width 0.5s ease-out, background 0.5s ease-out;
-  animation: ${pulseAnimation} 3s infinite ease-in-out,
-             ${colorChangeAnimation} 5s infinite ease-in-out;
   will-change: transform, width, background-color;
 `;
 
@@ -232,7 +228,6 @@ const GradientBackground = ({
       <ProgressBarContainer>
         <ProgressBar progress={progress} />
       </ProgressBarContainer>
-      <AnimatedContainer style={containerAnimation}>
         <BackgroundWrapper>
           {true && (
             <OverlayImage
@@ -251,7 +246,6 @@ const GradientBackground = ({
             </OverlayContainer>
           )}
         </BackgroundWrapper>
-      </AnimatedContainer>
 
       {buttonAppear && (
         <div style={{ display: 'flex', justifyContent: 'center', marginTop: '10px' }}>

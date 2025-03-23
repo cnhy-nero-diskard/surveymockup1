@@ -81,9 +81,14 @@ const BranchingSelect = () => {
 
   // 1) Load from localStorage **once** on mount
   useEffect(() => {
+
+
+    removeActiveBlocks('yesaccom');
+    removeActiveBlocks('noaccom');
     const savedOptions = loadFromLocalStorage('branchingSelectOptions');
     if (savedOptions) {
       setSelectedOptions(savedOptions);
+      
       savedOptions.forEach((option) => {
         if (optionToBlockMap[option]) {
           appendActiveBlocks([optionToBlockMap[option]]);

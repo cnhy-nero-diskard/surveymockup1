@@ -103,7 +103,7 @@ const Suggestions = styled.ul`
   top: 64px; /* positions the suggestions below the input */
   left: 0;
   right: 0;
-  z-index: 99; /* ensures suggestions appear above other elements */
+  z-index: 9999;
 `;
 
 const SuggestionItem = styled.li`
@@ -125,7 +125,7 @@ const CloseSuggestions = styled.button`
   right: 8px;
   border: none;
   cursor: pointer;
-  font-size: 0.8rem;  
+  font-size: 0.8rem;
   color: #aaa;
   background: transparent;
 
@@ -180,6 +180,31 @@ function convertEnglishToNativeOrReturn(englishName) {
   return foundCode ? countries[foundCode].native : englishName;
 }
 
+/**
+ * Returns a default country (in English) depending on the user’s selected language.
+ */
+function getDefaultCountryByLanguage(lang) {
+  switch (lang) {
+    case 'ko':
+      return 'Korea';
+    case 'zh':
+      return 'Chinese';
+    case 'ja':
+      return 'Japan';
+    case 'es':
+      return 'Spain';
+    case 'fr':
+      return 'France';
+    case 'ru':
+      return 'Russia';
+    case 'hi':
+      return 'India';
+    default:
+      // fallback to English if none of the above
+      return 'United states';
+  }
+}
+
 const Residence1 = () => {
   /**
    * Check localStorage on initial render.
@@ -187,17 +212,37 @@ const Residence1 = () => {
   const storedData = loadFromLocalStorage('Residence1Data') || {};
 
   /**
-   * For 'specifyInput', we assume the stored value is in English,
-   * so we convert it to native for display.
+   * Identify language from localStorage first.
    */
-  let initialSpecifyValue = storedData.specifyInput || '';
-  if (initialSpecifyValue) {
-    initialSpecifyValue = convertEnglishToNativeOrReturn(initialSpecifyValue);
+  const [language, setLanguage] = useState(
+    localStorage.getItem('selectedLanguage') || 'en'
+  );
+
+  const { routes } = useContext(UnifiedContext);
+  const currentStepIndex = useCurrentStepIndex(routes);
+  const { activeBlocks, appendActiveBlocks, removeActiveBlocks } =
+    useContext(UnifiedContext);
+
+  const navigate = useNavigate();
+  const translations = useTranslations('residence1', language);
+
+  /**
+   * If localStorage has a specifyInput, use that.
+   * Otherwise, supply a default country in English
+   * based on the user’s selected language.
+   */
+  let initialSpecifyValue = storedData.specifyInput;
+  if (!initialSpecifyValue) {
+    initialSpecifyValue = getDefaultCountryByLanguage(language);
   }
 
-  const [language, setLanguage] = useState(
-    localStorage.getItem('selectedLanguage')
-  );
+  // Convert that default or loaded English value to the native 
+  // for display if it exists in `countries-list`.
+  initialSpecifyValue = convertEnglishToNativeOrReturn(initialSpecifyValue);
+
+  /**
+   * Location states
+   */
   const [location, setLocation] = useState(storedData.location || {
     inCity: false,
     outsideCity: false,
@@ -209,11 +254,6 @@ const Residence1 = () => {
   const [cityMunInput, setCityMunInput] = useState(
     storedData.cityMunInput || ''
   );
-
-  /**
-   * Display a native country name in UI,
-   * but store & submit it in English form.
-   */
   const [specifyInput, setSpecifyInput] = useState(initialSpecifyValue);
 
   const [provinceSuggestions, setProvinceSuggestions] = useState([]);
@@ -224,23 +264,14 @@ const Residence1 = () => {
   const [showSpecifySuggestions, setShowSpecifySuggestions] = useState(false);
   const [error, setError] = useState('');
 
-  const { routes } = useContext(UnifiedContext);
-  const currentStepIndex = useCurrentStepIndex(routes);
-  const { activeBlocks, appendActiveBlocks, removeActiveBlocks } =
-    useContext(UnifiedContext);
-
   const [provincesWithMunicipalities, setProvincesWithMunicipalities] =
     useState({});
   const provinceRef = useRef(null);
   const cityMunRef = useRef(null);
   const specifyRef = useRef(null);
 
-  const navigate = useNavigate();
-  const translations = useTranslations('residence1', language);
-
   /**
-   * Fetch the municipalities for all provinces at the start
-   * to populate the suggestion lists.
+   * Fetch the municipalities for all provinces
    */
   useEffect(() => {
     const fetchMunicipalities = async () => {
@@ -272,9 +303,8 @@ const Residence1 = () => {
   }, []);
 
   /**
-   * Whenever the location or input states change,
-   * save them to localStorage. Here we specifically
-   * convert the 'specifyInput' to English before saving.
+   * Save to localStorage on each relevant change
+   * Convert specifyInput to English before saving
    */
   useEffect(() => {
     const dataToSave = {
@@ -289,18 +319,20 @@ const Residence1 = () => {
     saveToLocalStorage('Residence1Data', dataToSave);
   }, [location, provinceInput, cityMunInput, specifyInput]);
 
-  // If province & city are both filled, automatically set the country to "Philippines" (in native form).
+  /**
+   * If user picks a province and a city/municipality,
+   * automatically set the country to “Philippines” (in native form).
+   */
   useEffect(() => {
     if (provinceInput && cityMunInput) {
-      // "Philippines" is actually the English name, so let's convert it to its native form if it exists.
-      // For "Philippines", we do not have a different name in 'countries-list' for the native property:
-      // countries.PH.native is "Pilipinas". If you want to show "Pilipinas", you can do so by calling:
-      // convertEnglishToNativeOrReturn("Philippines").
       const philippinesNative = convertEnglishToNativeOrReturn('Philippines');
       setSpecifyInput(philippinesNative);
     }
   }, [provinceInput, cityMunInput]);
 
+  /**
+   * Helper for location checkboxes
+   */
   const handleLocationChange = (e) => {
     const { name, checked } = e.target;
     const newLocation = {
@@ -319,7 +351,7 @@ const Residence1 = () => {
         // Clear these when switching to "inCity"
         setProvinceInput('');
         setCityMunInput('');
-        // Also set "Philippines" in native form for specifyInput
+        // Also set "Philippines" in native form
         setSpecifyInput(convertEnglishToNativeOrReturn('Philippines'));
       } else if (name === 'outsideCity') {
         appendActiveBlocks(['oprovblock']);
@@ -332,18 +364,59 @@ const Residence1 = () => {
     setError('');
   };
 
-  const handleProvinceInputChange = (e) => {
-    const value = e.target.value;
-    setProvinceInput(value);
-    const filtered = Object.keys(provincesWithMunicipalities).filter((province) =>
-      province.toLowerCase().startsWith(value.toLowerCase())
-    );
-    setProvinceSuggestions(filtered);
-    setShowProvinceSuggestions(true);
-    setCityMunInput('');
-    setCityMunSuggestions([]);
-  };
+// --------------
+// 1) Create a helper that checks for Bohol if 'outsideCity' is active
+const handleProvinceBlockCheck = (provinceValue) => {
+  if (location.outsideCity) {
+    removeActiveBlocks('iprovblock');
+    removeActiveBlocks('oprovblock');
 
+    if (provinceValue.trim().toLowerCase() === 'bohol') {
+      appendActiveBlocks(['iprovblock']);
+    } else {
+      appendActiveBlocks(['oprovblock']);
+    }
+  }
+};
+
+// 2) Call that helper as needed in handleProvinceInputChange
+const handleProvinceInputChange = (e) => {
+  const value = e.target.value;
+  setProvinceInput(value);
+
+  // ∆ Moved logic into helper
+  handleProvinceBlockCheck(value);
+
+  // Filter suggestions as before
+  const filtered = Object.keys(provincesWithMunicipalities).filter((province) =>
+    province.toLowerCase().startsWith(value.toLowerCase())
+  );
+  setProvinceSuggestions(filtered);
+  setShowProvinceSuggestions(true);
+  setCityMunInput('');
+  setCityMunSuggestions([]);
+};
+
+// 3) Also call the helper in handleSuggestionClick
+const handleSuggestionClick = (inputSetter, suggestion) => {
+  inputSetter(suggestion);
+
+  // When it’s the Province input field being updated...
+  if (inputSetter === setProvinceInput) {
+    // ∆ The same check if "outside the city" is selected
+    handleProvinceBlockCheck(suggestion);
+  }
+
+  setShowProvinceSuggestions(false);
+  setShowCityMunSuggestions(false);
+  setShowSpecifySuggestions(false);
+};
+
+//-----------
+
+  /**
+   * City/Municipality input changes
+   */
   const handleCityMunInputChange = (e) => {
     const value = e.target.value;
     setCityMunInput(value);
@@ -357,26 +430,28 @@ const Residence1 = () => {
     }
   };
 
+  /**
+   * Foreign country input changes
+   */
   const handleSpecifyInputChange = (e) => {
     const value = e.target.value;
     setSpecifyInput(value);
-    const filtered = Object.keys(countries).filter((countryCode) =>
-      countries[countryCode].native
-        .toLowerCase()
-        .startsWith(value.toLowerCase())
-    );
+
+    // Filter by either English or native so user can type either
+    const filtered = Object.keys(countries).filter((countryCode) => {
+      const eng = countries[countryCode].name.toLowerCase();
+      const nat = countries[countryCode].native.toLowerCase();
+      const val = value.toLowerCase();
+      return eng.startsWith(val) || nat.startsWith(val);
+    });
     setSpecifySuggestions(filtered);
     setShowSpecifySuggestions(true);
   };
 
-  const handleSuggestionClick = (inputSetter, suggestion) => {
-    // For provinces/cities, we just set the plain string.
-    // For the country, we set the native name.
-    inputSetter(suggestion);
-    setShowProvinceSuggestions(false);
-    setShowCityMunSuggestions(false);
-    setShowSpecifySuggestions(false);
-  };
+  /**
+   * Clicking on a suggestion sets the input
+   */
+
 
   const handleCloseSuggestions = () => {
     setShowProvinceSuggestions(false);
@@ -384,6 +459,9 @@ const Residence1 = () => {
     setShowSpecifySuggestions(false);
   };
 
+  /**
+   * Validations on next click
+   */
   const handleNextClick = async () => {
     const isLocationSelected =
       location.inCity || location.outsideCity || location.foreignCountry;
@@ -399,8 +477,6 @@ const Residence1 = () => {
 
     setError('');
 
-    // For final submission, we also convert the specify input
-    // to English before sending to the server.
     const finalCountryEnglish = specifyInput
       ? convertNativeToEnglishOrReturn(specifyInput)
       : ' ';
@@ -594,7 +670,8 @@ const Residence1 = () => {
                         )
                       }
                     >
-                      {countries[countryCode].native}
+                      {/* Display both English and native forms */}
+                      {countries[countryCode].name} -- {countries[countryCode].native}
                     </SuggestionItem>
                   ))}
                 </Suggestions>

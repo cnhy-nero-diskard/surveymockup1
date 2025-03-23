@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   PieChart,
   Pie,
@@ -27,9 +27,24 @@ import {
 import Autocomplete from '@mui/material/Autocomplete';
 import styled from 'styled-components';
 import { fontFamily, fontSize, fontWeight } from '../../../config/fontConfig';
+import LocSpecificTopic from '../shared/partials/piecharttopics';
 
 // Color palette for charts
-const COLORS = ['#0088FE', '#FF8042', '#00C49F', '#FFBB28', '#8884D8'];
+const COLORS = ['red', 'yellow', 'rgb(19, 187, 13)', '#007AFF', '#8884D8'];
+
+// Unique color palette for Responses Proportion chart
+const RESPONSE_PROPORTION_COLORS = [
+  '#FF5733', // Bright Orange
+  '#33FF57', // Bright Green
+  '#3357FF', // Bright Blue
+  '#FF33A1', // Bright Pink
+  '#A133FF', // Bright Purple
+  '#33FFF5', // Bright Cyan
+  '#FFC300', // Bright Yellow
+  '#C70039', // Bright Red
+  '#900C3F', // Dark Pink
+  '#581845', // Dark Purple
+];
 
 /**
  * Styled Paper component with custom padding, width, and alignment.
@@ -100,6 +115,10 @@ const DataDashboard = ({ data, entities, entityLabel, entityKey }) => {
     return acc + (data[entity.key]?.totalResponses || 0);
   }, 0);
 
+  useEffect(() => {
+    console.log(`Entities = ${JSON.stringify(entities)}`);
+  }, []);
+
   // Build a single data entry for the stacked bar,
   // where each property is named after an entity's 'name' and stores its % of total
   const stackedData = [
@@ -141,6 +160,7 @@ const DataDashboard = ({ data, entities, entityLabel, entityKey }) => {
             value={entities.find((entity) => entity.key === selectedEntity) || null}
             onChange={(event, newValue) => {
               if (newValue) {
+                console.log(`Selected Entity: ${JSON.stringify(selectedEntity)}`);
                 setSelectedEntity(newValue.key);
               }
             }}
@@ -212,7 +232,7 @@ const DataDashboard = ({ data, entities, entityLabel, entityKey }) => {
                   key={entity.key}
                   dataKey={entity.name}
                   stackId="allEntities"
-                  fill={COLORS[index % COLORS.length]}
+                  fill={RESPONSE_PROPORTION_COLORS[index % RESPONSE_PROPORTION_COLORS.length]}
                 />
               ))}
             </BarChart>
@@ -221,7 +241,6 @@ const DataDashboard = ({ data, entities, entityLabel, entityKey }) => {
       </Grid>
 
       {/* Modal for Detailed Breakdown */}
-
       <Modal
         open={modalOpen}
         onClose={handleModalClose}
@@ -305,7 +324,7 @@ const DataDashboard = ({ data, entities, entityLabel, entityKey }) => {
         </Box>
       </Grid>
 
-      {/* Most Mentioned Terms Bar Chart */}
+      {/* Replace Most Mentioned Terms Bar Chart with PieChartTopics */}
       <Grid item xs={12} md={6}>
         <Box display="flex" justifyContent="center">
           <StyledPaper
@@ -316,26 +335,11 @@ const DataDashboard = ({ data, entities, entityLabel, entityKey }) => {
             }}
           >
             <Typography variant="h6" gutterBottom>
-              Most Mentioned Terms
+              Sentiment by Topic
             </Typography>
-            <BarChart
-              width={400}
-              height={300}
-              data={entityData.mentionedTerms}
-            >
-              <XAxis
-                dataKey="term"
-                tickFormatter={(value) =>
-                  value.length > 5 ? `${value.slice(0, 5)}...` : value
-                }
-                angle={-45}
-                textAnchor="end"
-              />
-              <YAxis />
-              <Tooltip />
-              <Legend />
-              <Bar dataKey="count" fill="#8884d8" />
-            </BarChart>
+            <Box width="100%" height={300}> {/* Set a fixed height for the chart container */}
+              <LocSpecificTopic short_id={entities.find((entity) => entity.key === selectedEntity)?.short_id} />
+            </Box>
           </StyledPaper>
         </Box>
       </Grid>

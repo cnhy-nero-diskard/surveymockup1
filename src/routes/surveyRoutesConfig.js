@@ -73,8 +73,8 @@ export const sroutes = [
     { label: 'Gmail Form', path: 'prelimform', component: PrelimForm, conditionalBlock: 'surveytpms'},
     { label: 'Greetings', path: 'greetings', component: Greetings, conditionalBlock: 'surveytpms'},
     { label: 'Residence 1', path: 'residence1', component: Residence1, conditionalBlock: 'surveytpms'},
-    { label: 'Transportation 1', path: 'transportation1', component: Transportation1, conditionalBlock: 'oprovblock'},
-    { label: 'Transportation 2', path: 'transportation2', component: Transportation2, conditionalBlock: 'iprovblock'},
+    { label: 'Transportation 1', path: 'outsidemodetranspo', component: Transportation1, conditionalBlock: 'oprovblock'},
+    { label: 'Transportation 2', path: 'insidemodetranspo', component: Transportation2, conditionalBlock: 'iprovblock'},
     { label: 'Main Purpose', path: 'mainpurpose', component: MainPurpose, conditionalBlock: 'surveytpms'},
     { label: 'Visit Frequency Form', path: 'visitfrequencyform', component: VisitFrequencyForm, conditionalBlock: 'surveytpms'},
     { label: 'Travel Question', path: 'travelquestion', component: TravelQuestion, conditionalBlock: 'surveytpms'},
@@ -85,9 +85,9 @@ export const sroutes = [
     { label: 'Package Paid', path: 'packagepaid', component: PackagePaid, conditionalBlock: 'pkgtour'},
     { label: 'Package Tour Feedback', path: 'packagetourfeedback', component: PackageTourFeedback, conditionalBlock: 'pkgtour'},
     
-    { label: 'Expense Tracker', path: 'expensetracker', component: ExpenseTracker, conditionalBlock: 'surveytpms'},
-    { label: 'Percentage Share List', path: 'percentagesharelist', component: PercentageShareList, conditionalBlock: 'perclist'},
-    { label: 'Expense Companions', path: 'expensecompanions', component: ExpenseCompanions, conditionalBlock: 'surveytpms'},
+    { label: 'Expense Tracker', path: 'expensetracker', component: ExpenseTracker, conditionalBlock: 'indtravel'},
+    { label: 'Percentage Share List', path: 'percentagesharelist', component: PercentageShareList, conditionalBlock: 'indtravel'},
+    { label: 'Expense Companions', path: 'expensecompanions', component: ExpenseCompanions, conditionalBlock: 'indtravel'},
     
     //                  !!!!!!!!!!!!!!!!!!!!!!   BRANCHING SELECT !!!!!!!!!!!!!!!!!!!!!!
     { label: 'Branching Select', path: 'branchingselect', component: BranchingSelect, conditionalBlock: 'surveytpms'},
@@ -121,7 +121,7 @@ export const sroutes = [
     
     
     
-    { label: 'rateservicesf', path: 'services2', component: Services2, conditionalBlock: 'serv'},
+    { label: 'Rate services finance', path: 'servicefinan', component: Services2, conditionalBlock: 'serv'},
     { label: 'Open Ended 1', path: 'openendedservice', component: OpenEndedServicev2, conditionalBlock: 'serv'},
     { label: 'Destination Shopping List', path: 'destshlist', component: DestinationShoppingList, conditionalBlock: 'serv'},
     { label: 'Open Ended Lifestyle', path: 'openendedlifestyle', component: OpenEndedLifestylev2,conditionalBlock: 'serv'},
@@ -131,7 +131,7 @@ export const sroutes = [
     
     { label: 'Services 1', path: 'rategeneralpricing', component: Services1, conditionalBlock: 'surveytpms'},
     { label: 'Personal Profile 1', path: 'pprofile1', component: PProfile1, conditionalBlock: 'surveytpms'},
-    { label: 'Personal Profile 2', path: 'pprofile2', component: PProfile2, conditionalBlock: 'surveytpms'},
+    { label: 'Personal Profile 2', path: 'dates', component: PProfile2, conditionalBlock: 'surveytpms'},
     { label: 'Survey Venue', path: 'surveyvenue', component: SurveyVenue, conditionalBlock: 'surveytpms'},
     // { label: 'Proponent LGU', path: 'proponentlgu', component: ProponentLgu, conditionalBlock: 'surveytpms'},
     { label: 'Survey Evaluation VERSION1', path: 'surveyevaluation05', component: SurveyEvaluation05, conditionalBlock: 'surveytpms'},

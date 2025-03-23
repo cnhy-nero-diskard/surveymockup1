@@ -71,6 +71,7 @@ const AreaDashboard = () => {
     return metrics.map((metric) => ({
       key: metric.entity.toLowerCase().replace(/\s+/g, ''), // Create a unique key for each entity
       name: metric.entity,
+      short_id: metric.short_id,
     }));
   };
 
@@ -91,6 +92,7 @@ const AreaDashboard = () => {
       entities={entities}
       entityLabel="Select Area"
       entityKey={entities[0]?.key} // Default to the first entity
+      
     />
   );
 };
