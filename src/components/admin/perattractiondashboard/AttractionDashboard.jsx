@@ -71,6 +71,8 @@ const AttractionDashboard = () => {
     return metrics.map((metric) => ({
       key: metric.entity.toLowerCase().replace(/\s+/g, ''), // Create a unique key for each entity
       name: metric.entity,
+      short_id: metric.short_id,
+
     }));
   };
 

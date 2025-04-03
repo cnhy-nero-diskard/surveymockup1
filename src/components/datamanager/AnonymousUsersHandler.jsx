@@ -240,18 +240,31 @@ const AnonymousUsersHandler = () => {
   };
 
   // Sorting function
-  const sortUsers = (criteria) => {
-    let sortedUsers = [...users];
-try{    if (criteria === 'alphabetical') {
-      sortedUsers.sort((a, b) => a.nickname.localeCompare(b.nickname));
+const sortUsers = (criteria) => {
+  let sortedUsers = [...users];
+
+  sortedUsers.sort((a, b) => {
+    // Priority 1: Sort by 'Present Data'
+    const aHasData = ["AT LEAST ONE ENTRY", "HAS COMPLETED"].includes(a.surveyStatus) ||
+                     a.feedback === true || a.tpms === true;
+    const bHasData = ["AT LEAST ONE ENTRY", "HAS COMPLETED"].includes(b.surveyStatus) ||
+                     b.feedback === true || b.tpms === true;
+
+    if (aHasData && !bHasData) return -1; // a comes first
+    if (!aHasData && bHasData) return 1;  // b comes first
+
+    // Priority 2: Sort by the selected criteria (alphabetical or created_at)
+    if (criteria === 'alphabetical') {
+      return a.nickname.localeCompare(b.nickname);
     } else if (criteria === 'created_at') {
-      sortedUsers.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+      return new Date(a.created_at) - new Date(b.created_at);
     }
-}catch(error){
-  console.log('Encountered an error:', error);
-}
-    setUsers(sortedUsers);
-  };
+
+    return 0; // Default case
+  });
+
+  setUsers(sortedUsers);
+};
 
   // Handle sort criteria change
   const handleSortChange = (e) => {
@@ -266,14 +279,16 @@ try{    if (criteria === 'alphabetical') {
   return (
     <Container>
       <Title>Anonymous Users and Survey Status</Title>
-      <PurgeButton onClick={handlePurge}>PURGE</PurgeButton>
-      <div>
-        <label>Sort by: </label>
-        <select value={sortCriteria} onChange={handleSortChange}>
-          <option value="alphabetical">Alphabetical</option>
-          <option value="created_at">Created At</option>
-        </select>
-      </div>
+      {/* <PurgeButton onClick={handlePurge}>PURGE</PurgeButton> */}
+<div>
+  <label>Sort by: </label>
+  <select value={sortCriteria} onChange={handleSortChange}>
+    <option value="alphabetical">Alphabetical</option>
+    <option value="created_at">Created At</option>
+    <option value="present_data">Present Data</option> {/* New sort option */}
+  </select>
+</div>
+
       <TableContainer>
         <Table>
           <TableHeader>

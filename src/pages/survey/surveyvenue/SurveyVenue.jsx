@@ -158,6 +158,16 @@ const SurveyVenue = () => {
     translations.surveyVenueOthersSpecify,
   ];
 
+  // Mapping of translated venue options to their English equivalents
+  const venueMapping = {
+    [translations.surveyVenueAccommodationEstablishment]: 'Accommodation Establishment',
+    [translations.surveyVenueTouristAttraction]: 'Tourist Attraction',
+    [translations.surveyVenueMICEFacility]: 'MICE Facility',
+    [translations.surveyVenueEmailedSurvey]: 'Emailed Survey',
+    [translations.surveyVenuePortTransportationFacility]: 'Port/Transportation Facility',
+    [translations.surveyVenueOthersSpecify]: 'Others (Specify)',
+  };
+
   /**
    * Handles the selection of a venue.
    * @param {string} venue - The selected venue.
@@ -167,7 +177,7 @@ const SurveyVenue = () => {
     if (venue === translations.surveyVenueOthersSpecify) {
       setShowPopup(true);
     } else {
-      submitResponse(venue);
+      submitResponse(venueMapping[venue]);
       // Save to localStorage right before navigating
       saveToLocalStorage('surveyVenue', { selectedVenue: venue, otherVenue: '' });
       goToNextStep(currentStepIndex, navigate, routes, activeBlocks);

@@ -62,8 +62,6 @@ const Greetings = () => {
   const currentStepIndex = useCurrentStepIndex(routes);
   const { activeBlocks, setActiveBlocks } = useContext(UnifiedContext);
 
-  // Animation props for container
-
   // Animation props for button
   const buttonProps = useSpring({
     from: { opacity: 0, transform: 'scale(0.9)' },

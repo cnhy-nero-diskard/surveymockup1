@@ -70,7 +70,7 @@ const ExpenseCompanions = () => {
         if (isBlockActive('isalone')){
             console.log('COUNTER IS ALONE FOR ENUMERATION');
             submitSurveyResponses({ surveyquestion_ref: "EXPC", response_value: "1" })
-            // goToNextStep(currentStepIndex, navigate, routes, activeBlocks);
+            goToNextStep(currentStepIndex, navigate, routes, activeBlocks);
         }
     }, []);
 

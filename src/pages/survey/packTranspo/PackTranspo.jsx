@@ -113,7 +113,10 @@ const PackTranspo = () => {
 
   // Handle user actions:
   const handleInputChange = (e) => {
-    setPrice(e.target.value);
+    const inputValue = e.target.value;
+    // Use a regular expression to remove any non-digit characters
+    const integerValue = inputValue.replace(/[^0-9]/g, '');
+    setPrice(integerValue);
   };
 
   const handleCurrencyChange = (selectedOption) => {
@@ -159,13 +162,13 @@ const PackTranspo = () => {
         blendMode="screen"
         handleNextClick={handleNextClick}
         buttonAppear={true}
-        nextmsg= {translations.packTranspoNextButton}
+        nextmsg={price.length > 0 ? '' : translations.packTranspoNextButton}
       >
         <QuestionText>{translations.packTranspoQuestion}</QuestionText>
         <InputContainer>
           <InputLabel>{translations.packTranspoInputLabel}</InputLabel>
           <CurrencyInput
-            type="number"
+            type="text" // Change from "number" to "text"
             placeholder={translations.packTranspoInputPlaceholder}
             value={price}
             onChange={handleInputChange}
@@ -243,3 +246,4 @@ const PackTranspo = () => {
 };
 
 export default PackTranspo;
+

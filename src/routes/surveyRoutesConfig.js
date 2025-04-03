@@ -86,7 +86,7 @@ export const sroutes = [
     { label: 'Package Tour Feedback', path: 'packagetourfeedback', component: PackageTourFeedback, conditionalBlock: 'pkgtour'},
     
     { label: 'Expense Tracker', path: 'expensetracker', component: ExpenseTracker, conditionalBlock: 'indtravel'},
-    { label: 'Percentage Share List', path: 'percentagesharelist', component: PercentageShareList, conditionalBlock: 'indtravel'},
+    { label: 'Percentage Share List', path: 'percentagesharelist', component: PercentageShareList, conditionalBlock: 'perclist'},
     { label: 'Expense Companions', path: 'expensecompanions', component: ExpenseCompanions, conditionalBlock: 'indtravel'},
     
     //                  !!!!!!!!!!!!!!!!!!!!!!   BRANCHING SELECT !!!!!!!!!!!!!!!!!!!!!!

@@ -233,7 +233,7 @@ const SurveyTouchpoints = () => {
               <Subtitle variant="body1">
                 Scan the QR code below to access the survey.
               </Subtitle>
-              {generateQRCode(`${process.env.REACT_APP_SELF_URL}/tpms/`)}
+              {generateQRCode(`${process.env.REACT_APP_SELF_URL}/survey/`)}
               <LinkContainer>
                 <StyledLink
                   href={`${process.env.REACT_APP_SELF_URL}/survey/`}

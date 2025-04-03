@@ -188,7 +188,7 @@ function getDefaultCountryByLanguage(lang) {
     case 'ko':
       return 'Korea';
     case 'zh':
-      return 'Chinese';
+      return 'China';
     case 'ja':
       return 'Japan';
     case 'es':

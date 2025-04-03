@@ -27,15 +27,38 @@ export const submitSurveyResponses = async (
             chunks.push(surveyResponses.slice(i, i + chunkSize));
         }
 
-        // Send each chunk in a separate request
+        // Helper function to retry API requests
+        const retryRequest = async (requestFn, maxRetries, timeout) => {
+            let attempts = 0;
+            while (attempts < maxRetries) {
+                try {
+                    return await requestFn();
+                } catch (error) {
+                    attempts++;
+                    console.warn(`Attempt ${attempts} failed. Retrying...`);
+                    if (attempts >= maxRetries) {
+                        throw new Error(`Max retries reached: ${error.message}`);
+                    }
+                    await new Promise((resolve) => setTimeout(resolve, timeout));
+                }
+            }
+        };
+
+        // Send each chunk in a separate request with retry logic
         const responses = [];
         for (const chunk of chunks) {
-            const response = await axios.post(
-                `${process.env.REACT_APP_API_HOST}/api/survey/submit`,
-                { surveyResponses: chunk },
-                {
-                    withCredentials: true,
-                }
+            const response = await retryRequest(
+                async () => {
+                    return await axios.post(
+                        `${process.env.REACT_APP_API_HOST}/api/survey/submit`,
+                        { surveyResponses: chunk },
+                        {
+                            withCredentials: true,
+                        }
+                    );
+                },
+                20, // Max retries
+                500 // Timeout between retries in milliseconds (10 seconds)
             );
             responses.push(response.data);
             console.log('SUBMIT Survey responses chunk submitted successfully:', response.data);

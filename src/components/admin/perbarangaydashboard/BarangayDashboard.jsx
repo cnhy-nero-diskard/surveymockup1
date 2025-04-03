@@ -15,7 +15,7 @@ const AreaDashboard = () => {
         const data = await fetchEntityMetrics();
         // Filter data to include only objects with touchpoint="attractions"
         const filteredData = Array.isArray(data)
-          ? data.filter(item => (item.touchpoint === "barangay" || item.touchpoint === "island" || item.touchpoint === "points" ))
+          ? data.filter(item => (item.touchpoint === "barangay" || item.touchpoint === "island" || item.touchpoint === "points" || item.touchpoint === "transportation"))
           : [];        if (filteredData.length === 0) {
           setMetrics([{
             entity: "No Data Available",

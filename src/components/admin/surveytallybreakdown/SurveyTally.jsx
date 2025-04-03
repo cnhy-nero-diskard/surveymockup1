@@ -108,6 +108,23 @@ const SurveyTally = () => {
     });
   };
 
+  /**
+   * getUniqueKeys:
+   * Extracts all unique keys from the 'occurrences' objects in the data.
+   * These keys will be used to dynamically generate the <Bar> components.
+   */
+  const getUniqueKeys = () => {
+    const keys = new Set();
+    data.forEach((group) => {
+      Object.keys(group).forEach((key) => {
+        if (key !== 'name' && key !== 'isEmpty') {
+          keys.add(key);
+        }
+      });
+    });
+    return Array.from(keys);
+  };
+
   if (loading) {
     return <Container>Loading...</Container>;
   }
@@ -120,12 +137,11 @@ const SurveyTally = () => {
     <Container>
       {data.map((group, index) => (
         <ChartContainer key={index}>
-          <Title>Division &amp; Question</Title>
           <Subtitle>{group.name}</Subtitle>
           {group.isEmpty ? (
             <NoDataMessage>NOT ENOUGH DATA/NOTHING HERE</NoDataMessage>
           ) : (
-            <ResponsiveContainer width="100%" height={400}>
+            <ResponsiveContainer width="100%" height={150}>
               <BarChart
                 data={[group]} // Provide an array with one data object or more
                 layout="vertical"
@@ -135,16 +151,19 @@ const SurveyTally = () => {
                 <XAxis type="number" />
                 <YAxis type="category" dataKey="name" width={150} />
                 <Tooltip />
-                <Legend />
+                {/* <Legend /> */}
                 {/* 
-                  For a stacked chart, each Bar uses a different dataKey and
-                  the same stackId to stack them together. 
-                  Adjust keys based on actual keys in group (like 'Yes', 'No', etc.).
-                  Here we show an example for three possible keys.
+                  Dynamically generate <Bar> components based on the unique keys
+                  found in the data.
                 */}
-                <Bar dataKey="Yes" stackId="responses" fill="#8884d8" />
-                <Bar dataKey="No" stackId="responses" fill="#82ca9d" />
-                <Bar dataKey="Maybe" stackId="responses" fill="#ffc658" />
+                {getUniqueKeys().map((key) => (
+                  <Bar
+                    key={key}
+                    dataKey={key}
+                    stackId="responses"
+                    fill={`#${Math.floor(Math.random() * 16777215).toString(16)}`} // Random color for each bar
+                  />
+                ))}
               </BarChart>
             </ResponsiveContainer>
           )}
