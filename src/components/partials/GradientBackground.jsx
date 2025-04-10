@@ -6,16 +6,8 @@ import { AnimatedContainer, NextButtonU } from '../utils/styles1';
 import useTranslations from '../utils/useTranslations';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { animated, useSpring } from 'react-spring';
-
-// --- Spinner Animation ---
-// const spinAnimation = keyframes`
-//   0% {
-//     transform: rotate(0deg);
-//   }
-//   100% {
-//     transform: rotate(360deg);
-//   }
-// `;
+import bisulogo from "../img/BISU-LOGO.png";
+import dotlogo from "../img/DOT-LOGO.svg";
 
 // --- Styled Spinner ---
 const Spinner = styled.div`
@@ -36,8 +28,50 @@ const OverlayContainer = styled.div`
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.3); // semi-transparent dark overlay
+  background-color: rgba(0, 0, 0, 0.3);
   z-index: 9999;
+`;
+
+// Header container that will hold both logos and progress bar
+const HeaderContainer = styled.div`
+  position: fixed;
+  top: 20px;
+  left: 0;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  z-index: 1000;
+  gap: 20px;
+`;
+
+// Logo container styles
+const LogoContainer = styled.div`
+  display: flex;
+  gap: 8px;
+  align-items: center;
+`;
+
+const LogoImage = styled.img`
+  height: 80px;
+  width: auto;
+  opacity: 0.8;
+  object-fit: contain;
+  transition: transform 0.2s ease;
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.1));
+
+  &:hover {
+    transform: scale(1.1);
+  }
+
+  @media (max-width: 768px) {
+    height: 60px;
+  }
+
+  @media (max-width: 480px) {
+    height: 60px;
+  }
 `;
 
 // Styled-component for the background
@@ -57,6 +91,7 @@ const BackgroundWrapper = styled.div`
   justify-content: center;
   max-height: 70vh;
   overflow-y: auto;
+  margin-top: 80px; // Added to account for the fixed header
 `;
 
 // Styled-component for optional image overlay
@@ -72,13 +107,10 @@ const OverlayImage = styled.img`
   pointer-events: none;
 `;
 
-// Styled-component for the progress bar container
+// Progress bar container now part of the header
 const ProgressBarContainer = styled.div`
-  position: absolute;
-  top: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 80%;
+  flex-grow: 1;
+  max-width: 60%;
   height: 25px;
   background-color: rgba(255, 255, 255, 0.6);
   border-radius: 30px;
@@ -93,20 +125,19 @@ const getColor = (progress) => {
 
 const colorChangeAnimation = keyframes`
   0% {
-    background-color: rgba(149, 177, 237, 0.8); // Light blue
+    background-color: rgba(149, 177, 237, 0.8);
   }
   33% {
-    background-color: rgba(0, 153, 255, 0.8); // Cyan
+    background-color: rgba(0, 153, 255, 0.8);
   }
   66% {
-    background-color: rgba(102, 51, 153, 0.8); // Purple
+    background-color: rgba(102, 51, 153, 0.8);
   }
   100% {
-    background-color: rgba(149, 177, 237, 0.8); // Light blue
+    background-color: rgba(149, 177, 237, 0.8);
   }
 `;
 
-// Keyframes for pulsating animation
 const pulseAnimation = keyframes`
   0% {
     transform: scaleX(1);
@@ -134,7 +165,7 @@ const ProgressBar = styled.div`
 // Styled-component for the progress text
 const ProgressText = styled.p`
   position: absolute;
-  top: 30px;
+  top: 50px;
   left: 50%;
   transform: translateX(-50%);
   color: white;
@@ -145,31 +176,10 @@ const ProgressText = styled.p`
 
 // New styled-component for the back button
 export const BackButtonU = styled(NextButtonU)`
-  width: 90px; /* Slightly shorter width */
-  margin-right: 10px; /* Spacing to separate from the next button */
+  width: 90px;
+  margin-right: 10px;
 `;
 
-/**
- * @typedef {object} GradientBackgroundProps
- * @property {React.ReactNode} children - The content to be rendered within the gradient background.
- * @property {string} [overlayImage] - URL of the overlay image.
- * @property {number} [opacity=0.3] - Opacity of the overlay image.
- * @property {string} [blendMode='overlay'] - Blend mode for the overlay image.
- * @property {function} handleNextClick - Function to handle the next button click.
- * @property {function} handleBackClick - Function to handle the back button click.
- * @property {string} [nextmsg=""] - Text to display on the next button. If empty, a default translation is used.
- * @property {boolean} [buttonAppear=true] - Determines whether the next/back buttons are visible.
- * @property {boolean} [isLoading=false] - Determines whether to show an overlay spinner.
- */
-
-/**
- * A component that provides a gradient background with an optional overlay image,
- * progress bar, and a next button. It also allows for an overlay spinner when loading.
- * Now includes a back button on the left.
- *
- * @param {GradientBackgroundProps} props - The props for the GradientBackground component.
- * @returns {JSX.Element} A React element representing the gradient background.
- */
 const GradientBackground = ({
   children,
   overlayImage,
@@ -196,7 +206,6 @@ const GradientBackground = ({
     return segments.slice(0, -1).join("/");
   };
 
-  // Use useEffect to trigger animation updates
   useEffect(() => {
     if (isBlockActive("feedback") && (getParentPath(location.pathname) === "/survey") || location.pathname === "/survey") {
       console.log("GBACK feedback detected...removing surveytpms");
@@ -224,28 +233,39 @@ const GradientBackground = ({
 
   return (
     <>
-      <ProgressText />
-      <ProgressBarContainer>
-        <ProgressBar progress={progress} />
-      </ProgressBarContainer>
-        <BackgroundWrapper>
-          {true && (
-            <OverlayImage
-              src={overlayImage}
-              alt=""
-              opacity={opacity}
-              blendMode={blendMode}
-            />
-          )}
-          {children}
+      <HeaderContainer>
+        <LogoContainer>
+          <LogoImage src={bisulogo} alt="BISU Logo" />
+          <LogoImage src={dotlogo} alt="DOT Logo" />
+          {/* Add additional logos here */}
+          {/* <LogoImage src="/path/to/logo2.png" alt="Partner Logo" /> */}
+          {/* <LogoImage src="/path/to/logo3.png" alt="Sponsor Logo" /> */}
+        </LogoContainer>
+        
+        <ProgressBarContainer>
+          <ProgressBar progress={progress} />
+        </ProgressBarContainer>
+      </HeaderContainer>
 
-          {/* Overlay Spinner Section */}
-          {isLoading && (
-            <OverlayContainer>
-              <Spinner />
-            </OverlayContainer>
-          )}
-        </BackgroundWrapper>
+      <ProgressText />
+      
+      <BackgroundWrapper>
+        {true && (
+          <OverlayImage
+            src={overlayImage}
+            alt=""
+            opacity={opacity}
+            blendMode={blendMode}
+          />
+        )}
+        {children}
+
+        {isLoading && (
+          <OverlayContainer>
+            <Spinner />
+          </OverlayContainer>
+        )}
+      </BackgroundWrapper>
 
       {buttonAppear && (
         <div style={{ display: 'flex', justifyContent: 'center', marginTop: '10px' }}>

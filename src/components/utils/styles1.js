@@ -163,42 +163,33 @@ export const OptionButton = styled.button`
 `;
 export const NextButtonU = styled.button`
   /* Main Gradient Background */
-  background: linear-gradient(135deg, rgb(36, 17, 203), #2575fc);
-  color: #ffffff;
-  border: none;
+  background: rgb(113, 210, 255);
+  color: rgb(51, 73, 99);
+  border: 3px solid rgba(49, 146, 190, 0.8); /* Added red border */
+
   border-radius: 30px;
   padding: 15px 30px;
   font-size: 1.2rem;
   cursor: pointer;
 
   /* Shadows and transitions for a smoother experience */
-  box-shadow: 0 4px 10px rgba(36, 17, 203, 0.3);
-  transition: 
-    background 0.3s ease-in-out, 
-    transform 0.2s ease-in-out,
-    box-shadow 0.3s ease-in-out;
 
   /* Pulse animation for continuous subtle movement */
-  animation: ${pulse} 2s infinite;
 
   &:hover {
     /* Change the gradient with reversed colors for a dynamic look */
-    background: linear-gradient(135deg,rgb(131, 38, 184), #6a11cb);
+    background: rgb(54, 128, 212);
+    color: #fff;
     transform: scale(1.05);
-    box-shadow: 0 60px 15px rgb(223, 178, 31);
   }
 
   &:active {
     transform: scale(0.95);
     /* Intensify shadow on click for a pressed effect */
-    box-shadow: 0 2px 5px rgba(36, 17, 203, 0.7);
+    box-shadow: 0 2px 5px rgba(17, 67, 203, 0.7);
   }
 
-  /* Focus style for accessibility */
-  &:focus {
-    outline: none;
-    box-shadow: 0 0 0 3px rgba(36, 17, 203, 0.3);
-  }
+
 `;
 // A subtle "bounce" or "pop-in" animation
 const popInAnimation = keyframes`

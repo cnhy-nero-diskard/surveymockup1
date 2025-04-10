@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import styled, { keyframes } from 'styled-components';
 import bg from './page1bg.jpg';
 import logo from './logo.svg';
+import bisulogo from "../../../components/img/BISU-LOGO.png"; 
 import BodyPartial from '../../../components/partials/BodyPartial';
 import { useNavigate } from 'react-router-dom';
 import { NextButtonU } from '../../../components/utils/styles1';
@@ -48,7 +49,10 @@ const Container = styled.div`
   width: 100%;
   height: 100vh;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
 `;
+
 
 const Wave = styled.div`
   position: absolute;
@@ -63,11 +67,15 @@ const Wave = styled.div`
 `;
 
 const Content = styled.div`
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
   text-align: center;
+  padding: 20px;
+  z-index: 2;
 `;
 
 const Logo = styled.img`
@@ -100,6 +108,34 @@ const NextButton = styled.input`
   }
 `;
 
+const CollaborationSection = styled.div`
+  position: absolute;
+  bottom: 20px;
+  left: 0;
+  right: 0;
+  text-align: center;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  animation: ${fadeIn} 1s ease-in-out 1s forwards;
+  opacity: 0;
+  z-index: 2;
+  margin-top: auto; /* Pushes it to the bottom */
+`;
+
+const CollaborationText = styled.p`
+  font-size: 1rem;
+  margin-bottom: 10px;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+`;
+
+const BisuLogo = styled.img`
+  width: 80px;
+  height: auto;
+  filter: drop-shadow(1px 1px 2px rgba(0, 0, 0, 0.5));
+`;
+
 const Page1 = () => {
   // Retain your existing translation logic
   const [language, setLanguage] = useState(localStorage.getItem('selectedLanguage') || 'en');
@@ -115,6 +151,18 @@ const Page1 = () => {
     fr: 'ENQUÊTE SUR LE MARCHÉ DES PRODUITS TOURISTIQUES',
     ru: 'ОПРОС РЫНКА ТУРИСТИЧЕСКИХ ПРОДУКТОВ',
     hi: 'पर्यटन उत्पाद बाजार सर्वेक्षण'
+  };
+
+  // Inline localizations for collaboration text
+  const collaborationLocalizations = {
+    en: 'IN COLLABORATION WITH BOHOL ISLAND STATE UNIVERSITY - BISU MAIN',
+    ko: '보홀 아일랜드 주립 대학교(BISU 메인)와 협력',
+    zh: '与薄荷岛州立大学-BISU主校区合作',
+    ja: 'ボホール島州立大学（BISUメイン）との協力',
+    es: 'EN COLABORACIÓN CON LA UNIVERSIDAD ESTATAL DE LA ISLA DE BOHOL - BISU MAIN',
+    fr: 'EN COLLABORATION AVEC L\'UNIVERSITÉ D\'ÉTAT DE L\'ÎLE DE BOHOL - BISU MAIN',
+    ru: 'В СОТРУДНИЧЕСТВЕ С ГОСУДАРСТВЕННЫМ УНИВЕРСИТЕТОМ ОСТРОВА БОХОЛЬ - BISU MAIN',
+    hi: 'बोहोल आइलैंड स्टेट यूनिवर्सिटी - बीआईएसयू मेन के सहयोग से'
   };
 
   const navigate = useNavigate();
@@ -147,22 +195,25 @@ const Page1 = () => {
   return (
     <>
       <BodyPartial />
-      <Wave />
-      <Content>
-        <Logo src={logo} alt="Department of Tourism Philippines logo" />
-        
-        {/* Display the title using the inline localizations object */}
-        <Title>{titleLocalizations[language]}</Title>
-
-        <div style={{ display: 'flex', justifyContent: 'center', marginTop: '10px' }}>
-          <BackButtonU onClick={() => navigate(-1)}>
-            ←
-          </BackButtonU>
-          <NextButtonU onClick={handleNextClick}>
-            {translations.next}
-          </NextButtonU>
-        </div>
-      </Content>
+      <Container>
+        <Wave />
+        <Content>
+          <Logo src={logo} alt="Department of Tourism Philippines logo" />
+          <Title>{titleLocalizations[language]}</Title>
+          <div style={{ display: 'flex', justifyContent: 'center', marginTop: '10px' }}>
+            <BackButtonU onClick={() => navigate(-1)}>
+              ←
+            </BackButtonU>
+            <NextButtonU onClick={handleNextClick}>
+              {translations.next}
+            </NextButtonU>
+          </div>
+        </Content>
+        <CollaborationSection>
+          <CollaborationText>{collaborationLocalizations[language]}</CollaborationText>
+          <BisuLogo src={bisulogo} alt="BISU Logo" />
+        </CollaborationSection>
+      </Container>
     </>
   );
 };
