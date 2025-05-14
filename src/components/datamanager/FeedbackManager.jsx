@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import styled from 'styled-components';
+import { color } from 'framer-motion';
 
 // Axios instance with base URL and credentials
 const api = axios.create({
@@ -10,7 +11,7 @@ const api = axios.create({
 
 // Styled components
 const Container = styled.div`
-  max-width: 1200px;
+  max-width: 2000px;
   margin: 0 auto;
   padding: 20px;
   font-family: 'Arial', sans-serif;
@@ -59,7 +60,6 @@ const Button = styled.button`
   padding: 8px 12px;
   margin: 0 5px;
   border: none;
-  border-radius: 4px;
   cursor: pointer;
   font-size: 14px;
   transition: background-color 0.3s;
@@ -144,13 +144,12 @@ const SurveyFeedbackCRUD = () => {
     entity: '',
     rating: '',
     response_value: '',
-    touchpoint: '',
-    anonymous_user_id: '',
-    surveyquestion_ref: '',
+    touchpoint: '', // Will be disabled in form
+    anonymous_user_id: '', // Will be disabled in form
+    surveyquestion_ref: '', // Will be disabled in form
     language: 'en',
-    relevance: 'neutral',
-  });
-  
+    relevance: 'UNKNOWN',
+  });  
   const [editingId, setEditingId] = useState(null);
   const [filters, setFilters] = useState({
     anonymous_user_id: '',
@@ -206,7 +205,7 @@ const SurveyFeedbackCRUD = () => {
       anonymous_user_id: '',
       surveyquestion_ref: '',
       language: 'en',
-      relevance: 'neutral',
+      relevance: 'UNKNOWN',
     });
     setEditingId(null);
   };
@@ -243,17 +242,15 @@ const SurveyFeedbackCRUD = () => {
       entity: feedback.entity,
       rating: feedback.rating,
       response_value: feedback.response_value,
-      touchpoint: feedback.touchpoint,
-      anonymous_user_id: feedback.anonymous_user_id,
-      surveyquestion_ref: feedback.surveyquestion_ref,
+      touchpoint: feedback.touchpoint, // This will be displayed but not editable
+      anonymous_user_id: feedback.anonymous_user_id, // This will be displayed but not editable
+      surveyquestion_ref: feedback.surveyquestion_ref, // This will be displayed but not editable
       language: feedback.language,
       relevance: feedback.relevance,
     });
     setEditingId(feedback.response_id);
-    setIsFormVisible(true); // Show form when editing
   };
-
-  // Delete feedback
+    // Delete feedback
   const handleDelete = async (id) => {
     if (window.confirm('Are you sure you want to delete this feedback?')) {
       setLoading(true);
@@ -274,7 +271,6 @@ const SurveyFeedbackCRUD = () => {
       <Header>Survey Feedback Management</Header>
 
       {error && <div style={{ color: 'red', marginBottom: '20px' }}>{error}</div>}
-
       {/* Filter Section */}
       <FilterContainer>
         <FilterGroup>
@@ -325,131 +321,124 @@ const SurveyFeedbackCRUD = () => {
       </FilterContainer>
 
       {/* Collapsible Form Section */}
-      <CollapsibleContainer>
-        <Button onClick={() => setIsFormVisible(prev => !prev)}>
-          {isFormVisible ? 'Hide Form' : 'Add New Feedback'}
-        </Button>
-        {isFormVisible && (
-          <>
-            <h2>{editingId ? 'Edit Feedback' : 'Add New Feedback'}</h2>
-            <form onSubmit={handleSubmit}>
-              <FormGroup>
-                <Label>Entity</Label>
-                <Input
-                  type="text"
-                  name="entity"
-                  value={formData.entity}
-                  onChange={handleInputChange}
-                  required
-                />
-              </FormGroup>
+      {editingId && (
+        <CollapsibleContainer>
+          <h2>Edit Feedback</h2>
+          <form onSubmit={handleSubmit}>
+            <FormGroup>
+              <Label>Entity</Label>
+              <Input
+                type="text"
+                name="entity"
+                value={formData.entity}
+                onChange={handleInputChange}
+                disabled
+              />
+            </FormGroup>
 
-              <FormGroup>
-                <Label>Rating</Label>
-                <Input
-                  type="number"
-                  name="rating"
-                  value={formData.rating}
-                  onChange={handleInputChange}
-                  min="1"
-                  max="5"
-                  required
-                />
-              </FormGroup>
+            <FormGroup>
+              <Label>Rating</Label>
+              <Input
+                type="number"
+                name="rating"
+                value={formData.rating}
+                onChange={handleInputChange}
+                min="1"
+                max="5"
+                required
+              />
+            </FormGroup>
 
-              <FormGroup>
-                <Label>Response Value</Label>
-                <TextArea
-                  name="response_value"
-                  value={formData.response_value}
-                  onChange={handleInputChange}
-                  required
-                />
-              </FormGroup>
+            <FormGroup>
+              <Label>Response Value</Label>
+              <TextArea
+                name="response_value"
+                value={formData.response_value}
+                onChange={handleInputChange}
+                required
+              />
+            </FormGroup>
 
-              <FormGroup>
-                <Label>Touchpoint</Label>
-                <Input
-                  type="text"
-                  name="touchpoint"
-                  value={formData.touchpoint}
-                  onChange={handleInputChange}
-                  required
-                />
-              </FormGroup>
+            <FormGroup>
+              <Label>Touchpoint</Label>
+              <Input
+                type="text"
+                name="touchpoint"
+                value={formData.touchpoint}
+                onChange={handleInputChange}
+                disabled 
+              />
+            </FormGroup>
 
-              <FormGroup>
-                <Label>Anonymous User ID</Label>
-                <Input
-                  type="text"
-                  name="anonymous_user_id"
-                  value={formData.anonymous_user_id}
-                  onChange={handleInputChange}
-                  required
-                />
-              </FormGroup>
+            <FormGroup>
+              <Label>Anonymous User ID</Label>
+              <Input
+                type="text"
+                name="anonymous_user_id"
+                value={formData.anonymous_user_id}
+                onChange={handleInputChange}
+                disabled 
+              />
+            </FormGroup>
 
-              <FormGroup>
-                <Label>Survey Question Reference</Label>
-                <Input
-                  type="text"
-                  name="surveyquestion_ref"
-                  value={formData.surveyquestion_ref}
-                  onChange={handleInputChange}
-                  required
-                />
-              </FormGroup>
+            <FormGroup>
+              <Label>Survey Question Reference</Label>
+              <Input
+                type="text"
+                name="surveyquestion_ref"
+                value={formData.surveyquestion_ref}
+                onChange={handleInputChange}
+                disabled 
+              />
+            </FormGroup>
 
-              <FormGroup>
-                <Label>Language</Label>
-                <Select
-                  name="language"
-                  value={formData.language}
-                  onChange={handleInputChange}
-                  required
-                >
-                  <option value="en">English</option>
-                  <option value="ko">Korean</option>
-                  <option value="zh">Chinese (simplified)</option>
-                  <option value="ja">Japanese</option>
-                  <option value="es">Spanish</option>
-                  <option value="fr">French</option>
-                  <option value="ru">Russian</option>
-                  <option value="hi">Hindi</option>
-                </Select>
-              </FormGroup>
+            <FormGroup>
+              <Label>Language</Label>
+              <Select
+                name="language"
+                value={formData.language}
+                onChange={handleInputChange}
+                required
+              >
+                <option value="en">English</option>
+                <option value="ko">Korean</option>
+                <option value="zh">Chinese (simplified)</option>
+                <option value="ja">Japanese</option>
+                <option value="es">Spanish</option>
+                <option value="fr">French</option>
+                <option value="ru">Russian</option>
+                <option value="hi">Hindi</option>
+              </Select>
+            </FormGroup>
 
-              <FormGroup>
-                <Label>Relevance</Label>
-                <Select
-                  name="relevance"
-                  value={formData.relevance}
-                  onChange={handleInputChange}
-                  required
-                >
-                  <option value="UNKOWN">Neutral</option>
-                  <option value="RELEVANT">Relevant</option>
-                  <option value="IRRELEVANT">Irrelevant</option>
-                </Select>
-              </FormGroup>
+            <FormGroup>
+              <Label>Relevance</Label>
+              <Select
+                name="relevance"
+                value={formData.relevance}
+                onChange={handleInputChange}
+                required
+              >
+                <option value="UNKNOWN">UNKNOWN</option>
+                <option value="RELEVANT">RELEVANT</option>
+                <option value="IRRELEVANT">IRRELEVANT</option>
+              </Select>
+            </FormGroup>
 
-              <div style={{ marginTop: '20px' }}>
-                <SuccessButton type="submit" disabled={loading}>
-                  {editingId ? 'Update' : 'Create'}
-                </SuccessButton>
-                {editingId && (
-                  <Button type="button" onClick={resetForm} disabled={loading}>
-                    Cancel
-                  </Button>
-                )}
-              </div>
-            </form>
-          </>
-        )}
-      </CollapsibleContainer>
+            <div style={{ marginTop: '20px' }}>
+              <Button type="submit" disabled={loading}>
+                Update
+              </Button>
+              <Button type="button" onClick={resetForm} disabled={loading}>
+                Cancel
+              </Button>
+            </div>
+          </form>
+        </CollapsibleContainer>
+      )}
 
       {/* List Section */}
-      <h2>Feedback List</h2>
+      <h2 style={{color: 'black'}}>Feedback List</h2>
       {loading && !feedbacks.length ? (
         <div>Loading...</div>
       ) : (
@@ -460,10 +449,10 @@ const SurveyFeedbackCRUD = () => {
               <Th>Entity</Th>
               <Th>Rating</Th>
               <Th>Feedback</Th>
+              <Th>Relevance</Th>
               <Th>Touchpoint</Th>
               <Th>User ID</Th>
               <Th>Language</Th>
-              <Th>Relevance</Th>
               <Th>Analyzed</Th>
               <Th>Actions</Th>
             </Tr>
@@ -475,10 +464,10 @@ const SurveyFeedbackCRUD = () => {
                 <Td>{feedback.entity}</Td>
                 <Td>{feedback.rating}</Td>
                 <Td>{feedback.response_value}</Td>
+                <Td>{feedback.relevance}</Td>
                 <Td>{feedback.touchpoint}</Td>
                 <Td>{feedback.anonymous_user_id}</Td>
                 <Td>{feedback.language}</Td>
-                <Td>{feedback.relevance}</Td>
                 <Td>{feedback.is_analyzed ? 'Yes' : 'No'}</Td>
                 <Td>
                   <PrimaryButton onClick={() => handleEdit(feedback)}>

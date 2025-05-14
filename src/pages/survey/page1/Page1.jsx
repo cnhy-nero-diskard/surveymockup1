@@ -58,7 +58,7 @@ const Wave = styled.div`
   position: absolute;
   top: 0;
   left: 0;
-  width: 100%;
+  width: 100vw;
   height: 100%;
   background-image: url(${bg});
   background-size: cover;
@@ -150,7 +150,8 @@ const Page1 = () => {
     es: 'ENCUESTA DE MERCADO DE PRODUCTOS TURÍSTICOS',
     fr: 'ENQUÊTE SUR LE MARCHÉ DES PRODUITS TOURISTIQUES',
     ru: 'ОПРОС РЫНКА ТУРИСТИЧЕСКИХ ПРОДУКТОВ',
-    hi: 'पर्यटन उत्पाद बाजार सर्वेक्षण'
+    hi: 'पर्यटन उत्पाद बाजार सर्वेक्षण',
+    fl: 'TOURISM PRODUCT MARKET SURVEY'
   };
 
   // Inline localizations for collaboration text
@@ -162,7 +163,8 @@ const Page1 = () => {
     es: 'EN COLABORACIÓN CON LA UNIVERSIDAD ESTATAL DE LA ISLA DE BOHOL - BISU MAIN',
     fr: 'EN COLLABORATION AVEC L\'UNIVERSITÉ D\'ÉTAT DE L\'ÎLE DE BOHOL - BISU MAIN',
     ru: 'В СОТРУДНИЧЕСТВЕ С ГОСУДАРСТВЕННЫМ УНИВЕРСИТЕТОМ ОСТРОВА БОХОЛЬ - BISU MAIN',
-    hi: 'बोहोल आइलैंड स्टेट यूनिवर्सिटी - बीआईएसयू मेन के सहयोग से'
+    hi: 'बोहोल आइलैंड स्टेट यूनिवर्सिटी - बीआईएसयू मेन के सहयोग से',
+    fl: 'Sa pakikipagtulungan ng Bohol Island State University - BISU Main'
   };
 
   const navigate = useNavigate();
@@ -195,7 +197,6 @@ const Page1 = () => {
   return (
     <>
       <BodyPartial />
-      <Container>
         <Wave />
         <Content>
           <Logo src={logo} alt="Department of Tourism Philippines logo" />
@@ -213,7 +214,6 @@ const Page1 = () => {
           <CollaborationText>{collaborationLocalizations[language]}</CollaborationText>
           <BisuLogo src={bisulogo} alt="BISU Logo" />
         </CollaborationSection>
-      </Container>
     </>
   );
 };

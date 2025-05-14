@@ -182,20 +182,20 @@ const Snackbar = styled.div`
 const TourismAttractionUI = () => {
     const [attractions, setAttractions] = useState([]);
     const [formData, setFormData] = useState({
-        ta_name: '',
-        type_code: '',
-        region: '',
-        prov_huc: '',
-        city_mun: '',
-        report_year: '',
-        brgy: '',
-        latitude: '',
-        longitude: '',
-        ta_category: '',
-        ntdp_category: '',
-        devt_lvl: '',
-        mgt: '',
-        online_connectivity: '',
+      ta_name: '',
+      type_code: '',
+      region: '',
+      prov_huc: '',
+      city_mun: '',
+      report_year: new Date().getFullYear().toString(), 
+      brgy: '',
+      latitude: '9.5780',  
+      longitude: '123.744900', 
+      ta_category: '',
+      ntdp_category: '',
+      devt_lvl: '',
+      mgt: '',
+      online_connectivity: '',
     });
     const [commaSeparatedValues, setCommaSeparatedValues] = useState('');
     const [isCollapsed, setIsCollapsed] = useState(false);
@@ -349,7 +349,7 @@ const TourismAttractionUI = () => {
 
                 />
                 <Input
-                    type="text"
+                    type="number"
                     placeholder="Report Year"
                     value={formData.report_year}
                     onChange={(e) => setFormData({ ...formData, report_year: e.target.value })}
@@ -367,7 +367,7 @@ const TourismAttractionUI = () => {
 
                 />
                 <Input
-                    type="text"
+                    type="number"
                     placeholder="Latitude"
                     value={formData.latitude}
                     onChange={(e) => setFormData({ ...formData, latitude: e.target.value })}
@@ -376,7 +376,7 @@ const TourismAttractionUI = () => {
 
                 />
                 <Input
-                    type="text"
+                    type="number"
                     placeholder="Longitude"
                     value={formData.longitude}
                     onChange={(e) => setFormData({ ...formData, longitude: e.target.value })}

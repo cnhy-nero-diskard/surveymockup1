@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
+
 import {
   createEstablishment,
   updateEstablishment,
@@ -7,6 +8,7 @@ import {
   fetchEstablishment,
 } from '../utils/crudapi';
 import { orange } from '@mui/material/colors';
+const API_HOST = process.env.REACT_APP_API_HOST;
 
 // Styled Components (Copied from LocalizationUI)
 const Container = styled.div`
@@ -52,8 +54,22 @@ const Input = styled.input`
   }
 `;
 
-const Button = styled.button`
+const Select = styled.select`
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 1rem;
+  height: 40px;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
 
+  &:focus {
+    border-color: #3498db;
+    box-shadow: 0 0 8px rgba(52, 152, 219, 0.3);
+    outline: none;
+  }
+`;
+
+const Button = styled.button`
   width: fit-content;
   padding: 0.75rem 1.5rem;
   background-color: #3498db;
@@ -124,9 +140,8 @@ const TableCell = styled.td`
   padding: 1rem;
   border: 1px solid #ddd;
   text-align: left;
-    min-width: 100px; 
-    max-height: 150px;
-
+  min-width: 100px; 
+  max-height: 150px;
 `;
 
 const ActionButton = styled.button`
@@ -170,7 +185,7 @@ const Snackbar = styled.div`
   bottom: 20px;
   left: 50%;
   transform: translateX(-50%);
-  background-color: #4caf50;
+  background-color: ${props => props.type === 'success' ? '#4caf50' : '#f44336'};
   color: white;
   padding: 1rem 2rem;
   border-radius: 8px;
@@ -181,9 +196,23 @@ const Snackbar = styled.div`
 
 const EstablishmentsUI = () => {
   const [establishments, setEstablishments] = useState([]);
+  const [barangays, setBarangays] = useState([]);
+  const [establishmentTypes, setEstablishmentTypes] = useState([]);
   const [formData, setFormData] = useState({
-    est_name: '', type: '', city_mun: '', barangay: '', latitude: '', longitude: '',
-    english: '', korean: '', chinese: '', japanese: '', russian: '', french: '', spanish: '', hindi: '',
+    est_name: '',
+    type: '',
+    city_mun: 'PANGLAO',
+    barangay: '',
+    latitude: '9.578',
+    longitude: '123.744900',
+    english: '',
+    korean: '',
+    chinese: '',
+    japanese: '',
+    russian: '',
+    french: '',
+    spanish: '',
+    hindi: '',
   });
   const [commaSeparatedValues, setCommaSeparatedValues] = useState('');
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -191,14 +220,46 @@ const EstablishmentsUI = () => {
   const [showSnackbar, setShowSnackbar] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [snackbarMessage, setSnackbarMessage] = useState('');
-  const [snackbarType, setSnackbarType] = useState('success'); // 'success' or 'error'
-
+  const [snackbarType, setSnackbarType] = useState('success');
 
   useEffect(() => {
+    // Fetch establishments
     fetchEstablishment().then((data) => {
-      // console.log(`ESTABLISHMENTS --> ${JSON.stringify(data)}`);
-      setEstablishments(data)
+      setEstablishments(data);
     });
+
+    // Fetch barangays
+    fetch(`${API_HOST}/api/admin/locations?location_type=barangay`,
+
+      {
+        credentials: "include",
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+      }
+    )
+      .then(response => response.json())
+      .then(data => {
+        setBarangays(data.map(item => item.name));
+      })
+      .catch(error => {
+        console.error('Error fetching barangays:', error);
+      });
+
+    // Fetch establishment types
+    fetch(`${API_HOST}/api/admin/estabtypes`,
+      {
+        credentials: "include",
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+      }
+    )
+      .then(response => response.json())
+      .then(data => {
+        setEstablishmentTypes(data.map(item => item.type_name));
+      })
+      .catch(error => {
+        console.error('Error fetching establishment types:', error);
+      });
   }, []);
 
   const handleSubmit = async (e) => {
@@ -216,14 +277,14 @@ const EstablishmentsUI = () => {
           barangay: parsedValues[3] || formData.barangay,
           latitude: parsedValues[4] || formData.latitude,
           longitude: parsedValues[5] || formData.longitude,
-          english: parsedValues[6] || formData.english,
-          korean: parsedValues[7] || formData.korean,
-          chinese: parsedValues[8] || formData.chinese,
-          japanese: parsedValues[9] || formData.japanese,
-          russian: parsedValues[10] || formData.russian,
-          french: parsedValues[11] || formData.french,
-          spanish: parsedValues[12] || formData.spanish,
-          hindi: parsedValues[13] || formData.hindi,
+          english: parsedValues[6] || formData.en,
+          korean: parsedValues[7] || formData.ko,
+          chinese: parsedValues[8] || formData.zh,
+          japanese: parsedValues[9] || formData.ja,
+          russian: parsedValues[10] || formData.ru,
+          french: parsedValues[11] || formData.fr,
+          spanish: parsedValues[12] || formData.es,
+          hindi: parsedValues[13] || formData.hi,
         };
       }
 
@@ -250,8 +311,20 @@ const EstablishmentsUI = () => {
 
       // Reset the form
       setFormData({
-        est_name: '', type: '', city_mun: '', barangay: '', latitude: '', longitude: '',
-        english: '', korean: '', chinese: '', japanese: '', russian: '', french: '', spanish: '', hindi: '',
+        est_name: '',
+        type: '',
+        city_mun: 'PANGLAO',
+        barangay: '',
+        latitude: '9.578',
+        longitude: '123.744900',
+        english: '',
+        korean: '',
+        chinese: '',
+        japanese: '',
+        russian: '',
+        french: '',
+        spanish: '',
+        hindi: '',
       });
       setCommaSeparatedValues('');
 
@@ -267,10 +340,7 @@ const EstablishmentsUI = () => {
     }
   };
 
-
-
   const handleDelete = async (id) => {
-
     await deleteEstablishment(id);
     setEstablishments(establishments.filter((est) => est.id !== id));
   };
@@ -305,8 +375,6 @@ const EstablishmentsUI = () => {
         <Title style={{ margin: 0 }}>Establishments Management</Title>
       </div>
 
-
-
       <Form onSubmit={handleSubmit}>
         <Input
           type="text"
@@ -316,14 +384,19 @@ const EstablishmentsUI = () => {
           required={!commaSeparatedValues}
           disabled={!!commaSeparatedValues}
         />
-        <Input
-          type="text"
-          placeholder="Type"
+
+        <Select
           value={formData.type}
           onChange={(e) => setFormData({ ...formData, type: e.target.value })}
           required={!commaSeparatedValues}
           disabled={!!commaSeparatedValues}
-        />
+        >
+          <option value="">Select Type</option>
+          {establishmentTypes.map((type, index) => (
+            <option key={index} value={type}>{type}</option>
+          ))}
+        </Select>
+
         <Input
           type="text"
           placeholder="City/Municipality"
@@ -332,30 +405,39 @@ const EstablishmentsUI = () => {
           required={!commaSeparatedValues}
           disabled={!!commaSeparatedValues}
         />
-        <Input
-          type="text"
-          placeholder="Barangay"
+
+        <Select
           value={formData.barangay}
           onChange={(e) => setFormData({ ...formData, barangay: e.target.value })}
           required={!commaSeparatedValues}
           disabled={!!commaSeparatedValues}
-        />
+        >
+          <option value="">Select Barangay</option>
+          {barangays.map((barangay, index) => (
+            <option key={index} value={barangay}>{barangay}</option>
+          ))}
+        </Select>
+
         <Input
-          type="text"
+          type="number"
           placeholder="Latitude"
           value={formData.latitude}
           onChange={(e) => setFormData({ ...formData, latitude: e.target.value })}
           required={!commaSeparatedValues}
           disabled={!!commaSeparatedValues}
+          step="0.000001"
         />
+
         <Input
-          type="text"
+          type="number"
           placeholder="Longitude"
           value={formData.longitude}
           onChange={(e) => setFormData({ ...formData, longitude: e.target.value })}
           required={!commaSeparatedValues}
           disabled={!!commaSeparatedValues}
+          step="0.000001"
         />
+
         <Input
           type="text"
           placeholder="English"
@@ -363,6 +445,7 @@ const EstablishmentsUI = () => {
           onChange={(e) => setFormData({ ...formData, english: e.target.value })}
           disabled={!!commaSeparatedValues}
         />
+
         <Input
           type="text"
           placeholder="Korean"
@@ -370,6 +453,7 @@ const EstablishmentsUI = () => {
           onChange={(e) => setFormData({ ...formData, korean: e.target.value })}
           disabled={!!commaSeparatedValues}
         />
+
         <Input
           type="text"
           placeholder="Chinese"
@@ -377,6 +461,7 @@ const EstablishmentsUI = () => {
           onChange={(e) => setFormData({ ...formData, chinese: e.target.value })}
           disabled={!!commaSeparatedValues}
         />
+
         <Input
           type="text"
           placeholder="Japanese"
@@ -384,6 +469,7 @@ const EstablishmentsUI = () => {
           onChange={(e) => setFormData({ ...formData, japanese: e.target.value })}
           disabled={!!commaSeparatedValues}
         />
+
         <Input
           type="text"
           placeholder="Russian"
@@ -391,6 +477,7 @@ const EstablishmentsUI = () => {
           onChange={(e) => setFormData({ ...formData, russian: e.target.value })}
           disabled={!!commaSeparatedValues}
         />
+
         <Input
           type="text"
           placeholder="French"
@@ -398,6 +485,7 @@ const EstablishmentsUI = () => {
           onChange={(e) => setFormData({ ...formData, french: e.target.value })}
           disabled={!!commaSeparatedValues}
         />
+
         <Input
           type="text"
           placeholder="Spanish"
@@ -405,6 +493,7 @@ const EstablishmentsUI = () => {
           onChange={(e) => setFormData({ ...formData, spanish: e.target.value })}
           disabled={!!commaSeparatedValues}
         />
+
         <Input
           type="text"
           placeholder="Hindi"
@@ -412,13 +501,15 @@ const EstablishmentsUI = () => {
           onChange={(e) => setFormData({ ...formData, hindi: e.target.value })}
           disabled={!!commaSeparatedValues}
         />
+
         <Input
-        style={{background: 'yellow'}}
+          style={{ background: 'yellow' }}
           type="text"
           placeholder="Comma Separated Values"
           value={commaSeparatedValues}
           onChange={(e) => setCommaSeparatedValues(e.target.value)}
         />
+
         <Button type="submit">{editMode ? 'Update Establishment' : 'Create Establishment'}</Button>
       </Form>
 
@@ -464,14 +555,14 @@ const EstablishmentsUI = () => {
                   <TableCell>{est.barangay}</TableCell>
                   <TableCell>{est.latitude}</TableCell>
                   <TableCell>{est.longitude}</TableCell>
-                  <TableCell>{est.english}</TableCell>
-                  <TableCell>{est.korean}</TableCell>
-                  <TableCell>{est.chinese}</TableCell>
-                  <TableCell>{est.japanese}</TableCell>
-                  <TableCell>{est.russian}</TableCell>
-                  <TableCell>{est.french}</TableCell>
-                  <TableCell>{est.spanish}</TableCell>
-                  <TableCell>{est.hindi}</TableCell>
+                  <TableCell>{est.en}</TableCell>
+                  <TableCell>{est.ko}</TableCell>
+                  <TableCell>{est.zh}</TableCell>
+                  <TableCell>{est.ja}</TableCell>
+                  <TableCell>{est.ru}</TableCell>
+                  <TableCell>{est.fr}</TableCell>
+                  <TableCell>{est.es}</TableCell>
+                  <TableCell>{est.hi}</TableCell>
                   <TableCell>
                     <EditButton onClick={() => handleEdit(est)}>Edit</EditButton>
                     <DeleteButton onClick={() => handleDelete(est.id)}>Delete</DeleteButton>

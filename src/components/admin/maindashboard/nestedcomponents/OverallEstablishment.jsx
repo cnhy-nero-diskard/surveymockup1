@@ -20,7 +20,8 @@ const OverallOneBarangay = () => {
   useEffect(() => {
     const fetchData = async () => {
       const metrics = await fetchEntityMetrics();
-      const filteredData = metrics
+      const filteredData = Array.isArray(metrics) // Ensure metrics is an array
+       ? metrics
         .filter(metric => metric.touchpoint === "establishments")
         .map(metric => ({
           entity: metric.entity,
@@ -28,7 +29,8 @@ const OverallOneBarangay = () => {
           ...metric.rating
         }))
         .sort((a, b) => b.total_responses - a.total_responses)
-        .slice(0, 6);
+        .slice(0, 6)
+        : [];
 
       setData(filteredData);
     };

@@ -62,7 +62,7 @@ const DataManager = () => {
 
   return (
     <div style={{ padding: '20px', fontFamily: 'Arial, sans-serif', maxWidth: '1200px', margin: '0 auto' }}>
-      <h1 style={{ textAlign: 'center', marginBottom: '20px', color: '#333', fontSize: '2rem' }}>CRUD Management</h1>
+      <h1 style={{ textAlign: 'center', marginBottom: '20px', color: '#333', fontSize: 'm' }}>CRUD Management</h1>
       
       {/* Selection UI */}
       <div style={{ display: 'flex', justifyContent: 'center', gap: '10px', marginBottom: '20px' }}>
@@ -140,7 +140,7 @@ const DataManager = () => {
           onMouseOut={(e) => e.target.style.backgroundColor = activeGroup === 'surveyresponses' ? '#007BFF' : '#6C757D'}
           aria-pressed={activeGroup === 'surveyresponses'}
         >
-          Tourism Attractions
+          Survey Responses
         </button>
         <button
           onClick={() => openModal('anonhandler')}

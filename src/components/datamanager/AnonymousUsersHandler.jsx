@@ -1,6 +1,22 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import styled from 'styled-components';
+import styled, { keyframes, css } from 'styled-components';
+import { FaRobot, FaExclamationTriangle } from 'react-icons/fa';
+
+// Animations
+const shake = keyframes`
+  0% { transform: translate(0, 0) rotate(0deg); }
+  25% { transform: translate(2px, 2px) rotate(2deg); }
+  50% { transform: translate(0, 0) rotate(0deg); }
+  75% { transform: translate(-2px, 2px) rotate(-2deg); }
+  100% { transform: translate(0, 0) rotate(0deg); }
+`;
+
+const pulse = keyframes`
+  0% { opacity: 0.8; }
+  50% { opacity: 1; }
+  100% { opacity: 0.8; }
+`;
 
 // Styled Components
 const Container = styled.div`
@@ -48,6 +64,7 @@ const TableRow = styled.tr`
   &:nth-child(odd) {
     background-color: rgba(5, 124, 160, 0.59);
   }
+  font-size: 0.8rem;
 
   &:hover {
     background-color: #0099ff;
@@ -56,10 +73,17 @@ const TableRow = styled.tr`
 
   ${({ status }) =>
     status === 'AT LEAST ONE ENTRY, HAS COMPLETED' &&
-    `
-    background-color: green !important;
-    color: white;
-  `}
+    css`
+      background-color: green !important;
+      color: white;
+    `}
+
+  ${({ isSpam }) =>
+    isSpam &&
+    css`
+      background-color:rgb(245, 91, 91) !important;
+      animation: ${pulse} 2s infinite;
+    `}
 `;
 
 const TableCell = styled.td`
@@ -71,15 +95,15 @@ const TableCell = styled.td`
 
   ${({ feedback }) =>
     feedback === 'Yes' &&
-    `
-    background-color: rgb(212, 113, 0);
-  `}
+    css`
+      background-color: rgb(212, 113, 0);
+    `}
 
   ${({ tpms }) =>
     tpms === 'Yes' &&
-    `
-    background-color: rgb(212, 113, 0);
-  `}
+    css`
+      background-color: rgb(212, 113, 0);
+    `}
 `;
 
 const LoadingMessage = styled.div`
@@ -151,39 +175,78 @@ const Timestamp = styled.small`
   color: #7f8c8d;
 `;
 
+const SpamBadge = styled.div`
+  display: inline-flex;
+  align-items: center;
+  background-color: #ff4444;
+  color: white;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: bold;
+  margin-left: 0.5rem;
+  
+  svg {
+    margin-right: 0.25rem;
+  }
+`;
+
+const SpamWarningBanner = styled.div`
+  padding: 0.5rem;
+  background-color: #ff4444;
+  color: white;
+  border-radius: 4px;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  font-weight: bold;
+  
+  svg {
+    margin-right: 0.5rem;
+    font-size: 1.2rem;
+  }
+`;
+
 const AnonymousUsersHandler = () => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [detailsVisible, setDetailsVisible] = useState(null);
   const [surveyQuestions, setSurveyQuestions] = useState([]);
-  const [sortCriteria, setSortCriteria] = useState('alphabetical'); // New state for sorting
+  const [sortCriteria, setSortCriteria] = useState('alphabetical');
+  const [spamUsers, setSpamUsers] = useState([]);
 
   useEffect(() => {
     const fetchAnonymousUsersAndSurveyResponses = async () => {
       try {
-        const usersResponse = await axios.get(`${process.env.REACT_APP_API_HOST}/api/admin/anonymous-users`, { withCredentials: true });
+        const [usersResponse, spamUsersResponse, surveyResponsesResponse, surveyQuestionsResponse] = await Promise.all([
+          axios.get(`${process.env.REACT_APP_API_HOST}/api/admin/anonymous-users`, { withCredentials: true }),
+          axios.get(`${process.env.REACT_APP_API_HOST}/api/admin/spam-anonymous-users`, { withCredentials: true }),
+          axios.get(`${process.env.REACT_APP_API_HOST}/api/admin/survey-responses`, { withCredentials: true }),
+          axios.get(`${process.env.REACT_APP_API_HOST}/api/admin/survey-questions`, { withCredentials: true })
+        ]);
+
         const anonymousUsers = usersResponse.data;
-
-        const surveyResponsesResponse = await axios.get(`${process.env.REACT_APP_API_HOST}/api/admin/survey-responses`, { withCredentials: true });
+        setSpamUsers(spamUsersResponse.data);
         const allSurveyResponses = surveyResponsesResponse.data;
-
-        const surveyQuestionsResponse = await axios.get(`${process.env.REACT_APP_API_HOST}/api/admin/survey-questions`, { withCredentials: true });
         setSurveyQuestions(surveyQuestionsResponse.data);
 
         const userSurveyStatus = anonymousUsers.map(user => {
           const userResponses = allSurveyResponses.filter(response => response.anonymous_user_id === user.anonymous_user_id);
+          const isSpam = spamUsersResponse.data.some(spamUser => spamUser.anonymous_user_id === user.anonymous_user_id);
+          
           let surveyStatus = {
             ...user,
             surveyEntries: userResponses,
-            surveyStatus: 'HAS NO SURVEY',
+            surveyStatus: 'NO SURVEY',
             completionStatus: 'INCOMPLETE',
             feedback: false,
             tpms: false,
+            isSpam
           };
 
           if (userResponses.length > 0) {
-            surveyStatus.surveyStatus = 'AT LEAST ONE ENTRY';
+            surveyStatus.surveyStatus = 'NOT FINISHED';
             const tpentResponse = userResponses.find(resp => resp.surveyquestion_ref === 'TPENT');
             const finishResponse = userResponses.find(resp => resp.surveyquestion_ref === 'FINISH');
 
@@ -212,8 +275,8 @@ const AnonymousUsersHandler = () => {
 
   const handlePurge = async () => {
     try {
-      // await axios.delete(`${process.env.REACT_APP_API_HOST}/api/admin/all-anonymous-users`, { withCredentials: true });
-      // setUsers([]);
+      await axios.delete(`${process.env.REACT_APP_API_HOST}/api/admin/all-anonymous-users`, { withCredentials: true });
+      setUsers([]);
     } catch (err) {
       setError(err.message);
     }
@@ -223,7 +286,6 @@ const AnonymousUsersHandler = () => {
     setDetailsVisible(detailsVisible === userId ? null : userId);
   };
 
-  // Function to group responses by title
   const groupResponsesByTitle = (responses) => {
     return responses.reduce((acc, response) => {
       const matchingQuestion = surveyQuestions.find(
@@ -239,34 +301,36 @@ const AnonymousUsersHandler = () => {
     }, {});
   };
 
-  // Sorting function
-const sortUsers = (criteria) => {
-  let sortedUsers = [...users];
+  const sortUsers = (criteria) => {
+    let sortedUsers = [...users];
 
-  sortedUsers.sort((a, b) => {
-    // Priority 1: Sort by 'Present Data'
-    const aHasData = ["AT LEAST ONE ENTRY", "HAS COMPLETED"].includes(a.surveyStatus) ||
-                     a.feedback === true || a.tpms === true;
-    const bHasData = ["AT LEAST ONE ENTRY", "HAS COMPLETED"].includes(b.surveyStatus) ||
-                     b.feedback === true || b.tpms === true;
+    sortedUsers.sort((a, b) => {
+      // Priority 1: Sort by 'Present Data'
+      const aHasData = ["AT LEAST ONE ENTRY", "HAS COMPLETED"].includes(a.surveyStatus) ||
+                      a.feedback === true || a.tpms === true;
+      const bHasData = ["AT LEAST ONE ENTRY", "HAS COMPLETED"].includes(b.surveyStatus) ||
+                      b.feedback === true || b.tpms === true;
 
-    if (aHasData && !bHasData) return -1; // a comes first
-    if (!aHasData && bHasData) return 1;  // b comes first
+      if (aHasData && !bHasData) return -1;
+      if (!aHasData && bHasData) return 1;
 
-    // Priority 2: Sort by the selected criteria (alphabetical or created_at)
-    if (criteria === 'alphabetical') {
-      return a.nickname.localeCompare(b.nickname);
-    } else if (criteria === 'created_at') {
-      return new Date(a.created_at) - new Date(b.created_at);
-    }
+      // Priority 2: Sort by spam status
+      if (a.isSpam && !b.isSpam) return -1;
+      if (!a.isSpam && b.isSpam) return 1;
 
-    return 0; // Default case
-  });
+      // Priority 3: Sort by the selected criteria
+      if (criteria === 'alphabetical') {
+        return a.nickname?.localeCompare(b.nickname);
+      } else if (criteria === 'created_at') {
+        return new Date(a.created_at) - new Date(b.created_at);
+      }
 
-  setUsers(sortedUsers);
-};
+      return 0;
+    });
 
-  // Handle sort criteria change
+    setUsers(sortedUsers);
+  };
+
   const handleSortChange = (e) => {
     const criteria = e.target.value;
     setSortCriteria(criteria);
@@ -279,15 +343,16 @@ const sortUsers = (criteria) => {
   return (
     <Container>
       <Title>Anonymous Users and Survey Status</Title>
-      {/* <PurgeButton onClick={handlePurge}>PURGE</PurgeButton> */}
-<div>
-  <label>Sort by: </label>
-  <select value={sortCriteria} onChange={handleSortChange}>
-    <option value="alphabetical">Alphabetical</option>
-    <option value="created_at">Created At</option>
-    <option value="present_data">Present Data</option> {/* New sort option */}
-  </select>
-</div>
+      <PurgeButton onClick={handlePurge}>PURGE ALL USERS</PurgeButton>
+      
+      <div style={{ marginBottom: '1rem' }}>
+        <label>Sort by: </label>
+        <select value={sortCriteria} onChange={handleSortChange}>
+          <option value="alphabetical">Alphabetical</option>
+          <option value="created_at">Created At</option>
+          <option value="present_data">Present Data</option>
+        </select>
+      </div>
 
       <TableContainer>
         <Table>
@@ -299,22 +364,43 @@ const sortUsers = (criteria) => {
               <th>Completion Status</th>
               <th>Feedback</th>
               <th>TPMS</th>
-              <th>SEE DETAILS</th>
+              <th>Actions</th>
             </tr>
           </TableHeader>
           <tbody>
             {users.map(user => (
               <React.Fragment key={user.anonymous_user_id}>
-                <TableRow status={`${user.surveyStatus}, ${user.completionStatus}`}>
-                  <TableCell>{user.anonymous_user_id}</TableCell>
-                  <TableCell>{user.nickname}</TableCell>
-                  <TableCell>{user.surveyStatus}</TableCell>
+                <TableRow status={`${user.surveyStatus}, ${user.completionStatus}`} isSpam={user.isSpam}>
+                  <TableCell>
+                    {user.anonymous_user_id}
+                    {user.isSpam && (
+                      <SpamBadge title="This user exhibits behavior patterns consistent with spam">
+                        <FaRobot /> SUSPECTED SPAM⚠️
+                      </SpamBadge>
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    {user.nickname || 'Anonymous'}
+                    {/* {user.isSpam && (
+                      <SpamBadge title="This user exhibits behavior patterns consistent with spam">
+                        <FaExclamationTriangle /> RISK
+                      </SpamBadge>
+                    )} */}
+                  </TableCell>
+                  <TableCell>
+                    {user.surveyStatus}
+                    {user.isSpam && user.surveyStatus === 'HAS NO SURVEY' && (
+                      <SpamBadge style={{ animation: 'none', backgroundColor: '#ff8800' }}>
+                        NO DATA
+                      </SpamBadge>
+                    )}
+                  </TableCell>
                   <TableCell>{user.completionStatus}</TableCell>
                   <TableCell feedback={user.feedback ? 'Yes' : 'No'}>{user.feedback ? 'Yes' : 'No'}</TableCell>
                   <TableCell tpms={user.tpms ? 'Yes' : 'No'}>{user.tpms ? 'Yes' : 'No'}</TableCell>
                   <TableCell>
                     <button onClick={() => toggleDetails(user.anonymous_user_id)}>
-                      SEE DETAILS
+                      {detailsVisible === user.anonymous_user_id ? 'HIDE DETAILS' : 'SHOW DETAILS'}
                     </button>
                   </TableCell>
                 </TableRow>
@@ -322,29 +408,41 @@ const sortUsers = (criteria) => {
                   <TableRow>
                     <TableCell colSpan="7">
                       <DetailsContainer>
-                        <h4>Survey Responses for {user.nickname}</h4>
-                        {Object.entries(groupResponsesByTitle(user.surveyEntries)).map(([title, responses]) => (
-                          <GroupedDetails key={title}>
-                            <GroupTitle>{title}</GroupTitle>
-                            {responses.map((response, index) => {
-                              const matchingQuestion = surveyQuestions.find(
-                                question => question.surveyresponses_ref === response.surveyquestion_ref
-                              );
+                        <h4>Survey Responses for {user.nickname || 'Anonymous User'}</h4>
+                        {user.isSpam && (
+                          <SpamWarningBanner>
+                            <FaExclamationTriangle />
+                            <span>WARNING: This user has been flagged as likely spam based on behavior patterns.</span>
+                          </SpamWarningBanner>
+                        )}
+                        {user.surveyEntries.length > 0 ? (
+                          Object.entries(groupResponsesByTitle(user.surveyEntries)).map(([title, responses]) => (
+                            <GroupedDetails key={title}>
+                              <GroupTitle>{title}</GroupTitle>
+                              {responses.map((response, index) => {
+                                const matchingQuestion = surveyQuestions.find(
+                                  question => question.surveyresponses_ref === response.surveyquestion_ref
+                                );
 
-                              return (
-                                <ResponseItem key={index}>
-                                  <ResponseText>
-                                    <strong>Question Content:</strong> {matchingQuestion ? matchingQuestion.content : 'N/A'} <br />
-                                    <strong>Response:</strong> {response.response_value}
-                                  </ResponseText>
-                                  <Timestamp>
-                                    {new Date(response.created_at).toLocaleString()}
-                                  </Timestamp>
-                                </ResponseItem>
-                              );
-                            })}
-                          </GroupedDetails>
-                        ))}
+                                return (
+                                  <ResponseItem key={index}>
+                                    <ResponseText>
+                                      <strong>Question:</strong> {matchingQuestion?.content || 'N/A'} <br />
+                                      <strong>Response:</strong> {response.response_value}
+                                    </ResponseText>
+                                    <Timestamp>
+                                      {new Date(response.created_at).toLocaleString()}
+                                    </Timestamp>
+                                  </ResponseItem>
+                                );
+                              })}
+                            </GroupedDetails>
+                          ))
+                        ) : (
+                          <div style={{ padding: '1rem', textAlign: 'center', color: '#666' }}>
+                            No survey responses found for this user.
+                          </div>
+                        )}
                       </DetailsContainer>
                     </TableCell>
                   </TableRow>

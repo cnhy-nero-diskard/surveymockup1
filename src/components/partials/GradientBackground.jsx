@@ -107,6 +107,15 @@ const OverlayImage = styled.img`
   pointer-events: none;
 `;
 
+ const BarIter = styled.div`
+  position: absolute;
+  top 50px;
+  bottom 70px;
+  left 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  height: 25px;
+ `
 // Progress bar container now part of the header
 const ProgressBarContainer = styled.div`
   flex-grow: 1;

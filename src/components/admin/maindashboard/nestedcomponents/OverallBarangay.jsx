@@ -12,18 +12,21 @@ const OverallSurveyTopic = () => {
     const loadData = async () => {
       const metrics = await fetchEntityMetrics();
       console.log('Fetched Data:', metrics); // Debug: Log fetched data
+      const filteredData = Array.isArray(metrics) // Ensure metrics is an array
+        ? metrics
+            .filter(item => item.touchpoint === "barangay") // Filter by "barangay"
+            .sort((a, b) => b.total_responses - a.total_responses) // Sort by total_responses
+            .slice(0, 6) // Take the top 6
+            .map(item => ({
+              name: item.entity, // Use the entity name (barangay name)
+              Dissatisfied: parseInt(item.rating.Dissatisfied, 10) || 0,
+              Neutral: parseInt(item.rating.Neutral, 10) || 0,
+              Satisfied: parseInt(item.rating.Satisfied, 10) || 0,
+              VerySatisfied: parseInt(item.rating.VerySatisfied, 10) || 0,
+            }))
+        : []; // Return an empty array if metrics is not an array
 
-      const filteredData = metrics
-        .filter(item => item.touchpoint === "barangay") // Filter by "barangay"
-        .sort((a, b) => b.total_responses - a.total_responses) // Sort by total_responses
-        .slice(0, 6) // Take the top 6
-        .map(item => ({
-          name: item.entity, // Use the entity name (barangay name)
-          Dissatisfied: parseInt(item.rating.Dissatisfied, 10) || 0,
-          Neutral: parseInt(item.rating.Neutral, 10) || 0,
-          Satisfied: parseInt(item.rating.Satisfied, 10) || 0,
-          VerySatisfied: parseInt(item.rating.VerySatisfied, 10) || 0,
-        }));
+      console.log('Transformed Data:', filteredData); // Debug: Log transformed data
 
       console.log('Transformed Data:', filteredData); // Debug: Log transformed data
       setData(filteredData);

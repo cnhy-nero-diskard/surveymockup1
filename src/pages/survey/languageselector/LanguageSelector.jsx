@@ -160,7 +160,9 @@ const LanguageSelector = () => {
     es: "SIGUIENTE",
     fr: "SUIVANT",
     ru: "ДАЛЕЕ",
-    hi: "अगला"
+    hi: "अगला",
+    fl: "SUSUNOD"
+
   };
 
   useEffect(() => {

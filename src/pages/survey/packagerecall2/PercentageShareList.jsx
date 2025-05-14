@@ -23,7 +23,7 @@ const Container = styled.div`
 
 const Title = styled.h1`
   font-size: 20px;
-  color: #333;
+  color: white;
   margin-bottom: 20px;
   text-align: center;
 `;
@@ -35,7 +35,7 @@ const ListItem = styled(motion.div)`
   padding: 10px 0;
   border-bottom: 1px solid #ddd;
   font-size: 16px;
-  color: #333;
+  color: white;
   margin-bottom: 10px;
 `;
 

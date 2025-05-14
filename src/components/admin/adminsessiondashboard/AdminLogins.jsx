@@ -80,7 +80,7 @@ const AdminSessionDashboard = () => {
             try {
                 const response = await fetch(`${process.env.REACT_APP_API_HOST}/api/admin/session-data`, {
                     method: 'GET',
-                    credentials: 'include', // Include cookies in the request
+                    credentials: 'include', 
                     headers: {
                         'Content-type': 'application/json',
                     },

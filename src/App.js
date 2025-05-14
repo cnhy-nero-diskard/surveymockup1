@@ -30,7 +30,7 @@ const App = () => {
     console.log('Initializing anonymous user...');
     try {
       const response = await axios.get(`${process.env.REACT_APP_API_HOST}/api/init-anonymous-user`, {
-        withCredentials: true, // Include cookies in the request
+        withCredentials: true, 
       });
 
       if (response.status === 200) {

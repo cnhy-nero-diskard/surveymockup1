@@ -56,7 +56,7 @@ export const OptionsGrid = styled.div`
   grid-template-columns: repeat(2, 1fr);
   gap: 20px;
   margin-bottom: 40px;
-
+  
   @media (max-width: 600px) {
     grid-template-columns: 1fr;
   }
