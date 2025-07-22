@@ -136,6 +136,17 @@ const FilterGroup = styled.div`
   min-width: 200px;
 `;
 
+// Helper function to truncate text
+const truncateText = (text, maxLength = 50) => {
+  if (!text) return '';
+  return text.length > maxLength ? `${text.substring(0, maxLength)}...` : text;
+};
+
+// Helper function to get sentiment value
+const getSentiment = (feedback) => {
+  return feedback.sentiment || 'N/A';
+};
+
 const SurveyFeedbackCRUD = () => {
   const [feedbacks, setFeedbacks] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -449,6 +460,7 @@ const SurveyFeedbackCRUD = () => {
               <Th>Entity</Th>
               <Th>Rating</Th>
               <Th>Feedback</Th>
+              <Th>Sentiment</Th>
               <Th>Relevance</Th>
               <Th>Touchpoint</Th>
               <Th>User ID</Th>
@@ -463,7 +475,8 @@ const SurveyFeedbackCRUD = () => {
                 <Td>{feedback.response_id}</Td>
                 <Td>{feedback.entity}</Td>
                 <Td>{feedback.rating}</Td>
-                <Td>{feedback.response_value}</Td>
+                <Td>{truncateText(feedback.response_value)}</Td>
+                <Td>{getSentiment(feedback)}</Td>
                 <Td>{feedback.relevance}</Td>
                 <Td>{feedback.touchpoint}</Td>
                 <Td>{feedback.anonymous_user_id}</Td>

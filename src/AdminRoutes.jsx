@@ -1,3 +1,4 @@
+// src/AdminRoutes.jsx
 import React, { useEffect, useState, useRef } from 'react';
 import { Route, Routes, Navigate } from 'react-router-dom';
 import axios from 'axios';

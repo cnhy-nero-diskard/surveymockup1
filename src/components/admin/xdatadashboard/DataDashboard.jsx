@@ -150,7 +150,7 @@ const DataDashboard = ({ data, entities, entityLabel, entityKey }) => {
 
   return (
     <StyledGridContainer container spacing={3}>
-      {/* Autocomplete "Searchable" Dropdown */}
+      {/* Search Dropdown */}
       <Grid item xs={12}>
         <Box display="flex" justifyContent="center">
           <Autocomplete
@@ -160,7 +160,6 @@ const DataDashboard = ({ data, entities, entityLabel, entityKey }) => {
             value={entities.find((entity) => entity.key === selectedEntity) || null}
             onChange={(event, newValue) => {
               if (newValue) {
-                console.log(`Selected Entity: ${JSON.stringify(selectedEntity)}`);
                 setSelectedEntity(newValue.key);
               }
             }}
@@ -174,17 +173,13 @@ const DataDashboard = ({ data, entities, entityLabel, entityKey }) => {
           />
         </Box>
       </Grid>
-
-      {/* Total Survey Responses */}
+  
+      {/* Total Responses Card */}
       <Grid item xs={12}>
         <Box display="flex" justifyContent="center">
-          <StyledPaper
-            elevation={3}
-            sx={{
-              background:
-                'linear-gradient(135deg, rgba(214, 214, 214, 0.74), rgba(242, 250, 255, 0.97));',
-            }}
-          >
+          <StyledPaper elevation={3} sx={{
+            background: 'linear-gradient(135deg, rgba(214, 214, 214, 0.74), rgba(242, 250, 255, 0.97))',
+          }}>
             <Typography variant="h6" gutterBottom>
               Total Survey Responses
             </Typography>
@@ -192,17 +187,16 @@ const DataDashboard = ({ data, entities, entityLabel, entityKey }) => {
           </StyledPaper>
         </Box>
       </Grid>
-
-      {/* Full Horizontal Stacked Proportion Bar */}
-      <Grid item xs={12} lg={12}>
+  
+      {/* Responses Proportion Bar */}
+      <Grid item xs={12}>
         <Box display="flex" justifyContent="center">
           <StyledPaper
             elevation={3}
-            onClick={handleModalOpen} // Open modal on click
+            onClick={handleModalOpen}
             sx={{
-              background:
-                'linear-gradient(135deg, rgba(214, 214, 214, 0.74), rgba(242, 250, 255, 0.97));',
-              cursor: 'pointer', // Add pointer cursor to indicate clickability
+              background: 'linear-gradient(135deg, rgba(214, 214, 214, 0.74), rgba(242, 250, 255, 0.97))',
+              cursor: 'pointer',
             }}
           >
             <Typography variant="h6" gutterBottom>
@@ -223,7 +217,7 @@ const DataDashboard = ({ data, entities, entityLabel, entityKey }) => {
               <YAxis
                 dataKey="name"
                 type="category"
-                tick={false} // Hide Y-axis labels for simplicity
+                tick={false}
               />
               <Tooltip formatter={(value) => `${value.toFixed(2)}%`} />
               {entities.length <= 10 && <Legend />}
@@ -239,7 +233,82 @@ const DataDashboard = ({ data, entities, entityLabel, entityKey }) => {
           </StyledPaper>
         </Box>
       </Grid>
-
+  
+      {/* Charts Row - Horizontal Layout */}
+      <Grid container item xs={12} spacing={3}>
+        {/* General Sentiment */}
+        <Grid item xs={12} md={4}>
+          <Box display="flex" justifyContent="center">
+            <StyledPaper elevation={3} sx={{
+              background: 'linear-gradient(135deg, rgba(214, 214, 214, 0.74), rgba(242, 250, 255, 0.97))',
+              height: '100%'
+            }}>
+              <Typography variant="h6" gutterBottom>
+                General Sentiment
+              </Typography>
+              <PieChart width={350} height={250}>
+                <Pie
+                  data={entityData.sentimentData}
+                  cx="50%"
+                  cy="50%"
+                  outerRadius={80}
+                  dataKey="value"
+                  label
+                >
+                  {entityData.sentimentData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  ))}
+                </Pie>
+                <Tooltip />
+                <Legend />
+              </PieChart>
+            </StyledPaper>
+          </Box>
+        </Grid>
+  
+        {/* Sentiment by Topic */}
+        <Grid item xs={12} md={4}>
+          <Box display="flex" justifyContent="center">
+            <StyledPaper elevation={3} sx={{
+              background: 'linear-gradient(135deg, rgba(214, 214, 214, 0.74), rgba(242, 250, 255, 0.97))',
+              height: '100%'
+            }}>
+              <Typography variant="h6" gutterBottom>
+                Sentiment by Topic
+              </Typography>
+              <Box width="100%" height={250}>
+                <LocSpecificTopic short_id={entities.find((entity) => entity.key === selectedEntity)?.short_id} />
+              </Box>
+            </StyledPaper>
+          </Box>
+        </Grid>
+  
+        {/* Language Distribution */}
+        <Grid item xs={12} md={4}>
+          <Box display="flex" justifyContent="center">
+            <StyledPaper elevation={3} sx={{
+              background: 'linear-gradient(135deg, rgba(214, 214, 214, 0.74), rgba(242, 250, 255, 0.97))',
+              height: '100%'
+            }}>
+              <Typography variant="h6" gutterBottom>
+                Language Distribution
+              </Typography>
+              <BarChart
+                width={350}
+                height={250}
+                data={entityData.languageDistribution}
+              >
+                <XAxis dataKey="language" />
+                <YAxis />
+                <Tooltip />
+                <Legend />
+                <Bar dataKey="count" fill="#ffc658" />
+              </BarChart>
+            </StyledPaper>
+          </Box>
+        </Grid>
+      </Grid>
+  
       {/* Modal for Detailed Breakdown */}
       <Modal
         open={modalOpen}
@@ -252,23 +321,22 @@ const DataDashboard = ({ data, entities, entityLabel, entityKey }) => {
             Detailed Breakdown of Responses
           </Typography>
           <TableContainer style={{
-            overflowY: 'auto',  // Adds vertical scrollbar
-            maxHeight: '500px' // Limits table height
+            overflowY: 'auto',
+            maxHeight: '500px'
           }}>
             <Table>
               <TableHead style={{
-                position: 'sticky',  // Keeps header fixed while scrolling
+                position: 'sticky',
                 top: 0,
-                backgroundColor: 'white' // Optional: header background color
+                backgroundColor: 'white'
               }}>
                 <TableRow>
                   <TableCell>Entity</TableCell>
+                  <TableCell align="right">Responses</TableCell>
+                  <TableCell align="right">Percentage</TableCell>
                 </TableRow>
               </TableHead>
-              <TableBody style={{
-                display: 'block',  // Allows for table body scrolling
-                overflowY: 'auto'
-              }}>
+              <TableBody>
                 {entities.map((entity) => {
                   const entityTotal = data[entity.key]?.totalResponses || 0;
                   const percentage = totalResponsesAll > 0
@@ -287,90 +355,6 @@ const DataDashboard = ({ data, entities, entityLabel, entityKey }) => {
           </TableContainer>
         </Box>
       </Modal>
-
-      {/* General Sentiment Pie Chart */}
-      <Grid item xs={12} md={6}>
-        <Box display="flex" justifyContent="center">
-          <StyledPaper
-            elevation={3}
-            sx={{
-              background:
-                'linear-gradient(135deg, rgba(214, 214, 214, 0.74), rgba(242, 250, 255, 0.97));',
-            }}
-          >
-            <Typography variant="h6" gutterBottom>
-              General Sentiment
-            </Typography>
-            <PieChart width={400} height={300}>
-              <Pie
-                data={entityData.sentimentData}
-                cx="50%"
-                cy="50%"
-                outerRadius={80}
-                dataKey="value"
-                label
-              >
-                {entityData.sentimentData.map((entry, index) => (
-                  <Cell
-                    key={`cell-${index}`}
-                    fill={COLORS[index % COLORS.length]}
-                  />
-                ))}
-              </Pie>
-              <Tooltip />
-              <Legend />
-            </PieChart>
-          </StyledPaper>
-        </Box>
-      </Grid>
-
-      {/* Replace Most Mentioned Terms Bar Chart with PieChartTopics */}
-      <Grid item xs={12} md={6}>
-        <Box display="flex" justifyContent="center">
-          <StyledPaper
-            elevation={3}
-            sx={{
-              background:
-                'linear-gradient(135deg, rgba(214, 214, 214, 0.74), rgba(242, 250, 255, 0.97));',
-            }}
-          >
-            <Typography variant="h6" gutterBottom>
-              Sentiment by Topic
-            </Typography>
-            <Box width="100%" height={300}> {/* Set a fixed height for the chart container */}
-              <LocSpecificTopic short_id={entities.find((entity) => entity.key === selectedEntity)?.short_id} />
-            </Box>
-          </StyledPaper>
-        </Box>
-      </Grid>
-
-      {/* Language Distribution Bar Chart */}
-      <Grid item xs={12} md={6}>
-        <Box display="flex" justifyContent="center">
-          <StyledPaper
-            elevation={3}
-            sx={{
-              background:
-                'linear-gradient(135deg, rgba(214, 214, 214, 0.74), rgba(242, 250, 255, 0.97));',
-            }}
-          >
-            <Typography variant="h6" gutterBottom>
-              Language Distribution
-            </Typography>
-            <BarChart
-              width={400}
-              height={300}
-              data={entityData.languageDistribution}
-            >
-              <XAxis dataKey="language" />
-              <YAxis />
-              <Tooltip />
-              <Legend />
-              <Bar dataKey="count" fill="#ffc658" />
-            </BarChart>
-          </StyledPaper>
-        </Box>
-      </Grid>
     </StyledGridContainer>
   );
 };

@@ -1,14 +1,5 @@
-/* SurveyConsent.css */
 
-/* .container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    max-width: 50vw;
-    font-family: Arial, sans-serif;
-    border-radius: 40px;} */
-  
+
   .title {
     font-size: 2rem;
     margin-bottom: 20px;
@@ -20,7 +11,7 @@
     text-align: center;
     margin-bottom: 20px;
     color: #cbe5f4;
-    width: 100%; /* Ensure the text takes the full width */
+    width: 100%; 
   }
   
   .button {
@@ -30,39 +21,37 @@
     padding: 10px 20px;
     font-size: 1.2rem;
     color: white;
-    /* background-color: #007bff; */
     border: none;
     border-radius: 20px;
     cursor: pointer;
     transition: background-color 0.3s ease;
-    width: 80%; /* Initial width set to 80% of the container */
-    max-width: 300px; /* Maximum width to prevent it from becoming too wide */
+    width: 80%; 
+    max-width: 300px; 
   }
   
   .button:hover {
     background-color: #0056b3;
   }
   
-  /* Media queries for different screen sizes */
+  
   @media (max-width: 600px) {
     .button {
-      width: 90%; /* Increase width for smaller screens */
-    }
+      width: 90%;
   }
   
   @media (min-width: 601px) and (max-width: 900px) {
     .button {
-      width: 70%; /* Adjust width for medium-sized screens */
+      width: 70%; 
     }
   }
   
   @media (min-width: 901px) {
     .button {
-      width: 50%; /* Adjust width for larger screens */
+      width: 50%; 
     }
   }
   
-  /* Additional styles to imitate Form.css */
+  
   .form-container {
     display: flex;
     flex-direction: column;
@@ -74,7 +63,7 @@
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     max-width: 300px;
     margin:  auto;
-    background: linear-gradient(135deg, #95b1ed, #3abde9); /* Subtle gradient from white to light blue */
+    background: linear-gradient(135deg, #95b1ed, #3abde9); 
 
   }
   

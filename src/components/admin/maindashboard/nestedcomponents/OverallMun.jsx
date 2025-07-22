@@ -61,7 +61,7 @@ const OverallMun = () => {
         data.push({ name: `Positive (${positiveLabel})`, value: parseInt(counts.positive), color: "#1f78b4" }); // Blue
       }
       if (counts.neutral !== "0" && neutralLabel) {
-        data.push({ name: `Neutral (${neutralLabel})`, value: parseInt(counts.neutral), color: "rgb(255, 196, 0)" }); // Yellow
+        data.push({ name: `Neutral (${neutralLabel})`, value: parseInt(counts.neutral), color: "rgb(251, 255, 41)" }); // Yellow
       }
       if (counts.negative !== "0" && negativeLabel) {
         data.push({ name: `Negative (${negativeLabel})`, value: parseInt(counts.negative), color: "#e31a1c" }); // Red
@@ -103,7 +103,7 @@ const OverallMun = () => {
               <Tooltip />
               <Legend
                 wrapperStyle={{
-                  fontSize: '20px',
+                  fontSize: '13px',
                 }}
               />
             </PieChart>

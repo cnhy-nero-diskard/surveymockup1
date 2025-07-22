@@ -1,3 +1,4 @@
+// src/routes/surveyRoutesConfig.js
 /**
  * @typedef {object} Route
  * @property {string} label - The label for the route.

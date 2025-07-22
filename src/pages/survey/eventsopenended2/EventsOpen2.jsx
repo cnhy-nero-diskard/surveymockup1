@@ -85,7 +85,7 @@ const EventsOpen2 = () => {
   const handleOptionClick = (option) => {
     setSelectedOption(option);
 
-    // Update placeholder text based on the selected option
+    
     switch (option) {
       case 'Dissatisfied':
         setPlaceholderText('What went wrong? How can we improve?');
@@ -107,7 +107,7 @@ const EventsOpen2 = () => {
   const handlePackageOptionClick = (option) => {
     setSelectedPackageOption(option);
 
-    // Update placeholder text based on the selected option
+    
     switch (option) {
       case 'Dissatisfied':
         setPackagePlaceholderText('What went wrong with the package tour? How can we improve?');
@@ -131,9 +131,9 @@ const EventsOpen2 = () => {
     from: { opacity: 0 },
     config: { duration: 1000 },
   });
-  const navigate = useNavigate(); // Initialize useNavigate
+  const navigate = useNavigate(); 
 const handleNextClick = () => {
-  navigate('/'); // Navigate to the next question
+  navigate('/'); 
 };
 
 

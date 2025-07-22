@@ -55,6 +55,8 @@
     "react-spring": "^9.7.4",
     "react-toastify": "^11.0.3",
     "react-transition-group": "^4.4.5",
+    "react-virtualized-auto-sizer": "^1.0.26",
+    "react-window": "^1.8.11",
     "rechart": "^0.0.1",
     "recharts": "^2.15.0",
     "request": "^2.88.2",
